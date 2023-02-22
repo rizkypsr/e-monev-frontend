@@ -2,7 +2,7 @@ import React from "react";
 
 function Dashboard() {
   return (
-    <div>
+    <>
       <h1 className="font-semibold text-2xl mb-8">
         Halo Admin, selamat datang di halaman elektronik aplikasi&nbsp;
         <span className="italic">e-Monev</span>
@@ -64,7 +64,7 @@ function Dashboard() {
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 
