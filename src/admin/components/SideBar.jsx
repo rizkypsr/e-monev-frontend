@@ -10,6 +10,7 @@ import { ReactComponent as TargetLogo } from "../../assets/icons/target.svg";
 import { ReactComponent as NoteLogo } from "../../assets/icons/note.svg";
 import { ReactComponent as LogoutLogo } from "../../assets/icons/logout.svg";
 import Logo from "../../assets/images/logo.png";
+import { Link } from "react-router-dom";
 
 function SideBar() {
   return (
@@ -46,92 +47,92 @@ function SideBar() {
               </div>
             </li>
             <li>
-              <a
-                href="/"
+              <Link
+                to={"/admin"}
                 className="flex items-center p-2 rounded-lg hover:bg-cotton-ball">
                 <DashboardLogo />
                 <span className="ml-3 text-primary font-medium">Dashboard</span>
-              </a>
+              </Link>
             </li>
             <li>
-              <a
-                href="#"
+              <Link
+                to={"akun-saya"}
                 className="flex items-center p-2 rounded-lg hover:bg-cotton-ball">
                 <UserLogo />
                 <span className="flex-1 ml-3 text-dark-gray whitespace-nowrap">
                   Akun Saya
                 </span>
-              </a>
+              </Link>
             </li>
             <li>
-              <a
-                href="#"
+              <Link
+                to={"login-akses-user"}
                 className="flex items-center p-2 rounded-lg hover:bg-cotton-ball">
                 <LockLogo />
                 <span className="flex-1 ml-3 text-dark-gray whitespace-nowrap">
                   Login Akses User
                 </span>
-              </a>
+              </Link>
             </li>
             <li>
-              <a
-                href="#"
+              <Link
+                to={"urusan"}
                 className="flex items-center p-2 rounded-lg hover:bg-cotton-ball">
                 <ChecklistLogo />
                 <span className="flex-1 ml-3 text-dark-gray whitespace-nowrap">
                   Urusan
                 </span>
-              </a>
+              </Link>
             </li>
             <li>
-              <a
-                href="#"
+              <Link
+                to={"organisasi"}
                 className="flex items-center p-2 rounded-lg hover:bg-cotton-ball">
                 <MedalLogo />
                 <span className="flex-1 ml-3 text-dark-gray whitespace-nowrap">
                   Organisasi
                 </span>
-              </a>
+              </Link>
             </li>
             <li>
-              <a
-                href="#"
+              <Link
+                to={"program"}
                 className="flex items-center p-2 rounded-lg hover:bg-cotton-ball">
                 <BookLogo />
                 <span className="flex-1 ml-3 text-dark-gray whitespace-nowrap">
                   Program
                 </span>
-              </a>
+              </Link>
             </li>
             <li>
-              <a
-                href="#"
+              <Link
+                to={"kegiatan"}
                 className="flex items-center p-2 rounded-lg hover:bg-cotton-ball">
                 <StarLogo />
                 <span className="flex-1 ml-3 text-dark-gray whitespace-nowrap">
                   Kegiatan
                 </span>
-              </a>
+              </Link>
             </li>
             <li>
-              <a
-                href="#"
+              <Link
+                to={"sasaran"}
                 className="flex items-center p-2 rounded-lg hover:bg-cotton-ball">
                 <TargetLogo />
                 <span className="flex-1 ml-3 text-dark-gray whitespace-nowrap">
                   Sasaran
                 </span>
-              </a>
+              </Link>
             </li>
             <li>
-              <a
-                href="#"
+              <Link
+                to={"data-laporan"}
                 className="flex items-center p-2 rounded-lg hover:bg-cotton-ball">
                 <NoteLogo />
                 <span className="flex-1 ml-3 text-dark-gray whitespace-nowrap">
                   Data Laporan
                 </span>
-              </a>
+              </Link>
             </li>
           </ul>
           <ul className="pt-4 mt-4 space-y-2 border-t border-gray-200 dark:border-gray-700">
