@@ -10,11 +10,16 @@ import { ReactComponent as TargetLogo } from "../../assets/icons/target.svg";
 import { ReactComponent as NoteLogo } from "../../assets/icons/note.svg";
 import { ReactComponent as LogoutLogo } from "../../assets/icons/logout.svg";
 import Logo from "../../assets/images/logo.png";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 
 function SideBar() {
+  const activeClass =
+    "flex items-center p-2 rounded-lg hover:bg-cotton-ball text-primary";
+  const inActiveClass =
+    "flex items-center p-2 rounded-lg hover:bg-cotton-ball text-dark-gray";
+
   return (
-    <div className="w-1/6 drop-shadow-xl bg-white">
+    <div className="w-1/6 bg-white drop-shadow-xl">
       <aside className="fixed top-0 left-0 z-40 w-full h-screen">
         <div className="h-full px-3 py-4 overflow-y-auto">
           <a
@@ -35,7 +40,7 @@ function SideBar() {
               <div className="flex items-center pl-2.5 mb-5">
                 <img
                   src="https://images.pexels.com/photos/4336061/pexels-photo-4336061.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-                  className="h-9 w-9 rounded-full object-cover mr-4"
+                  className="object-cover mr-4 rounded-full h-9 w-9"
                   alt="Profil"
                 />
                 <div className="flex flex-col">
@@ -47,92 +52,109 @@ function SideBar() {
               </div>
             </li>
             <li>
-              <Link
-                to={"/admin"}
-                className="flex items-center p-2 rounded-lg hover:bg-cotton-ball">
+              <NavLink
+                end
+                to="/admin"
+                className={({ isActive }) =>
+                  isActive ? activeClass : inActiveClass
+                }>
                 <DashboardLogo />
-                <span className="ml-3 text-primary font-medium">Dashboard</span>
-              </Link>
+                <span className="flex-1 ml-3 whitespace-nowrap">Dashboard</span>
+              </NavLink>
             </li>
             <li>
-              <Link
+              <NavLink
                 to={"akun-saya"}
-                className="flex items-center p-2 rounded-lg hover:bg-cotton-ball">
+                className={({ isActive }) =>
+                  isActive ? activeClass : inActiveClass
+                }>
                 <UserLogo />
-                <span className="flex-1 ml-3 text-dark-gray whitespace-nowrap">
-                  Akun Saya
-                </span>
-              </Link>
+                <span className="flex-1 ml-3 whitespace-nowrap">Akun Saya</span>
+              </NavLink>
             </li>
             <li>
-              <Link
+              <NavLink
                 to={"login-akses-user"}
-                className="flex items-center p-2 rounded-lg hover:bg-cotton-ball">
+                className={({ isActive }) =>
+                  isActive ? activeClass : inActiveClass
+                }>
                 <LockLogo />
-                <span className="flex-1 ml-3 text-dark-gray whitespace-nowrap">
+                <span className="flex-1 ml-3 whitespace-nowrap">
                   Login Akses User
                 </span>
-              </Link>
+              </NavLink>
             </li>
             <li>
-              <Link
+              <NavLink
                 to={"urusan"}
-                className="flex items-center p-2 rounded-lg hover:bg-cotton-ball">
+                className={({ isActive }) =>
+                  isActive ? activeClass : inActiveClass
+                }>
                 <ChecklistLogo />
-                <span className="flex-1 ml-3 text-dark-gray whitespace-nowrap">
+                <span className="flex-1 ml-3 whitespace-nowrap">
                   Urusan
                 </span>
-              </Link>
+              </NavLink>
             </li>
             <li>
-              <Link
+              <NavLink
                 to={"organisasi"}
-                className="flex items-center p-2 rounded-lg hover:bg-cotton-ball">
+                className={({ isActive }) =>
+                  isActive ? activeClass : inActiveClass
+                }>
                 <MedalLogo />
-                <span className="flex-1 ml-3 text-dark-gray whitespace-nowrap">
+                <span className="flex-1 ml-3 whitespace-nowrap">
                   Organisasi
                 </span>
-              </Link>
+              </NavLink>
             </li>
             <li>
-              <Link
+              <NavLink
                 to={"program"}
-                className="flex items-center p-2 rounded-lg hover:bg-cotton-ball">
+                className={({ isActive }) =>
+                  isActive ? activeClass : inActiveClass
+                }>
                 <BookLogo />
-                <span className="flex-1 ml-3 text-dark-gray whitespace-nowrap">
+                <span className="flex-1 ml-3 whitespace-nowrap">
                   Program
                 </span>
-              </Link>
+              </NavLink>
             </li>
             <li>
-              <Link
+              <NavLink
                 to={"kegiatan"}
-                className="flex items-center p-2 rounded-lg hover:bg-cotton-ball">
+                className={({ isActive }) =>
+                  isActive ? activeClass : inActiveClass
+                }>
                 <StarLogo />
-                <span className="flex-1 ml-3 text-dark-gray whitespace-nowrap">
+                <span className="flex-1 ml-3 whitespace-nowrap">
                   Kegiatan
                 </span>
-              </Link>
+              </NavLink>
             </li>
             <li>
-              <Link
+              <NavLink
                 to={"sasaran"}
-                className="flex items-center p-2 rounded-lg hover:bg-cotton-ball">
+                className={({ isActive }) =>
+                  isActive ? activeClass : inActiveClass
+                }>
                 <TargetLogo />
-                <span className="flex-1 ml-3 text-dark-gray whitespace-nowrap">
+                <span className="flex-1 ml-3 whitespace-nowrap">
                   Sasaran
                 </span>
-              </Link>
+              </NavLink>
             </li>
             <li>
-              <Link
+              <NavLink
                 to={"data-laporan"}
-                className="flex items-center p-2 rounded-lg hover:bg-cotton-ball">
+                className={({ isActive }) =>
+                  isActive ? activeClass : inActiveClass
+                }>
                 <NoteLogo />
-                <span className="flex-1 ml-3 text-dark-gray whitespace-nowrap">
+                <span className="flex-1 ml-3 whitespace-nowrap">
                   Data Laporan
                 </span>
-              </Link>
+              </NavLink>
             </li>
           </ul>
           <ul className="pt-4 mt-4 space-y-2 border-t border-gray-200 dark:border-gray-700">
