@@ -7,6 +7,8 @@ function TextInput(props) {
     setShowPassword(!showPassword);
   };
 
+  const type = props.type || "text";
+
   return (
     <div className={`relative ${props.className}`}>
       {props.type === "password" && (
@@ -23,10 +25,15 @@ function TextInput(props) {
       )}
       <input
         id={props.id}
-        type={showPassword ? "text" : props.type}
+        type={showPassword ? "text" : type}
         placeholder={props.placeholder}
-        className={`bg-white border border-dark-gray text-gray-900 text-sm rounded-lg focus:ring-0 focus:border-dark-gray block w-full p-2.5 ${
-          props.error && "border-red-600"
+        disabled={props.disabled}
+        className={`${
+          props.disabled
+            ? "bg-[#F2F2F2] border border-[#BDBDBD]"
+            : "bg-white border border-dark-gray"
+        } text-gray-900 text-sm rounded-lg focus:ring-0 focus:border-dark-gray block w-full p-2.5 ${
+          props.error ? "border-red-600" : ""
         }`}
         required={props.required}
       />
