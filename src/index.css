@@ -7,3 +7,29 @@
         font-family: Poppins, system-ui, sans-serif;
     }
 }
+
+@layer components {
+    .solid-shadow-blue {
+        box-shadow: 0px 6px 0px 0px rgba(86, 204, 242, 1);
+    }
+
+    .solid-shadow-purple {
+        box-shadow: 0px 6px 0px 0px rgba(187, 107, 217, 1);
+    }
+
+    .solid-shadow-green {
+        box-shadow: 0px 6px 0px 0px rgba(111, 207, 151, 1);
+    }
+
+    .solid-shadow-yellow {
+        box-shadow: 0px 6px 0px 0px rgba(242, 201, 76, 1);
+    }
+
+    .solid-shadow-orange {
+        box-shadow: 0px 6px 0px 0px rgba(242, 153, 74, 1);
+    }
+
+    .solid-shadow-gray {
+        box-shadow: 0px 6px 0px 0px rgba(189, 189, 189, 1);
+    }
+}
