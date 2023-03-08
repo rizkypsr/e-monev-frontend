@@ -1,20 +1,11 @@
 import React from "react";
 import { Link, NavLink, Outlet } from "react-router-dom";
 import Breadcrumb from "../../components/Breadcrumb";
-import { BookIcon } from "../../components/icons/BookIcon";
-import { CheckIcon } from "../../components/icons/CheckIcon";
-import { DashboardIcon } from "../../components/icons/DashboardIcon";
-import { LockIcon } from "../../components/icons/LockIcon";
-import { MedalIcon } from "../../components/icons/MedalIcon";
-import { ProfileIcon } from "../../components/icons/ProfileIcon";
-import { ReportIcon } from "../../components/icons/ReportIcon";
-import { StarIcon } from "../../components/icons/StarIcon";
-import { TargetIcon } from "../../components/icons/TargetIcon";
 import Sidebar from "../../components/Sidebar";
 
 function AdminRoot() {
   return (
-    <>
+    <div className="h-screen">
       <button
         className="inline-flex items-center p-2 mt-2 ml-3 text-sm md:hidden focus:outline-none"
         type="button">
@@ -32,7 +23,7 @@ function AdminRoot() {
       </button>
 
       <Sidebar />
-      <div className="bg-[#F3F6FF] md:ml-64 h-screen">
+      <div className="bg-[#F3F6FF] md:ml-64 min-h-screen">
         <header className="px-8 py-4 bg-white">
           <Breadcrumb />
         </header>
@@ -40,7 +31,7 @@ function AdminRoot() {
           <Outlet />
         </main>
       </div>
-    </>
+    </div>
   );
 }
 
