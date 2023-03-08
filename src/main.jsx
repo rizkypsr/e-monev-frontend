@@ -14,12 +14,33 @@ import AdminRoot from "./views/Admin/AdminRoot";
 import AkunSaya from "./views/Admin/AkunSaya/AkunSaya";
 import LoginAksesUser from "./views/Admin/LoginAksesUser/LoginAksesUser";
 import Urusan from "./views/Admin/Urusan/Urusan";
-import Organisasi from "./admin/routes/Organisasi";
-import Program from "./admin/routes/Program";
-import Kegiatan from "./admin/routes/Kegiatan";
-import Sasaran from "./admin/routes/Sasaran";
 import Laporan from "./views/Admin/Laporan/Laporan";
 import Dashboard from "./views/Admin/Dashboard/Dashboard";
+import AkunSayaForm from "./views/Admin/AkunSaya/AkunSayaForm";
+import AkunSayaEdit from "./views/Admin/AkunSaya/AkunSayaEdit";
+import LoginAksesTable from "./views/Admin/LoginAksesUser/LoginAksesTable";
+import LoginAksesCreate from "./views/Admin/LoginAksesUser/LoginAksesCreate";
+import UrusanTable from "./views/Admin/Urusan/UrusanTable";
+import UrusanCreate from "./views/Admin/Urusan/UrusanCreate";
+import UrusanEdit from "./views/Admin/Urusan/UrusanEdit";
+import OrganisasiTable from "./views/Admin/Organisasi/OrganisasiTable";
+import OrganisasiCreate from "./views/Admin/Organisasi/OrganisasiCreate";
+import OrganisasiEdit from "./views/Admin/Organisasi/OrganisasiEdit";
+import ProgramTable from "./views/Admin/Program/ProgramTable";
+import ProgramCreate from "./views/Admin/Program/ProgramCreate";
+import ProgramEdit from "./views/Admin/Program/ProgramEdit";
+import Program from "./views/Admin/Program/Program";
+import Kegiatan from "./views/Admin/Kegiatan/Kegiatan";
+import Sasaran from "./views/Admin/Sasaran/Sasaran";
+import Organisasi from "./views/Admin/Organisasi/Organisasi";
+import KegiatanTable from "./views/Admin/Kegiatan/KegiatanTable";
+import KegiatanCreate from "./views/Admin/Kegiatan/KegiatanCreate";
+import KegiatanEdit from "./views/Admin/Kegiatan/KegiatanEdit";
+import SasaranTable from "./views/Admin/Sasaran/SasaranTable";
+import SasaranCreate from "./views/Admin/Sasaran/SasaranCreate";
+import SasaranEdit from "./views/Admin/Sasaran/SasaranEdit";
+import LoginAksesEdit from "./views/Admin/LoginAksesUser/LoginAksesEdit";
+import LoginAksesDetail from "./views/Admin/LoginAksesUser/LoginAksesDetail";
 
 const router = createBrowserRouter(
   createRoutesFromElements([
@@ -76,6 +97,18 @@ const router = createBrowserRouter(
             ),
           }}
           element={<AkunSaya />}
+          children={[
+            <Route
+              index
+              key="akunSayaForm"
+              element={<AkunSayaForm />}
+            />,
+            <Route
+              key="akunSayaFormEdit"
+              path="edit/:id"
+              element={<AkunSayaEdit />}
+            />,
+          ]}
         />,
         <Route
           key="loginAksesUser"
@@ -91,6 +124,28 @@ const router = createBrowserRouter(
             ),
           }}
           element={<LoginAksesUser />}
+          children={[
+            <Route
+              index
+              key="loginAksesTable"
+              element={<LoginAksesTable />}
+            />,
+            <Route
+              key="loginAksesCreate"
+              path="create"
+              element={<LoginAksesCreate />}
+            />,
+            <Route
+              key="loginAksesEdit"
+              path="edit/:id"
+              element={<LoginAksesEdit />}
+            />,
+            <Route
+              key="loginAksesDetail"
+              path="detail/:id"
+              element={<LoginAksesDetail />}
+            />,
+          ]}
         />,
         <Route
           key="urusan"
@@ -106,6 +161,23 @@ const router = createBrowserRouter(
             ),
           }}
           element={<Urusan />}
+          children={[
+            <Route
+              index
+              key="urusan"
+              element={<UrusanTable />}
+            />,
+            <Route
+              key="urusanCreate"
+              path="create"
+              element={<UrusanCreate />}
+            />,
+            <Route
+              key="urusanEdit"
+              path="edit/:id"
+              element={<UrusanEdit />}
+            />,
+          ]}
         />,
         <Route
           key="organisasi"
@@ -121,6 +193,23 @@ const router = createBrowserRouter(
             ),
           }}
           element={<Organisasi />}
+          children={[
+            <Route
+              index
+              key="organisasi"
+              element={<OrganisasiTable />}
+            />,
+            <Route
+              key="organisasiCreate"
+              path="create"
+              element={<OrganisasiCreate />}
+            />,
+            <Route
+              key="organisasiEdit"
+              path="edit/:id"
+              element={<OrganisasiEdit />}
+            />,
+          ]}
         />,
         <Route
           key="program"
@@ -136,6 +225,23 @@ const router = createBrowserRouter(
             ),
           }}
           element={<Program />}
+          children={[
+            <Route
+              index
+              key="program"
+              element={<ProgramTable />}
+            />,
+            <Route
+              key="programCreate"
+              path="create"
+              element={<ProgramCreate />}
+            />,
+            <Route
+              key="programEdit"
+              path="edit/:id"
+              element={<ProgramEdit />}
+            />,
+          ]}
         />,
         <Route
           key="kegiatan"
@@ -151,6 +257,23 @@ const router = createBrowserRouter(
             ),
           }}
           element={<Kegiatan />}
+          children={[
+            <Route
+              index
+              key="kegiatan"
+              element={<KegiatanTable />}
+            />,
+            <Route
+              key="kegiatanCreate"
+              path="create"
+              element={<KegiatanCreate />}
+            />,
+            <Route
+              key="kegiatanEdit"
+              path="edit/:id"
+              element={<KegiatanEdit />}
+            />,
+          ]}
         />,
         <Route
           key="sasaran"
@@ -166,6 +289,23 @@ const router = createBrowserRouter(
             ),
           }}
           element={<Sasaran />}
+          children={[
+            <Route
+              index
+              key="sasaran"
+              element={<SasaranTable />}
+            />,
+            <Route
+              key="sasaranCreate"
+              path="create"
+              element={<SasaranCreate />}
+            />,
+            <Route
+              key="sasaranEdit"
+              path="edit/:id"
+              element={<SasaranEdit />}
+            />,
+          ]}
         />,
         <Route
           key="laporan"
