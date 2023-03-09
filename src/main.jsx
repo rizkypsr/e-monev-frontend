@@ -46,6 +46,7 @@ import ErrorPage from "./views/ErrorPage";
 import UserRoot from "./views/User/UserRoot";
 import { ToastProvider } from "./context/ToastContext";
 import UrusanDetail from "./views/Admin/Urusan/UrusanDetail";
+import App from "./App";
 
 const router = createBrowserRouter(
   createRoutesFromElements([
@@ -349,7 +350,8 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <AuthProvider>
       <ToastProvider>
-        <RouterProvider router={router} />
+        {/* <RouterProvider router={router} /> */}
+        <App />
       </ToastProvider>
     </AuthProvider>
   </React.StrictMode>
