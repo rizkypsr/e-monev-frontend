@@ -14,7 +14,7 @@ function Table({ children, className, table, data, columns }) {
                 <th
                   key={header.id}
                   scope="col"
-                  className="px-6 py-3">
+                  className="px-6 py-3 font-medium text-[#4F4F4F] text-sm leading-5">
                   {header.isPlaceholder
                     ? null
                     : flexRender(
@@ -34,7 +34,7 @@ function Table({ children, className, table, data, columns }) {
               {row.getVisibleCells().map((cell) => (
                 <td
                   key={cell.id}
-                  className="pl-6 py-3">
+                  className="pl-6 pr-3 py-3">
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </td>
               ))}

@@ -41,12 +41,22 @@ import SasaranCreate from "./views/Admin/Sasaran/SasaranCreate";
 import SasaranEdit from "./views/Admin/Sasaran/SasaranEdit";
 import LoginAksesEdit from "./views/Admin/LoginAksesUser/LoginAksesEdit";
 import LoginAksesDetail from "./views/Admin/LoginAksesUser/LoginAksesDetail";
+import { AuthProvider, RequireAuth } from "react-auth-kit";
+import ErrorPage from "./views/ErrorPage";
+import UserRoot from "./views/User/UserRoot";
+import { ToastProvider } from "./context/ToastContext";
+import UrusanDetail from "./views/Admin/Urusan/UrusanDetail";
 
 const router = createBrowserRouter(
   createRoutesFromElements([
     <Route
-      path="/admin/login"
+      path="/login"
       element={<Login />}
+    />,
+    <Route
+      path="/"
+      element={<UserRoot />}
+      errorElement={<ErrorPage />}
     />,
     <Route
       path="/admin"
@@ -63,7 +73,7 @@ const router = createBrowserRouter(
         ),
       }}
       element={
-        <PrivateRoute roles={"admin"}>
+        <PrivateRoute loginPath="/login">
           <AdminRoot />
         </PrivateRoute>
       }
@@ -176,6 +186,11 @@ const router = createBrowserRouter(
               key="urusanEdit"
               path="edit/:id"
               element={<UrusanEdit />}
+            />,
+            <Route
+              key="urusanDetail"
+              path="detail/:id"
+              element={<UrusanDetail />}
             />,
           ]}
         />,
@@ -329,6 +344,10 @@ const router = createBrowserRouter(
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <AuthProvider>
+      <ToastProvider>
+        <RouterProvider router={router} />
+      </ToastProvider>
+    </AuthProvider>
   </React.StrictMode>
 );

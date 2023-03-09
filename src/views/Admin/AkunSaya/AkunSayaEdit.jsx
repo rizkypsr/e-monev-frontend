@@ -1,5 +1,5 @@
 import { ArrowLeftIcon, CheckCircleIcon } from "@heroicons/react/24/solid";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Button from "../../../components/Button";
 import Label from "../../../components/Label";
 import TextInput from "../../../components/TextInput";
@@ -10,8 +10,63 @@ import {
   DialogTrigger,
 } from "../../../components/DialogContent";
 import SuccessImg from "../../../assets/images/success.png";
+import { useState } from "react";
+import { useAuthHeader, useAuthUser, useSignOut } from "react-auth-kit";
+import { useToastContext } from "../../../context/ToastContext";
+import { baseUrl } from "../../../utils/constants";
 
 function AkunSayaEdit() {
+  const [username, setUsername] = useState(null);
+  const [password, setPassword] = useState(null);
+  const [passwordConfirmation, setPasswordConfirmation] = useState(null);
+  const [passwordError, setPasswordError] = useState("");
+  const [error, setError] = useState("");
+
+  const authHeader = useAuthHeader();
+  const authUser = useAuthUser();
+  const navigate = useNavigate();
+  const signOut = useSignOut();
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+
+    if (password !== passwordConfirmation) {
+      setPasswordError("Pastikan Password yang anda masukan sama");
+      return;
+    }
+
+    const requestBody = {
+      user_id: authUser().id,
+    };
+
+    if (username) {
+      requestBody.username = username;
+    }
+
+    if (password) {
+      requestBody.password = password;
+    }
+
+    const res = await fetch(`${baseUrl}/user/update`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: authHeader(),
+      },
+      body: JSON.stringify(requestBody),
+    });
+
+    if (res.ok) {
+      signOut();
+    } else {
+      setError(new Error(result.message));
+      toast.error("Terjadi kesalahan pada server", {
+        position: toast.POSITION.BOTTOM_CENTER,
+        autoClose: 3000,
+      });
+    }
+  }
+
   return (
     <>
       <Link
@@ -22,71 +77,58 @@ function AkunSayaEdit() {
           Ubah akun saya
         </h1>
       </Link>
-      <form className="mt-4">
+      <form
+        className="mt-4"
+        onSubmit={handleSubmit}>
         <div className="mb-6">
-          <Label htmlFor="username">Username</Label>
+          <Label>Username Baru</Label>
           <TextInput
-            id="username"
             className="mt-2 lg:w-2/3 xl:w-1/3"
-            placeholder="Masukan Username"
-            required={true}
+            placeholder="Masukan Username Baru"
+            onChange={(e) => setUsername(e.target.value)}
           />
         </div>
         <div className="mb-6">
-          <Label htmlFor="password">Password</Label>
+          <Label>Password</Label>
           <TextInput
-            id="password"
             className="mt-2 lg:w-2/3 xl:w-1/3"
             type="password"
+            disableIcon={false}
             placeholder="Masukan Password"
-            required={true}
+            onChange={(e) => setPassword(e.target.value)}
+            error={passwordError}
           />
         </div>
-        <Dialog>
-          <DialogContent className="px-28 py-14">
-            <div className="flex flex-col items-center justify-center h-full">
-              <div className="p-10 bg-[#E2F8FF] w-fit rounded-lg">
-                <img src={SuccessImg} />
-              </div>
+        <div className="mb-6">
+          <Label>Ulangi Password</Label>
+          <TextInput
+            className="mt-2 lg:w-2/3 xl:w-1/3"
+            type="password"
+            disableIcon={false}
+            placeholder="Masukan Ulang Password"
+            onChange={(e) => setPasswordConfirmation(e.target.value)}
+            error={passwordError}
+          />
+        </div>
 
-              <div>
-                <h1 className="mt-6 font-semibold text-lg leading-7 text-dark-gray">
-                  Berhasil Disimpan!
-                </h1>
-                <DialogClose>
-                  <Button
-                    className="w-full md:w-28 mt-8"
-                    type="modal"
-                    background="bg-primary"
-                    textColor="text-white"
-                    icon={<ArrowLeftIcon className="w-5 h-5" />}>
-                    Simpan
-                  </Button>
-                </DialogClose>
-              </div>
-            </div>
-          </DialogContent>
-          <div className="flex space-x-3">
-            <DialogTrigger>
-              <Button
-                className="w-full md:w-28"
-                type="modal"
-                background="bg-primary"
-                textColor="text-white"
-                icon={<CheckCircleIcon className="w-5 h-5" />}>
-                Simpan
-              </Button>
-            </DialogTrigger>
-            <Link to="../">
-              <Button
-                className="w-full md:w-28 font-medium"
-                background="bg-[#EAEAEA]"
-                textColor="text-dark-gray">
-                Batal
-              </Button>
-            </Link>
-          </div>
-        </Dialog>
+        <div className="flex space-x-3">
+          <Button
+            className="w-full md:w-28"
+            type="submit"
+            background="bg-primary"
+            textColor="text-white"
+            icon={<CheckCircleIcon className="w-5 h-5" />}>
+            Simpan
+          </Button>
+          <Link to="../">
+            <Button
+              className="w-full md:w-28 font-medium"
+              background="bg-[#EAEAEA]"
+              textColor="text-dark-gray">
+              Batal
+            </Button>
+          </Link>
+        </div>
       </form>
     </>
   );

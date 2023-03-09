@@ -83,6 +83,7 @@ function LoginAksesTable() {
               <DialogTrigger>
                 <Button
                   className="text-sm font-normal"
+                  type="modal"
                   textColor="text-red-500"
                   icon={<TrashIcon className="w-4 h-4" />}>
                   Hapus

@@ -1,32 +1,40 @@
 import { PencilIcon } from "@heroicons/react/24/solid";
-import React from "react";
+import { useEffect, useState } from "react";
+import { useAuthUser } from "react-auth-kit";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 import Button from "../../../components/Button";
 import Label from "../../../components/Label";
 import TextInput from "../../../components/TextInput";
+import { useToastContext } from "../../../context/ToastContext";
 
 function AkunSayaForm() {
+  const auth = useAuthUser();
+  const [username, setUsername] = useState(auth().username);
+  const [password, setPassword] = useState(auth().password);
+
   return (
     <form className="mt-4">
       <div className="mb-6">
         <Label htmlFor="username">Username</Label>
         <TextInput
-          id="username"
           className="mt-2 lg:w-2/3 xl:w-1/3"
           placeholder="Masukan Username"
-          value="admin_dinaskementerian"
-          required={true}
+          value={username}
+          disabled={true}
+          onChange={(e) => setUsername(e.target.value)}
         />
-      </div> 
+      </div>
       <div className="mb-6">
         <Label htmlFor="password">Password</Label>
         <TextInput
-          id="password"
           className="mt-2 lg:w-2/3 xl:w-1/3"
           type="password"
           placeholder="Masukan Password"
-          value="admin_dinaskementerian"
-          required={true}
+          value={password}
+          disabled
+          disableIcon
+          onChange={(e) => setPassword(e.target.value)}
         />
       </div>
       <Link to={`edit/123`}>

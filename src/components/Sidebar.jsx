@@ -17,11 +17,13 @@ import {
   DialogContent,
   DialogTrigger,
 } from "./DialogContent";
-import SuccessImg from "../assets/images/success.png";
 import LogoutImg from "../assets/images/logout.png";
 import Button from "./Button";
+import { useSignOut } from "react-auth-kit";
 
 function Sidebar() {
+  const signOut = useSignOut();
+
   return (
     <aside className="shadow-xl fixed top-0 left-0 z-40 w-64 h-screen transition-transform -translate-x-full md:translate-x-0">
       <div className="h-full overflow-y-auto bg-white flex flex-col">
@@ -184,6 +186,7 @@ function Sidebar() {
                 <div className="flex space-x-3 justify-center">
                   <DialogClose>
                     <Button
+                      onClick={() => signOut()}
                       className="w-full md:w-28 mt-8 border border-[#EB5757]"
                       type="modal"
                       background="bg-white"

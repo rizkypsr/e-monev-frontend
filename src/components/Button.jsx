@@ -22,7 +22,7 @@ function Button({
     </div>
   ) : (
     <button
-      type="button"
+      type={type}
       onClick={onClick}
       className={`font-medium rounded-lg text-sm px-3 min-w-fit py-2.5 ${
         icon ? "flex items-center justify-center space-x-2" : ""
