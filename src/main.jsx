@@ -51,13 +51,13 @@ import App from "./App";
 const router = createBrowserRouter(
   createRoutesFromElements([
     <Route
-      path="/login"
-      element={<Login />}
-    />,
-    <Route
       path="/"
       element={<UserRoot />}
       errorElement={<ErrorPage />}
+    />,
+    <Route
+      path="/login"
+      element={<Login />}
     />,
     <Route
       path="/admin"
