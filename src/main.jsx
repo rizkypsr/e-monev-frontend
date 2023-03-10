@@ -42,18 +42,19 @@ import SasaranEdit from "./views/Admin/Sasaran/SasaranEdit";
 import LoginAksesEdit from "./views/Admin/LoginAksesUser/LoginAksesEdit";
 import LoginAksesDetail from "./views/Admin/LoginAksesUser/LoginAksesDetail";
 import { AuthProvider, RequireAuth } from "react-auth-kit";
-import ErrorPage from "./views/ErrorPage";
+import ErrorPage404 from "./views/ErrorPage404";
 import UserRoot from "./views/User/UserRoot";
 import { ToastProvider } from "./context/ToastContext";
 import UrusanDetail from "./views/Admin/Urusan/UrusanDetail";
 import App from "./App";
+import OrganisasiDetail from "./views/Admin/Organisasi/OrganisasiDetail";
 
 const router = createBrowserRouter(
   createRoutesFromElements([
     <Route
       path="/"
       element={<UserRoot />}
-      errorElement={<ErrorPage />}
+      errorElement={<ErrorPage404 />}
     />,
     <Route
       path="/login"
@@ -224,6 +225,11 @@ const router = createBrowserRouter(
               key="organisasiEdit"
               path="edit/:id"
               element={<OrganisasiEdit />}
+            />,
+            <Route
+              key="organisasiDetail"
+              path="detail/:id"
+              element={<OrganisasiDetail />}
             />,
           ]}
         />,
