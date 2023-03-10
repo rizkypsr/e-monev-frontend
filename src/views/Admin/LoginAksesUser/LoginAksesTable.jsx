@@ -1,19 +1,16 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   createColumnHelper,
   getCoreRowModel,
-  getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { makeData } from "./makeData";
 import Dropdown from "../../../components/Dropdown";
 import Table from "../../../components/Table";
 import Button from "../../../components/Button";
 import {
   EyeIcon,
-  MagnifyingGlassIcon,
   PencilIcon,
   PlusIcon,
   TrashIcon,
@@ -28,13 +25,47 @@ import {
 } from "../../../components/DialogContent";
 import TrashImg from "../../../assets/images/trash.png";
 import DebouncedInput from "../../../components/DebouncedInput";
+import { useAuthHeader } from "react-auth-kit";
+import { baseUrl } from "../../../utils/constants";
 
 function LoginAksesTable() {
   const columnHelper = createColumnHelper();
 
-  const [data, setData] = useState(() => makeData(1000));
+  const [data, setData] = useState([]);
+  const [pageSize, setPageSize] = useState(10);
   const [sorting, setSorting] = useState([]);
-  const [globalFilter, setGlobalFilter] = useState("i");
+  const [globalFilter, setGlobalFilter] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const authHeader = useAuthHeader();
+
+  useEffect(() => {
+    console.log("useEffect");
+    fetchData(0, pageSize);
+  }, [pageSize]);
+
+  async function fetchData(offset, limit) {
+    console.log("fetchData");
+    try {
+      const response = await fetch(
+        `${baseUrl}/user/list?offset=${offset}&limit=${limit}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: authHeader(),
+          },
+        }
+      );
+      console.log(response);
+      const jsonData = await response.json();
+      console.log(jsonData.data.result);
+      setData(jsonData.data.result);
+      setLoading(false);
+    } catch (error) {
+      setError(true);
+      setLoading(false);
+    }
+  }
 
   const columns = [
     columnHelper.accessor("id", {
@@ -45,15 +76,14 @@ function LoginAksesTable() {
       id: "username",
       cell: (info) => <i>{info.getValue()}</i>,
       header: () => <span>Username</span>,
-      footer: (info) => info.column.id,
     }),
-    columnHelper.accessor("nama", {
+    columnHelper.accessor("name", {
       header: () => "Nama OPD",
       cell: (info) => info.renderValue(),
-      footer: (info) => info.column.id,
     }),
-    columnHelper.accessor("level", {
+    columnHelper.accessor("admin_role_id", {
       header: () => <span>Level User</span>,
+      cell: (info) => (info.renderValue() === 1 ? "Super Admin" : "User OPD"),
     }),
     columnHelper.accessor((row) => row.aksi, {
       id: "aksi",
@@ -147,6 +177,7 @@ function LoginAksesTable() {
   });
 
   function onPageSizeChanged({ value, label }) {
+    setPageSize(Number(value));
     table.setPageSize(Number(value));
   }
 
@@ -158,87 +189,85 @@ function LoginAksesTable() {
 
   return (
     <>
-      <AlertDialog.Root>
-        <div className="flex justify-between">
-          <h1 className="text-2xl font-semibold">Login Akses User</h1>
-          <Link to="create">
-            <Button
-              background="bg-primary"
-              textColor={"text-white"}
-              icon={<PlusIcon className="w-4 h-4" />}>
-              Tambah User
-            </Button>
-          </Link>
-        </div>
+      <div className="flex justify-between">
+        <h1 className="text-2xl font-semibold">Login Akses User</h1>
+        <Link to="create">
+          <Button
+            background="bg-primary"
+            textColor={"text-white"}
+            icon={<PlusIcon className="w-4 h-4" />}>
+            Tambah User
+          </Button>
+        </Link>
+      </div>
 
-        <div className="flex justify-between mt-6">
-          <div className="flex space-x-3">
-            {/* Sorting Dropdown */}
-            <div>
-              <Dropdown
-                onSelect={onSorting}
-                defaultValue="A - Z"
-                label="Urutkan:">
-                <Dropdown.Items>
-                  <li
-                    value="asc"
-                    className="block px-4 py-2 font-semibold cursor-pointer hover:bg-gray-100">
-                    A - Z
-                  </li>
-                  <li
-                    value="desc"
-                    className="block px-4 py-2 font-semibold cursor-pointer hover:bg-gray-100">
-                    Z - A
-                  </li>
-                </Dropdown.Items>
-              </Dropdown>
-            </div>
-
-            {/* Page Size Dropdown */}
-            <div>
-              <Dropdown
-                onSelect={onPageSizeChanged}
-                defaultValue="10"
-                label="Tampilkan:"
-                endLabel="Entri">
-                <Dropdown.Items>
-                  <li
-                    value="10"
-                    className="block px-4 py-2 font-semibold cursor-pointer hover:bg-gray-100">
-                    10
-                  </li>
-                  <li
-                    value="50"
-                    className="block px-4 py-2 font-semibold cursor-pointer hover:bg-gray-100">
-                    50
-                  </li>
-                  <li
-                    value="100"
-                    className="block px-4 py-2 font-semibold cursor-pointer hover:bg-gray-100">
-                    100
-                  </li>
-                </Dropdown.Items>
-              </Dropdown>
-            </div>
+      <div className="flex justify-between mt-6">
+        <div className="flex space-x-3">
+          {/* Sorting Dropdown */}
+          <div>
+            <Dropdown
+              onSelect={onSorting}
+              defaultValue="A - Z"
+              label="Urutkan:">
+              <Dropdown.Items>
+                <li
+                  value="asc"
+                  className="block px-4 py-2 font-semibold cursor-pointer hover:bg-gray-100">
+                  A - Z
+                </li>
+                <li
+                  value="desc"
+                  className="block px-4 py-2 font-semibold cursor-pointer hover:bg-gray-100">
+                  Z - A
+                </li>
+              </Dropdown.Items>
+            </Dropdown>
           </div>
 
-          <div className="relative w-1/3">
-            <DebouncedInput
-              initialValue={globalFilter ?? ""}
-              onChange={(value) => setGlobalFilter(String(value))}
-            />
+          {/* Page Size Dropdown */}
+          <div>
+            <Dropdown
+              onSelect={onPageSizeChanged}
+              defaultValue="10"
+              label="Tampilkan:"
+              endLabel="Entri">
+              <Dropdown.Items>
+                <li
+                  value="10"
+                  className="block px-4 py-2 font-semibold cursor-pointer hover:bg-gray-100">
+                  10
+                </li>
+                <li
+                  value="50"
+                  className="block px-4 py-2 font-semibold cursor-pointer hover:bg-gray-100">
+                  50
+                </li>
+                <li
+                  value="100"
+                  className="block px-4 py-2 font-semibold cursor-pointer hover:bg-gray-100">
+                  100
+                </li>
+              </Dropdown.Items>
+            </Dropdown>
           </div>
         </div>
 
-        <div className="w-full h-full mt-6 bg-white rounded-lg">
-          <Table
-            className="mt-6"
-            table={table}
-            columns={columns}
-            data={data}
+        <div className="relative w-1/3">
+          <DebouncedInput
+            initialValue={globalFilter ?? ""}
+            onChange={(value) => setGlobalFilter(String(value))}
           />
         </div>
-      </AlertDialog.Root>
+      </div>
+
+      <div className="w-full h-full mt-6 bg-white rounded-lg">
+        <Table
+          className="mt-6"
+          table={table}
+          columns={columns}
+          data={data}
+        />
+      </div>
     </>
   );
 }
