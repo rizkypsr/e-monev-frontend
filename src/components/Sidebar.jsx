@@ -19,10 +19,11 @@ import {
 } from "./DialogContent";
 import LogoutImg from "../assets/images/logout.png";
 import Button from "./Button";
-import { useSignOut } from "react-auth-kit";
+import { useAuthUser, useSignOut } from "react-auth-kit";
 
 function Sidebar() {
   const signOut = useSignOut();
+  const authUser = useAuthUser();
 
   return (
     <aside className="shadow-xl fixed top-0 left-0 z-40 w-64 h-screen transition-transform -translate-x-full md:translate-x-0">
@@ -47,8 +48,10 @@ function Sidebar() {
             alt="Profil"
           />
           <div className="flex flex-col">
-            <span className="font-semibold whitespace-nowrap">Super Admin</span>
-            <span className="text-xs">Nama OPD</span>
+            <span className="font-semibold whitespace-nowrap">
+              {authUser().admin_role_id === 1 ? "Super Admin" : "User OPD"}
+            </span>
+            <span className="text-xs">{authUser().name}</span>
           </div>
         </div>
         <ul className="space-y-2 px-3 font-medium leading-5">
