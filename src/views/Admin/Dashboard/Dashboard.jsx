@@ -1,4 +1,42 @@
+import { useEffect, useState } from "react";
+import { useAuthHeader } from "react-auth-kit";
+import CountUp from "react-countup";
+import { baseUrl } from "../../../utils/constants";
+
 function Dashboard() {
+  const [counts, setCounts] = useState({
+    userCount: 0,
+    urusanCount: 0,
+  });
+
+  const authHeader = useAuthHeader();
+
+  useEffect(() => {
+    Promise.all([
+      fetch(`${baseUrl}/user/list`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: authHeader(),
+        },
+      }).then((response) => response.json()),
+      fetch(`${baseUrl}/occassion/list`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: authHeader(),
+        },
+      }).then((response) => response.json()),
+    ])
+      .then(([userCount, urusanCount]) => {
+        setCounts({
+          userCount: userCount.data.total,
+          urusanCount: urusanCount.data.total,
+        });
+      })
+      .catch((error) => console.error(error));
+  }, []);
+
   return (
     <>
       <h1 className="font-semibold text-2xl mb-8">
@@ -12,7 +50,12 @@ function Dashboard() {
             className="w-12 h-12 rounded-lg"
             style={{ background: "#56CCF2" }}></div>
           <div>
-            <h2 className="font-semibold text-lg">28</h2>
+            <h2 className="font-semibold text-lg">
+              <CountUp
+                end={counts.urusanCount}
+                duration={0.7}
+              />
+            </h2>
             <h3 className="text-sm">URUSAN</h3>
           </div>
         </div>
@@ -21,7 +64,12 @@ function Dashboard() {
             className="w-12 h-12 rounded-lg"
             style={{ background: "#BB6BD9" }}></div>
           <div>
-            <h2 className="font-semibold text-lg">28</h2>
+            <h2 className="font-semibold text-lg">
+              <CountUp
+                end={51}
+                duration={0.7}
+              />
+            </h2>
             <h3 className="text-sm">ORGANISASI</h3>
           </div>
         </div>
@@ -30,7 +78,12 @@ function Dashboard() {
             className="w-12 h-12 rounded-lg"
             style={{ background: "#6FCF97" }}></div>
           <div>
-            <h2 className="font-semibold text-lg">28</h2>
+            <h2 className="font-semibold text-lg">
+              <CountUp
+                end={90}
+                duration={0.7}
+              />
+            </h2>
             <h3 className="text-sm">PROGRAM</h3>
           </div>
         </div>
@@ -39,7 +92,12 @@ function Dashboard() {
             className="w-12 h-12 rounded-lg"
             style={{ background: "#F2C94C" }}></div>
           <div>
-            <h2 className="font-semibold text-lg">28</h2>
+            <h2 className="font-semibold text-lg">
+              <CountUp
+                end={102}
+                duration={0.7}
+              />
+            </h2>
             <h3 className="text-sm">KEGIATAN</h3>
           </div>
         </div>
@@ -48,7 +106,12 @@ function Dashboard() {
             className="w-12 h-12 rounded-lg"
             style={{ background: "#F2C94C" }}></div>
           <div>
-            <h2 className="font-semibold text-lg">28</h2>
+            <h2 className="font-semibold text-lg">
+              <CountUp
+                end={33}
+                duration={0.7}
+              />
+            </h2>
             <h3 className="text-sm">SASARAN</h3>
           </div>
         </div>
@@ -57,7 +120,12 @@ function Dashboard() {
             className="w-12 h-12 rounded-lg"
             style={{ background: "#BDBDBD" }}></div>
           <div>
-            <h2 className="font-semibold text-lg">28</h2>
+            <h2 className="font-semibold text-lg">
+              <CountUp
+                end={counts.userCount}
+                duration={0.7}
+              />
+            </h2>
             <h3 className="text-sm">LOGIN AKSES USER</h3>
           </div>
         </div>
