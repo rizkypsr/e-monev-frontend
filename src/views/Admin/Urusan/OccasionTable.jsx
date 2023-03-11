@@ -12,8 +12,8 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import React, { useCallback, useEffect, useState } from "react";
-import { useAuthHeader, useAuthUser } from "react-auth-kit";
+import React, { useEffect, useState } from "react";
+import { useAuthHeader } from "react-auth-kit";
 import { Link } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import Button from "../../../components/Button";
@@ -27,12 +27,12 @@ import Dropdown from "../../../components/Dropdown";
 import Table from "../../../components/Table";
 import { useToastContext } from "../../../context/ToastContext";
 import TrashImg from "../../../assets/images/trash.png";
-import { baseUrl } from "../../../utils/constants";
+import { deleteOccasion, getOccasions } from "../../../api/admin/occasion";
 
-function UrusanTable() {
+function OccasionTable() {
   const authHeader = useAuthHeader();
 
-  const [data, setData] = useState([]);
+  const [occasions, setOccasions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [pageSize, setPageSize] = useState(10);
@@ -51,57 +51,32 @@ function UrusanTable() {
   }, [showToast, toastMessage, hideToastMessage]);
 
   useEffect(() => {
-    fetchData(0, pageSize);
+    fetchOccasions(0, pageSize);
   }, [pageSize]);
 
-  async function fetchData(offset, limit) {
+  async function fetchOccasions(offset, limit) {
     try {
-      const response = await fetch(
-        `${baseUrl}/occassion/list?offset=${offset}&limit=${limit}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: authHeader(),
-          },
-        }
-      );
-      const jsonData = await response.json();
-      setData(jsonData.data.result);
-      setLoading(false);
+      const occasionsData = await getOccasions(authHeader, offset, limit);
+      setOccasions(occasionsData);
     } catch (error) {
-      setError(true);
-      setLoading(false);
+      console.error(error);
+      setError(error);
     }
   }
 
-  async function deleteUrusan(id) {
+  async function deleteOccasionData(id) {
     try {
-      const response = await fetch(`${baseUrl}/occassion/delete`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: authHeader(),
-        },
-        body: JSON.stringify({ occassion_id: id }),
+      const deleteResponse = await deleteOccasion(authHeader, id);
+      fetchOccasions(0, pageSize);
+
+      toast.success(deleteResponse, {
+        onClose: hideToastMessage,
+        position: toast.POSITION.BOTTOM_CENTER,
+        autoClose: 3000,
       });
-      const jsonData = await response.json();
-      if (response.ok) {
-        toast.success("Urusan berhasil dihapus!", {
-          onClose: hideToastMessage,
-          position: toast.POSITION.BOTTOM_CENTER,
-          autoClose: 3000,
-        });
-        fetchData(0, pageSize);
-      } else {
-        setError(new Error(jsonData.message));
-        toast.error("Terjadi kesalahan pada server", {
-          position: toast.POSITION.BOTTOM_CENTER,
-          autoClose: 3000,
-        });
-      }
     } catch (error) {
       setError(error);
-      toast.error("Terjadi kesalahan pada server", {
+      toast.error(error.message, {
         position: toast.POSITION.BOTTOM_CENTER,
         autoClose: 3000,
       });
@@ -171,7 +146,7 @@ function UrusanTable() {
                     <div className="flex space-x-3 justify-center">
                       <DialogClose>
                         <Button
-                          onClick={() => deleteUrusan(rowId)}
+                          onClick={() => deleteOccasionData(rowId)}
                           className="w-full md:w-28 mt-8 border border-[#EB5757]"
                           type="modal"
                           background="bg-white"
@@ -201,7 +176,7 @@ function UrusanTable() {
   ];
 
   const table = useReactTable({
-    data,
+    data: occasions,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -212,14 +187,6 @@ function UrusanTable() {
     onSortingChange: setSorting,
     debugTable: true,
   });
-
-  // if (loading) {
-  //   return <p>Loading data...</p>;
-  // }
-
-  if (error) {
-    return <p>Failed to fetch data.</p>;
-  }
 
   function onPageSizeChanged({ value, label }) {
     setPageSize(Number(value));
@@ -315,7 +282,7 @@ function UrusanTable() {
           className="mt-6"
           table={table}
           columns={columns}
-          data={data}
+          data={occasions}
         />
       </div>
 
@@ -324,4 +291,4 @@ function UrusanTable() {
   );
 }
 
-export default UrusanTable;
+export default OccasionTable;
