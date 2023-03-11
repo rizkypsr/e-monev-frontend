@@ -1,40 +1,29 @@
 import { useEffect, useState } from "react";
 import { useAuthHeader } from "react-auth-kit";
 import CountUp from "react-countup";
-import { baseUrl } from "../../../utils/constants";
+import { getCounts } from "../../../api/admin/dashboard";
 
 function Dashboard() {
   const [counts, setCounts] = useState({
     userCount: 0,
-    urusanCount: 0,
+    occasionCount: 0,
   });
+  const [error, setError] = useState(null);
 
   const authHeader = useAuthHeader();
 
   useEffect(() => {
-    Promise.all([
-      fetch(`${baseUrl}/user/list`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          authorization: authHeader(),
-        },
-      }).then((response) => response.json()),
-      fetch(`${baseUrl}/occassion/list`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          authorization: authHeader(),
-        },
-      }).then((response) => response.json()),
-    ])
-      .then(([userCount, urusanCount]) => {
-        setCounts({
-          userCount: userCount.data.total,
-          urusanCount: urusanCount.data.total,
-        });
-      })
-      .catch((error) => console.error(error));
+    async function fetchCounts() {
+      try {
+        const countsData = await getCounts(authHeader);
+        setCounts(countsData);
+      } catch (error) {
+        console.error(error);
+        setError(error);
+      }
+    }
+
+    fetchCounts();
   }, []);
 
   return (
@@ -52,7 +41,7 @@ function Dashboard() {
           <div>
             <h2 className="font-semibold text-lg">
               <CountUp
-                end={counts.urusanCount}
+                end={counts.occasionCount}
                 duration={0.7}
               />
             </h2>
