@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, NavLink, Outlet } from "react-router-dom";
 import Breadcrumb from "../../components/Breadcrumb";
-import Sidebar from "../../components/Sidebar";
+import Sidebar from "../../layouts/Sidebar";
 
 function AdminRoot() {
   return (
