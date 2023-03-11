@@ -1,9 +1,9 @@
 import React from "react";
 import { Link, NavLink, Outlet } from "react-router-dom";
-import Breadcrumb from "../../components/Breadcrumb";
-import Sidebar from "../../layouts/Sidebar";
+import Breadcrumb from "../components/Breadcrumb";
+import Sidebar from "./Sidebar";
 
-function AdminRoot() {
+function AdminLayout() {
   return (
     <div className="h-screen">
       <button
@@ -35,4 +35,4 @@ function AdminRoot() {
   );
 }
 
-export default AdminRoot;
+export default AdminLayout;

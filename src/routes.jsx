@@ -1,7 +1,7 @@
 import React from "react";
 import { RequireAuth } from "react-auth-kit";
 import { BrowserRouter, Link, Route, Routes } from "react-router-dom";
-import AdminRoot from "./views/Admin/AdminRoot";
+import AdminLayout from "./layouts/AdminRoot";
 import Dashboard from "./views/Admin/Dashboard/Dashboard";
 import Login from "./views/Auth/Login";
 import PrivateRoute from "./views/PrivateRoute";
@@ -28,7 +28,7 @@ function RoutesComponent() {
               </Link>
             ),
           }}
-          element={<PrivateRoute Component={AdminRoot} />}
+          element={<PrivateRoute Component={AdminLayout} />}
           children={[
             <Route
               index

@@ -10,7 +10,7 @@ import {
 import "./index.css";
 import Login from "./views/Auth/Login";
 import PrivateRoute from "./views/PrivateRoute";
-import AdminRoot from "./views/Admin/AdminRoot";
+import AdminLayout from "./layouts/AdminRoot";
 import AkunSaya from "./views/Admin/AkunSaya/AkunSaya";
 import LoginAksesUser from "./views/Admin/LoginAksesUser/LoginAksesUser";
 import Urusan from "./views/Admin/Urusan/Urusan";
@@ -76,7 +76,7 @@ const router = createBrowserRouter(
       }}
       element={
         <PrivateRoute loginPath="/login">
-          <AdminRoot />
+          <AdminLayout />
         </PrivateRoute>
       }
       children={[
