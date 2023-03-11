@@ -20,7 +20,7 @@ import AkunSayaForm from "./views/Admin/AkunSaya/AkunSayaForm";
 import AkunSayaEdit from "./views/Admin/AkunSaya/AkunSayaEdit";
 import LoginAksesTable from "./views/Admin/LoginAksesUser/LoginAksesTable";
 import LoginAksesCreate from "./views/Admin/LoginAksesUser/LoginAksesCreate";
-import UrusanTable from "./views/Admin/Urusan/UrusanTable";
+import OccasionTable from "./views/Admin/Urusan/OccasionTable";
 import UrusanCreate from "./views/Admin/Urusan/UrusanCreate";
 import UrusanEdit from "./views/Admin/Urusan/UrusanEdit";
 import OrganisasiTable from "./views/Admin/Organisasi/OrganisasiTable";
@@ -177,7 +177,7 @@ const router = createBrowserRouter(
             <Route
               index
               key="urusan"
-              element={<UrusanTable />}
+              element={<OccasionTable />}
             />,
             <Route
               key="urusanCreate"

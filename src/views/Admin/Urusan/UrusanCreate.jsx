@@ -9,44 +9,29 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useToastContext } from "../../../context/ToastContext";
 import { baseUrl } from "../../../utils/constants";
+import { createOccasion } from "../../../api/admin/occasion";
 
 function UrusanCreate() {
-  const [kode, setKode] = useState("");
-  const [urusan, setUrusan] = useState("");
+  const [code, setCode] = useState("");
+  const [occasion, setOccasion] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const authHeader = useAuthHeader();
   const navigate = useNavigate();
   const { showToastMessage } = useToastContext();
 
-  async function handleSubmit(e) {
+  async function onSubmit(e) {
     e.preventDefault();
-    setLoading(true);
+
     setError(null);
 
     try {
-      const response = await fetch(`${baseUrl}/occassion/create`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: authHeader(),
-        },
-        body: JSON.stringify({ code: kode, title: urusan }),
-      });
-      const result = await response.json();
-      setLoading(false);
-      if (response.ok) {
-        showToastMessage("Urusan berhasil ditambahkan!");
-        navigate("../");
-      } else {
-        setError(new Error(result.message));
-        toast.error("Terjadi kesalahan pada server", {
-          position: toast.POSITION.BOTTOM_CENTER,
-          autoClose: 3000,
-        });
-      }
+      const occasionBody = { code, title: occasion };
+      await createOccasion(authHeader, occasionBody);
+
+      showToastMessage("Urusan berhasil ditambahkan!");
+      navigate("../");
     } catch (error) {
-      setLoading(false);
       setError(error);
       toast.error("Terjadi kesalahan pada server", {
         position: toast.POSITION.BOTTOM_CENTER,
@@ -73,15 +58,15 @@ function UrusanCreate() {
 
         <form
           className="mt-4"
-          onSubmit={handleSubmit}>
+          onSubmit={onSubmit}>
           <div className="mb-6">
             <Label>Kode</Label>
             <TextInput
               className="mt-2 lg:w-2/3 xl:w-1/3"
               name="code"
-              value={kode}
+              value={code}
               placeholder="Masukkan Kode Urusan"
-              onChange={(e) => setKode(e.target.value)}
+              onChange={(e) => setCode(e.target.value)}
               required={true}
             />
           </div>
@@ -90,9 +75,9 @@ function UrusanCreate() {
             <TextInput
               className="mt-2 lg:w-2/3 xl:w-1/3"
               name="title"
-              value={urusan}
+              value={occasion}
               placeholder="Masukkan Urusan"
-              onChange={(e) => setUrusan(e.target.value)}
+              onChange={(e) => setOccasion(e.target.value)}
             />
           </div>
           <div className="flex space-x-3">
