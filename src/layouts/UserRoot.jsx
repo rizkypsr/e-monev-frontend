@@ -1,7 +1,7 @@
 import React from "react";
 
-function UserRoot() {
+function UserLayout() {
   return <div>UserRoot</div>;
 }
 
-export default UserRoot;
+export default UserLayout;

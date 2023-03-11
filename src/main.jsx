@@ -43,7 +43,7 @@ import LoginAksesEdit from "./views/Admin/LoginAksesUser/LoginAksesEdit";
 import LoginAksesDetail from "./views/Admin/LoginAksesUser/LoginAksesDetail";
 import { AuthProvider, RequireAuth } from "react-auth-kit";
 import ErrorPage404 from "./views/ErrorPage404";
-import UserRoot from "./views/User/UserRoot";
+import UserLayout from "./layouts/UserRoot";
 import { ToastProvider } from "./context/ToastContext";
 import UrusanDetail from "./views/Admin/Urusan/UrusanDetail";
 import App from "./App";
@@ -53,7 +53,7 @@ const router = createBrowserRouter(
   createRoutesFromElements([
     <Route
       path="/"
-      element={<UserRoot />}
+      element={<UserLayout />}
       errorElement={<ErrorPage404 />}
     />,
     <Route
