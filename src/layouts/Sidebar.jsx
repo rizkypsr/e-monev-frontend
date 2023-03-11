@@ -1,24 +1,24 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { BookIcon } from "./icons/BookIcon";
-import { CheckIcon } from "./icons/CheckIcon";
-import { DashboardIcon } from "./icons/DashboardIcon";
-import { LockIcon } from "./icons/LockIcon";
-import { MedalIcon } from "./icons/MedalIcon";
-import { ProfileIcon } from "./icons/ProfileIcon";
-import { ReportIcon } from "./icons/ReportIcon";
-import { StarIcon } from "./icons/StarIcon";
-import { TargetIcon } from "./icons/TargetIcon";
+import { BookIcon } from "../components/icons/BookIcon";
+import { CheckIcon } from "../components/icons/CheckIcon";
+import { DashboardIcon } from "../components/icons/DashboardIcon";
+import { LockIcon } from "../components/icons/LockIcon";
+import { MedalIcon } from "../components/icons/MedalIcon";
+import { ProfileIcon } from "../components/icons/ProfileIcon";
+import { ReportIcon } from "../components/icons/ReportIcon";
+import { StarIcon } from "../components/icons/StarIcon";
+import { TargetIcon } from "../components/icons/TargetIcon";
 import Logo from "../assets/images/big_logo.png";
-import { LogoutIcon } from "./icons/LogoutIcon";
+import { LogoutIcon } from "../components/icons/LogoutIcon";
 import {
   Dialog,
   DialogClose,
   DialogContent,
   DialogTrigger,
-} from "./DialogContent";
+} from "../components/DialogContent";
 import LogoutImg from "../assets/images/logout.png";
-import Button from "./Button";
+import Button from "../components/Button";
 import { useAuthUser, useSignOut } from "react-auth-kit";
 
 function Sidebar() {
