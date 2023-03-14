@@ -13,7 +13,7 @@ import PrivateRoute from "./views/PrivateRoute";
 import AdminLayout from "./layouts/AdminRoot";
 import AkunSaya from "./views/Admin/AkunSaya/AkunSaya";
 import LoginAksesUser from "./views/Admin/LoginAksesUser/LoginAksesUser";
-import Urusan from "./views/Admin/Urusan/Urusan";
+import Occasion from "./views/Admin/Urusan/Occasion";
 import Laporan from "./views/Admin/Laporan/Laporan";
 import Dashboard from "./views/Admin/Dashboard/Dashboard";
 import AkunSayaForm from "./views/Admin/AkunSaya/AkunSayaForm";
@@ -21,8 +21,8 @@ import AkunSayaEdit from "./views/Admin/AkunSaya/AkunSayaEdit";
 import LoginAksesTable from "./views/Admin/LoginAksesUser/LoginAksesTable";
 import LoginAksesCreate from "./views/Admin/LoginAksesUser/LoginAksesCreate";
 import OccasionTable from "./views/Admin/Urusan/OccasionTable";
-import UrusanCreate from "./views/Admin/Urusan/UrusanCreate";
-import UrusanEdit from "./views/Admin/Urusan/UrusanEdit";
+import OccasionCreate from "./views/Admin/Urusan/OccasionCreate";
+import OccasionEdit from "./views/Admin/Urusan/OccasionEdit";
 import OrganisasiTable from "./views/Admin/Organisasi/OrganisasiTable";
 import OrganisasiCreate from "./views/Admin/Organisasi/OrganisasiCreate";
 import OrganisasiEdit from "./views/Admin/Organisasi/OrganisasiEdit";
@@ -44,10 +44,9 @@ import LoginAksesDetail from "./views/Admin/LoginAksesUser/LoginAksesDetail";
 import { AuthProvider, RequireAuth } from "react-auth-kit";
 import ErrorPage404 from "./views/ErrorPage404";
 import UserLayout from "./layouts/UserRoot";
-import { ToastProvider } from "./context/ToastContext";
-import UrusanDetail from "./views/Admin/Urusan/UrusanDetail";
-import App from "./App";
+import OccasionDetail from "./views/Admin/Urusan/OccasionDetail";
 import OrganisasiDetail from "./views/Admin/Organisasi/OrganisasiDetail";
+import ToastProvider from "./context/ToastContext";
 
 const router = createBrowserRouter(
   createRoutesFromElements([
@@ -172,7 +171,7 @@ const router = createBrowserRouter(
               </span>
             ),
           }}
-          element={<Urusan />}
+          element={<Occasion />}
           children={[
             <Route
               index
@@ -182,17 +181,17 @@ const router = createBrowserRouter(
             <Route
               key="urusanCreate"
               path="create"
-              element={<UrusanCreate />}
+              element={<OccasionCreate />}
             />,
             <Route
               key="urusanEdit"
               path="edit/:id"
-              element={<UrusanEdit />}
+              element={<OccasionEdit />}
             />,
             <Route
               key="urusanDetail"
               path="detail/:id"
-              element={<UrusanDetail />}
+              element={<OccasionDetail />}
             />,
           ]}
         />,

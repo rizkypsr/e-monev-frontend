@@ -15,7 +15,6 @@ import {
 import React, { useEffect, useState } from "react";
 import { useAuthHeader } from "react-auth-kit";
 import { Link } from "react-router-dom";
-import { toast, ToastContainer } from "react-toastify";
 import Button from "../../../components/Button";
 import {
   Dialog,
@@ -28,6 +27,8 @@ import Table from "../../../components/Table";
 import { useToastContext } from "../../../context/ToastContext";
 import TrashImg from "../../../assets/images/trash.png";
 import { deleteOccasion, getOccasions } from "../../../api/admin/occasion";
+import showToast from "../../../utils/showToast";
+import showToastMessage from "../../../utils/showToast";
 
 function OccasionTable() {
   const authHeader = useAuthHeader();
@@ -38,17 +39,7 @@ function OccasionTable() {
   const [pageSize, setPageSize] = useState(10);
   const [sorting, setSorting] = useState([]);
 
-  const { showToast, toastMessage, hideToastMessage } = useToastContext();
-
-  useEffect(() => {
-    if (showToast) {
-      toast.success(toastMessage, {
-        onClose: hideToastMessage,
-        position: toast.POSITION.BOTTOM_CENTER,
-        autoClose: 3000,
-      });
-    }
-  }, [showToast, toastMessage, hideToastMessage]);
+  const { hideToastMessage } = useToastContext();
 
   useEffect(() => {
     fetchOccasions(0, pageSize);
@@ -61,6 +52,7 @@ function OccasionTable() {
     } catch (error) {
       console.error(error);
       setError(error);
+      showToast("error", error.message, hideToastMessage);
     }
   }
 
@@ -69,17 +61,10 @@ function OccasionTable() {
       const deleteResponse = await deleteOccasion(authHeader, id);
       fetchOccasions(0, pageSize);
 
-      toast.success(deleteResponse, {
-        onClose: hideToastMessage,
-        position: toast.POSITION.BOTTOM_CENTER,
-        autoClose: 3000,
-      });
+      showToastMessage("success", deleteResponse, hideToastMessage);
     } catch (error) {
       setError(error);
-      toast.error(error.message, {
-        position: toast.POSITION.BOTTOM_CENTER,
-        autoClose: 3000,
-      });
+      showToastMessage("error", error.message, hideToastMessage);
     }
   }
 
@@ -285,8 +270,6 @@ function OccasionTable() {
           data={occasions}
         />
       </div>
-
-      <ToastContainer />
     </>
   );
 }
