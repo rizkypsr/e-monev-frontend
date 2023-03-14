@@ -1,9 +1,9 @@
 import { baseUrl } from "../../../utils/constants";
 
-export default async function getOccasions(authHeader, offset = 0, limit = 10) {
+export default async function getOccasionDetail(authHeader, occasionId) {
   try {
     const occasionResponse = await fetch(
-      `${baseUrl}/occassion/list?offset=${offset}&limit=${limit}`,
+      `${baseUrl}/occassion/detail/${occasionId}`,
       {
         method: "GET",
         headers: {
