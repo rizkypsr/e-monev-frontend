@@ -5,29 +5,31 @@ import {
   PlusIcon,
   TrashIcon,
 } from "@heroicons/react/24/solid";
-import {
-  createColumnHelper,
-  getCoreRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
+import { createColumnHelper } from "@tanstack/react-table";
 import React, { useEffect, useState } from "react";
 import { useAuthHeader } from "react-auth-kit";
 import { Link } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
+import { getOrganizations } from "../../../api/admin/organization";
 import Button from "../../../components/Button";
 import Dropdown from "../../../components/Dropdown";
+import Pagination from "../../../components/Pagination";
 import Table from "../../../components/Table";
 import { useToastContext } from "../../../context/ToastContext";
-import { baseUrl } from "../../../utils/constants";
 
 function OrganizationTable() {
-  const [data, setData] = useState([]);
+  const [search, setSearch] = useState("");
   const [sorting, setSorting] = useState([]);
   const [pageSize, setPageSize] = useState(10);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [pageData, setCurrentPageData] = useState({
+    rowData: [],
+    isLoading: false,
+    totalPages: 0,
+    totalData: 0,
+  });
+  const [currentPage, setCurrentPage] = useState(1);
+  const [resetPage, setResetPage] = useState(false);
 
   const authHeader = useAuthHeader();
   const { showToast, toastMessage, hideToastMessage } = useToastContext();
@@ -43,26 +45,46 @@ function OrganizationTable() {
   }, [showToast, toastMessage, hideToastMessage]);
 
   useEffect(() => {
-    fetchData(0, pageSize);
-  }, [pageSize]);
+    setCurrentPageData((prevState) => ({
+      ...prevState,
+      rowData: [],
+      isLoading: true,
+    }));
 
-  async function fetchData(offset, limit) {
+    fetchOrganizations(0, pageSize, currentPage);
+  }, [currentPage, pageSize]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+    setResetPage((prevState) => !prevState);
+    setCurrentPageData((prevState) => ({
+      ...prevState,
+      rowData: [],
+      isLoading: true,
+    }));
+
+    fetchOrganizations(0, pageSize, currentPage);
+  }, [search]);
+
+  async function fetchOrganizations(offset, limit, pageNumber) {
     try {
-      const response = await fetch(
-        `${baseUrl}/org/list?offset=${offset}&limit=${limit}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: authHeader(),
-          },
-        }
+      const organizationData = await getOrganizations(
+        authHeader,
+        offset,
+        limit,
+        pageNumber,
+        search
       );
-      const jsonData = await response.json();
-      setData(jsonData.data.result);
-      setLoading(false);
+      setCurrentPageData({
+        rowData: organizationData.result,
+        isLoading: false,
+        totalPages: organizationData.pages,
+        totalData: organizationData.total,
+      });
     } catch (error) {
-      setError(true);
-      setLoading(false);
+      console.error(error);
+      setError(error);
+      showToast("error", error.message, hideToastMessage);
     }
   }
 
@@ -118,28 +140,17 @@ function OrganizationTable() {
     }),
   ];
 
-  const table = useReactTable({
-    data,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    state: {
-      sorting,
-    },
-    onSortingChange: setSorting,
-    debugTable: true,
-  });
-
-  function onPageSizeChanged({ value, label }) {
-    table.setPageSize(Number(value));
+  async function onPageSizeChanged({ value, label }) {
+    setCurrentPage(1);
+    setResetPage((prevState) => !prevState);
+    setPageSize(Number(value));
   }
 
-  function onSorting({ value, label }) {
-    table
-      .getHeaderGroups()[0]
-      .headers[0].column.toggleSorting(value === "desc");
-  }
+  // function onSorting({ value, label }) {
+  //   table
+  //     .getHeaderGroups()[0]
+  //     .headers[0].column.toggleSorting(value === "desc");
+  // }
 
   return (
     <>
@@ -158,7 +169,7 @@ function OrganizationTable() {
       <div className="flex justify-between mt-6">
         <div className="flex space-x-3">
           {/* Sorting Dropdown */}
-          <div>
+          {/* <div>
             <Dropdown
               onSelect={onSorting}
               defaultValue="A - Z"
@@ -176,7 +187,7 @@ function OrganizationTable() {
                 </li>
               </Dropdown.Items>
             </Dropdown>
-          </div>
+          </div> */}
 
           {/* Page Size Dropdown */}
           <div>
@@ -212,7 +223,8 @@ function OrganizationTable() {
           </div>
           <input
             type="search"
-            id="search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
             className="bg-gray-50 text-light-gray border-none text-sm rounded-lg focus:ring-0 block w-full pl-10 p-2.5 shadow"
             placeholder="Pencarian"
           />
@@ -221,10 +233,16 @@ function OrganizationTable() {
 
       <div className="w-full h-full mt-6 bg-white rounded-lg">
         <Table
-          className="mt-6"
-          table={table}
           columns={columns}
-          data={data}
+          data={pageData.rowData}
+          isLoading={pageData.isLoading}
+        />
+
+        <Pagination
+          totalRows={pageData.totalData}
+          pageChangeHandler={setCurrentPage}
+          rowsPerPage={pageSize}
+          resetPage={resetPage}
         />
       </div>
       <ToastContainer />

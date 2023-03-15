@@ -9,12 +9,16 @@ import { toast, ToastContainer } from "react-toastify";
 import { baseUrl } from "../../../utils/constants";
 import ErrorPage from "../../ErrorPage";
 import Label from "../../../components/Label";
+import {
+  getOrganization,
+  updateOrganization,
+} from "../../../api/admin/organization";
 
 function OrganizationEdit() {
   const { id } = useParams();
 
-  const [kode, setKode] = useState("");
-  const [organisasi, setOrganisasi] = useState("");
+  const [code, setCode] = useState("");
+  const [organization, setOrganization] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -23,83 +27,47 @@ function OrganizationEdit() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchOrganisasi();
+    fetchOrganization();
   }, []);
 
-  async function fetchOrganisasi() {
+  async function fetchOrganization() {
     try {
-      const response = await fetch(`${baseUrl}/org/detail/${1}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: authHeader(),
-        },
-      });
-      const result = await response.json();
-
-      if (response.ok) {
-        const { code, title } = result.data.result;
-        setKode(code);
-        setUrusan(title);
-      } else {
-        const errorMessage = "Terjadi kesalahan pada server";
-        setError(new Error(errorMessage));
-        console.log("err");
-        toast.error(errorMessage, {
-          position: toast.POSITION.BOTTOM_CENTER,
-          autoClose: 3000,
-        });
-      }
+      const organizationResponse = await getOrganization(authHeader, id);
+      setCode(organizationResponse.code);
+      setOccasion(organizationResponse.title);
     } catch (error) {
+      console.error(error);
       setError(error);
-      const errorMessage = "Terjadi kesalahan pada server";
-      console.log("err");
-      toast.error(errorMessage, {
-        position: toast.POSITION.BOTTOM_CENTER,
-        autoClose: 3000,
-      });
     }
   }
 
-  async function handleSubmit(e) {
+  async function onSubmit(e) {
     e.preventDefault();
 
     try {
-      const response = await fetch(`${baseUrl}/org/update`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: authHeader(),
-        },
-        body: JSON.stringify({ organization_id: id, title: organisasi }),
-      });
-      const result = await response.json();
-      setLoading(false);
-      if (response.ok) {
-        showToastMessage("Urusan berhasil diubah!");
-        navigate("../");
-      } else {
-        setError(new Error(result.message));
-        toast.error("Terjadi kesalahan pada server", {
-          position: toast.POSITION.BOTTOM_CENTER,
-          autoClose: 3000,
-        });
-      }
+      const organizationBody = {
+        organization_id: id,
+        title: organization,
+        code,
+      };
+      const organizationResponse = await updateOrganization(
+        authHeader,
+        organizationBody
+      );
+
+      showToastMessage(organizationResponse, "success");
+      navigate("../");
     } catch (error) {
-      setLoading(false);
+      console.error(error);
       setError(error);
-      toast.error("Terjadi kesalahan pada server", {
-        position: toast.POSITION.BOTTOM_CENTER,
-        autoClose: 3000,
-      });
+      showToastMessage(error.message, "error");
     }
   }
 
   if (error) {
     return (
       <>
-        <ErrorPage />;
-        <ToastContainer />
+        <ErrorPage />
       </>
     );
   }
@@ -121,29 +89,13 @@ function OrganizationEdit() {
 
         <form
           className="mt-4"
-          onSubmit={handleSubmit}>
-          {/* <div className="mb-6">
-            <Label>Jenis</Label>
-            <TextInput
-              className="mt-2 lg:w-2/3 xl:w-1/3"
-              placeholder="Masukan Jenis"
-              required={true}
-            />
-          </div>
-          <div className="mb-6">
-            <Label>Induk</Label>
-            <TextInput
-              className="mt-2 lg:w-2/3 xl:w-1/3"
-              placeholder="Masukan Induk"
-              required={true}
-            />
-          </div> */}
+          onSubmit={onSubmit}>
           <div className="mb-6">
             <Label>Kode</Label>
             <TextInput
               className="mt-2 lg:w-2/3 xl:w-1/3"
-              value={kode}
-              onChange={(e) => setKode(e.target.value)}
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
               required
               disabled
             />
@@ -153,8 +105,8 @@ function OrganizationEdit() {
             <TextInput
               className="mt-2 lg:w-2/3 xl:w-1/3"
               placeholder="Masukan Organisasi"
-              value={organisasi}
-              onChange={(e) => setOrganisasi(e.target.value)}
+              value={organization}
+              onChange={(e) => setOrganization(e.target.value)}
               required
             />
           </div>

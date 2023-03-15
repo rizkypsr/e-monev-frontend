@@ -8,10 +8,11 @@ import { baseUrl } from "../../../utils/constants";
 import { toast } from "react-toastify";
 import { useToastContext } from "../../../context/ToastContext";
 import { useAuthHeader } from "react-auth-kit";
+import createOrganization from "../../../api/admin/organization/createOrganization";
 
 function OrganizationCreate() {
-  const [kode, setKode] = useState("");
-  const [organisasi, setOrganisasi] = useState("");
+  const [code, setCode] = useState("");
+  const [organization, setOrganization] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -19,39 +20,20 @@ function OrganizationCreate() {
   const navigate = useNavigate();
   const authHeader = useAuthHeader();
 
-  async function handleSubmit(e) {
+  async function onSubmit(e) {
     e.preventDefault();
-    setLoading(true);
+
     setError(null);
 
     try {
-      const response = await fetch(`${baseUrl}/org/create`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: authHeader(),
-        },
-        body: JSON.stringify({ code: kode, title: organisasi }),
-      });
-      const result = await response.json();
-      setLoading(false);
-      if (response.ok) {
-        showToastMessage("Organisasi berhasil ditambahkan!");
-        navigate("../");
-      } else {
-        setError(new Error(result.message));
-        toast.error("Terjadi kesalahan pada server", {
-          position: toast.POSITION.BOTTOM_CENTER,
-          autoClose: 3000,
-        });
-      }
+      const organizationBody = { code, title: organization };
+      await createOrganization(authHeader, organizationBody);
+
+      showToastMessage("Organisasi berhasil ditambahkan!");
+      navigate("../");
     } catch (error) {
-      setLoading(false);
       setError(error);
-      toast.error("Terjadi kesalahan pada server", {
-        position: toast.POSITION.BOTTOM_CENTER,
-        autoClose: 3000,
-      });
+      showToastMessage(error.message, "erorr");
     }
   }
 
@@ -72,30 +54,14 @@ function OrganizationCreate() {
 
         <form
           className="mt-4"
-          onSubmit={handleSubmit}>
-          {/* <div className="mb-6">
-            <Label>Jenis</Label>
-            <TextInput
-              className="mt-2 lg:w-2/3 xl:w-1/3"
-              placeholder="Masukan Jenis"
-              required={true}
-            />
-          </div>
-          <div className="mb-6">
-            <Label>Induk</Label>
-            <TextInput
-              className="mt-2 lg:w-2/3 xl:w-1/3"
-              placeholder="Masukan Induk"
-              required={true}
-            />
-          </div> */}
+          onSubmit={onSubmit}>
           <div className="mb-6">
             <Label>Kode</Label>
             <TextInput
               className="mt-2 lg:w-2/3 xl:w-1/3"
               placeholder="Masukan Kode"
-              value={kode}
-              onChange={(e) => setKode(e.target.value)}
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
               required
             />
           </div>
@@ -104,8 +70,8 @@ function OrganizationCreate() {
             <TextInput
               className="mt-2 lg:w-2/3 xl:w-1/3"
               placeholder="Masukan Organisasi"
-              value={organisasi}
-              onChange={(e) => setOrganisasi(e.target.value)}
+              value={organization}
+              onChange={(e) => setOrganization(e.target.value)}
               required
             />
           </div>
