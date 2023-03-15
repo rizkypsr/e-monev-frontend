@@ -29,6 +29,7 @@ import TrashImg from "../../../assets/images/trash.png";
 import { deleteOccasion, getOccasions } from "../../../api/admin/occasion";
 import showToast from "../../../utils/showToast";
 import showToastMessage from "../../../utils/showToast";
+import Pagination from "../../../components/Pagination";
 
 function OccasionTable() {
   const authHeader = useAuthHeader();
@@ -38,17 +39,42 @@ function OccasionTable() {
   const [error, setError] = useState(false);
   const [pageSize, setPageSize] = useState(10);
   const [sorting, setSorting] = useState([]);
+  const [search, setSearch] = useState("");
+
+  const [pageData, setCurrentPageData] = useState({
+    rowData: [],
+    isLoading: false,
+    totalPages: 0,
+    totalData: 0,
+  });
+  const [currentPage, setCurrentPage] = useState(1);
 
   const { hideToastMessage } = useToastContext();
 
   useEffect(() => {
-    fetchOccasions(0, pageSize);
-  }, [pageSize]);
+    setCurrentPageData((prevState) => ({
+      ...prevState,
+      rowData: [],
+      isLoading: true,
+    }));
 
-  async function fetchOccasions(offset, limit) {
+    fetchOccasions(0, pageSize, currentPage);
+  }, [currentPage]);
+
+  async function fetchOccasions(offset, limit, pageNumber) {
     try {
-      const occasionsData = await getOccasions(authHeader, offset, limit);
-      setOccasions(occasionsData);
+      const occasionsData = await getOccasions(
+        authHeader,
+        offset,
+        limit,
+        pageNumber
+      );
+      setCurrentPageData({
+        rowData: occasionsData.result,
+        isLoading: false,
+        totalPages: occasionsData.pages,
+        totalData: occasionsData.total,
+      });
     } catch (error) {
       console.error(error);
       setError(error);
@@ -160,29 +186,30 @@ function OccasionTable() {
     }),
   ];
 
-  const table = useReactTable({
-    data: occasions,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    state: {
-      sorting,
-    },
-    onSortingChange: setSorting,
-    debugTable: true,
-  });
+  // const table = useReactTable({
+  //   data: occasions,
+  //   columns,
+  //   getCoreRowModel: getCoreRowModel(),
+  //   getSortedRowModel: getSortedRowModel(),
+  //   // getPaginationRowModel: getPaginationRowModel(),
+  //   manualPagination: true,
+  //   state: {
+  //     sorting,
+  //   },
+  //   onSortingChange: setSorting,
+  //   debugTable: true,
+  // });
 
-  function onPageSizeChanged({ value, label }) {
-    setPageSize(Number(value));
-    table.setPageSize(Number(value));
-  }
+  // function onPageSizeChanged({ value, label }) {
+  //   setPageSize(Number(value));
+  //   table.setPageSize(Number(value));
+  // }
 
-  function onSorting({ value, label }) {
-    table
-      .getHeaderGroups()[0]
-      .headers[0].column.toggleSorting(value === "desc");
-  }
+  // function onSorting({ value, label }) {
+  //   table
+  //     .getHeaderGroups()[0]
+  //     .headers[0].column.toggleSorting(value === "desc");
+  // }
 
   return (
     <>
@@ -201,7 +228,7 @@ function OccasionTable() {
       <div className="flex justify-between mt-6">
         <div className="flex space-x-3">
           {/* Sorting Dropdown */}
-          <div>
+          {/* <div>
             <Dropdown
               onSelect={onSorting}
               defaultValue="A - Z"
@@ -219,10 +246,10 @@ function OccasionTable() {
                 </li>
               </Dropdown.Items>
             </Dropdown>
-          </div>
+          </div> */}
 
           {/* Page Size Dropdown */}
-          <div>
+          {/* <div>
             <Dropdown
               onSelect={onPageSizeChanged}
               defaultValue="10"
@@ -246,7 +273,7 @@ function OccasionTable() {
                 </li>
               </Dropdown.Items>
             </Dropdown>
-          </div>
+          </div> */}
         </div>
 
         <div className="relative w-1/3">
@@ -263,11 +290,23 @@ function OccasionTable() {
       </div>
 
       <div className="w-full h-full mt-6 bg-white rounded-lg">
-        <Table
+        {/* <Table
           className="mt-6"
           table={table}
           columns={columns}
           data={occasions}
+        /> */}
+
+        <Table
+          columns={columns}
+          data={pageData.rowData}
+          isLoading={pageData.isLoading}
+        />
+
+        <Pagination
+          totalRows={pageData.totalData}
+          pageChangeHandler={setCurrentPage}
+          rowsPerPage={pageSize}
         />
       </div>
     </>

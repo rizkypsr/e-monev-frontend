@@ -1,9 +1,14 @@
 import { baseUrl } from "../../../utils/constants";
 
-export default async function getOccasions(authHeader, offset = 0, limit = 10) {
+export default async function getOccasions(
+  authHeader,
+  offset = 0,
+  limit = 10,
+  pageNumber = 1
+) {
   try {
     const occasionResponse = await fetch(
-      `${baseUrl}/occassion/list?offset=${offset}&limit=${limit}`,
+      `${baseUrl}/occassion/list?offset=${offset}&limit=${limit}&page=${pageNumber}`,
       {
         method: "GET",
         headers: {
@@ -19,7 +24,7 @@ export default async function getOccasions(authHeader, offset = 0, limit = 10) {
 
     const occasionData = await occasionResponse.json();
 
-    return occasionData.data.result;
+    return occasionData.data;
   } catch (error) {
     console.error(error);
     throw new Error("Gagal mendapatkan data dari server");

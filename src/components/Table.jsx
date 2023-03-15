@@ -1,11 +1,26 @@
-import { flexRender } from "@tanstack/react-table";
-import React from "react";
-import Pagination from "./Pagination";
+import {
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+import React, { useMemo } from "react";
 
-function Table({ children, className, table, data, columns }) {
-  return (
+function Table({ isLoading, className, data, columns, pagination }) {
+  const columnData = useMemo(() => columns, [columns]);
+  const rowData = useMemo(() => data, [data]);
+
+  const table = useReactTable({
+    columns: columnData,
+    data: rowData,
+    getCoreRowModel: getCoreRowModel(),
+    manualPagination: true,
+  });
+
+  return isLoading ? (
+    <div>Loading...</div>
+  ) : (
     <div
-      className={`relative overflow-x-auto shadow-md sm:rounded-md ${className}`}>
+      className={`relative overflow-x-auto ${className}`}>
       <table className="w-full text-sm text-left text-dark-gray">
         <thead className="bg-white border-b">
           <tr>
@@ -41,18 +56,15 @@ function Table({ children, className, table, data, columns }) {
             </tr>
           ))}
         </tbody>
-        <tfoot className="text-xs text-dark-gray border-t bg-white">
+        {/* <tfoot className="text-xs text-dark-gray border-t bg-white">
           <tr className="border-b">
             <td
               colSpan={5}
               className="px-6 py-3">
-              <Pagination
-                table={table}
-                dataLength={data.length}
-              />
+              {pagination}
             </td>
           </tr>
-        </tfoot>
+        </tfoot> */}
       </table>
     </div>
   );
