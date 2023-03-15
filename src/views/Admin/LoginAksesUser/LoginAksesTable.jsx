@@ -27,43 +27,55 @@ import TrashImg from "../../../assets/images/trash.png";
 import DebouncedInput from "../../../components/DebouncedInput";
 import { useAuthHeader } from "react-auth-kit";
 import { baseUrl } from "../../../utils/constants";
+import { getUsers } from "../../../api/admin/user";
+import Pagination from "../../../components/Pagination";
 
 function LoginAksesTable() {
   const columnHelper = createColumnHelper();
 
-  const [data, setData] = useState([]);
-  const [pageSize, setPageSize] = useState(10);
   const [sorting, setSorting] = useState([]);
-  const [globalFilter, setGlobalFilter] = useState("");
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [pageSize, setPageSize] = useState(10);
+  const [search, setSearch] = useState("");
+  const [pageData, setCurrentPageData] = useState({
+    rowData: [],
+    isLoading: false,
+    totalPages: 0,
+    totalData: 0,
+  });
+  const [currentPage, setCurrentPage] = useState(1);
+  const [resetPage, setResetPage] = useState(false);
+
   const authHeader = useAuthHeader();
 
   useEffect(() => {
-    console.log("useEffect");
-    fetchData(0, pageSize);
-  }, [pageSize]);
+    setCurrentPageData((prevState) => ({
+      ...prevState,
+      rowData: [],
+      isLoading: true,
+    }));
 
-  async function fetchData(offset, limit) {
-    console.log("fetchData");
+    fetchUsers(0, pageSize, currentPage);
+  }, [currentPage, pageSize]);
+  async function fetchUsers(offset, limit, pageNumber) {
     try {
-      const response = await fetch(
-        `${baseUrl}/user/list?offset=${offset}&limit=${limit}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: authHeader(),
-          },
-        }
+      const usersData = await getUsers(
+        authHeader,
+        offset,
+        limit,
+        pageNumber,
+        search
       );
-      console.log(response);
-      const jsonData = await response.json();
-      console.log(jsonData.data.result);
-      setData(jsonData.data.result);
-      setLoading(false);
+      setCurrentPageData({
+        rowData: usersData.result,
+        isLoading: false,
+        totalPages: usersData.pages,
+        totalData: usersData.total,
+      });
     } catch (error) {
-      setError(true);
-      setLoading(false);
+      console.error(error);
+      setError(error);
+      showToast("error", error.message, hideToastMessage);
     }
   }
 
@@ -161,31 +173,17 @@ function LoginAksesTable() {
     }),
   ];
 
-  const table = useReactTable({
-    data,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    state: {
-      sorting,
-      globalFilter,
-    },
-    onSortingChange: setSorting,
-    onGlobalFilterChange: setGlobalFilter,
-    debugTable: true,
-  });
-
-  function onPageSizeChanged({ value, label }) {
+  async function onPageSizeChanged({ value, label }) {
+    setCurrentPage(1);
+    setResetPage((prevState) => !prevState);
     setPageSize(Number(value));
-    table.setPageSize(Number(value));
   }
 
-  function onSorting({ value, label }) {
-    table
-      .getHeaderGroups()[0]
-      .headers[0].column.toggleSorting(value === "desc");
-  }
+  // function onSorting({ value, label }) {
+  //   table
+  //     .getHeaderGroups()[0]
+  //     .headers[0].column.toggleSorting(value === "desc");
+  // }
 
   return (
     <>
@@ -204,7 +202,7 @@ function LoginAksesTable() {
       <div className="flex justify-between mt-6">
         <div className="flex space-x-3">
           {/* Sorting Dropdown */}
-          <div>
+          {/* <div>
             <Dropdown
               onSelect={onSorting}
               defaultValue="A - Z"
@@ -222,7 +220,7 @@ function LoginAksesTable() {
                 </li>
               </Dropdown.Items>
             </Dropdown>
-          </div>
+          </div> */}
 
           {/* Page Size Dropdown */}
           <div>
@@ -252,20 +250,26 @@ function LoginAksesTable() {
           </div>
         </div>
 
-        <div className="relative w-1/3">
+        {/* <div className="relative w-1/3">
           <DebouncedInput
             initialValue={globalFilter ?? ""}
             onChange={(value) => setGlobalFilter(String(value))}
           />
-        </div>
+        </div> */}
       </div>
 
       <div className="w-full h-full mt-6 bg-white rounded-lg">
         <Table
-          className="mt-6"
-          table={table}
           columns={columns}
-          data={data}
+          data={pageData.rowData}
+          isLoading={pageData.isLoading}
+        />
+
+        <Pagination
+          totalRows={pageData.totalData}
+          pageChangeHandler={setCurrentPage}
+          rowsPerPage={pageSize}
+          resetPage={resetPage}
         />
       </div>
     </>

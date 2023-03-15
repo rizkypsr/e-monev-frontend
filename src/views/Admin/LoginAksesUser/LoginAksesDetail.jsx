@@ -14,32 +14,32 @@ function LoginAksesDetail() {
         </h1>
       </Link>
 
-      <div class="relative overflow-x-auto">
-        <table class="w-full text-sm text-left text-dark-gray">
+      <div className="relative overflow-x-auto">
+        <table className="w-full text-sm text-left text-dark-gray">
           <tbody>
-            <tr class="bg-light-blue">
+            <tr className="bg-light-blue">
               <th
                 scope="row"
-                class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                 No.
               </th>
-              <td class="px-6 py-4">3</td>
+              <td className="px-6 py-4">3</td>
             </tr>
-            <tr class="bg-white">
+            <tr className="bg-white">
               <th
                 scope="row"
-                class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                 Kode
               </th>
-              <td class="px-6 py-4">10291092</td>
+              <td className="px-6 py-4">10291092</td>
             </tr>
-            <tr class="bg-light-blue">
+            <tr className="bg-light-blue">
               <th
                 scope="row"
-                class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                 Urusan
               </th>
-              <td class="px-6 py-4">Lorem ipsum dolor sit.</td>
+              <td className="px-6 py-4">Lorem ipsum dolor sit.</td>
             </tr>
           </tbody>
         </table>
