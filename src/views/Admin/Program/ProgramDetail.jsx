@@ -2,12 +2,13 @@ import { ArrowLeftIcon } from "@heroicons/react/24/solid";
 import React, { useEffect, useState } from "react";
 import { useAuthHeader } from "react-auth-kit";
 import { Link, useParams } from "react-router-dom";
-import getOccasionDetail from "../../../api/admin/occasion/getOccasionDetail";
+import { ToastContainer } from "react-toastify";
+import { getProgram } from "../../../api/admin/program";
 import ErrorPage from "../../ErrorPage";
 
-function OccasionDetail() {
+function ProgramDetail() {
   const [code, setCode] = useState("");
-  const [occasion, setOccasion] = useState("");
+  const [program, setProgram] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
 
@@ -15,14 +16,14 @@ function OccasionDetail() {
   const authHeader = useAuthHeader();
 
   useEffect(() => {
-    fetchOccasion();
+    fetchProgram();
   }, []);
 
-  async function fetchOccasion() {
+  async function fetchProgram() {
     try {
-      const occasionResponse = await getOccasionDetail(authHeader, id);
-      setCode(occasionResponse.code);
-      setOccasion(occasionResponse.title);
+      const programResponse = await getProgram(authHeader, id);
+      setCode(programResponse.code);
+      setProgram(programResponse.title);
     } catch (error) {
       console.error(error);
       setError(error);
@@ -44,7 +45,7 @@ function OccasionDetail() {
         className="flex space-x-3 items-center mb-8">
         <ArrowLeftIcon className="w-6 h-6" />
         <h1 className="font-semibold text-lg text-dark-gray leading-7">
-          Detail User
+          Detail Program
         </h1>
       </Link>
 
@@ -73,7 +74,7 @@ function OccasionDetail() {
                 className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                 Urusan
               </th>
-              <td className="px-6 py-4">{occasion}</td>
+              <td className="px-6 py-4">{program}</td>
             </tr>
           </tbody>
         </table>
@@ -82,4 +83,4 @@ function OccasionDetail() {
   );
 }
 
-export default OccasionDetail;
+export default ProgramDetail;

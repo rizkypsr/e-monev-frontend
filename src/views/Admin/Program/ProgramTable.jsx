@@ -5,62 +5,96 @@ import {
   PlusIcon,
   TrashIcon,
 } from "@heroicons/react/24/solid";
-import {
-  createColumnHelper,
-  getCoreRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
+import { createColumnHelper } from "@tanstack/react-table";
 import React, { useEffect, useState } from "react";
 import { useAuthHeader } from "react-auth-kit";
 import { Link } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
+import { deleteProgram, getPrograms } from "../../../api/admin/program";
 import Button from "../../../components/Button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogTrigger,
+} from "../../../components/DialogContent";
 import Dropdown from "../../../components/Dropdown";
+import Pagination from "../../../components/Pagination";
 import Table from "../../../components/Table";
 import { useToastContext } from "../../../context/ToastContext";
-import { baseUrl } from "../../../utils/constants";
-import { makeRequest } from "../../../utils/makeRequest";
+import TrashImg from "../../../assets/images/trash.png";
+import showToastMessage from "../../../utils/showToast";
 
 function ProgramTable() {
-  const [data, setData] = useState([]);
   const [sorting, setSorting] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [pageSize, setPageSize] = useState(10);
+  const [search, setSearch] = useState("");
+  const [pageData, setCurrentPageData] = useState({
+    rowData: [],
+    isLoading: false,
+    totalPages: 0,
+    totalData: 0,
+  });
+  const [currentPage, setCurrentPage] = useState(1);
+  const [resetPage, setResetPage] = useState(false);
 
   const authHeader = useAuthHeader();
   const { showToast, toastMessage, hideToastMessage } = useToastContext();
 
   useEffect(() => {
-    if (showToast) {
-      toast.success(toastMessage, {
-        onClose: hideToastMessage,
-        position: toast.POSITION.BOTTOM_CENTER,
-        autoClose: 3000,
-      });
-    }
-  }, [showToast, toastMessage, hideToastMessage]);
+    setCurrentPageData((prevState) => ({
+      ...prevState,
+      rowData: [],
+      isLoading: true,
+    }));
+
+    fetchProgram(0, pageSize, currentPage);
+  }, [currentPage, pageSize]);
 
   useEffect(() => {
-    fetchProgram(0, pageSize);
-  }, [pageSize]);
+    setCurrentPage(1);
+    setResetPage((prevState) => !prevState);
+    setCurrentPageData((prevState) => ({
+      ...prevState,
+      rowData: [],
+      isLoading: true,
+    }));
 
-  async function fetchProgram(offset, limit) {
-    const url = `${baseUrl}/program/list?offset=${offset}&limit=${limit}`;
-    const headers = {
-      "Content-Type": "application/json",
-      Authorization: authHeader(),
-    };
+    fetchProgram(0, pageSize, currentPage);
+  }, [search]);
 
+  async function fetchProgram(offset, limit, pageNumber) {
     try {
-      const data = await makeRequest(url, headers);
-      setData(data);
-      setLoading(false);
+      const programData = await getPrograms(
+        authHeader,
+        offset,
+        limit,
+        pageNumber,
+        search
+      );
+      setCurrentPageData({
+        rowData: programData.result,
+        isLoading: false,
+        totalPages: programData.pages,
+        totalData: programData.total,
+      });
     } catch (error) {
-      setError(true);
-      setLoading(false);
+      console.error(error);
+      setError(error);
+      showToast("error", error.message, hideToastMessage);
+    }
+  }
+
+  async function deleteProgramData(id) {
+    try {
+      const deleteResponse = await deleteProgram(authHeader, id);
+      fetchProgram(0, pageSize, currentPage);
+
+      showToastMessage("success", deleteResponse, hideToastMessage);
+    } catch (error) {
+      setError(error);
+      showToastMessage("error", error.message, hideToastMessage);
     }
   }
 
@@ -69,6 +103,11 @@ function ProgramTable() {
     columnHelper.accessor("id", {
       header: () => <span>ID</span>,
       cell: (info) => info.getValue(),
+    }),
+    columnHelper.accessor((row) => row.code, {
+      id: "code",
+      cell: (info) => <i>{info.getValue()}</i>,
+      header: () => <span>Kode</span>,
     }),
     columnHelper.accessor((row) => row.title, {
       id: "program",
@@ -90,18 +129,60 @@ function ProgramTable() {
                 Edit
               </Button>
             </Link>
-            <Button
-              className="text-sm font-normal"
-              textColor="text-blue-500"
-              icon={<EyeIcon className="w-4 h-4" />}>
-              Lihat
-            </Button>
-            <Button
-              className="text-sm font-normal"
-              textColor="text-red-500"
-              icon={<TrashIcon className="w-4 h-4" />}>
-              Hapus
-            </Button>
+            <Link to={`detail/${rowId}`}>
+              <Button
+                className="text-sm font-normal"
+                textColor="text-blue-500"
+                icon={<EyeIcon className="w-4 h-4" />}>
+                Lihat
+              </Button>
+            </Link>
+            <Dialog>
+              <DialogTrigger>
+                <Button
+                  className="text-sm font-normal"
+                  type="modal"
+                  textColor="text-red-500"
+                  icon={<TrashIcon className="w-4 h-4" />}>
+                  Hapus
+                </Button>
+              </DialogTrigger>
+
+              <DialogContent className="py-12 w-1/3">
+                <div className="flex flex-col items-center justify-center h-full">
+                  <div className="p-6 bg-[#FFDADA] w-fit rounded-lg">
+                    <img src={TrashImg} />
+                  </div>
+
+                  <div>
+                    <h1 className="mt-6 font-semibold text-lg leading-7 text-dark-gray">
+                      Apakah Anda yakin menghapus ini?
+                    </h1>
+                    <div className="flex space-x-3 justify-center">
+                      <DialogClose>
+                        <Button
+                          onClick={() => deleteProgramData(rowId)}
+                          className="w-full md:w-28 mt-8 border border-[#EB5757]"
+                          type="modal"
+                          background="bg-white"
+                          textColor="text-[#EB5757]">
+                          Ya, hapus
+                        </Button>
+                      </DialogClose>
+                      <DialogClose>
+                        <Button
+                          className="w-full md:w-28 mt-8"
+                          type="modal"
+                          background="bg-primary"
+                          textColor="text-white">
+                          Batal
+                        </Button>
+                      </DialogClose>
+                    </div>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
         );
       },
@@ -109,29 +190,17 @@ function ProgramTable() {
     }),
   ];
 
-  const table = useReactTable({
-    data,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    state: {
-      sorting,
-    },
-    onSortingChange: setSorting,
-    debugTable: true,
-  });
-
-  function onPageSizeChanged({ value, label }) {
+  async function onPageSizeChanged({ value, label }) {
+    setCurrentPage(1);
+    setResetPage((prevState) => !prevState);
     setPageSize(Number(value));
-    table.setPageSize(Number(value));
   }
 
-  function onSorting({ value, label }) {
-    table
-      .getHeaderGroups()[0]
-      .headers[0].column.toggleSorting(value === "desc");
-  }
+  // function onSorting({ value, label }) {
+  //   table
+  //     .getHeaderGroups()[0]
+  //     .headers[0].column.toggleSorting(value === "desc");
+  // }
 
   return (
     <>
@@ -150,7 +219,7 @@ function ProgramTable() {
       <div className="flex justify-between mt-6">
         <div className="flex space-x-3">
           {/* Sorting Dropdown */}
-          <div>
+          {/* <div>
             <Dropdown
               onSelect={onSorting}
               defaultValue="A - Z"
@@ -168,7 +237,7 @@ function ProgramTable() {
                 </li>
               </Dropdown.Items>
             </Dropdown>
-          </div>
+          </div> */}
 
           {/* Page Size Dropdown */}
           <div>
@@ -204,7 +273,8 @@ function ProgramTable() {
           </div>
           <input
             type="search"
-            id="search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
             className="bg-gray-50 text-light-gray border-none text-sm rounded-lg focus:ring-0 block w-full pl-10 p-2.5 shadow"
             placeholder="Pencarian"
           />
@@ -213,10 +283,16 @@ function ProgramTable() {
 
       <div className="w-full h-full mt-6 bg-white rounded-lg">
         <Table
-          className="mt-6"
-          table={table}
           columns={columns}
-          data={data}
+          data={pageData.rowData}
+          isLoading={pageData.isLoading}
+        />
+
+        <Pagination
+          totalRows={pageData.totalData}
+          pageChangeHandler={setCurrentPage}
+          rowsPerPage={pageSize}
+          resetPage={resetPage}
         />
       </div>
       <ToastContainer />

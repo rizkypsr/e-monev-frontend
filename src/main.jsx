@@ -47,6 +47,7 @@ import UserLayout from "./layouts/UserRoot";
 import OccasionDetail from "./views/Admin/Occasion/OccasionDetail";
 import OrganizationDetail from "./views/Admin/Organization/OrganizationDetail";
 import ToastProvider from "./context/ToastContext";
+import ProgramDetail from "./views/Admin/Program/ProgramDetail";
 
 const router = createBrowserRouter(
   createRoutesFromElements([
@@ -261,6 +262,11 @@ const router = createBrowserRouter(
               key="programEdit"
               path="edit/:id"
               element={<ProgramEdit />}
+            />,
+            <Route
+              key="programDetail"
+              path="detail/:id"
+              element={<ProgramDetail />}
             />,
           ]}
         />,

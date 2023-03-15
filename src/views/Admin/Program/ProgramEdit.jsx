@@ -1,11 +1,67 @@
 import { ArrowLeftIcon, CheckCircleIcon } from "@heroicons/react/24/solid";
 import { Label } from "flowbite-react";
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import TextInput from "../../../components/TextInput";
 import Button from "../../../components/Button";
+import { getProgram, updateProgram } from "../../../api/admin/program";
+import ErrorPage from "../../ErrorPage";
+import { useAuthHeader } from "react-auth-kit";
+import { useToastContext } from "../../../context/ToastContext";
 
 function ProgramEdit() {
+  const { id } = useParams();
+  const [code, setCode] = useState("");
+  const [program, setProgram] = useState("");
+  const [error, setError] = useState(null);
+
+  const authHeader = useAuthHeader();
+  const navigate = useNavigate();
+  const { showToastMessage } = useToastContext();
+
+  useEffect(() => {
+    fetchProgram();
+  }, []);
+
+  async function fetchProgram() {
+    try {
+      const programResponse = await getProgram(authHeader, id);
+      setCode(programResponse.code);
+      setProgram(programResponse.title);
+    } catch (error) {
+      console.error(error);
+      setError(error);
+    }
+  }
+
+  async function onSubmit(e) {
+    e.preventDefault();
+
+    try {
+      const programBody = {
+        program_id: id,
+        title: program,
+        code,
+      };
+      const programResponse = await updateProgram(authHeader, programBody);
+
+      showToastMessage(programResponse, "success");
+      navigate("../");
+    } catch (error) {
+      console.error(error);
+      setError(error);
+      showToastMessage(error.message, "error");
+    }
+  }
+
+  if (error) {
+    return (
+      <>
+        <ErrorPage />
+      </>
+    );
+  }
+
   return (
     <>
       <div className="flex justify-between">
@@ -21,12 +77,14 @@ function ProgramEdit() {
           </h1>
         </Link>
 
-        <form className="mt-4">
+        <form
+          className="mt-4"
+          onSubmit={onSubmit}>
           <div className="mb-6">
             <Label>Kode</Label>
             <TextInput
               className="mt-2 lg:w-2/3 xl:w-1/3"
-              value={29833}
+              value={code}
               required={true}
               disabled={true}
             />
@@ -36,11 +94,14 @@ function ProgramEdit() {
             <TextInput
               className="mt-2 lg:w-2/3 xl:w-1/3"
               placeholder="Masukan Program"
+              value={program}
+              onChange={(e) => setProgram(e.target.value)}
               required={true}
             />
           </div>
           <div className="flex space-x-3">
             <Button
+              type="submit"
               className="w-full md:w-28"
               background="bg-primary"
               textColor="text-white"

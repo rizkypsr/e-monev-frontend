@@ -7,10 +7,6 @@ import {
 } from "@heroicons/react/24/solid";
 import {
   createColumnHelper,
-  getCoreRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
 } from "@tanstack/react-table";
 import React, { useEffect, useState } from "react";
 import { useAuthHeader } from "react-auth-kit";

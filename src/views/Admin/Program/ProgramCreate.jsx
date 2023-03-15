@@ -6,12 +6,10 @@ import TextInput from "../../../components/TextInput";
 import Button from "../../../components/Button";
 import { useAuthHeader } from "react-auth-kit";
 import { useToastContext } from "../../../context/ToastContext";
-import { baseUrl } from "../../../utils/constants";
-import { makeRequest } from "../../../utils/makeRequest";
-import { toast } from "react-toastify";
+import { createProgram } from "../../../api/admin/program";
 
 function ProgramCreate() {
-  const [kode, setKode] = useState("");
+  const [code, setCode] = useState("");
   const [program, setProgram] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -19,33 +17,20 @@ function ProgramCreate() {
   const navigate = useNavigate();
   const { showToastMessage } = useToastContext();
 
-  async function handleSubmit(e) {
+  async function onSubmit(e) {
     e.preventDefault();
 
-    setLoading(true);
     setError(null);
 
-    const url = `${baseUrl}/program/create`;
-    const headers = {
-      "Content-Type": "application/json",
-      Authorization: authHeader(),
-    };
-    const body = { code: kode, title: program };
-
     try {
-      await makeRequest(url, headers, "POST", body);
+      const programBody = { code, title: program };
+      await createProgram(authHeader, programBody);
 
-      setLoading(false);
-      showToastMessage("Urusan berhasil ditambahkan!");
+      showToastMessage("Program berhasil ditambahkan!");
       navigate("../");
     } catch (error) {
-      setLoading(false);
       setError(error);
-
-      toast.error("Terjadi kesalahan pada server", {
-        position: toast.POSITION.BOTTOM_CENTER,
-        autoClose: 3000,
-      });
+      showToastMessage("erorr", error.message);
     }
   }
 
@@ -66,14 +51,14 @@ function ProgramCreate() {
 
         <form
           className="mt-4"
-          onSubmit={handleSubmit}>
+          onSubmit={onSubmit}>
           <div className="mb-6">
             <Label>Kode</Label>
             <TextInput
               className="mt-2 lg:w-2/3 xl:w-1/3"
-              value={kode}
+              value={code}
               placeholder="Masukan Kode Program"
-              onChange={(e) => setKode(e.target.value)}
+              onChange={(e) => setCode(e.target.value)}
               required
             />
           </div>
