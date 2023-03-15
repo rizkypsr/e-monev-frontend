@@ -7,6 +7,10 @@ function Dashboard() {
   const [counts, setCounts] = useState({
     userCount: 0,
     occasionCount: 0,
+    organizationCount: 0,
+    programCount: 0,
+    activityCount: 0,
+    purposeCount: 0,
   });
   const [error, setError] = useState(null);
 
@@ -55,7 +59,7 @@ function Dashboard() {
           <div>
             <h2 className="font-semibold text-lg">
               <CountUp
-                end={51}
+                end={counts.organizationCount}
                 duration={0.7}
               />
             </h2>
@@ -69,7 +73,7 @@ function Dashboard() {
           <div>
             <h2 className="font-semibold text-lg">
               <CountUp
-                end={90}
+                end={counts.programCount}
                 duration={0.7}
               />
             </h2>
@@ -83,7 +87,7 @@ function Dashboard() {
           <div>
             <h2 className="font-semibold text-lg">
               <CountUp
-                end={102}
+                end={counts.activityCount}
                 duration={0.7}
               />
             </h2>
@@ -97,7 +101,7 @@ function Dashboard() {
           <div>
             <h2 className="font-semibold text-lg">
               <CountUp
-                end={33}
+                end={counts.purposeCount}
                 duration={0.7}
               />
             </h2>
