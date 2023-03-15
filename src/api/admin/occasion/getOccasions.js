@@ -4,11 +4,13 @@ export default async function getOccasions(
   authHeader,
   offset = 0,
   limit = 10,
-  pageNumber = 1
+  pageNumber = 1,
+  search = ""
 ) {
   try {
     const occasionResponse = await fetch(
-      `${baseUrl}/occassion/list?offset=${offset}&limit=${limit}&page=${pageNumber}`,
+      `${baseUrl}/occassion/list?offset=${offset}&limit=${limit}&search=${search}` +
+        (pageNumber ? `&page=${pageNumber}` : ""),
       {
         method: "GET",
         headers: {

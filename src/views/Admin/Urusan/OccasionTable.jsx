@@ -22,7 +22,6 @@ import {
   DialogContent,
   DialogTrigger,
 } from "../../../components/DialogContent";
-import Dropdown from "../../../components/Dropdown";
 import Table from "../../../components/Table";
 import { useToastContext } from "../../../context/ToastContext";
 import TrashImg from "../../../assets/images/trash.png";
@@ -30,12 +29,11 @@ import { deleteOccasion, getOccasions } from "../../../api/admin/occasion";
 import showToast from "../../../utils/showToast";
 import showToastMessage from "../../../utils/showToast";
 import Pagination from "../../../components/Pagination";
+import Dropdown from "../../../components/Dropdown";
 
 function OccasionTable() {
   const authHeader = useAuthHeader();
 
-  const [occasions, setOccasions] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [pageSize, setPageSize] = useState(10);
   const [sorting, setSorting] = useState([]);
@@ -48,7 +46,7 @@ function OccasionTable() {
     totalData: 0,
   });
   const [currentPage, setCurrentPage] = useState(1);
-
+  const [resetPage, setResetPage] = useState(false);
   const { hideToastMessage } = useToastContext();
 
   useEffect(() => {
@@ -59,7 +57,19 @@ function OccasionTable() {
     }));
 
     fetchOccasions(0, pageSize, currentPage);
-  }, [currentPage]);
+  }, [currentPage, pageSize]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+    setResetPage((prevState) => !prevState);
+    setCurrentPageData((prevState) => ({
+      ...prevState,
+      rowData: [],
+      isLoading: true,
+    }));
+
+    fetchOccasions(0, pageSize, currentPage);
+  }, [search]);
 
   async function fetchOccasions(offset, limit, pageNumber) {
     try {
@@ -67,7 +77,8 @@ function OccasionTable() {
         authHeader,
         offset,
         limit,
-        pageNumber
+        pageNumber,
+        search
       );
       setCurrentPageData({
         rowData: occasionsData.result,
@@ -186,24 +197,11 @@ function OccasionTable() {
     }),
   ];
 
-  // const table = useReactTable({
-  //   data: occasions,
-  //   columns,
-  //   getCoreRowModel: getCoreRowModel(),
-  //   getSortedRowModel: getSortedRowModel(),
-  //   // getPaginationRowModel: getPaginationRowModel(),
-  //   manualPagination: true,
-  //   state: {
-  //     sorting,
-  //   },
-  //   onSortingChange: setSorting,
-  //   debugTable: true,
-  // });
-
-  // function onPageSizeChanged({ value, label }) {
-  //   setPageSize(Number(value));
-  //   table.setPageSize(Number(value));
-  // }
+  async function onPageSizeChanged({ value, label }) {
+    setCurrentPage(1);
+    setResetPage((prevState) => !prevState);
+    setPageSize(Number(value));
+  }
 
   // function onSorting({ value, label }) {
   //   table
@@ -249,7 +247,7 @@ function OccasionTable() {
           </div> */}
 
           {/* Page Size Dropdown */}
-          {/* <div>
+          <div>
             <Dropdown
               onSelect={onPageSizeChanged}
               defaultValue="10"
@@ -273,7 +271,7 @@ function OccasionTable() {
                 </li>
               </Dropdown.Items>
             </Dropdown>
-          </div> */}
+          </div>
         </div>
 
         <div className="relative w-1/3">
@@ -282,7 +280,8 @@ function OccasionTable() {
           </div>
           <input
             type="search"
-            id="search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
             className="bg-gray-50 text-light-gray border-none text-sm rounded-lg focus:ring-0 block w-full pl-10 p-2.5 shadow"
             placeholder="Pencarian"
           />
@@ -290,13 +289,6 @@ function OccasionTable() {
       </div>
 
       <div className="w-full h-full mt-6 bg-white rounded-lg">
-        {/* <Table
-          className="mt-6"
-          table={table}
-          columns={columns}
-          data={occasions}
-        /> */}
-
         <Table
           columns={columns}
           data={pageData.rowData}
@@ -307,6 +299,7 @@ function OccasionTable() {
           totalRows={pageData.totalData}
           pageChangeHandler={setCurrentPage}
           rowsPerPage={pageSize}
+          resetPage={resetPage}
         />
       </div>
     </>
