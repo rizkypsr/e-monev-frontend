@@ -22,7 +22,7 @@ import Table from "../../../components/Table";
 import { useToastContext } from "../../../context/ToastContext";
 import { baseUrl } from "../../../utils/constants";
 
-function OrganisasiTable() {
+function OrganizationTable() {
   const [data, setData] = useState([]);
   const [sorting, setSorting] = useState([]);
   const [pageSize, setPageSize] = useState(10);
@@ -232,4 +232,4 @@ function OrganisasiTable() {
   );
 }
 
-export default OrganisasiTable;
+export default OrganizationTable;

@@ -6,7 +6,7 @@ import { ToastContainer } from "react-toastify";
 import { baseUrl } from "../../../utils/constants";
 import ErrorPage from "../../ErrorPage";
 
-function OrganisasiDetail() {
+function OrganizationDetail() {
   const [kode, setKode] = useState("");
   const [organisasi, setOrganisasi] = useState("");
   const [loading, setLoading] = useState(false);
@@ -101,4 +101,4 @@ function OrganisasiDetail() {
   );
 }
 
-export default OrganisasiDetail;
+export default OrganizationDetail;

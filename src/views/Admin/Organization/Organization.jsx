@@ -1,7 +1,7 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
 
-function Organisasi() {
+function Organization() {
   return (
     <>
       <Outlet />
@@ -9,4 +9,4 @@ function Organisasi() {
   );
 }
 
-export default Organisasi;
+export default Organization;

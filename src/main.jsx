@@ -23,16 +23,16 @@ import LoginAksesCreate from "./views/Admin/LoginAksesUser/LoginAksesCreate";
 import OccasionTable from "./views/Admin/Occasion/OccasionTable";
 import OccasionCreate from "./views/Admin/Occasion/OccasionCreate";
 import OccasionEdit from "./views/Admin/Occasion/OccasionEdit";
-import OrganisasiTable from "./views/Admin/Organisasi/OrganisasiTable";
-import OrganisasiCreate from "./views/Admin/Organisasi/OrganisasiCreate";
-import OrganisasiEdit from "./views/Admin/Organisasi/OrganisasiEdit";
+import OrganizationTable from "./views/Admin/Organization/OrganizationTable";
+import OrganizationCreate from "./views/Admin/Organization/OrganizationCreate";
+import OrganizationEdit from "./views/Admin/Organization/OrganizationEdit";
 import ProgramTable from "./views/Admin/Program/ProgramTable";
 import ProgramCreate from "./views/Admin/Program/ProgramCreate";
 import ProgramEdit from "./views/Admin/Program/ProgramEdit";
 import Program from "./views/Admin/Program/Program";
 import Kegiatan from "./views/Admin/Kegiatan/Kegiatan";
 import Sasaran from "./views/Admin/Sasaran/Sasaran";
-import Organisasi from "./views/Admin/Organisasi/Organisasi";
+import Organization from "./views/Admin/Organization/Organization";
 import KegiatanTable from "./views/Admin/Kegiatan/KegiatanTable";
 import KegiatanCreate from "./views/Admin/Kegiatan/KegiatanCreate";
 import KegiatanEdit from "./views/Admin/Kegiatan/KegiatanEdit";
@@ -45,7 +45,7 @@ import { AuthProvider, RequireAuth } from "react-auth-kit";
 import ErrorPage404 from "./views/ErrorPage404";
 import UserLayout from "./layouts/UserRoot";
 import OccasionDetail from "./views/Admin/Occasion/OccasionDetail";
-import OrganisasiDetail from "./views/Admin/Organisasi/OrganisasiDetail";
+import OrganizationDetail from "./views/Admin/Organization/OrganizationDetail";
 import ToastProvider from "./context/ToastContext";
 
 const router = createBrowserRouter(
@@ -208,27 +208,27 @@ const router = createBrowserRouter(
               </span>
             ),
           }}
-          element={<Organisasi />}
+          element={<Organization />}
           children={[
             <Route
               index
               key="organisasi"
-              element={<OrganisasiTable />}
+              element={<OrganizationTable />}
             />,
             <Route
               key="organisasiCreate"
               path="create"
-              element={<OrganisasiCreate />}
+              element={<OrganizationCreate />}
             />,
             <Route
               key="organisasiEdit"
               path="edit/:id"
-              element={<OrganisasiEdit />}
+              element={<OrganizationEdit />}
             />,
             <Route
               key="organisasiDetail"
               path="detail/:id"
-              element={<OrganisasiDetail />}
+              element={<OrganizationDetail />}
             />,
           ]}
         />,
