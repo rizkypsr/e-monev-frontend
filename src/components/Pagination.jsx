@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 
-function Pagination({ pageChangeHandler, totalRows, rowsPerPage }) {
+function Pagination({ pageChangeHandler, totalRows, rowsPerPage, resetPage }) {
   const [currentPage, setCurrentPage] = useState(0);
   const [canGoBack, setCanGoBack] = useState(false);
   const [canGoNext, setCanGoNext] = useState(true);
@@ -16,13 +16,12 @@ function Pagination({ pageChangeHandler, totalRows, rowsPerPage }) {
   const onPageSelect = (pageNo) => setCurrentPage(pageNo);
 
   useEffect(() => {
-    console.log(currentPage);
-    if (noOfPages === currentPage) {
+    if (noOfPages === currentPage + 1) {
       setCanGoNext(false);
     } else {
       setCanGoNext(true);
     }
-    if (currentPage === 1) {
+    if (currentPage === 0) {
       setCanGoBack(false);
     } else {
       setCanGoBack(true);
@@ -34,6 +33,10 @@ function Pagination({ pageChangeHandler, totalRows, rowsPerPage }) {
     pageChangeHandler(currentPage + 1);
   }, [currentPage]);
 
+  useEffect(() => {
+    setCurrentPage(0);
+  }, [resetPage]);
+
   const paginationItems = useMemo(() => {
     const items = [];
 
@@ -42,10 +45,10 @@ function Pagination({ pageChangeHandler, totalRows, rowsPerPage }) {
         items.push(
           <li key={i}>
             <button
-              onClick={() => onPageSelect(i + 1)}
+              onClick={() => onPageSelect(i)}
               className={
                 "px-3 py-2 leading-tight text-sm font-semibold rounded-md hover:text-gray-700 " +
-                (i + 1 == currentPage
+                (i == currentPage
                   ? "bg-primary border border-priimary hover:bg-gray-100 text-white"
                   : "bg-white border border-gray-300 hover:bg-gray-100 text-dark-gray")
               }>
