@@ -8,18 +8,17 @@ export default async function deleteProgram(authHeader, programId) {
         "Content-Type": "application/json",
         authorization: authHeader(),
       },
-      body: JSON.stringify({ occassion_id: programId }),
+      body: JSON.stringify({ program_id: programId }),
     });
 
+    const programData = await programResponse.json();
+
     if (!programResponse.ok) {
-      throw new Error(
-        "Gagal menghapus Program! Terjadi kesalahan pada server."
-      );
+      throw new Error(programData.message);
     }
 
-    return "Program berhasil dihapus!";
+    return programData.message;
   } catch (error) {
-    console.error(error);
-    throw new Error("Gagal menghapus Program! Terjadi kesalahan pada server.");
+    throw new Error(error.message);
   }
 }

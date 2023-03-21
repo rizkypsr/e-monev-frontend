@@ -11,12 +11,14 @@ export default async function updateProgram(authHeader, programBody) {
       body: JSON.stringify(programBody),
     });
 
+    const programData = await programResponse.json();
+
     if (!programResponse.ok) {
-      throw new Error("Gagal mengubah Program! Terjadi kesalahan pada server.");
+      throw new Error(programData.message);
     }
 
-    return "Program berhasil diubah!";
+    return programData.message;
   } catch (error) {
-    throw new Error("Gagal mengubah Program! Terjadi kesalahan pada server.");
+    throw new Error(error.message);
   }
 }

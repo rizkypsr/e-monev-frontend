@@ -24,13 +24,13 @@ function ProgramCreate() {
 
     try {
       const programBody = { code, title: program };
-      await createProgram(authHeader, programBody);
+      const programResponse = await createProgram(authHeader, programBody);
 
-      showToastMessage("Program berhasil ditambahkan!");
+      showToastMessage(programResponse);
       navigate("../");
     } catch (error) {
       setError(error);
-      showToastMessage("erorr", error.message);
+      showToastMessage(error.message, "error");
     }
   }
 

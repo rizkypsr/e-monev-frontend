@@ -20,15 +20,14 @@ export default async function getPrograms(
       }
     );
 
-    if (!programResponse.ok) {
-      throw new Error("Gagal mendapatkan data dari server");
-    }
-
     const programData = await programResponse.json();
+
+    if (!programResponse.ok) {
+      throw new Error(programData.message);
+    }
 
     return programData.data;
   } catch (error) {
-    console.error(error);
-    throw new Error("Gagal mendapatkan data dari server");
+    throw new Error(error.message);
   }
 }

@@ -11,11 +11,14 @@ export default async function createProgram(authHeader, body) {
       body: JSON.stringify(body),
     });
 
+    const programData = await programResponse.json();
+
     if (!programResponse.ok) {
-      throw new Error("Gagal menambahkan Program");
+      throw new Error(programData.message);
     }
+
+    return programData.message;
   } catch (error) {
-    console.error(error);
-    throw new Error("Gagal menambahkan Program");
+    throw new Error(error.message);
   }
 }

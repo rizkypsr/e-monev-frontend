@@ -40,7 +40,7 @@ function ProgramTable() {
   const [resetPage, setResetPage] = useState(false);
 
   const authHeader = useAuthHeader();
-  const { showToast, toastMessage, hideToastMessage } = useToastContext();
+  const { showToastMessage, hideToastMessage } = useToastContext();
 
   useEffect(() => {
     setCurrentPageData((prevState) => ({
@@ -81,8 +81,13 @@ function ProgramTable() {
       });
     } catch (error) {
       console.error(error);
+      setCurrentPageData((prevState) => ({
+        ...prevState,
+        rowData: [],
+        isLoading: false,
+      }));
       setError(error);
-      showToast("error", error.message, hideToastMessage);
+      showToastMessage(error.message, "error");
     }
   }
 
@@ -91,10 +96,10 @@ function ProgramTable() {
       const deleteResponse = await deleteProgram(authHeader, id);
       fetchProgram(0, pageSize, currentPage);
 
-      showToastMessage("success", deleteResponse, hideToastMessage);
+      showToastMessage(deleteResponse);
     } catch (error) {
       setError(error);
-      showToastMessage("error", error.message, hideToastMessage);
+      showToastMessage(error.message, "error");
     }
   }
 
