@@ -13,15 +13,14 @@ export default async function getOccasionDetail(authHeader, occasionId) {
       }
     );
 
-    if (!occasionResponse.ok) {
-      throw new Error("Gagal mendapatkan data dari server");
-    }
-
     const occasionData = await occasionResponse.json();
+
+    if (!occasionResponse.ok) {
+      throw new Error(occasionData.message);
+    }
 
     return occasionData.data.result;
   } catch (error) {
-    console.error(error);
-    throw new Error("Gagal mendapatkan data dari server");
+    throw new Error(error.message);
   }
 }

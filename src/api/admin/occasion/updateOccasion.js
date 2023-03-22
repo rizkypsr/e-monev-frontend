@@ -11,13 +11,14 @@ export default async function updateOccasion(authHeader, occasionBody) {
       body: JSON.stringify(occasionBody),
     });
 
+    const occasionData = await occasionResponse.json();
+
     if (!occasionResponse.ok) {
-      throw new Error("Gagal mengubah Urusan! Terjadi kesalahan pada server.");
+      throw new Error(occasionData.message);
     }
 
-    return "Urusan berhasil diubah!";
+    return occasionData.message;
   } catch (error) {
-    console.error(error);
-    throw new Error("Gagal mengubah Urusan! Terjadi kesalahan pada server.");
+    throw new Error(error.message);
   }
 }

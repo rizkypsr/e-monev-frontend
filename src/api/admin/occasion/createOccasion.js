@@ -12,11 +12,14 @@ export default async function createOccasion(authHeader, body) {
       body: JSON.stringify(body),
     });
 
+    const occasionData = await occasionResponse.json();
+
     if (!occasionResponse.ok) {
-      throw new Error("Gagal menambahkan Urusan");
+      throw new Error(occasionData);
     }
+
+    return occasionData.message;
   } catch (error) {
-    console.error(error);
-    throw new Error("Gagal menambahkan Urusan");
+    throw new Error(error.message);
   }
 }

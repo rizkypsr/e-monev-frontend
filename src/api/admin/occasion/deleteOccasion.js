@@ -11,13 +11,14 @@ export default async function deleteOccasion(authHeader, occasionId) {
       body: JSON.stringify({ occassion_id: occasionId }),
     });
 
+    const occasionData = await occasionResponse.json();
+
     if (!occasionResponse.ok) {
-      throw new Error("Gagal menghapus Urusan! Terjadi kesalahan pada server.");
+      throw new Error(occasionData.message);
     }
 
-    return "Urusan berhasil dihapus!";
+    return occasionData.message;
   } catch (error) {
-    console.error(error);
-    throw new Error("Gagal menghapus Urusan! Terjadi kesalahan pada server.");
+    throw new Error(error.message);
   }
 }
