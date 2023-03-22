@@ -11,14 +11,16 @@ export default async function updateOrganization(authHeader, organizationBody) {
       body: JSON.stringify(organizationBody),
     });
 
+    const organizationData = await organizationResponse.json();
+
     if (!organizationResponse.ok) {
-      throw new Error("Gagal mengubah Organisasi! Terjadi kesalahan pada server.");
+      throw new Error(
+        `Terjadi kesalahan pada server ${organizationData.message}`
+      );
     }
 
     return "Organisasi berhasil diubah!";
   } catch (error) {
-    throw new Error(
-      "Gagal mengubah Organisasi! Terjadi kesalahan pada server."
-    );
+    throw new Error(`Terjadi kesalahan pada server ${error.message}`);
   }
 }

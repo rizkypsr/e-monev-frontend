@@ -13,15 +13,16 @@ export default async function getOrganization(authHeader, organizationId) {
       }
     );
 
-    if (!organizationResponse.ok) {
-      throw new Error("Gagal mendapatkan data dari server");
-    }
-
     const organizationData = await organizationResponse.json();
+
+    if (!organizationResponse.ok) {
+      throw new Error(
+        `Gagal mendapatkan data dari server ${organizationData.message}`
+      );
+    }
 
     return organizationData.data.result;
   } catch (error) {
-    console.error(error);
-    throw new Error("Gagal mendapatkan data dari server");
+    throw new Error(error.message);
   }
 }

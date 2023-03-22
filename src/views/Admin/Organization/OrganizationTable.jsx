@@ -11,11 +11,21 @@ import { useAuthHeader } from "react-auth-kit";
 import { Link } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import { getOrganizations } from "../../../api/admin/organization";
+import deleteOrganization from "../../../api/admin/organization/deleteOrganization";
 import Button from "../../../components/Button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogTrigger,
+} from "../../../components/DialogContent";
 import Dropdown from "../../../components/Dropdown";
 import Pagination from "../../../components/Pagination";
 import Table from "../../../components/Table";
 import { useToastContext } from "../../../context/ToastContext";
+import TrashImg from "../../../assets/images/trash.png";
+import showToastMessage from "../../../utils/showToast";
+import ErrorPage from "../../ErrorPage";
 
 function OrganizationTable() {
   const [search, setSearch] = useState("");
@@ -82,9 +92,18 @@ function OrganizationTable() {
         totalData: organizationData.total,
       });
     } catch (error) {
-      console.error(error);
-      setError(error);
-      showToast("error", error.message, hideToastMessage);
+      setError(error.message);
+    }
+  }
+
+  async function deleteOccasionData(id) {
+    try {
+      const deleteResponse = await deleteOrganization(authHeader, id);
+      fetchOrganizations(0, pageSize, currentPage);
+
+      showToastMessage("success", deleteResponse, hideToastMessage);
+    } catch (error) {
+      showToastMessage("error", error.message, hideToastMessage);
     }
   }
 
@@ -115,7 +134,8 @@ function OrganizationTable() {
               <Button
                 className="text-sm font-normal"
                 textColor="text-blue-500"
-                icon={<PencilIcon className="w-4 h-4" />}>
+                icon={<PencilIcon className="w-4 h-4" />}
+              >
                 Edit
               </Button>
             </Link>
@@ -123,16 +143,60 @@ function OrganizationTable() {
               <Button
                 className="text-sm font-normal"
                 textColor="text-blue-500"
-                icon={<EyeIcon className="w-4 h-4" />}>
+                icon={<EyeIcon className="w-4 h-4" />}
+              >
                 Lihat
               </Button>
             </Link>
-            <Button
-              className="text-sm font-normal"
-              textColor="text-red-500"
-              icon={<TrashIcon className="w-4 h-4" />}>
-              Hapus
-            </Button>
+            <Dialog>
+              <DialogTrigger>
+                <Button
+                  className="text-sm font-normal"
+                  type="modal"
+                  textColor="text-red-500"
+                  icon={<TrashIcon className="w-4 h-4" />}
+                >
+                  Hapus
+                </Button>
+              </DialogTrigger>
+
+              <DialogContent className="py-12 w-1/3">
+                <div className="flex flex-col items-center justify-center h-full">
+                  <div className="p-6 bg-[#FFDADA] w-fit rounded-lg">
+                    <img src={TrashImg} />
+                  </div>
+
+                  <div>
+                    <h1 className="mt-6 font-semibold text-lg leading-7 text-dark-gray">
+                      Apakah Anda yakin menghapus ini?
+                    </h1>
+                    <div className="flex space-x-3 justify-center">
+                      <DialogClose>
+                        <Button
+                          onClick={() => deleteOccasionData(rowId)}
+                          className="w-full md:w-28 mt-8 border border-[#EB5757]"
+                          type="modal"
+                          background="bg-white"
+                          textColor="text-[#EB5757]"
+                        >
+                          Ya, hapus
+                        </Button>
+                      </DialogClose>
+                      <DialogClose>
+                        <Button
+                          className="w-full md:w-28 mt-8"
+                          type="modal"
+                          background="bg-primary"
+                          textColor="text-white"
+                        >
+                          Batal
+                        </Button>
+                      </DialogClose>
+                    </div>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
         );
       },
@@ -152,6 +216,10 @@ function OrganizationTable() {
   //     .headers[0].column.toggleSorting(value === "desc");
   // }
 
+  if (error) {
+    return <ErrorPage errorMessage={error} />;
+  }
+
   return (
     <>
       <div className="flex justify-between">
@@ -160,7 +228,8 @@ function OrganizationTable() {
           <Button
             background="bg-primary"
             textColor={"text-white"}
-            icon={<PlusIcon className="w-4 h-4" />}>
+            icon={<PlusIcon className="w-4 h-4" />}
+          >
             Tambah Organisasi
           </Button>
         </Link>
@@ -195,21 +264,25 @@ function OrganizationTable() {
               onSelect={onPageSizeChanged}
               defaultValue="10"
               label="Tampilkan:"
-              endLabel="Entri">
+              endLabel="Entri"
+            >
               <Dropdown.Items>
                 <li
                   value="10"
-                  className="block px-4 py-2 font-semibold cursor-pointer hover:bg-gray-100">
+                  className="block px-4 py-2 font-semibold cursor-pointer hover:bg-gray-100"
+                >
                   10
                 </li>
                 <li
                   value="50"
-                  className="block px-4 py-2 font-semibold cursor-pointer hover:bg-gray-100">
+                  className="block px-4 py-2 font-semibold cursor-pointer hover:bg-gray-100"
+                >
                   50
                 </li>
                 <li
                   value="100"
-                  className="block px-4 py-2 font-semibold cursor-pointer hover:bg-gray-100">
+                  className="block px-4 py-2 font-semibold cursor-pointer hover:bg-gray-100"
+                >
                   100
                 </li>
               </Dropdown.Items>

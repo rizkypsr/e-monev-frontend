@@ -11,11 +11,14 @@ export default async function createOrganization(authHeader, body) {
       body: JSON.stringify(body),
     });
 
+    const organizationData = await organizationResponse.json();
+
     if (!organizationResponse.ok) {
-      throw new Error("Gagal menambahkan Organisasi");
+      throw new Error(
+        `Terjadi kesalahan pada server ${organizationData.message}`
+      );
     }
   } catch (error) {
-    console.error(error);
-    throw new Error("Gagal menambahkan Organisasi");
+    throw new Error(error.message);
   }
 }

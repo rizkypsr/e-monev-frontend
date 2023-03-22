@@ -8,20 +8,19 @@ export default async function deleteOrganization(authHeader, organizationId) {
         "Content-Type": "application/json",
         authorization: authHeader(),
       },
-      body: JSON.stringify({ occassion_id: organizationId }),
+      body: JSON.stringify({ organization_id: organizationId }),
     });
+
+    const organizationData = await organizationResponse.json();
 
     if (!organizationResponse.ok) {
       throw new Error(
-        "Gagal menghapus Organisasi! Terjadi kesalahan pada server."
+        `Terjadi kesalahan pada server ${organizationData.message}`
       );
     }
 
-    return "Organisasi berhasil dihapus!";
+    return organizationData.message;
   } catch (error) {
-    console.error(error);
-    throw new Error(
-      "Gagal menghapus Organisasi! Terjadi kesalahan pada server."
-    );
+    throw new Error(error.message);
   }
 }
