@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useAuthHeader } from "react-auth-kit";
 import CountUp from "react-countup";
 import { getCounts } from "../../../api/admin/dashboard";
+import ErrorPage from "../../ErrorPage";
 
 function Dashboard() {
   const [counts, setCounts] = useState({
@@ -22,13 +23,16 @@ function Dashboard() {
         const countsData = await getCounts(authHeader);
         setCounts(countsData);
       } catch (error) {
-        console.error(error);
-        setError(error);
+        setError(error.message);
       }
     }
 
     fetchCounts();
   }, []);
+
+  if (error) {
+    return <ErrorPage errorMessage={error} />;
+  }
 
   return (
     <>
@@ -41,13 +45,11 @@ function Dashboard() {
         <div className="sm:w-60 h-20 bg-white shadow-md p-4 flex space-x-4 rounded-lg hover:solid-shadow-blue">
           <div
             className="w-12 h-12 rounded-lg"
-            style={{ background: "#56CCF2" }}></div>
+            style={{ background: "#56CCF2" }}
+          ></div>
           <div>
             <h2 className="font-semibold text-lg">
-              <CountUp
-                end={counts.occasionCount}
-                duration={0.7}
-              />
+              <CountUp end={counts.occasionCount} duration={0.7} />
             </h2>
             <h3 className="text-sm">URUSAN</h3>
           </div>
@@ -55,13 +57,11 @@ function Dashboard() {
         <div className="sm:w-60 h-20 bg-white shadow-md p-4 flex space-x-4 rounded-lg hover:solid-shadow-purple">
           <div
             className="w-12 h-12 rounded-lg"
-            style={{ background: "#BB6BD9" }}></div>
+            style={{ background: "#BB6BD9" }}
+          ></div>
           <div>
             <h2 className="font-semibold text-lg">
-              <CountUp
-                end={counts.organizationCount}
-                duration={0.7}
-              />
+              <CountUp end={counts.organizationCount} duration={0.7} />
             </h2>
             <h3 className="text-sm">ORGANISASI</h3>
           </div>
@@ -69,13 +69,11 @@ function Dashboard() {
         <div className="sm:w-60 h-20 bg-white shadow-md p-4 flex space-x-4 rounded-lg hover:solid-shadow-green">
           <div
             className="w-12 h-12 rounded-lg"
-            style={{ background: "#6FCF97" }}></div>
+            style={{ background: "#6FCF97" }}
+          ></div>
           <div>
             <h2 className="font-semibold text-lg">
-              <CountUp
-                end={counts.programCount}
-                duration={0.7}
-              />
+              <CountUp end={counts.programCount} duration={0.7} />
             </h2>
             <h3 className="text-sm">PROGRAM</h3>
           </div>
@@ -83,13 +81,11 @@ function Dashboard() {
         <div className="sm:w-60 h-20 bg-white shadow-md p-4 flex space-x-4 rounded-lg hover:solid-shadow-yellow">
           <div
             className="w-12 h-12 rounded-lg"
-            style={{ background: "#F2C94C" }}></div>
+            style={{ background: "#F2C94C" }}
+          ></div>
           <div>
             <h2 className="font-semibold text-lg">
-              <CountUp
-                end={counts.activityCount}
-                duration={0.7}
-              />
+              <CountUp end={counts.activityCount} duration={0.7} />
             </h2>
             <h3 className="text-sm">KEGIATAN</h3>
           </div>
@@ -97,13 +93,11 @@ function Dashboard() {
         <div className="sm:w-60 h-20 bg-white shadow-md p-4 flex space-x-4 rounded-lg hover:solid-shadow-orange">
           <div
             className="w-12 h-12 rounded-lg"
-            style={{ background: "#F2C94C" }}></div>
+            style={{ background: "#F2C94C" }}
+          ></div>
           <div>
             <h2 className="font-semibold text-lg">
-              <CountUp
-                end={counts.purposeCount}
-                duration={0.7}
-              />
+              <CountUp end={counts.purposeCount} duration={0.7} />
             </h2>
             <h3 className="text-sm">SASARAN</h3>
           </div>
@@ -111,13 +105,11 @@ function Dashboard() {
         <div className="sm:w-60 h-20 bg-white shadow-md p-4 flex space-x-4 rounded-lg hover:solid-shadow-gray">
           <div
             className="w-12 h-12 rounded-lg"
-            style={{ background: "#BDBDBD" }}></div>
+            style={{ background: "#BDBDBD" }}
+          ></div>
           <div>
             <h2 className="font-semibold text-lg">
-              <CountUp
-                end={counts.userCount}
-                duration={0.7}
-              />
+              <CountUp end={counts.userCount} duration={0.7} />
             </h2>
             <h3 className="text-sm">LOGIN AKSES USER</h3>
           </div>

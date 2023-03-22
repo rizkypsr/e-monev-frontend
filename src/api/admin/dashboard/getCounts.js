@@ -1,84 +1,29 @@
 import { baseUrl } from "../../../utils/constants";
+import makeRequest from "../../../utils/makeRequest";
+
+async function extractTotalCount(response) {
+  if (response.status === "fulfilled") {
+    const data = await response.value.json();
+    if (response.value.ok) {
+      return data.data.total;
+    } else {
+      throw new Error(data.message);
+    }
+  }
+
+  throw new Error(response.reason);
+}
 
 export default async function getCounts(authHeader) {
   try {
-    const [
-      userResponse,
-      occasionResponse,
-      organizationResponse,
-      programResponse,
-      activityResponse,
-      purposeResponse,
-    ] = await Promise.allSettled([
-      fetch(`${baseUrl}/user/list`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          authorization: authHeader(),
-        },
-      }),
-      fetch(`${baseUrl}/occassion/list`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          authorization: authHeader(),
-        },
-      }),
-      fetch(`${baseUrl}/org/list`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          authorization: authHeader(),
-        },
-      }),
-      fetch(`${baseUrl}/program/list`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          authorization: authHeader(),
-        },
-      }),
-      fetch(`${baseUrl}/activity/list`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          authorization: authHeader(),
-        },
-      }),
-      fetch(`${baseUrl}/purpose/list`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          authorization: authHeader(),
-        },
-      }),
+    const responses = await Promise.allSettled([
+      makeRequest(`${baseUrl}/user/list`, authHeader),
+      makeRequest(`${baseUrl}/occassion/list`, authHeader),
+      makeRequest(`${baseUrl}/org/list`, authHeader),
+      makeRequest(`${baseUrl}/program/list`, authHeader),
+      makeRequest(`${baseUrl}/activity/list`, authHeader),
+      makeRequest(`${baseUrl}/purpose/list`, authHeader),
     ]);
-
-    const userResponseValue =
-      userResponse.status === "fulfilled" ? userResponse.value : null;
-    const occasionResponseValue =
-      occasionResponse.status === "fulfilled" ? occasionResponse.value : null;
-    const organizationResponseValue =
-      organizationResponse.status === "fulfilled"
-        ? organizationResponse.value
-        : null;
-    const programResponseValue =
-      programResponse.status === "fulfilled" ? programResponse.value : null;
-    const activityResponseValue =
-      activityResponse.status === "fulfilled" ? activityResponse.value : null;
-    const purposeResponseValue =
-      purposeResponse.status === "fulfilled" ? purposeResponse.value : null;
-
-    if (
-      !userResponseValue ||
-      !occasionResponseValue ||
-      !organizationResponseValue ||
-      !programResponseValue ||
-      !activityResponseValue ||
-      !purposeResponseValue
-    ) {
-      throw new Error("Gagal mendapatkan data dari server");
-    }
 
     const [
       userData,
@@ -87,25 +32,19 @@ export default async function getCounts(authHeader) {
       programData,
       activityData,
       purposeData,
-    ] = await Promise.all([
-      userResponseValue.json(),
-      occasionResponseValue.json(),
-      organizationResponseValue.json(),
-      programResponseValue.json(),
-      activityResponseValue.json(),
-      purposeResponseValue.json(),
-    ]);
+    ] = await Promise.all(
+      responses.map((response) => extractTotalCount(response))
+    );
 
     return {
-      userCount: userData.data.total,
-      occasionCount: occasionData.data.total,
-      organizationCount: organizationData.data.total,
-      programCount: programData.data.total,
-      activityCount: activityData.data.total,
-      purposeCount: purposeData.data.total,
+      userCount: userData,
+      occasionCount: occasionData,
+      organizationCount: organizationData,
+      programCount: programData,
+      activityCount: activityData,
+      purposeCount: purposeData,
     };
   } catch (error) {
-    console.error(error);
-    throw new Error("Gagal mendapatkan data dari server");
+    throw new Error("Terjadi kesalahan pada server: " + error.message);
   }
 }
