@@ -5,9 +5,7 @@ import {
   PlusIcon,
   TrashIcon,
 } from "@heroicons/react/24/solid";
-import {
-  createColumnHelper,
-} from "@tanstack/react-table";
+import { createColumnHelper } from "@tanstack/react-table";
 import React, { useEffect, useState } from "react";
 import { useAuthHeader } from "react-auth-kit";
 import { Link } from "react-router-dom";
@@ -26,6 +24,7 @@ import showToast from "../../../utils/showToast";
 import showToastMessage from "../../../utils/showToast";
 import Pagination from "../../../components/Pagination";
 import Dropdown from "../../../components/Dropdown";
+import ErrorPage from "../../ErrorPage";
 
 function OccasionTable() {
   const authHeader = useAuthHeader();
@@ -83,9 +82,7 @@ function OccasionTable() {
         totalData: occasionsData.total,
       });
     } catch (error) {
-      console.error(error);
-      setError(error);
-      showToast("error", error.message, hideToastMessage);
+      setError(error.message);
     }
   }
 
@@ -96,7 +93,7 @@ function OccasionTable() {
 
       showToastMessage("success", deleteResponse, hideToastMessage);
     } catch (error) {
-      setError(error);
+      setError(error.message);
       showToastMessage("error", error.message, hideToastMessage);
     }
   }
@@ -128,7 +125,8 @@ function OccasionTable() {
               <Button
                 className="text-sm font-normal"
                 textColor="text-blue-500"
-                icon={<PencilIcon className="w-4 h-4" />}>
+                icon={<PencilIcon className="w-4 h-4" />}
+              >
                 Edit
               </Button>
             </Link>
@@ -136,7 +134,8 @@ function OccasionTable() {
               <Button
                 className="text-sm font-normal"
                 textColor="text-blue-500"
-                icon={<EyeIcon className="w-4 h-4" />}>
+                icon={<EyeIcon className="w-4 h-4" />}
+              >
                 Lihat
               </Button>
             </Link>
@@ -146,7 +145,8 @@ function OccasionTable() {
                   className="text-sm font-normal"
                   type="modal"
                   textColor="text-red-500"
-                  icon={<TrashIcon className="w-4 h-4" />}>
+                  icon={<TrashIcon className="w-4 h-4" />}
+                >
                   Hapus
                 </Button>
               </DialogTrigger>
@@ -168,7 +168,8 @@ function OccasionTable() {
                           className="w-full md:w-28 mt-8 border border-[#EB5757]"
                           type="modal"
                           background="bg-white"
-                          textColor="text-[#EB5757]">
+                          textColor="text-[#EB5757]"
+                        >
                           Ya, hapus
                         </Button>
                       </DialogClose>
@@ -177,7 +178,8 @@ function OccasionTable() {
                           className="w-full md:w-28 mt-8"
                           type="modal"
                           background="bg-primary"
-                          textColor="text-white">
+                          textColor="text-white"
+                        >
                           Batal
                         </Button>
                       </DialogClose>
@@ -205,6 +207,10 @@ function OccasionTable() {
   //     .headers[0].column.toggleSorting(value === "desc");
   // }
 
+  if (error) {
+    return <ErrorPage errorMessage={error} />;
+  }
+
   return (
     <>
       <div className="flex justify-between">
@@ -213,7 +219,8 @@ function OccasionTable() {
           <Button
             background="bg-primary"
             textColor={"text-white"}
-            icon={<PlusIcon className="w-4 h-4" />}>
+            icon={<PlusIcon className="w-4 h-4" />}
+          >
             Tambah Urusan
           </Button>
         </Link>
@@ -248,21 +255,25 @@ function OccasionTable() {
               onSelect={onPageSizeChanged}
               defaultValue="10"
               label="Tampilkan:"
-              endLabel="Entri">
+              endLabel="Entri"
+            >
               <Dropdown.Items>
                 <li
                   value="10"
-                  className="block px-4 py-2 font-semibold cursor-pointer hover:bg-gray-100">
+                  className="block px-4 py-2 font-semibold cursor-pointer hover:bg-gray-100"
+                >
                   10
                 </li>
                 <li
                   value="50"
-                  className="block px-4 py-2 font-semibold cursor-pointer hover:bg-gray-100">
+                  className="block px-4 py-2 font-semibold cursor-pointer hover:bg-gray-100"
+                >
                   50
                 </li>
                 <li
                   value="100"
-                  className="block px-4 py-2 font-semibold cursor-pointer hover:bg-gray-100">
+                  className="block px-4 py-2 font-semibold cursor-pointer hover:bg-gray-100"
+                >
                   100
                 </li>
               </Dropdown.Items>

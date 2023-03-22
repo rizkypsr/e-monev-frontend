@@ -16,7 +16,9 @@ export default async function getOccasionDetail(authHeader, occasionId) {
     const occasionData = await occasionResponse.json();
 
     if (!occasionResponse.ok) {
-      throw new Error(occasionData.message);
+      throw new Error(
+        `Gagal mendapatkan data dari server: ${occasionData.message}`
+      );
     }
 
     return occasionData.data.result;
