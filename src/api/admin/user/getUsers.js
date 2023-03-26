@@ -20,15 +20,16 @@ export default async function getUsers(
       }
     );
 
-    if (!userResponse.ok) {
-      throw new Error("Gagal mendapatkan data dari server");
-    }
-
     const usersData = await userResponse.json();
+
+    if (!userResponse.ok) {
+      throw new Error(
+        `Gagal mendapatkan data dari server: ${usersData.message}`
+      );
+    }
 
     return usersData.data;
   } catch (error) {
-    console.error(error);
-    throw new Error("Gagal mendapatkan data dari server");
+    throw new Error(error.message);
   }
 }
