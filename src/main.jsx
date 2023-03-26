@@ -30,15 +30,15 @@ import ProgramTable from "./views/Admin/Program/ProgramTable";
 import ProgramCreate from "./views/Admin/Program/ProgramCreate";
 import ProgramEdit from "./views/Admin/Program/ProgramEdit";
 import Program from "./views/Admin/Program/Program";
-import Kegiatan from "./views/Admin/Kegiatan/Kegiatan";
-import Sasaran from "./views/Admin/Sasaran/Sasaran";
+import Activity from "./views/Admin/Activity/Activity";
+import Purpose from "./views/Admin/Purpose/Purpose";
 import Organization from "./views/Admin/Organization/Organization";
-import KegiatanTable from "./views/Admin/Kegiatan/KegiatanTable";
-import KegiatanCreate from "./views/Admin/Kegiatan/KegiatanCreate";
-import KegiatanEdit from "./views/Admin/Kegiatan/KegiatanEdit";
-import SasaranTable from "./views/Admin/Sasaran/SasaranTable";
-import SasaranCreate from "./views/Admin/Sasaran/SasaranCreate";
-import SasaranEdit from "./views/Admin/Sasaran/SasaranEdit";
+import ActivityTable from "./views/Admin/Activity/ActivityTable";
+import ActivityCreate from "./views/Admin/Activity/ActivityCreate";
+import ActivityEdit from "./views/Admin/Activity/ActivityEdit";
+import PurposeTable from "./views/Admin/Purpose/PurposeTable";
+import PurposeCreate from "./views/Admin/Purpose/PurposeCreate";
+import PurposeEdit from "./views/Admin/Purpose/PurposeEdit";
 import LoginAksesEdit from "./views/Admin/LoginAksesUser/LoginAksesEdit";
 import LoginAksesDetail from "./views/Admin/LoginAksesUser/LoginAksesDetail";
 import { AuthProvider, RequireAuth } from "react-auth-kit";
@@ -48,18 +48,12 @@ import OccasionDetail from "./views/Admin/Occasion/OccasionDetail";
 import OrganizationDetail from "./views/Admin/Organization/OrganizationDetail";
 import ToastProvider from "./context/ToastContext";
 import ProgramDetail from "./views/Admin/Program/ProgramDetail";
+import PurposeDetail from "./views/Admin/Purpose/PurposeDetail";
 
 const router = createBrowserRouter(
   createRoutesFromElements([
-    <Route
-      path="/"
-      element={<UserLayout />}
-      errorElement={<ErrorPage404 />}
-    />,
-    <Route
-      path="/login"
-      element={<Login />}
-    />,
+    <Route path="/" element={<UserLayout />} errorElement={<ErrorPage404 />} />,
+    <Route path="/login" element={<Login />} />,
     <Route
       path="/admin"
       loader={() => {
@@ -69,7 +63,8 @@ const router = createBrowserRouter(
         crumb: (data) => (
           <Link
             to="/admin"
-            className="ml-1 text-sm text-dark-gray hover:text-primary md:ml-2">
+            className="ml-1 text-sm text-dark-gray hover:text-primary md:ml-2"
+          >
             e-Monev
           </Link>
         ),
@@ -110,11 +105,7 @@ const router = createBrowserRouter(
           }}
           element={<AkunSaya />}
           children={[
-            <Route
-              index
-              key="akunSayaForm"
-              element={<AkunSayaForm />}
-            />,
+            <Route index key="akunSayaForm" element={<AkunSayaForm />} />,
             <Route
               key="akunSayaFormEdit"
               path="edit/:id"
@@ -137,11 +128,7 @@ const router = createBrowserRouter(
           }}
           element={<LoginAksesUser />}
           children={[
-            <Route
-              index
-              key="loginAksesTable"
-              element={<LoginAksesTable />}
-            />,
+            <Route index key="loginAksesTable" element={<LoginAksesTable />} />,
             <Route
               key="loginAksesCreate"
               path="create"
@@ -174,11 +161,7 @@ const router = createBrowserRouter(
           }}
           element={<Occasion />}
           children={[
-            <Route
-              index
-              key="urusan"
-              element={<OccasionTable />}
-            />,
+            <Route index key="urusan" element={<OccasionTable />} />,
             <Route
               key="urusanCreate"
               path="create"
@@ -211,11 +194,7 @@ const router = createBrowserRouter(
           }}
           element={<Organization />}
           children={[
-            <Route
-              index
-              key="organisasi"
-              element={<OrganizationTable />}
-            />,
+            <Route index key="organisasi" element={<OrganizationTable />} />,
             <Route
               key="organisasiCreate"
               path="create"
@@ -248,11 +227,7 @@ const router = createBrowserRouter(
           }}
           element={<Program />}
           children={[
-            <Route
-              index
-              key="program"
-              element={<ProgramTable />}
-            />,
+            <Route index key="program" element={<ProgramTable />} />,
             <Route
               key="programCreate"
               path="create"
@@ -283,22 +258,18 @@ const router = createBrowserRouter(
               </span>
             ),
           }}
-          element={<Kegiatan />}
+          element={<Activity />}
           children={[
-            <Route
-              index
-              key="kegiatan"
-              element={<KegiatanTable />}
-            />,
+            <Route index key="kegiatan" element={<ActivityTable />} />,
             <Route
               key="kegiatanCreate"
               path="create"
-              element={<KegiatanCreate />}
+              element={<ActivityCreate />}
             />,
             <Route
               key="kegiatanEdit"
               path="edit/:id"
-              element={<KegiatanEdit />}
+              element={<ActivityEdit />}
             />,
           ]}
         />,
@@ -315,22 +286,23 @@ const router = createBrowserRouter(
               </span>
             ),
           }}
-          element={<Sasaran />}
+          element={<Purpose />}
           children={[
+            <Route index key="sasaran" element={<PurposeTable />} />,
             <Route
-              index
-              key="sasaran"
-              element={<SasaranTable />}
-            />,
-            <Route
-              key="sasaranCreate"
+              key="purposeCreate"
               path="create"
-              element={<SasaranCreate />}
+              element={<PurposeCreate />}
             />,
             <Route
-              key="sasaranEdit"
+              key="purposeEdit"
               path="edit/:id"
-              element={<SasaranEdit />}
+              element={<PurposeEdit />}
+            />,
+            <Route
+              key="purposeDetail"
+              path="detail/:id"
+              element={<PurposeDetail />}
             />,
           ]}
         />,
