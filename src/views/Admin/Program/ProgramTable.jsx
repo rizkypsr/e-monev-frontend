@@ -24,6 +24,7 @@ import Table from "../../../components/Table";
 import { useToastContext } from "../../../context/ToastContext";
 import TrashImg from "../../../assets/images/trash.png";
 import showToastMessage from "../../../utils/showToast";
+import ErrorPage from "../../ErrorPage";
 
 function ProgramTable() {
   const [sorting, setSorting] = useState([]);
@@ -86,8 +87,7 @@ function ProgramTable() {
         rowData: [],
         isLoading: false,
       }));
-      setError(error);
-      showToastMessage(error.message, "error");
+      setError(error.message);
     }
   }
 
@@ -98,7 +98,6 @@ function ProgramTable() {
 
       showToastMessage(deleteResponse);
     } catch (error) {
-      setError(error);
       showToastMessage(error.message, "error");
     }
   }
@@ -130,7 +129,8 @@ function ProgramTable() {
               <Button
                 className="text-sm font-normal"
                 textColor="text-blue-500"
-                icon={<PencilIcon className="w-4 h-4" />}>
+                icon={<PencilIcon className="w-4 h-4" />}
+              >
                 Edit
               </Button>
             </Link>
@@ -138,7 +138,8 @@ function ProgramTable() {
               <Button
                 className="text-sm font-normal"
                 textColor="text-blue-500"
-                icon={<EyeIcon className="w-4 h-4" />}>
+                icon={<EyeIcon className="w-4 h-4" />}
+              >
                 Lihat
               </Button>
             </Link>
@@ -148,7 +149,8 @@ function ProgramTable() {
                   className="text-sm font-normal"
                   type="modal"
                   textColor="text-red-500"
-                  icon={<TrashIcon className="w-4 h-4" />}>
+                  icon={<TrashIcon className="w-4 h-4" />}
+                >
                   Hapus
                 </Button>
               </DialogTrigger>
@@ -170,7 +172,8 @@ function ProgramTable() {
                           className="w-full md:w-28 mt-8 border border-[#EB5757]"
                           type="modal"
                           background="bg-white"
-                          textColor="text-[#EB5757]">
+                          textColor="text-[#EB5757]"
+                        >
                           Ya, hapus
                         </Button>
                       </DialogClose>
@@ -179,7 +182,8 @@ function ProgramTable() {
                           className="w-full md:w-28 mt-8"
                           type="modal"
                           background="bg-primary"
-                          textColor="text-white">
+                          textColor="text-white"
+                        >
                           Batal
                         </Button>
                       </DialogClose>
@@ -207,6 +211,10 @@ function ProgramTable() {
   //     .headers[0].column.toggleSorting(value === "desc");
   // }
 
+  if (error) {
+    return <ErrorPage errorMessage={error} />;
+  }
+
   return (
     <>
       <div className="flex justify-between">
@@ -215,7 +223,8 @@ function ProgramTable() {
           <Button
             background="bg-primary"
             textColor={"text-white"}
-            icon={<PlusIcon className="w-4 h-4" />}>
+            icon={<PlusIcon className="w-4 h-4" />}
+          >
             Tambah Program
           </Button>
         </Link>
@@ -250,21 +259,25 @@ function ProgramTable() {
               onSelect={onPageSizeChanged}
               defaultValue="10"
               label="Tampilkan:"
-              endLabel="Entri">
+              endLabel="Entri"
+            >
               <Dropdown.Items>
                 <li
                   value="10"
-                  className="block px-4 py-2 font-semibold cursor-pointer hover:bg-gray-100">
+                  className="block px-4 py-2 font-semibold cursor-pointer hover:bg-gray-100"
+                >
                   10
                 </li>
                 <li
                   value="50"
-                  className="block px-4 py-2 font-semibold cursor-pointer hover:bg-gray-100">
+                  className="block px-4 py-2 font-semibold cursor-pointer hover:bg-gray-100"
+                >
                   50
                 </li>
                 <li
                   value="100"
-                  className="block px-4 py-2 font-semibold cursor-pointer hover:bg-gray-100">
+                  className="block px-4 py-2 font-semibold cursor-pointer hover:bg-gray-100"
+                >
                   100
                 </li>
               </Dropdown.Items>

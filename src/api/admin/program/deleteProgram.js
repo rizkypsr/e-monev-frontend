@@ -14,7 +14,7 @@ export default async function deleteProgram(authHeader, programId) {
     const programData = await programResponse.json();
 
     if (!programResponse.ok) {
-      throw new Error(programData.message);
+      throw new Error(`Terjadi kesalahan pada server: ${programData.message}`);
     }
 
     return programData.message;

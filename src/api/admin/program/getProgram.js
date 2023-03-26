@@ -16,7 +16,9 @@ export default async function getProgram(authHeader, programId) {
     const programData = await programResponse.json();
 
     if (!programResponse.ok) {
-      throw new Error(programData.message);
+      throw new Error(
+        `gagal mendapatkan data dari server: ${programData.message}`
+      );
     }
 
     return programData.data.result;

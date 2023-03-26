@@ -23,7 +23,9 @@ export default async function getPrograms(
     const programData = await programResponse.json();
 
     if (!programResponse.ok) {
-      throw new Error(programData.message);
+      throw new Error(
+        `Gagal mendapatkan data dari server: ${programData.message}`
+      );
     }
 
     return programData.data;
