@@ -1,6 +1,6 @@
 import { toast } from "react-toastify";
 
-export default function showToastMessage(type, message, onClose) {
+export default function showToastMsg(type, message, onClose) {
   const config = {
     onClose,
     position: toast.POSITION.BOTTOM_CENTER,
