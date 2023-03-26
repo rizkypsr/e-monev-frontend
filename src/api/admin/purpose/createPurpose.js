@@ -8,8 +8,10 @@ export default async function createPurpose(authHeader, purposeBody) {
         "Content-Type": "application/json",
         authorization: authHeader(),
       },
-      purposeBody: JSON.stringify(purposeBody),
+      body: JSON.stringify(purposeBody),
     });
+
+    console.log(purposeBody);
 
     const purposeData = await purposeResponse.json();
 
