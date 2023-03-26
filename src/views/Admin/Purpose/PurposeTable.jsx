@@ -20,7 +20,7 @@ import Dropdown from "../../../components/Dropdown";
 import Table from "../../../components/Table";
 import { makeData } from "./makeData";
 
-function SasaranTable() {
+function PurposeTable() {
   const columnHelper = createColumnHelper();
   const [data, setData] = useState(() => makeData(1000));
   const [sorting, setSorting] = useState([]);
@@ -185,4 +185,4 @@ function SasaranTable() {
   );
 }
 
-export default SasaranTable;
+export default PurposeTable;

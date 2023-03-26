@@ -1,15 +1,11 @@
-import {
-  ArrowLeftIcon,
-  CheckCircleIcon,
-  MagnifyingGlassIcon,
-} from "@heroicons/react/24/solid";
+import { ArrowLeftIcon, CheckCircleIcon } from "@heroicons/react/24/solid";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Label from "../../../components/Label";
 import TextInput from "../../../components/TextInput";
 import Button from "../../../components/Button";
 
-function SasaranCreate() {
+function PurposeEdit() {
   return (
     <>
       <div className="flex justify-between">
@@ -21,7 +17,7 @@ function SasaranCreate() {
           className="flex space-x-3 items-center mb-8">
           <ArrowLeftIcon className="w-6 h-6" />
           <h1 className="font-semibold text-lg text-dark-gray leading-7">
-            Tambah Sasaran
+            Edit Sasaran
           </h1>
         </Link>
 
@@ -66,4 +62,4 @@ function SasaranCreate() {
   );
 }
 
-export default SasaranCreate;
+export default PurposeEdit;

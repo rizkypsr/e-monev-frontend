@@ -1,7 +1,7 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
 
-function Sasaran() {
+function Purpose() {
   return (
     <>
       <Outlet />
@@ -9,4 +9,4 @@ function Sasaran() {
   );
 }
 
-export default Sasaran;
+export default Purpose;
