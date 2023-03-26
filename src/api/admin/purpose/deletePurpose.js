@@ -8,7 +8,7 @@ export default async function deletePurpose(authHeader, purposeId) {
         "Content-Type": "application/json",
         authorization: authHeader(),
       },
-      body: JSON.stringify({ program_id: purposeId }),
+      body: JSON.stringify({ purpose_id: purposeId }),
     });
 
     const purposeData = await purposeResponse.json();

@@ -11,8 +11,6 @@ export default async function createPurpose(authHeader, purposeBody) {
       body: JSON.stringify(purposeBody),
     });
 
-    console.log(purposeBody);
-
     const purposeData = await purposeResponse.json();
 
     if (!purposeResponse.ok) {

@@ -28,7 +28,7 @@ export default async function getPurposes(
       );
     }
 
-    return programData.data;
+    return purposeData.data;
   } catch (error) {
     throw new Error(error.message);
   }
