@@ -9,7 +9,7 @@ import {
 } from "react-router-dom";
 import "./index.css";
 import Login from "./views/Auth/Login";
-import PrivateRoute from "./views/PrivateRoute";
+import PrivateRoute from "./layouts/PrivateRoute";
 import AdminLayout from "./layouts/AdminRoot";
 import AkunSaya from "./views/Admin/AkunSaya/AkunSaya";
 import LoginAksesUser from "./views/Admin/LoginAksesUser/LoginAksesUser";
@@ -41,7 +41,7 @@ import PurposeCreate from "./views/Admin/Purpose/PurposeCreate";
 import PurposeEdit from "./views/Admin/Purpose/PurposeEdit";
 import LoginAksesEdit from "./views/Admin/LoginAksesUser/LoginAksesEdit";
 import LoginAksesDetail from "./views/Admin/LoginAksesUser/LoginAksesDetail";
-import { AuthProvider, RequireAuth } from "react-auth-kit";
+import { AuthProvider } from "react-auth-kit";
 import ErrorPage404 from "./views/ErrorPage404";
 import UserLayout from "./layouts/UserRoot";
 import OccasionDetail from "./views/Admin/Occasion/OccasionDetail";
@@ -52,7 +52,15 @@ import PurposeDetail from "./views/Admin/Purpose/PurposeDetail";
 
 const router = createBrowserRouter(
   createRoutesFromElements([
-    <Route path="/" element={<UserLayout />} errorElement={<ErrorPage404 />} />,
+    <Route
+      path="/"
+      element={
+        <PrivateRoute loginPath="/login" role={2}>
+          <UserLayout />
+        </PrivateRoute>
+      }
+      errorElement={<ErrorPage404 />}
+    />,
     <Route path="/login" element={<Login />} />,
     <Route
       path="/admin"
@@ -70,7 +78,7 @@ const router = createBrowserRouter(
         ),
       }}
       element={
-        <PrivateRoute loginPath="/login">
+        <PrivateRoute loginPath="/login" role={1}>
           <AdminLayout />
         </PrivateRoute>
       }

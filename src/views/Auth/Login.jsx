@@ -3,15 +3,13 @@ import Label from "../../components/Label";
 import TextInput from "../../components/TextInput";
 import Button from "../../components/Button";
 import Batik from "../../assets/images/batik.png";
-import { useEffect, useState } from "react";
-import { useCookies } from "react-cookie";
+import { useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
-import { useIsAuthenticated, useSignIn } from "react-auth-kit";
-import { baseUrl } from "../../utils/constants";
+import { useAuthUser, useIsAuthenticated, useSignIn } from "react-auth-kit";
+import login from "../../api/auth/login";
+import showToastMsg from "../../utils/showToast";
 
 function Login() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [role, setRole] = useState(0);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [usernameError, setUsernameError] = useState("");
@@ -19,7 +17,7 @@ function Login() {
 
   const isAuthenticated = useIsAuthenticated();
   const signIn = useSignIn();
-  const navigate = useNavigate();
+  const auth = useAuthUser();
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -28,75 +26,47 @@ function Login() {
     setPasswordError("");
 
     try {
-      const res = await fetch(`${baseUrl}/user/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: username,
-          password: password,
-        }),
-      });
+      const loginBody = { username, password };
+      const loginResponse = await login(loginBody);
 
-      const data = await res.json();
-
-      if (res.status === 200) {
-        if (
-          signIn({
-            token: data.access_token,
-            tokenType: "Bearer",
-            authState: data.payloadClient,
-            expiresIn: 2880,
-          })
-        ) {
-          console.log("Login Success");
-          navigate("/admin");
-        } else {
-          alert("Terjadi kesalahan saat login");
-        }
-
-        console.log(data);
-      } else {
-        switch (data.message) {
-          case "Data user tidak ditemukan":
-            setUsernameError("Username yang Anda masukkan tidak tersedia");
-            break;
-          case "Username/password salah":
-            setPasswordError("Password yang Anda masukkan salah");
-          default:
-            break;
-        }
-
-        console.error(data);
+      if (
+        !signIn({
+          token: loginResponse.access_token,
+          tokenType: "Bearer",
+          authState: loginResponse.payloadClient,
+          expiresIn: 2880,
+        })
+      ) {
+        showToastMsg("error", "Terjadi kesalahan saat login");
       }
     } catch (error) {
-      alert(error);
+      switch (error.message) {
+        case "Data user tidak ditemukan":
+          setUsernameError("Username yang Anda masukkan tidak tersedia");
+          break;
+        case "Username/password salah":
+          setPasswordError("Password yang Anda masukkan salah");
+        default:
+          break;
+      }
     }
   };
 
   if (isAuthenticated()) {
-    return (
-      <Navigate
-        to={"/admin"}
-        replace
-      />
-    );
+    if (auth().admin_role_id === 1) {
+      return <Navigate to="/admin" replace />;
+    }
+
+    return <Navigate to="/" replace />;
   } else {
     return (
       <div className="lg:flex h-screen">
         <div className="hidden lg:block h-full sm:basis-1/2">
-          <img
-            src={Batik}
-            className="object-cover w-full h-full"
-          />
+          <img src={Batik} className="object-cover w-full h-full" />
         </div>
         <div className="flex flex-col basis-1/2 p-9">
           <div className="flex space-x-3">
-            <img
-              src={Logo}
-              className="w-14"
-            />
+            <img src={Logo} className="w-14" />
             <div className="text-dark-gray">
               <h1 className="font-semibold">SISTEM INFORMASI E-MONEY</h1>
               <h2>KABUPATEN SORONG</h2>
@@ -111,9 +81,7 @@ function Login() {
               Login dibawah untuk akses akun Anda
             </h4>
 
-            <form
-              className="mt-4"
-              onSubmit={onSubmit}>
+            <form className="mt-4" onSubmit={onSubmit}>
               <div className="mb-6">
                 <Label htmlFor="username">Username</Label>
                 <TextInput
@@ -148,9 +116,7 @@ function Login() {
                     type="checkbox"
                     className="w-4 h-4 border rounded border-light-gray focus:ring-3 focus:ring-blue-300"
                   />
-                  <Label
-                    htmlFor="remember"
-                    className="ml-2">
+                  <Label htmlFor="remember" className="ml-2">
                     Ingatkan Saya
                   </Label>
                 </div>
@@ -161,7 +127,8 @@ function Login() {
                 className="w-28"
                 type="submit"
                 background="bg-primary"
-                textColor="text-white">
+                textColor="text-white"
+              >
                 Masuk
               </Button>
             </form>
