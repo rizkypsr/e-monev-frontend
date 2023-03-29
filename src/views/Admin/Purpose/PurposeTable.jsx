@@ -4,32 +4,124 @@ import {
   PencilIcon,
   PlusIcon,
   TrashIcon,
-} from "@heroicons/react/24/solid";
-import { createColumnHelper } from "@tanstack/react-table";
-import React, { useEffect, useState } from "react";
-import { useAuthHeader } from "react-auth-kit";
-import { Link } from "react-router-dom";
-import { ToastContainer } from "react-toastify";
-import { getPurposes } from "../../../api/admin/purpose";
-import deletePurpose from "../../../api/admin/purpose/deletePurpose";
-import Button from "../../../components/Button";
+} from '@heroicons/react/24/solid';
+import { createColumnHelper } from '@tanstack/react-table';
+import React, { useEffect, useState } from 'react';
+import { useAuthHeader } from 'react-auth-kit';
+import { Link } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import { getPurposes } from '../../../api/admin/purpose';
+import deletePurpose from '../../../api/admin/purpose/deletePurpose';
+import Button from '../../../components/Button';
 import {
   Dialog,
   DialogClose,
   DialogContent,
   DialogTrigger,
-} from "../../../components/DialogContent";
-import Dropdown from "../../../components/Dropdown";
-import Pagination from "../../../components/Pagination";
-import Table from "../../../components/Table";
-import { useToastContext } from "../../../context/ToastContext";
-import ErrorPage from "../../ErrorPage";
-import TrashImg from "../../../assets/images/trash.png";
+} from '../../../components/DialogContent';
+import Dropdown from '../../../components/Dropdown';
+import Pagination from '../../../components/Pagination';
+import Table from '../../../components/Table';
+import { useToastContext } from '../../../context/ToastContext';
+import ErrorPage from '../../ErrorPage';
+import TrashImg from '../../../assets/images/trash.png';
+
+const columnHelper = createColumnHelper();
+const columns = [
+  columnHelper.accessor('id', {
+    cell: (info) => info.getValue(),
+    footer: (info) => info.column.id,
+  }),
+  columnHelper.accessor((row) => row.title, {
+    id: 'title',
+    cell: (info) => <i>{info.getValue()}</i>,
+    header: () => <span>Indikator Program</span>,
+  }),
+  columnHelper.accessor((row) => row.aksi, {
+    id: 'aksi',
+    size: 10,
+    cell: (props, deletePurposeData) => {
+      const rowId = props.row.original.id;
+      return (
+        <div className="flex justify-end">
+          <Link to={`edit/${rowId}`}>
+            <Button
+              className="text-sm font-normal"
+              textColor="text-blue-500"
+              icon={<PencilIcon className="w-4 h-4" />}
+            >
+              Edit
+            </Button>
+          </Link>
+          <Link to={`detail/${rowId}`}>
+            <Button
+              className="text-sm font-normal"
+              textColor="text-blue-500"
+              icon={<EyeIcon className="w-4 h-4" />}
+            >
+              Lihat
+            </Button>
+          </Link>
+          <Dialog>
+            <DialogTrigger>
+              <Button
+                className="text-sm font-normal"
+                type="modal"
+                textColor="text-red-500"
+                icon={<TrashIcon className="w-4 h-4" />}
+              >
+                Hapus
+              </Button>
+            </DialogTrigger>
+
+            <DialogContent className="py-12 w-1/3">
+              <div className="flex flex-col items-center justify-center h-full">
+                <div className="p-6 bg-[#FFDADA] w-fit rounded-lg">
+                  <img src={TrashImg} alt="Hapus" />
+                </div>
+
+                <div>
+                  <h1 className="mt-6 font-semibold text-lg leading-7 text-dark-gray">
+                    Apakah Anda yakin menghapus ini?
+                  </h1>
+                  <div className="flex space-x-3 justify-center">
+                    <DialogClose>
+                      <Button
+                        onClick={() => deletePurposeData(rowId)}
+                        className="w-full md:w-28 mt-8 border border-[#EB5757]"
+                        type="modal"
+                        background="bg-white"
+                        textColor="text-[#EB5757]"
+                      >
+                        Ya, hapus
+                      </Button>
+                    </DialogClose>
+                    <DialogClose>
+                      <Button
+                        className="w-full md:w-28 mt-8"
+                        type="modal"
+                        background="bg-primary"
+                        textColor="text-white"
+                      >
+                        Batal
+                      </Button>
+                    </DialogClose>
+                  </div>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
+      );
+    },
+    header: () => <div className="text-right">Aksi</div>,
+  }),
+];
 
 function PurposeTable() {
   const [error, setError] = useState(false);
   const [pageSize, setPageSize] = useState(10);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState('');
   const [pageData, setCurrentPageData] = useState({
     rowData: [],
     isLoading: false,
@@ -38,176 +130,71 @@ function PurposeTable() {
   });
   const [currentPage, setCurrentPage] = useState(1);
   const [resetPage, setResetPage] = useState(false);
+  const [sorting, setSorting] = useState('z-a');
 
   const authHeader = useAuthHeader();
-  const { showToastMessage, hideToastMessage } = useToastContext();
+  const { showToastMessage } = useToastContext();
 
-  const columnHelper = createColumnHelper();
-  const columns = [
-    columnHelper.accessor("id", {
-      cell: (info) => info.getValue(),
-      footer: (info) => info.column.id,
-    }),
-    columnHelper.accessor((row) => row.title, {
-      id: "title",
-      cell: (info) => <i>{info.getValue()}</i>,
-      header: () => <span>Indikator Program</span>,
-    }),
-    columnHelper.accessor((row) => row.aksi, {
-      id: "aksi",
-      size: 10,
-      cell: (props) => {
-        const rowId = props.row.original.id;
-        return (
-          <div className="flex justify-end">
-            <Link to={`edit/${rowId}`}>
-              <Button
-                className="text-sm font-normal"
-                textColor="text-blue-500"
-                icon={<PencilIcon className="w-4 h-4" />}
-              >
-                Edit
-              </Button>
-            </Link>
-            <Link to={`detail/${rowId}`}>
-              <Button
-                className="text-sm font-normal"
-                textColor="text-blue-500"
-                icon={<EyeIcon className="w-4 h-4" />}
-              >
-                Lihat
-              </Button>
-            </Link>
-            <Dialog>
-              <DialogTrigger>
-                <Button
-                  className="text-sm font-normal"
-                  type="modal"
-                  textColor="text-red-500"
-                  icon={<TrashIcon className="w-4 h-4" />}
-                >
-                  Hapus
-                </Button>
-              </DialogTrigger>
-
-              <DialogContent className="py-12 w-1/3">
-                <div className="flex flex-col items-center justify-center h-full">
-                  <div className="p-6 bg-[#FFDADA] w-fit rounded-lg">
-                    <img src={TrashImg} />
-                  </div>
-
-                  <div>
-                    <h1 className="mt-6 font-semibold text-lg leading-7 text-dark-gray">
-                      Apakah Anda yakin menghapus ini?
-                    </h1>
-                    <div className="flex space-x-3 justify-center">
-                      <DialogClose>
-                        <Button
-                          onClick={() => deletePurposeData(rowId)}
-                          className="w-full md:w-28 mt-8 border border-[#EB5757]"
-                          type="modal"
-                          background="bg-white"
-                          textColor="text-[#EB5757]"
-                        >
-                          Ya, hapus
-                        </Button>
-                      </DialogClose>
-                      <DialogClose>
-                        <Button
-                          className="w-full md:w-28 mt-8"
-                          type="modal"
-                          background="bg-primary"
-                          textColor="text-white"
-                        >
-                          Batal
-                        </Button>
-                      </DialogClose>
-                    </div>
-                  </div>
-                </div>
-              </DialogContent>
-            </Dialog>
-          </div>
-        );
-      },
-      header: () => <div className="text-right">Aksi</div>,
-    }),
-  ];
-
-  useEffect(() => {
-    setCurrentPageData((prevState) => ({
-      ...prevState,
-      rowData: [],
-      isLoading: true,
-    }));
-
-    fetchPurposes(0, pageSize, currentPage);
-  }, [currentPage, pageSize]);
-
-  useEffect(() => {
-    setCurrentPage(1);
-    setResetPage((prevState) => !prevState);
-    setCurrentPageData((prevState) => ({
-      ...prevState,
-      rowData: [],
-      isLoading: true,
-    }));
-
-    fetchPurposes(0, pageSize, currentPage);
-  }, [search]);
-
-  async function fetchPurposes(offset, limit, pageNumber) {
+  async function fetchPurposes(offset, limit, pageNumber, sort) {
     try {
-      const purposeData = await getPurposes(
-        authHeader,
-        offset,
-        limit,
-        pageNumber,
-        search
-      );
+      const purposeData = await getPurposes(authHeader, offset, limit, pageNumber, search, sort);
       setCurrentPageData({
         rowData: purposeData.result,
         isLoading: false,
         totalPages: purposeData.pages,
         totalData: purposeData.total,
       });
-    } catch (error) {
-      console.error(error);
-      setCurrentPageData((prevState) => ({
-        ...prevState,
-        rowData: [],
-        isLoading: false,
-      }));
-      setError(error.message);
+    } catch (err) {
+      setError(err.message);
     }
   }
 
-  async function deletePurposeData(id) {
+  useEffect(() => {
+    setCurrentPageData((prevState) => ({
+      ...prevState,
+      rowData: [],
+      isLoading: true,
+    }));
+
+    fetchPurposes(0, pageSize, currentPage, sorting);
+  }, [currentPage, pageSize, sorting]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+    setResetPage((prevState) => !prevState);
+    setCurrentPageData((prevState) => ({
+      ...prevState,
+      rowData: [],
+      isLoading: true,
+    }));
+
+    fetchPurposes(0, pageSize, currentPage, sorting);
+  }, [search]);
+
+  const deletePurposeData = async (id) => {
     try {
       const deleteResponse = await deletePurpose(authHeader, id);
       fetchPurposes(0, pageSize, currentPage);
 
       showToastMessage(deleteResponse);
-    } catch (error) {
-      showToastMessage(error.message, "error");
+    } catch (err) {
+      showToastMessage(err.message, 'error');
     }
-  }
+  };
 
-  async function onPageSizeChanged({ value, label }) {
+  async function onPageSizeChanged({ value }) {
     setCurrentPage(1);
     setResetPage((prevState) => !prevState);
     setPageSize(Number(value));
   }
 
+  function onSorting({ value }) {
+    setSorting(value);
+  }
+
   if (error) {
     return <ErrorPage errorMessage={error} />;
   }
-
-  // function onSorting({ value, label }) {
-  //   table
-  //     .getHeaderGroups()[0]
-  //     .headers[0].column.toggleSorting(value === "desc");
-  // }
 
   return (
     <>
@@ -216,7 +203,7 @@ function PurposeTable() {
         <Link to="create">
           <Button
             background="bg-primary"
-            textColor={"text-white"}
+            textColor="text-white"
             icon={<PlusIcon className="w-4 h-4" />}
           >
             Tambah Sasaran
@@ -227,25 +214,24 @@ function PurposeTable() {
       <div className="flex justify-between mt-6">
         <div className="flex space-x-3">
           {/* Sorting Dropdown */}
-          {/* <div>
-            <Dropdown
-              onSelect={onSorting}
-              defaultValue="A - Z"
-              label="Urutkan:">
+          <div>
+            <Dropdown onSelect={onSorting} defaultValue="Z - A" label="Urutkan:">
               <Dropdown.Items>
                 <li
-                  value="asc"
-                  className="block px-4 py-2 font-semibold cursor-pointer hover:bg-gray-100">
+                  value="a-z"
+                  className="block px-4 py-2 font-semibold cursor-pointer hover:bg-gray-100"
+                >
                   A - Z
                 </li>
                 <li
-                  value="desc"
-                  className="block px-4 py-2 font-semibold cursor-pointer hover:bg-gray-100">
+                  value="z-a"
+                  className="block px-4 py-2 font-semibold cursor-pointer hover:bg-gray-100"
+                >
                   Z - A
                 </li>
               </Dropdown.Items>
             </Dropdown>
-          </div> */}
+          </div>
 
           {/* Page Size Dropdown */}
           <div>
@@ -295,7 +281,11 @@ function PurposeTable() {
 
       <div className="w-full h-full mt-6 bg-white rounded-lg">
         <Table
-          columns={columns}
+          columns={columns.map((column) =>
+            column.cell
+              ? { ...column, cell: (props) => column.cell(props, deletePurposeData) }
+              : column,
+          )}
           data={pageData.rowData}
           isLoading={pageData.isLoading}
         />

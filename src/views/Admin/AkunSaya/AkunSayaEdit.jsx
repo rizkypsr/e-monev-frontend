@@ -1,33 +1,25 @@
 import { ArrowLeftIcon, CheckCircleIcon } from "@heroicons/react/24/solid";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Button from "../../../components/Button";
 import Label from "../../../components/Label";
 import TextInput from "../../../components/TextInput";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogTrigger,
-} from "../../../components/DialogContent";
 import SuccessImg from "../../../assets/images/success.png";
 import { useState } from "react";
-import { useAuthHeader, useAuthUser, useSignOut } from "react-auth-kit";
+import { useAuthUser, useSignOut } from "react-auth-kit";
+import updateUser from "../../../api/auth/updateUser";
 import { useToastContext } from "../../../context/ToastContext";
-import { baseUrl } from "../../../utils/constants";
 
 function AkunSayaEdit() {
   const [username, setUsername] = useState(null);
   const [password, setPassword] = useState(null);
   const [passwordConfirmation, setPasswordConfirmation] = useState(null);
   const [passwordError, setPasswordError] = useState("");
-  const [error, setError] = useState("");
 
-  const authHeader = useAuthHeader();
   const authUser = useAuthUser();
-  const navigate = useNavigate();
   const signOut = useSignOut();
+  const { showToastMessage } = useToastContext();
 
-  async function handleSubmit(e) {
+  const onSubmit = async (e) => {
     e.preventDefault();
 
     if (password !== passwordConfirmation) {
@@ -47,39 +39,25 @@ function AkunSayaEdit() {
       requestBody.password = password;
     }
 
-    const res = await fetch(`${baseUrl}/user/update`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: authHeader(),
-      },
-      body: JSON.stringify(requestBody),
-    });
+    const userResponse = await updateUser(requestBody);
 
-    if (res.ok) {
+    if (userResponse.statusCode === 200) {
       signOut();
+      showToastMessage(userResponse.message);
     } else {
-      setError(new Error(result.message));
-      toast.error("Terjadi kesalahan pada server", {
-        position: toast.POSITION.BOTTOM_CENTER,
-        autoClose: 3000,
-      });
+      showToastMessage(userResponse.message, "error");
     }
-  }
+  };
 
   return (
     <>
-      <Link
-        to="../"
-        className="flex space-x-3 items-center mb-8">
+      <Link to="../" className="flex space-x-3 items-center mb-8">
         <ArrowLeftIcon className="w-6 h-6" />
         <h1 className="font-semibold text-lg text-dark-gray leading-7">
           Ubah akun saya
         </h1>
       </Link>
-      <form
-        className="mt-4"
-        onSubmit={handleSubmit}>
+      <form className="mt-4" onSubmit={onSubmit}>
         <div className="mb-6">
           <Label>Username Baru</Label>
           <TextInput
@@ -117,14 +95,16 @@ function AkunSayaEdit() {
             type="submit"
             background="bg-primary"
             textColor="text-white"
-            icon={<CheckCircleIcon className="w-5 h-5" />}>
+            icon={<CheckCircleIcon className="w-5 h-5" />}
+          >
             Simpan
           </Button>
           <Link to="../">
             <Button
               className="w-full md:w-28 font-medium"
               background="bg-[#EAEAEA]"
-              textColor="text-dark-gray">
+              textColor="text-dark-gray"
+            >
               Batal
             </Button>
           </Link>

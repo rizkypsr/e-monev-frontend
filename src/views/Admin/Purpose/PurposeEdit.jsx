@@ -1,36 +1,36 @@
-import { ArrowLeftIcon, CheckCircleIcon } from "@heroicons/react/24/solid";
-import React, { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import Label from "../../../components/Label";
-import TextInput from "../../../components/TextInput";
-import Button from "../../../components/Button";
-import { useAuthHeader } from "react-auth-kit";
-import { useToastContext } from "../../../context/ToastContext";
-import getPurpose from "../../../api/admin/purpose/getPurpose";
-import ErrorPage from "../../ErrorPage";
-import updatePurpose from "../../../api/admin/purpose/updatePurpose";
+import { ArrowLeftIcon, CheckCircleIcon } from '@heroicons/react/24/solid';
+import React, { useEffect, useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useAuthHeader } from 'react-auth-kit';
+import Label from '../../../components/Label';
+import TextInput from '../../../components/TextInput';
+import Button from '../../../components/Button';
+import { useToastContext } from '../../../context/ToastContext';
+import getPurpose from '../../../api/admin/purpose/getPurpose';
+import ErrorPage from '../../ErrorPage';
+import updatePurpose from '../../../api/admin/purpose/updatePurpose';
 
 function PurposeEdit() {
   const { id } = useParams();
-  const [title, setTitle] = useState("");
+  const [title, setTitle] = useState('');
   const [error, setError] = useState(null);
 
   const authHeader = useAuthHeader();
   const navigate = useNavigate();
   const { showToastMessage } = useToastContext();
 
-  useEffect(() => {
-    fetchPurpose();
-  }, []);
-
   const fetchPurpose = async () => {
     try {
       const purposeResponse = await getPurpose(authHeader, id);
       setTitle(purposeResponse.title);
-    } catch (error) {
-      setError(error);
+    } catch (err) {
+      setError(err.message);
     }
   };
+
+  useEffect(() => {
+    fetchPurpose();
+  }, []);
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -42,10 +42,10 @@ function PurposeEdit() {
       };
       const purposeResponse = await updatePurpose(authHeader, purposeBody);
 
-      showToastMessage(purposeResponse, "success");
-      navigate("../");
-    } catch (error) {
-      showToastMessage(error.message, "error");
+      showToastMessage(purposeResponse, 'success');
+      navigate('../');
+    } catch (err) {
+      showToastMessage(err.message, 'error');
     }
   };
 
@@ -61,9 +61,7 @@ function PurposeEdit() {
       <div className="w-full h-full mt-6 bg-white rounded-lg p-9">
         <Link to="../" className="flex space-x-3 items-center mb-8">
           <ArrowLeftIcon className="w-6 h-6" />
-          <h1 className="font-semibold text-lg text-dark-gray leading-7">
-            Edit Sasaran
-          </h1>
+          <h1 className="font-semibold text-lg text-dark-gray leading-7">Edit Sasaran</h1>
         </Link>
 
         <form className="mt-4" onSubmit={onSubmit}>

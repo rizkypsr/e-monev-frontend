@@ -1,13 +1,49 @@
 import { ArrowLeftIcon } from "@heroicons/react/24/solid";
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useAuthHeader } from "react-auth-kit";
+import { Link, useParams } from "react-router-dom";
+import getUser from "../../../api/admin/user/getUser";
+import getRole from "../../../utils/getRole";
+import ErrorPage from "../../ErrorPage";
 
-function LoginAksesDetail() {
+const LoginAksesDetail = () => {
+  const { id } = useParams();
+
+  const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
+  const [levelUser, setLevelUser] = useState("");
+  const [error, setError] = useState(null);
+
+  const authHeader = useAuthHeader();
+
+  useEffect(() => {
+    fetchUser();
+  }, []);
+
+  const fetchUser = async () => {
+    try {
+      const userResponse = await getUser(authHeader, id);
+
+      setName(userResponse.name);
+      setUsername(userResponse.username);
+      setLevelUser(getRole(userResponse.admin_role_id));
+    } catch (error) {
+      console.error(error);
+      setError(error);
+    }
+  };
+
+  if (error) {
+    return (
+      <>
+        <ErrorPage />;
+      </>
+    );
+  }
+
   return (
     <div className="w-full h-full mt-6 bg-white rounded-lg p-9">
-      <Link
-        to="../"
-        className="flex space-x-3 items-center mb-8">
+      <Link to="../" className="flex space-x-3 items-center mb-8">
         <ArrowLeftIcon className="w-6 h-6" />
         <h1 className="font-semibold text-lg text-dark-gray leading-7">
           Detail User
@@ -20,32 +56,44 @@ function LoginAksesDetail() {
             <tr className="bg-light-blue">
               <th
                 scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                No.
+                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+              >
+                ID
               </th>
-              <td className="px-6 py-4">3</td>
+              <td className="px-6 py-4">{id}</td>
             </tr>
             <tr className="bg-white">
               <th
                 scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                Kode
+                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+              >
+                Nama
               </th>
-              <td className="px-6 py-4">10291092</td>
+              <td className="px-6 py-4">{name}</td>
             </tr>
             <tr className="bg-light-blue">
               <th
                 scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                Urusan
+                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+              >
+                Username
               </th>
-              <td className="px-6 py-4">Lorem ipsum dolor sit.</td>
+              <td className="px-6 py-4">{username}</td>
+            </tr>
+            <tr className="bg-white">
+              <th
+                scope="row"
+                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+              >
+                Level User
+              </th>
+              <td className="px-6 py-4">{levelUser}</td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
   );
-}
+};
 
 export default LoginAksesDetail;

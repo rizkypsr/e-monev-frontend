@@ -4,7 +4,7 @@ import { BrowserRouter, Link, Route, Routes } from "react-router-dom";
 import AdminLayout from "./layouts/AdminRoot";
 import Dashboard from "./views/Admin/Dashboard/Dashboard";
 import Login from "./views/Auth/Login";
-import PrivateRoute from "./views/PrivateRoute";
+import PrivateRoute from "./layouts/PrivateRoute";
 
 function RoutesComponent() {
   return (

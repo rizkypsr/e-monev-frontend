@@ -1,11 +1,11 @@
-import { baseUrl } from "../../../utils/constants";
+import { baseUrl } from '../../../utils/constants';
 
 export default async function createProgram(authHeader, body) {
   try {
     const programResponse = await fetch(`${baseUrl}/program/create`, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
         authorization: authHeader(),
       },
       body: JSON.stringify(body),

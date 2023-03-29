@@ -1,11 +1,11 @@
-import { baseUrl } from "../../../utils/constants";
+import { baseUrl } from '../../../utils/constants';
 
 export default async function updateOccasion(authHeader, occasionBody) {
   try {
     const occasionResponse = await fetch(`${baseUrl}/occassion/update`, {
-      method: "PATCH",
+      method: 'PATCH',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
         authorization: authHeader(),
       },
       body: JSON.stringify(occasionBody),

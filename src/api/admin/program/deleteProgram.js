@@ -1,11 +1,11 @@
-import { baseUrl } from "../../../utils/constants";
+import { baseUrl } from '../../../utils/constants';
 
 export default async function deleteProgram(authHeader, programId) {
   try {
     const programResponse = await fetch(`${baseUrl}/program/delete`, {
-      method: "PATCH",
+      method: 'PATCH',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
         authorization: authHeader(),
       },
       body: JSON.stringify({ program_id: programId }),

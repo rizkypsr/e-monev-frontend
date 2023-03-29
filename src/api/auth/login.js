@@ -1,11 +1,11 @@
-import { baseUrl } from "../../utils/constants";
+import { baseUrl } from '../../utils/constants';
 
 export default async function login(body) {
   try {
     const loginResponse = await fetch(`${baseUrl}/user/login`, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify(body),
     });

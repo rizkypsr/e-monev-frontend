@@ -1,11 +1,11 @@
-import { baseUrl } from "../../../utils/constants";
+import { baseUrl } from '../../../utils/constants';
 
 export default async function updateProgram(authHeader, programBody) {
   try {
     const programResponse = await fetch(`${baseUrl}/program/update`, {
-      method: "PATCH",
+      method: 'PATCH',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
         authorization: authHeader(),
       },
       body: JSON.stringify(programBody),

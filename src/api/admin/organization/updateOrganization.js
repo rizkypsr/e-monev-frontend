@@ -1,11 +1,11 @@
-import { baseUrl } from "../../../utils/constants";
+import { baseUrl } from '../../../utils/constants';
 
 export default async function updateOrganization(authHeader, organizationBody) {
   try {
     const organizationResponse = await fetch(`${baseUrl}/org/update`, {
-      method: "PATCH",
+      method: 'PATCH',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
         authorization: authHeader(),
       },
       body: JSON.stringify(organizationBody),
@@ -14,13 +14,11 @@ export default async function updateOrganization(authHeader, organizationBody) {
     const organizationData = await organizationResponse.json();
 
     if (!organizationResponse.ok) {
-      throw new Error(
-        `Terjadi kesalahan pada server ${organizationData.message}`
-      );
+      throw new Error(`Terjadi kesalahan pada server ${organizationData.message}`);
     }
 
-    return "Organisasi berhasil diubah!";
+    return 'Organisasi berhasil diubah!';
   } catch (error) {
-    throw new Error(`Terjadi kesalahan pada server ${error.message}`);
+    throw new Error(error.message);
   }
 }

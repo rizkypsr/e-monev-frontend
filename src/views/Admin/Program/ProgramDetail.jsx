@@ -1,52 +1,41 @@
-import { ArrowLeftIcon } from "@heroicons/react/24/solid";
-import React, { useEffect, useState } from "react";
-import { useAuthHeader } from "react-auth-kit";
-import { Link, useParams } from "react-router-dom";
-import { ToastContainer } from "react-toastify";
-import { getProgram } from "../../../api/admin/program";
-import ErrorPage from "../../ErrorPage";
+import { ArrowLeftIcon } from '@heroicons/react/24/solid';
+import React, { useEffect, useState } from 'react';
+import { useAuthHeader } from 'react-auth-kit';
+import { Link, useParams } from 'react-router-dom';
+import { getProgram } from '../../../api/admin/program';
+import ErrorPage from '../../ErrorPage';
 
 function ProgramDetail() {
-  const [code, setCode] = useState("");
-  const [program, setProgram] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [code, setCode] = useState('');
+  const [program, setProgram] = useState('');
   const [error, setError] = useState(false);
 
   const { id } = useParams();
   const authHeader = useAuthHeader();
 
-  useEffect(() => {
-    fetchProgram();
-  }, []);
-
-  async function fetchProgram() {
+  const fetchProgram = async () => {
     try {
       const programResponse = await getProgram(authHeader, id);
       setCode(programResponse.code);
       setProgram(programResponse.title);
-    } catch (error) {
-      console.error(error);
-      setError(error);
+    } catch (err) {
+      setError(err.message);
     }
-  }
+  };
+
+  useEffect(() => {
+    fetchProgram();
+  }, []);
 
   if (error) {
-    return (
-      <>
-        <ErrorPage />;
-      </>
-    );
+    return <ErrorPage />;
   }
 
   return (
     <div className="w-full h-full mt-6 bg-white rounded-lg p-9">
-      <Link
-        to="../"
-        className="flex space-x-3 items-center mb-8">
+      <Link to="../" className="flex space-x-3 items-center mb-8">
         <ArrowLeftIcon className="w-6 h-6" />
-        <h1 className="font-semibold text-lg text-dark-gray leading-7">
-          Detail Program
-        </h1>
+        <h1 className="font-semibold text-lg text-dark-gray leading-7">Detail Program</h1>
       </Link>
 
       <div className="relative overflow-x-auto">
@@ -55,7 +44,8 @@ function ProgramDetail() {
             <tr className="bg-light-blue">
               <th
                 scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+              >
                 No.
               </th>
               <td className="px-6 py-4">{id}</td>
@@ -63,7 +53,8 @@ function ProgramDetail() {
             <tr className="bg-white">
               <th
                 scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+              >
                 Kode
               </th>
               <td className="px-6 py-4">{code}</td>
@@ -71,7 +62,8 @@ function ProgramDetail() {
             <tr className="bg-light-blue">
               <th
                 scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+              >
                 Urusan
               </th>
               <td className="px-6 py-4">{program}</td>

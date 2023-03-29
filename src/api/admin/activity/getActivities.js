@@ -1,23 +1,25 @@
-import { baseUrl } from "../../../utils/constants";
+import { baseUrl } from '../../../utils/constants';
 
 export default async function getActivities(
   authHeader,
   offset = 0,
   limit = 10,
   pageNumber = 1,
-  search = ""
+  search = '',
+  sort = 'z-a',
 ) {
   try {
     const activityResponse = await fetch(
-      `${baseUrl}/activity/list?offset=${offset}&limit=${limit}&search=${search}` +
-        (pageNumber ? `&page=${pageNumber}` : ""),
+      `${baseUrl}/activity/list?offset=${offset}&limit=${limit}&search=${search}&sort=${sort}${
+        pageNumber ? `&page=${pageNumber}` : ''
+      }`,
       {
-        method: "GET",
+        method: 'GET',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
           authorization: authHeader(),
         },
-      }
+      },
     );
 
     const activityData = await activityResponse.json();

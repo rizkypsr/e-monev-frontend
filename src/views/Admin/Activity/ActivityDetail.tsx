@@ -2,33 +2,33 @@ import { ArrowLeftIcon } from '@heroicons/react/24/solid';
 import React, { useEffect, useState } from 'react';
 import { useAuthHeader } from 'react-auth-kit';
 import { Link, useParams } from 'react-router-dom';
-import { getOrganization } from '../../../api/admin/organization';
+import { getActivity } from '../../../api/admin/activity';
 import ErrorPage from '../../ErrorPage';
 
-function OrganizationDetail() {
-  const [code, setCode] = useState('');
-  const [title, setTitle] = useState('');
+function ActivityDetail() {
+  const [activity, setActivity] = useState('');
+  const [programId, setProgramId] = useState('');
   const [error, setError] = useState(false);
 
   const { id } = useParams();
   const authHeader = useAuthHeader();
 
-  const fetchOrganization = async () => {
+  const fetchActivity = async () => {
     try {
-      const organizationResponse = await getOrganization(authHeader, id);
-      setCode(organizationResponse.code);
-      setTitle(organizationResponse.title);
+      const occasionResponse = await getActivity(authHeader, id);
+      setActivity(occasionResponse.title);
+      setProgramId(occasionResponse.program_id);
     } catch (err) {
-      setError(error.message);
+      setError(err.message);
     }
   };
 
   useEffect(() => {
-    fetchOrganization();
+    fetchActivity();
   }, []);
 
   if (error) {
-    return <ErrorPage errorMessage={error} />;
+    return <ErrorPage errorMessage={error} showBackButton />;
   }
 
   return (
@@ -55,18 +55,18 @@ function OrganizationDetail() {
                 scope="row"
                 className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
               >
-                Kode
+                ID Program
               </th>
-              <td className="px-6 py-4">{code}</td>
+              <td className="px-6 py-4">{programId}</td>
             </tr>
             <tr className="bg-light-blue">
               <th
                 scope="row"
                 className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
               >
-                Urusan
+                Kegiatan
               </th>
-              <td className="px-6 py-4">{title}</td>
+              <td className="px-6 py-4">{activity}</td>
             </tr>
           </tbody>
         </table>
@@ -75,4 +75,4 @@ function OrganizationDetail() {
   );
 }
 
-export default OrganizationDetail;
+export default ActivityDetail;

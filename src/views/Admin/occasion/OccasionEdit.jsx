@@ -1,40 +1,40 @@
-import { ArrowLeftIcon, CheckCircleIcon } from "@heroicons/react/24/solid";
-import { Label } from "flowbite-react";
-import React, { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import TextInput from "../../../components/TextInput";
-import Button from "../../../components/Button";
-import { useAuthHeader } from "react-auth-kit";
-import { useToastContext } from "../../../context/ToastContext";
-import { updateOccasion } from "../../../api/admin/occasion";
-import getOccasionDetail from "../../../api/admin/occasion/getOccasionDetail";
+import { ArrowLeftIcon, CheckCircleIcon } from '@heroicons/react/24/solid';
+import { Label } from 'flowbite-react';
+import React, { useEffect, useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useAuthHeader } from 'react-auth-kit';
+import TextInput from '../../../components/TextInput';
+import Button from '../../../components/Button';
+import { useToastContext } from '../../../context/ToastContext';
+import { updateOccasion } from '../../../api/admin/occasion';
+import getOccasionDetail from '../../../api/admin/occasion/getOccasionDetail';
+import ErrorPage from '../../ErrorPage';
 
 function OccasionEdit() {
   const authHeader = useAuthHeader();
-  const [code, setCode] = useState("");
-  const [occasion, setOccasion] = useState("");
+  const [code, setCode] = useState('');
+  const [occasion, setOccasion] = useState('');
+  const [error, setError] = useState(null);
 
   const { showToastMessage } = useToastContext();
   const { id } = useParams();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchOccasionDetail();
-  }, []);
-
-  async function fetchOccasionDetail() {
+  const fetchOccasionDetail = async () => {
     try {
       const occasionResponse = await getOccasionDetail(authHeader, id);
       setCode(occasionResponse.code);
       setOccasion(occasionResponse.title);
-    } catch (error) {
-      console.error(error);
-      showToastMessage(error.message, "error");
-      navigate("../");
+    } catch (err) {
+      setError(err.message);
     }
-  }
+  };
 
-  async function onSubmit(e) {
+  useEffect(() => {
+    fetchOccasionDetail();
+  }, []);
+
+  const onSubmit = async (e) => {
     e.preventDefault();
 
     try {
@@ -45,12 +45,15 @@ function OccasionEdit() {
       };
       const occasionResponse = await updateOccasion(authHeader, occasionBody);
 
-      showToastMessage(occasionResponse, "success");
-      navigate("../");
-    } catch (error) {
-      console.error(error);
-      showToastMessage(error.message, "error");
+      showToastMessage(occasionResponse);
+      navigate('../');
+    } catch (err) {
+      showToastMessage(err.message, 'error');
     }
+  };
+
+  if (error) {
+    return <ErrorPage errorMessage={error} />;
   }
 
   return (
@@ -59,26 +62,20 @@ function OccasionEdit() {
         <h1 className="text-2xl font-semibold">Urusan</h1>
       </div>
       <div className="w-full h-full mt-6 bg-white rounded-lg p-9">
-        <Link
-          to="../"
-          className="flex space-x-3 items-center mb-8">
+        <Link to="../" className="flex space-x-3 items-center mb-8">
           <ArrowLeftIcon className="w-6 h-6" />
-          <h1 className="font-semibold text-lg text-dark-gray leading-7">
-            Edit Urusan
-          </h1>
+          <h1 className="font-semibold text-lg text-dark-gray leading-7">Edit Urusan</h1>
         </Link>
 
-        <form
-          className="mt-4"
-          onSubmit={onSubmit}>
+        <form className="mt-4" onSubmit={onSubmit}>
           <div className="mb-6">
             <Label>Kode</Label>
             <TextInput
               className="mt-2 lg:w-2/3 xl:w-1/3"
               value={code}
               onChange={(e) => setCode(e.target.value)}
-              required={true}
-              disabled={true}
+              required
+              disabled
             />
           </div>
           <div className="mb-6">
@@ -88,7 +85,7 @@ function OccasionEdit() {
               value={occasion}
               onChange={(e) => setOccasion(e.target.value)}
               placeholder="Masukan Urusan"
-              required={true}
+              required
             />
           </div>
           <div className="flex space-x-3">
@@ -97,14 +94,16 @@ function OccasionEdit() {
               className="w-full md:w-28"
               background="bg-primary"
               textColor="text-white"
-              icon={<CheckCircleIcon className="w-5 h-5" />}>
+              icon={<CheckCircleIcon className="w-5 h-5" />}
+            >
               Simpan
             </Button>
             <Link to="../">
               <Button
                 className="w-full md:w-28 font-medium"
                 background="bg-[#EAEAEA]"
-                textColor="text-dark-gray">
+                textColor="text-dark-gray"
+              >
                 Batal
               </Button>
             </Link>

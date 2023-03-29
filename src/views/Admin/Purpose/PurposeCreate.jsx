@@ -1,24 +1,19 @@
-import {
-  ArrowLeftIcon,
-  CheckCircleIcon,
-  MagnifyingGlassIcon,
-} from "@heroicons/react/24/solid";
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import Label from "../../../components/Label";
-import TextInput from "../../../components/TextInput";
-import Button from "../../../components/Button";
-import { useAuthHeader } from "react-auth-kit";
-import { useToastContext } from "../../../context/ToastContext";
-import createPurpose from "../../../api/admin/purpose/createPurpose";
-import showToastMsg from "../../../utils/showToast";
+import { ArrowLeftIcon, CheckCircleIcon } from '@heroicons/react/24/solid';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuthHeader } from 'react-auth-kit';
+import Label from '../../../components/Label';
+import TextInput from '../../../components/TextInput';
+import Button from '../../../components/Button';
+import { useToastContext } from '../../../context/ToastContext';
+import createPurpose from '../../../api/admin/purpose/createPurpose';
 
-const PurposeCreate = () => {
-  const [title, setTitle] = useState("");
+function PurposeCreate() {
+  const [title, setTitle] = useState('');
 
   const authHeader = useAuthHeader();
   const navigate = useNavigate();
-  const { showToastMessage, hideToastMessage } = useToastContext();
+  const { showToastMessage } = useToastContext();
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -28,9 +23,9 @@ const PurposeCreate = () => {
       const purposeResponse = await createPurpose(authHeader, purposeBody);
 
       showToastMessage(purposeResponse);
-      navigate("../");
+      navigate('../');
     } catch (error) {
-      showToastMsg("error", error.message, hideToastMessage);
+      showToastMessage(error.message, 'error');
     }
   };
 
@@ -42,9 +37,7 @@ const PurposeCreate = () => {
       <div className="w-full h-full mt-6 bg-white rounded-lg p-9">
         <Link to="../" className="flex space-x-3 items-center mb-8">
           <ArrowLeftIcon className="w-6 h-6" />
-          <h1 className="font-semibold text-lg text-dark-gray leading-7">
-            Tambah Sasaran
-          </h1>
+          <h1 className="font-semibold text-lg text-dark-gray leading-7">Tambah Sasaran</h1>
         </Link>
 
         <form className="mt-4" onSubmit={onSubmit}>
@@ -82,6 +75,6 @@ const PurposeCreate = () => {
       </div>
     </>
   );
-};
+}
 
 export default PurposeCreate;

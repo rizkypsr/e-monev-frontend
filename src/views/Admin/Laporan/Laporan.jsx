@@ -1,7 +1,8 @@
-import React from "react";
+import React from 'react';
+import Development from '../../Development';
 
 function Laporan() {
-  return <div>Laporan</div>;
+  return <Development />;
 }
 
 export default Laporan;

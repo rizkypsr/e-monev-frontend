@@ -1,21 +1,20 @@
-import { useIsAuthenticated, useAuthUser } from "react-auth-kit";
-import { Navigate, useLocation } from "react-router-dom";
-import AccessDenied from "../views/AccessDenied";
+import React from 'react';
+import { useIsAuthenticated, useAuthUser } from 'react-auth-kit';
+import { Navigate, useLocation } from 'react-router-dom';
+import AccessDenied from '../views/AccessDenied';
 
-function PrivateRoute({ children, loginPath, role }) {
+function PrivateRoute({ children, loginPath, roleId }) {
   const isAuthenticated = useIsAuthenticated();
   const auth = useAuthUser();
   const location = useLocation();
 
   if (isAuthenticated()) {
-    if (auth().admin_role_id === role) {
+    if (auth().admin_role_id === roleId) {
       return children;
-    } else {
-      return <AccessDenied />;
     }
-  } else {
-    return <Navigate to={loginPath} state={{ from: location }} replace />;
+    return <AccessDenied />;
   }
+  return <Navigate to={loginPath} state={{ from: location }} replace />;
 }
 
 export default PrivateRoute;

@@ -1,51 +1,41 @@
-import { ArrowLeftIcon } from "@heroicons/react/24/solid";
-import React, { useEffect, useState } from "react";
-import { useAuthHeader } from "react-auth-kit";
-import { Link, useParams } from "react-router-dom";
-import getOccasionDetail from "../../../api/admin/occasion/getOccasionDetail";
-import ErrorPage from "../../ErrorPage";
+import { ArrowLeftIcon } from '@heroicons/react/24/solid';
+import React, { useEffect, useState } from 'react';
+import { useAuthHeader } from 'react-auth-kit';
+import { Link, useParams } from 'react-router-dom';
+import getOccasionDetail from '../../../api/admin/occasion/getOccasionDetail';
+import ErrorPage from '../../ErrorPage';
 
 function OccasionDetail() {
-  const [code, setCode] = useState("");
-  const [occasion, setOccasion] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [code, setCode] = useState('');
+  const [occasion, setOccasion] = useState('');
   const [error, setError] = useState(false);
 
   const { id } = useParams();
   const authHeader = useAuthHeader();
 
-  useEffect(() => {
-    fetchOccasion();
-  }, []);
-
-  async function fetchOccasion() {
+  const fetchOccasion = async () => {
     try {
       const occasionResponse = await getOccasionDetail(authHeader, id);
       setCode(occasionResponse.code);
       setOccasion(occasionResponse.title);
-    } catch (error) {
-      console.error(error);
-      setError(error);
+    } catch (err) {
+      setError(error.message);
     }
-  }
+  };
+
+  useEffect(() => {
+    fetchOccasion();
+  }, []);
 
   if (error) {
-    return (
-      <>
-        <ErrorPage />;
-      </>
-    );
+    return <ErrorPage errorMessage={error} />;
   }
 
   return (
     <div className="w-full h-full mt-6 bg-white rounded-lg p-9">
-      <Link
-        to="../"
-        className="flex space-x-3 items-center mb-8">
+      <Link to="../" className="flex space-x-3 items-center mb-8">
         <ArrowLeftIcon className="w-6 h-6" />
-        <h1 className="font-semibold text-lg text-dark-gray leading-7">
-          Detail User
-        </h1>
+        <h1 className="font-semibold text-lg text-dark-gray leading-7">Detail User</h1>
       </Link>
 
       <div className="relative overflow-x-auto">
@@ -54,7 +44,8 @@ function OccasionDetail() {
             <tr className="bg-light-blue">
               <th
                 scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+              >
                 No.
               </th>
               <td className="px-6 py-4">{id}</td>
@@ -62,7 +53,8 @@ function OccasionDetail() {
             <tr className="bg-white">
               <th
                 scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+              >
                 Kode
               </th>
               <td className="px-6 py-4">{code}</td>
@@ -70,7 +62,8 @@ function OccasionDetail() {
             <tr className="bg-light-blue">
               <th
                 scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+              >
                 Urusan
               </th>
               <td className="px-6 py-4">{occasion}</td>

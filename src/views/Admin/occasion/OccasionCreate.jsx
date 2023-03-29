@@ -1,19 +1,18 @@
-import { ArrowLeftIcon, CheckCircleIcon } from "@heroicons/react/24/solid";
-import { Label } from "flowbite-react";
-import { Link, useNavigate } from "react-router-dom";
-import TextInput from "../../../components/TextInput";
-import Button from "../../../components/Button";
-import { useAuthHeader } from "react-auth-kit";
-import "react-toastify/dist/ReactToastify.css";
-import { useToastContext } from "../../../context/ToastContext";
-import { createOccasion } from "../../../api/admin/occasion";
-import { useState } from "react";
+import React, { useState } from 'react';
+import { ArrowLeftIcon, CheckCircleIcon } from '@heroicons/react/24/solid';
+import { Label } from 'flowbite-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuthHeader } from 'react-auth-kit';
+import TextInput from '../../../components/TextInput';
+import Button from '../../../components/Button';
+import 'react-toastify/dist/ReactToastify.css';
+import { useToastContext } from '../../../context/ToastContext';
+import { createOccasion } from '../../../api/admin/occasion';
 
 function OccasionCreate() {
-  const [code, setCode] = useState("");
-  const [occasion, setOccasion] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [code, setCode] = useState('');
+  const [occasion, setOccasion] = useState('');
+
   const authHeader = useAuthHeader();
   const navigate = useNavigate();
   const { showToastMessage } = useToastContext();
@@ -21,17 +20,14 @@ function OccasionCreate() {
   async function onSubmit(e) {
     e.preventDefault();
 
-    setError(null);
-
     try {
       const occasionBody = { code, title: occasion };
-      await createOccasion(authHeader, occasionBody);
+      const occasionResponse = await createOccasion(authHeader, occasionBody);
 
-      showToastMessage("Urusan berhasil ditambahkan!");
-      navigate("../");
+      showToastMessage(occasionResponse);
+      navigate('../');
     } catch (error) {
-      setError(error);
-      showToastMessage(error.message, "erorr");
+      showToastMessage(error.message, 'error');
     }
   }
 
@@ -42,18 +38,12 @@ function OccasionCreate() {
       </div>
 
       <div className="w-full h-full mt-6 bg-white rounded-lg p-9">
-        <Link
-          to="../"
-          className="flex space-x-3 items-center mb-8">
+        <Link to="../" className="flex space-x-3 items-center mb-8">
           <ArrowLeftIcon className="w-6 h-6" />
-          <h1 className="font-semibold text-lg text-dark-gray leading-7">
-            Tambah Urusan
-          </h1>
+          <h1 className="font-semibold text-lg text-dark-gray leading-7">Tambah Urusan</h1>
         </Link>
 
-        <form
-          className="mt-4"
-          onSubmit={onSubmit}>
+        <form className="mt-4" onSubmit={onSubmit}>
           <div className="mb-6">
             <Label>Kode</Label>
             <TextInput
@@ -62,7 +52,7 @@ function OccasionCreate() {
               value={code}
               placeholder="Masukkan Kode Urusan"
               onChange={(e) => setCode(e.target.value)}
-              required={true}
+              required
             />
           </div>
           <div className="mb-6">
@@ -81,14 +71,16 @@ function OccasionCreate() {
               className="w-full md:w-28"
               background="bg-primary"
               textColor="text-white"
-              icon={<CheckCircleIcon className="w-5 h-5" />}>
+              icon={<CheckCircleIcon className="w-5 h-5" />}
+            >
               Simpan
             </Button>
             <Link to="../">
               <Button
                 className="w-full md:w-28 font-medium"
                 background="bg-[#EAEAEA]"
-                textColor="text-dark-gray">
+                textColor="text-dark-gray"
+              >
                 Batal
               </Button>
             </Link>

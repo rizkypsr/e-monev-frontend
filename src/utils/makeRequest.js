@@ -1,16 +1,11 @@
-export async function makeRequest(url, headers, method = "GET", body) {
-  const options = {
-    method,
-    headers,
-    body: JSON.stringify(body),
-  };
+export default async function makeRequest(url, authHeader) {
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      authorization: authHeader(),
+    },
+  });
 
-  const response = await fetch(url, options);
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch data: ${response.status}`);
-  }
-
-  const jsonData = await response.json();
-  return jsonData.data.result;
+  return response;
 }

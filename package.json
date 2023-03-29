@@ -7,7 +7,8 @@
     "start": "npx http-server ./dist",
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "lint": "eslint ./src --ext .jsx --ext .js"
   },
   "dependencies": {
     "@heroicons/react": "^2.0.16",
@@ -19,11 +20,13 @@
     "flowbite": "^1.6.3",
     "flowbite-react": "^0.3.8",
     "react": "^18.2.0",
-    "react-auth-kit": "^2.8.1",
+    "react-auth-kit": "^2.9.0",
     "react-cookie": "^4.1.1",
     "react-countup": "^6.4.1",
     "react-dom": "^18.2.0",
+    "react-infinite-scroll-component": "^6.1.0",
     "react-router-dom": "^6.8.1",
+    "react-table": "^7.8.0",
     "react-toastify": "^9.1.1",
     "vite-plugin-svgr": "^2.4.0"
   },
@@ -32,6 +35,12 @@
     "@types/react-dom": "^18.0.10",
     "@vitejs/plugin-react": "^3.1.0",
     "autoprefixer": "^10.4.13",
+    "eslint": "^8.37.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-jsx-a11y": "^6.7.1",
+    "eslint-plugin-react": "^7.32.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
     "postcss": "^8.4.21",
     "react-error-overlay": "^6.0.9",
     "tailwindcss": "^3.2.7",
