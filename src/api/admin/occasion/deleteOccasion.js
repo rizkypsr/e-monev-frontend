@@ -6,6 +6,7 @@ export default async function deleteOccasion(authHeader, occasionId) {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': baseUrl,
         authorization: authHeader(),
       },
       body: JSON.stringify({ occassion_id: occasionId }),

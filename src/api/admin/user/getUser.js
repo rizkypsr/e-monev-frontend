@@ -1,11 +1,12 @@
-import { baseUrl } from "../../../utils/constants";
+import { baseUrl } from '../../../utils/constants';
 
 const getUser = async (authHeader, userId) => {
   try {
     const userResponse = await fetch(`${baseUrl}/user/detail/${userId}`, {
-      method: "GET",
+      method: 'GET',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': baseUrl,
         Authorization: authHeader(),
       },
     });
@@ -13,9 +14,7 @@ const getUser = async (authHeader, userId) => {
     const userData = await userResponse.json();
 
     if (!userResponse.ok) {
-      throw new Error(
-        `Gagal mendapatkan data dari server: ${userData.message}`
-      );
+      throw new Error(`Gagal mendapatkan data dari server: ${userData.message}`);
     }
 
     return userData.data;

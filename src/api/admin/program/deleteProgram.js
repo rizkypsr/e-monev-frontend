@@ -6,6 +6,7 @@ export default async function deleteProgram(authHeader, programId) {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': baseUrl,
         authorization: authHeader(),
       },
       body: JSON.stringify({ program_id: programId }),

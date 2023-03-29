@@ -1,11 +1,12 @@
-import { baseUrl } from "../../../utils/constants";
+import { baseUrl } from '../../../utils/constants';
 
 export default async function updatePurpose(authHeader, purposeBody) {
   try {
     const purposeResponse = await fetch(`${baseUrl}/purpose/update`, {
-      method: "PATCH",
+      method: 'PATCH',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': baseUrl,
         authorization: authHeader(),
       },
       body: JSON.stringify(purposeBody),

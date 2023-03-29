@@ -17,6 +17,7 @@ export default async function getOccasions(
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': baseUrl,
           authorization: authHeader(),
         },
       },

@@ -1,11 +1,12 @@
-import { baseUrl } from "../../../utils/constants";
+import { baseUrl } from '../../../utils/constants';
 
 export default async function createPurpose(authHeader, purposeBody) {
   try {
     const purposeResponse = await fetch(`${baseUrl}/purpose/create`, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': baseUrl,
         authorization: authHeader(),
       },
       body: JSON.stringify(purposeBody),

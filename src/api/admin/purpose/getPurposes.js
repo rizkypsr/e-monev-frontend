@@ -17,6 +17,7 @@ export default async function getPurposes(
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': baseUrl,
           authorization: authHeader(),
         },
       },

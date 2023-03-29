@@ -6,6 +6,7 @@ export default async function getOccasionDetail(authHeader, occasionId) {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': baseUrl,
         authorization: authHeader(),
       },
     });

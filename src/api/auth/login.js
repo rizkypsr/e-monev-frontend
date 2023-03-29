@@ -6,6 +6,7 @@ export default async function login(body) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': baseUrl,
       },
       body: JSON.stringify(body),
     });

@@ -6,6 +6,7 @@ export default async function getProgram(authHeader, programId) {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': baseUrl,
         authorization: authHeader(),
       },
     });

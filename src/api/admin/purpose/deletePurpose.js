@@ -1,11 +1,12 @@
-import { baseUrl } from "../../../utils/constants";
+import { baseUrl } from '../../../utils/constants';
 
 export default async function deletePurpose(authHeader, purposeId) {
   try {
     const purposeResponse = await fetch(`${baseUrl}/purpose/delete`, {
-      method: "PATCH",
+      method: 'PATCH',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': baseUrl,
         authorization: authHeader(),
       },
       body: JSON.stringify({ purpose_id: purposeId }),

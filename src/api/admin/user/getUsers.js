@@ -11,11 +11,13 @@ export default async function getUsers(
   try {
     const userResponse = await fetch(
       `${baseUrl}/user/list?offset=${offset}&limit=${limit}&search=${search}&sort=${sort}${
-        pageNumber ? `&page=${pageNumber}` : ''}`,
+        pageNumber ? `&page=${pageNumber}` : ''
+      }`,
       {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': baseUrl,
           authorization: authHeader(),
         },
       },

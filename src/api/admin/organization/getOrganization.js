@@ -6,6 +6,7 @@ export default async function getOrganization(authHeader, organizationId) {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': baseUrl,
         authorization: authHeader(),
       },
     });

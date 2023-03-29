@@ -6,6 +6,7 @@ export default async function deleteOrganization(authHeader, organizationId) {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': baseUrl,
         authorization: authHeader(),
       },
       body: JSON.stringify({ organization_id: organizationId }),

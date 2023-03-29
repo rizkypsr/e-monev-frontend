@@ -1,11 +1,12 @@
-import { baseUrl } from "../../utils/constants";
+import { baseUrl } from '../../utils/constants';
 
 const register = async (userBody) => {
   try {
     const userResponse = await fetch(`${baseUrl}/user/register`, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': baseUrl,
       },
       body: JSON.stringify(userBody),
     });

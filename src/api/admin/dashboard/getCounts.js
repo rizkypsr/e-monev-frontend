@@ -1,14 +1,13 @@
-import { baseUrl } from "../../../utils/constants";
-import makeRequest from "../../../utils/makeRequest";
+import { baseUrl } from '../../../utils/constants';
+import makeRequest from '../../../utils/makeRequest';
 
 async function extractTotalCount(response) {
-  if (response.status === "fulfilled") {
+  if (response.status === 'fulfilled') {
     const data = await response.value.json();
     if (response.value.ok) {
       return data.data.total;
-    } else {
-      throw new Error(data.message);
     }
+    throw new Error(data.message);
   }
 
   throw new Error(response.reason);
@@ -25,16 +24,7 @@ export default async function getCounts(authHeader) {
       makeRequest(`${baseUrl}/purpose/list`, authHeader),
     ]);
 
-    const [
-      userData,
-      occasionData,
-      organizationData,
-      programData,
-      activityData,
-      purposeData,
-    ] = await Promise.all(
-      responses.map((response) => extractTotalCount(response))
-    );
+    const [userData, occasionData, organizationData, programData, activityData, purposeData] = await Promise.all(responses.map((response) => extractTotalCount(response)));
 
     return {
       userCount: userData,
@@ -45,6 +35,6 @@ export default async function getCounts(authHeader) {
       purposeCount: purposeData,
     };
   } catch (error) {
-    throw new Error("Terjadi kesalahan pada server: " + error.message);
+    throw new Error(`Terjadi kesalahan pada server: ${error.message}`);
   }
 }

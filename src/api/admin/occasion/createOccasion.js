@@ -6,6 +6,7 @@ export default async function createOccasion(authHeader, body) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': baseUrl,
         authorization: authHeader(),
       },
       body: JSON.stringify(body),
