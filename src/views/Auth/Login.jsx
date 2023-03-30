@@ -8,6 +8,7 @@ import Button from '../../components/Button';
 import Batik from '../../assets/images/batik.png';
 import login from '../../api/auth/login';
 import showToastMsg from '../../utils/showToast';
+import { useToastContext } from '../../context/ToastContext';
 
 function Login() {
   const [username, setUsername] = useState('');
@@ -18,6 +19,7 @@ function Login() {
   const isAuthenticated = useIsAuthenticated();
   const signIn = useSignIn();
   const auth = useAuthUser();
+  const { showToastMessage } = useToastContext();
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -46,6 +48,9 @@ function Login() {
           break;
         case 'Username/password salah':
           setPasswordError('Password yang Anda masukkan salah');
+          break;
+        default:
+          showToastMessage(error.message, 'error');
       }
     }
   };
