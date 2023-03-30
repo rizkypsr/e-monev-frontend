@@ -1,4 +1,4 @@
-import { baseUrl } from '../../utils/constants';
+import { baseUrl, domainUrl } from '../../utils/constants';
 
 const register = async (userBody) => {
   try {
@@ -6,7 +6,7 @@ const register = async (userBody) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': baseUrl,
+        'Access-Control-Allow-Origin': domainUrl,
       },
       body: JSON.stringify(userBody),
     });

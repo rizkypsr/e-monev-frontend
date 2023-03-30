@@ -1,4 +1,4 @@
-import { baseUrl } from '../../utils/constants';
+import { baseUrl, domainUrl } from '../../utils/constants';
 
 const updateUser = async (userBody) => {
   try {
@@ -6,7 +6,7 @@ const updateUser = async (userBody) => {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': baseUrl,
+        'Access-Control-Allow-Origin': domainUrl,
       },
       body: JSON.stringify(userBody),
     });

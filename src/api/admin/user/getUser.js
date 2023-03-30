@@ -1,4 +1,4 @@
-import { baseUrl } from '../../../utils/constants';
+import { baseUrl, domainUrl } from '../../../utils/constants';
 
 const getUser = async (authHeader, userId) => {
   try {
@@ -6,7 +6,7 @@ const getUser = async (authHeader, userId) => {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': baseUrl,
+        'Access-Control-Allow-Origin': domainUrl,
         Authorization: authHeader(),
       },
     });

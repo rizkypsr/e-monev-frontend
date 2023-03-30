@@ -1,4 +1,4 @@
-import { baseUrl } from '../../../utils/constants';
+import { baseUrl, domainUrl } from '../../../utils/constants';
 
 export default async function createProgram(authHeader, body) {
   try {
@@ -6,7 +6,7 @@ export default async function createProgram(authHeader, body) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': baseUrl,
+        'Access-Control-Allow-Origin': domainUrl,
         authorization: authHeader(),
       },
       body: JSON.stringify(body),

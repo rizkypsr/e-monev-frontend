@@ -1,4 +1,4 @@
-import { baseUrl } from '../../../utils/constants';
+import { baseUrl, domainUrl } from '../../../utils/constants';
 
 export default async function deleteProgram(authHeader, programId) {
   try {
@@ -6,7 +6,7 @@ export default async function deleteProgram(authHeader, programId) {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': baseUrl,
+        'Access-Control-Allow-Origin': domainUrl,
         authorization: authHeader(),
       },
       body: JSON.stringify({ program_id: programId }),

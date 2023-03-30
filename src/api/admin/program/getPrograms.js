@@ -1,4 +1,4 @@
-import { baseUrl } from '../../../utils/constants';
+import { baseUrl, domainUrl } from '../../../utils/constants';
 
 export default async function getPrograms(
   authHeader,
@@ -17,7 +17,7 @@ export default async function getPrograms(
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': baseUrl,
+          'Access-Control-Allow-Origin': domainUrl,
           authorization: authHeader(),
         },
       },
