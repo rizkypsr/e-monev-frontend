@@ -16,7 +16,6 @@ import { useToastContext } from '../../../context/ToastContext';
 function ActivityCreate() {
   const [selectedOpd, setSelectedOpd] = useState(null);
   const [openOpd, setOpenOpd] = useState(false);
-  const [code, setCode] = useState('');
   const [title, setTitle] = useState('');
 
   const [pageData, setPageData] = useState({
@@ -56,9 +55,13 @@ function ActivityCreate() {
   const onSubmit = async (e) => {
     e.preventDefault();
 
+    if (selectedOpd === null) {
+      showToastMessage('Anda belum memilih Nama OPD!', 'error');
+      return;
+    }
+
     try {
       const activityBody = {
-        code,
         title,
         program_id: selectedOpd.id,
       };
@@ -90,16 +93,6 @@ function ActivityCreate() {
         </Link>
 
         <form className="mt-4" onSubmit={onSubmit}>
-          <div className="mb-6">
-            <Label>Kode</Label>
-            <TextInput
-              required
-              className="mt-2 lg:w-2/3 xl:w-1/3"
-              value={code}
-              placeholder="Masukan Kode Kegiatan"
-              onChange={(e) => setCode(e.target.value)}
-            />
-          </div>
           <div className="mb-6">
             <Label>Kegiatan</Label>
             <TextInput

@@ -9,7 +9,6 @@ import { useToastContext } from '../../../context/ToastContext';
 import createOrganization from '../../../api/admin/organization/createOrganization';
 
 function OrganizationCreate() {
-  const [code, setCode] = useState('');
   const [organization, setOrganization] = useState('');
 
   const { showToastMessage } = useToastContext();
@@ -20,7 +19,7 @@ function OrganizationCreate() {
     e.preventDefault();
 
     try {
-      const organizationBody = { code, title: organization };
+      const organizationBody = { title: organization };
       const organizationResponse = await createOrganization(authHeader, organizationBody);
 
       showToastMessage(organizationResponse);
@@ -42,16 +41,6 @@ function OrganizationCreate() {
         </Link>
 
         <form className="mt-4" onSubmit={onSubmit}>
-          <div className="mb-6">
-            <Label>Kode</Label>
-            <TextInput
-              className="mt-2 lg:w-2/3 xl:w-1/3"
-              placeholder="Masukan Kode"
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-              required
-            />
-          </div>
           <div className="mb-6">
             <Label>Organisasi</Label>
             <TextInput

@@ -9,7 +9,6 @@ import { useToastContext } from '../../../context/ToastContext';
 import { createProgram } from '../../../api/admin/program';
 
 function ProgramCreate() {
-  const [code, setCode] = useState('');
   const [program, setProgram] = useState('');
   const authHeader = useAuthHeader();
   const navigate = useNavigate();
@@ -19,7 +18,7 @@ function ProgramCreate() {
     e.preventDefault();
 
     try {
-      const programBody = { code, title: program };
+      const programBody = { title: program };
       const programResponse = await createProgram(authHeader, programBody);
 
       showToastMessage(programResponse);
@@ -41,16 +40,6 @@ function ProgramCreate() {
         </Link>
 
         <form className="mt-4" onSubmit={onSubmit}>
-          <div className="mb-6">
-            <Label>Kode</Label>
-            <TextInput
-              className="mt-2 lg:w-2/3 xl:w-1/3"
-              value={code}
-              placeholder="Masukan Kode Program"
-              onChange={(e) => setCode(e.target.value)}
-              required
-            />
-          </div>
           <div className="mb-6">
             <Label>Program</Label>
             <TextInput

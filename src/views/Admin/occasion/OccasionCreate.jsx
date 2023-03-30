@@ -10,7 +10,6 @@ import { useToastContext } from '../../../context/ToastContext';
 import { createOccasion } from '../../../api/admin/occasion';
 
 function OccasionCreate() {
-  const [code, setCode] = useState('');
   const [occasion, setOccasion] = useState('');
 
   const authHeader = useAuthHeader();
@@ -21,7 +20,7 @@ function OccasionCreate() {
     e.preventDefault();
 
     try {
-      const occasionBody = { code, title: occasion };
+      const occasionBody = { title: occasion };
       const occasionResponse = await createOccasion(authHeader, occasionBody);
 
       showToastMessage(occasionResponse);
@@ -44,17 +43,6 @@ function OccasionCreate() {
         </Link>
 
         <form className="mt-4" onSubmit={onSubmit}>
-          <div className="mb-6">
-            <Label>Kode</Label>
-            <TextInput
-              className="mt-2 lg:w-2/3 xl:w-1/3"
-              name="code"
-              value={code}
-              placeholder="Masukkan Kode Urusan"
-              onChange={(e) => setCode(e.target.value)}
-              required
-            />
-          </div>
           <div className="mb-6">
             <Label>Urusan</Label>
             <TextInput
