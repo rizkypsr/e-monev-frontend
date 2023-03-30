@@ -1,25 +1,22 @@
-import React from "react";
-import { NavLink } from "react-router-dom";
-import { BookIcon } from "../components/icons/BookIcon";
-import { CheckIcon } from "../components/icons/CheckIcon";
-import { DashboardIcon } from "../components/icons/DashboardIcon";
-import { LockIcon } from "../components/icons/LockIcon";
-import { MedalIcon } from "../components/icons/MedalIcon";
-import { ProfileIcon } from "../components/icons/ProfileIcon";
-import { ReportIcon } from "../components/icons/ReportIcon";
-import { StarIcon } from "../components/icons/StarIcon";
-import { TargetIcon } from "../components/icons/TargetIcon";
-import Logo from "../assets/images/big_logo.png";
-import { LogoutIcon } from "../components/icons/LogoutIcon";
+import React from 'react';
+import { NavLink } from 'react-router-dom';
+import { useAuthUser, useSignOut } from 'react-auth-kit';
+import { BookIcon } from '../components/icons/BookIcon';
+import { CheckIcon } from '../components/icons/CheckIcon';
+import { DashboardIcon } from '../components/icons/DashboardIcon';
+import { LockIcon } from '../components/icons/LockIcon';
+import { MedalIcon } from '../components/icons/MedalIcon';
+import { ProfileIcon } from '../components/icons/ProfileIcon';
+import { ReportIcon } from '../components/icons/ReportIcon';
+import { StarIcon } from '../components/icons/StarIcon';
+import { TargetIcon } from '../components/icons/TargetIcon';
+import Logo from '../assets/images/big_logo.png';
+import { LogoutIcon } from '../components/icons/LogoutIcon';
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogTrigger,
-} from "../components/DialogContent";
-import LogoutImg from "../assets/images/logout.png";
-import Button from "../components/Button";
-import { useAuthUser, useSignOut } from "react-auth-kit";
+  Dialog, DialogClose, DialogContent, DialogTrigger,
+} from '../components/DialogContent';
+import LogoutImg from '../assets/images/logout.png';
+import Button from '../components/Button';
 
 function Sidebar() {
   const signOut = useSignOut();
@@ -28,14 +25,8 @@ function Sidebar() {
   return (
     <aside className="shadow-xl fixed top-0 left-0 z-40 w-64 h-screen transition-transform -translate-x-full md:translate-x-0">
       <div className="h-full overflow-y-auto bg-white flex flex-col">
-        <a
-          href="/"
-          className="flex items-center pl-4 py-5 border-b border-gray-20">
-          <img
-            src={Logo}
-            className="h-12 mr-4 sm:h-9"
-            alt="E-Monev Logo"
-          />
+        <a href="/" className="flex items-center pl-4 py-5 border-b border-gray-20">
+          <img src={Logo} className="h-12 mr-4 sm:h-9" alt="E-Monev Logo" />
           <div className="flex flex-col">
             <span className="font-semibold whitespace-nowrap">E-MONEV</span>
             <span className="text-xs">KABUPATEN SORONG</span>
@@ -49,7 +40,7 @@ function Sidebar() {
           />
           <div className="flex flex-col">
             <span className="font-semibold whitespace-nowrap">
-              {authUser().admin_role_id === 1 ? "Super Admin" : "User OPD"}
+              {authUser().admin_role_id === 1 ? 'Super Admin' : 'User OPD'}
             </span>
             <span className="text-xs">{authUser().name}</span>
           </div>
@@ -58,119 +49,92 @@ function Sidebar() {
           <NavLink
             end
             to="/admin"
-            className={({ isActive }) => {
-              return [
-                "flex items-center p-2",
-                isActive ? "text-blue-600" : "text-black",
-              ]
+            className={({ isActive }) =>
+              ['flex items-center p-2', isActive ? 'text-blue-600' : 'text-black']
                 .filter(Boolean)
-                .join(" ");
-            }}>
+                .join(' ')}
+          >
             <DashboardIcon />
             <span className="ml-3">Dashboard</span>
           </NavLink>
           <NavLink
             to="/admin/akun-saya"
-            className={({ isActive }) => {
-              return [
-                "flex items-center p-2",
-                isActive ? "text-blue-600" : "text-black",
-              ]
+            className={({ isActive }) =>
+              ['flex items-center p-2', isActive ? 'text-blue-600' : 'text-black']
                 .filter(Boolean)
-                .join(" ");
-            }}>
+                .join(' ')}
+          >
             <ProfileIcon />
             <span className="ml-3"> Akun Saya</span>
           </NavLink>
           <NavLink
             to="/admin/login-akses-user"
-            className={({ isActive }) => {
-              return [
-                "flex items-center p-2",
-                isActive ? "text-blue-600" : "text-black",
-              ]
+            className={({ isActive }) =>
+              ['flex items-center p-2', isActive ? 'text-blue-600' : 'text-black']
                 .filter(Boolean)
-                .join(" ");
-            }}>
+                .join(' ')}
+          >
             <LockIcon />
 
             <span className="ml-3">Login Akses User</span>
           </NavLink>
           <NavLink
             to="/admin/urusan"
-            className={({ isActive }) => {
-              return [
-                "flex items-center p-2",
-                isActive ? "text-blue-600" : "text-black",
-              ]
+            className={({ isActive }) =>
+              ['flex items-center p-2', isActive ? 'text-blue-600' : 'text-black']
                 .filter(Boolean)
-                .join(" ");
-            }}>
+                .join(' ')}
+          >
             <CheckIcon />
             <span className="ml-3">Urusan</span>
           </NavLink>
           <NavLink
             to="/admin/organisasi"
-            className={({ isActive }) => {
-              return [
-                "flex items-center p-2",
-                isActive ? "text-blue-600" : "text-black",
-              ]
+            className={({ isActive }) =>
+              ['flex items-center p-2', isActive ? 'text-blue-600' : 'text-black']
                 .filter(Boolean)
-                .join(" ");
-            }}>
+                .join(' ')}
+          >
             <MedalIcon />
             <span className="ml-3">Organisasi</span>
           </NavLink>
           <NavLink
             to="/admin/program"
-            className={({ isActive }) => {
-              return [
-                "flex items-center p-2",
-                isActive ? "text-blue-600" : "text-black",
-              ]
+            className={({ isActive }) =>
+              ['flex items-center p-2', isActive ? 'text-blue-600' : 'text-black']
                 .filter(Boolean)
-                .join(" ");
-            }}>
+                .join(' ')}
+          >
             <BookIcon />
             <span className="ml-3">Program</span>
           </NavLink>
           <NavLink
             to="/admin/kegiatan"
-            className={({ isActive }) => {
-              return [
-                "flex items-center p-2",
-                isActive ? "text-blue-600" : "text-black",
-              ]
+            className={({ isActive }) =>
+              ['flex items-center p-2', isActive ? 'text-blue-600' : 'text-black']
                 .filter(Boolean)
-                .join(" ");
-            }}>
+                .join(' ')}
+          >
             <StarIcon />
             <span className="ml-3">Kegiatan</span>
           </NavLink>
           <NavLink
             to="/admin/sasaran"
-            className={({ isActive }) => {
-              return [
-                "flex items-center p-2",
-                isActive ? "text-blue-600" : "text-black",
-              ]
+            className={({ isActive }) =>
+              ['flex items-center p-2', isActive ? 'text-blue-600' : 'text-black']
                 .filter(Boolean)
-                .join(" ");
-            }}>
+                .join(' ')}
+          >
             <TargetIcon />
             <span className="ml-3">Sasaran</span>
           </NavLink>
           <NavLink
             to="/admin/laporan"
-            className={({ isActive }) => {
-              return [
-                "flex items-center p-2",
-                isActive ? "text-blue-600" : "text-black",
-              ]
+            className={({ isActive }) =>
+              ['flex items-center p-2', isActive ? 'text-blue-600' : 'text-black']
                 .filter(Boolean)
-                .join(" ");
-            }}>
+                .join(' ')}
+          >
             <ReportIcon />
             <span className="ml-3">Data Laporan</span>
           </NavLink>
@@ -179,7 +143,7 @@ function Sidebar() {
           <DialogContent className="py-12">
             <div className="flex flex-col items-center justify-center h-full">
               <div className="p-6 bg-[#FFDADA] w-fit rounded-lg">
-                <img src={LogoutImg} />
+                <img src={LogoutImg} alt="Logout" />
               </div>
 
               <div>
@@ -193,7 +157,8 @@ function Sidebar() {
                       className="w-full md:w-28 mt-8 border border-[#EB5757]"
                       type="modal"
                       background="bg-white"
-                      textColor="text-[#EB5757]">
+                      textColor="text-[#EB5757]"
+                    >
                       Ya, keluar
                     </Button>
                   </DialogClose>
@@ -202,7 +167,8 @@ function Sidebar() {
                       className="w-full md:w-28 mt-8"
                       type="modal"
                       background="bg-primary"
-                      textColor="text-white">
+                      textColor="text-white"
+                    >
                       Batal
                     </Button>
                   </DialogClose>

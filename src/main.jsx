@@ -50,6 +50,7 @@ import ToastProvider from './context/ToastContext';
 import ProgramDetail from './views/Admin/Program/ProgramDetail';
 import PurposeDetail from './views/Admin/Purpose/PurposeDetail';
 import ActivityDetail from './views/Admin/Activity/ActivityDetail';
+import Development from './views/Development';
 
 const router = createBrowserRouter(
   createRoutesFromElements([
@@ -113,7 +114,7 @@ const router = createBrowserRouter(
       >
         <Route index key="loginAksesTable" element={<LoginAksesTable />} />
         <Route key="loginAksesCreate" path="create" element={<LoginAksesCreate />} />
-        <Route key="loginAksesEdit" path="edit/:id" element={<LoginAksesEdit />} />
+        <Route key="loginAksesEdit" path="edit/:id" element={<Development />} />
         <Route key="loginAksesDetail" path="detail/:id" element={<LoginAksesDetail />} />
       </Route>
       <Route
