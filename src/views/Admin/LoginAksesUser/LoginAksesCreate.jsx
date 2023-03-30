@@ -1,37 +1,28 @@
-import {
-  ArrowLeftIcon,
-  CheckCircleIcon,
-  MagnifyingGlassIcon,
-} from "@heroicons/react/24/solid";
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import Label from "../../../components/Label";
-import TextInput from "../../../components/TextInput";
-import Button from "../../../components/Button";
-import SelectInputModal from "../../../components/SelectInputModal";
-import {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-} from "../../../components/DialogContent";
-import List from "../../../components/List";
-import { getOrganizations } from "../../../api/admin/organization";
-import { useAuthHeader } from "react-auth-kit";
-import InfiniteScroll from "react-infinite-scroll-component";
-import { useEffect } from "react";
-import register from "../../../api/auth/register";
-import { useToastContext } from "../../../context/ToastContext";
+import { ArrowLeftIcon, CheckCircleIcon, MagnifyingGlassIcon } from '@heroicons/react/24/solid';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuthHeader } from 'react-auth-kit';
+import InfiniteScroll from 'react-infinite-scroll-component';
+import Label from '../../../components/Label';
+import TextInput from '../../../components/TextInput';
+import Button from '../../../components/Button';
+import SelectInputModal from '../../../components/SelectInputModal';
+import { Dialog, DialogTrigger, DialogContent } from '../../../components/DialogContent';
+import List from '../../../components/List';
+import { getOrganizations } from '../../../api/admin/organization';
+import register from '../../../api/auth/register';
+import { useToastContext } from '../../../context/ToastContext';
+import ReactLoading from '../../../components/Loading';
 
 function LoginAksesCreate() {
-  const dataLevel = ["User OPD", "Super Admin"];
-
-  const [name, setName] = useState("");
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [name, setName] = useState('');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [selectedOpd, setSelectedOpd] = useState(null);
   const [openOpd, setOpenOpd] = useState(false);
   const [selectedLevel, setSelectedLevel] = useState(null);
   const [openLevel, setOpenLevel] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [opdData, setOpdData] = useState({
     items: [],
     hasMore: true,
@@ -44,28 +35,15 @@ function LoginAksesCreate() {
   const navigate = useNavigate();
   const { showToastMessage } = useToastContext();
 
-  useEffect(() => {
-    fetchLevel();
-  }, []);
-
-  useEffect(() => {
-    fetchOrganizations(opdData.currentPage);
-  }, [opdData.currentPage]);
-
   const fetchLevel = async () => {
     setLevelData([
-      { id: 1, name: "Super Admin" },
-      { id: 2, name: "User OPD" },
+      { id: 1, name: 'Super Admin' },
+      { id: 2, name: 'User OPD' },
     ]);
   };
 
   const fetchOrganizations = async (page) => {
-    const organizationResponse = await getOrganizations(
-      authHeader,
-      0,
-      10,
-      page
-    );
+    const organizationResponse = await getOrganizations(authHeader, 0, 10, page);
 
     if (page === opdData.totalPages) {
       setOpdData((prevData) => ({ ...prevData, hasMore: false }));
@@ -78,6 +56,14 @@ function LoginAksesCreate() {
     }));
   };
 
+  useEffect(() => {
+    fetchLevel();
+  }, []);
+
+  useEffect(() => {
+    fetchOrganizations(opdData.currentPage);
+  }, [opdData.currentPage]);
+
   const loadMoreData = async () => {
     setOpdData((prevData) => ({
       ...prevData,
@@ -87,6 +73,8 @@ function LoginAksesCreate() {
 
   const onSubmit = async (e) => {
     e.preventDefault();
+
+    setIsLoading(true);
 
     try {
       const userBody = {
@@ -98,10 +86,12 @@ function LoginAksesCreate() {
       };
       const userResponse = await register(userBody);
 
+      setIsLoading(false);
       showToastMessage(userResponse.message);
-      navigate("../");
+      navigate('../');
     } catch (error) {
-      showToastMessage(error.message, "error");
+      setIsLoading(false);
+      showToastMessage(error.message, 'error');
     }
   };
 
@@ -123,9 +113,7 @@ function LoginAksesCreate() {
       <div className="w-full h-full mt-6 bg-white rounded-lg p-9">
         <Link to="../" className="flex space-x-3 items-center mb-8">
           <ArrowLeftIcon className="w-6 h-6" />
-          <h1 className="font-semibold text-lg text-dark-gray leading-7">
-            Tambah User
-          </h1>
+          <h1 className="font-semibold text-lg text-dark-gray leading-7">Tambah User</h1>
         </Link>
 
         <form className="mt-4" onSubmit={onSubmit}>
@@ -158,9 +146,7 @@ function LoginAksesCreate() {
                   next={loadMoreData}
                   hasMore={opdData.hasMore}
                   height={500}
-                  endMessage={
-                    <h1 className="font-bold text-2xl text-gray-400">...</h1>
-                  }
+                  endMessage={<h1 className="font-bold text-2xl text-gray-400">...</h1>}
                 >
                   <List data={opdData.items} onSelectValue={handleSelectOpd} />
                 </InfiniteScroll>
@@ -226,26 +212,30 @@ function LoginAksesCreate() {
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
-          <div className="flex space-x-3">
-            <Button
-              className="w-full md:w-28"
-              background="bg-primary"
-              textColor="text-white"
-              type="submit"
-              icon={<CheckCircleIcon className="w-5 h-5" />}
-            >
-              Simpan
-            </Button>
-            <Link to="../">
+          {isLoading ? (
+            <ReactLoading />
+          ) : (
+            <div className="flex space-x-3">
               <Button
-                className="w-full md:w-28 font-medium"
-                background="bg-[#EAEAEA]"
-                textColor="text-dark-gray"
+                className="w-full md:w-28"
+                background="bg-primary"
+                textColor="text-white"
+                type="submit"
+                icon={<CheckCircleIcon className="w-5 h-5" />}
               >
-                Batal
+                Simpan
               </Button>
-            </Link>
-          </div>
+              <Link to="../">
+                <Button
+                  className="w-full md:w-28 font-medium"
+                  background="bg-[#EAEAEA]"
+                  textColor="text-dark-gray"
+                >
+                  Batal
+                </Button>
+              </Link>
+            </div>
+          )}
         </form>
       </div>
     </>

@@ -8,9 +8,11 @@ import Button from '../../../components/Button';
 import 'react-toastify/dist/ReactToastify.css';
 import { useToastContext } from '../../../context/ToastContext';
 import { createOccasion } from '../../../api/admin/occasion';
+import ReactLoading from '../../../components/Loading';
 
 function OccasionCreate() {
   const [occasion, setOccasion] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const authHeader = useAuthHeader();
   const navigate = useNavigate();
@@ -19,13 +21,17 @@ function OccasionCreate() {
   async function onSubmit(e) {
     e.preventDefault();
 
+    setIsLoading(true);
+
     try {
       const occasionBody = { title: occasion };
       const occasionResponse = await createOccasion(authHeader, occasionBody);
 
+      setIsLoading(false);
       showToastMessage(occasionResponse);
       navigate('../');
     } catch (error) {
+      setIsLoading(false);
       showToastMessage(error.message, 'error');
     }
   }
@@ -53,26 +59,30 @@ function OccasionCreate() {
               onChange={(e) => setOccasion(e.target.value)}
             />
           </div>
-          <div className="flex space-x-3">
-            <Button
-              type="submit"
-              className="w-full md:w-28"
-              background="bg-primary"
-              textColor="text-white"
-              icon={<CheckCircleIcon className="w-5 h-5" />}
-            >
-              Simpan
-            </Button>
-            <Link to="../">
+          {isLoading ? (
+            <ReactLoading />
+          ) : (
+            <div className="flex space-x-3">
               <Button
-                className="w-full md:w-28 font-medium"
-                background="bg-[#EAEAEA]"
-                textColor="text-dark-gray"
+                type="submit"
+                className="w-full md:w-28"
+                background="bg-primary"
+                textColor="text-white"
+                icon={<CheckCircleIcon className="w-5 h-5" />}
               >
-                Batal
+                Simpan
               </Button>
-            </Link>
-          </div>
+              <Link to="../">
+                <Button
+                  className="w-full md:w-28 font-medium"
+                  background="bg-[#EAEAEA]"
+                  textColor="text-dark-gray"
+                >
+                  Batal
+                </Button>
+              </Link>
+            </div>
+          )}
         </form>
       </div>
     </>

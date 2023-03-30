@@ -3,22 +3,28 @@ import React, { useEffect, useState } from 'react';
 import { useAuthHeader } from 'react-auth-kit';
 import { Link, useParams } from 'react-router-dom';
 import getOccasionDetail from '../../../api/admin/occasion/getOccasionDetail';
+import ReactLoading from '../../../components/Loading';
 import ErrorPage from '../../ErrorPage';
 
 function OccasionDetail() {
   const [code, setCode] = useState('');
   const [occasion, setOccasion] = useState('');
   const [error, setError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const { id } = useParams();
   const authHeader = useAuthHeader();
 
   const fetchOccasion = async () => {
+    setIsLoading(true);
+
     try {
       const occasionResponse = await getOccasionDetail(authHeader, id);
       setCode(occasionResponse.code);
       setOccasion(occasionResponse.title);
+      setIsLoading(false);
     } catch (err) {
+      setIsLoading(false);
       setError(error.message);
     }
   };
@@ -29,6 +35,10 @@ function OccasionDetail() {
 
   if (error) {
     return <ErrorPage errorMessage={error} />;
+  }
+
+  if (isLoading) {
+    return <ReactLoading />;
   }
 
   return (

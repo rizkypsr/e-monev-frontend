@@ -3,23 +3,29 @@ import React, { useEffect, useState } from 'react';
 import { useAuthHeader } from 'react-auth-kit';
 import { Link, useParams } from 'react-router-dom';
 import { getOrganization } from '../../../api/admin/organization';
+import ReactLoading from '../../../components/Loading';
 import ErrorPage from '../../ErrorPage';
 
 function OrganizationDetail() {
   const [code, setCode] = useState('');
   const [title, setTitle] = useState('');
   const [error, setError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const { id } = useParams();
   const authHeader = useAuthHeader();
 
   const fetchOrganization = async () => {
+    setIsLoading(true);
+
     try {
       const organizationResponse = await getOrganization(authHeader, id);
       setCode(organizationResponse.code);
       setTitle(organizationResponse.title);
+      setIsLoading(false);
     } catch (err) {
       setError(error.message);
+      setIsLoading(false);
     }
   };
 
@@ -29,6 +35,10 @@ function OrganizationDetail() {
 
   if (error) {
     return <ErrorPage errorMessage={error} />;
+  }
+
+  if (isLoading) {
+    return <ReactLoading />;
   }
 
   return (

@@ -1,53 +1,56 @@
-import { ArrowLeftIcon } from "@heroicons/react/24/solid";
-import React, { useEffect, useState } from "react";
-import { useAuthHeader } from "react-auth-kit";
-import { Link, useParams } from "react-router-dom";
-import getUser from "../../../api/admin/user/getUser";
-import getRole from "../../../utils/getRole";
-import ErrorPage from "../../ErrorPage";
+import { ArrowLeftIcon } from '@heroicons/react/24/solid';
+import React, { useEffect, useState } from 'react';
+import { useAuthHeader } from 'react-auth-kit';
+import { Link, useParams } from 'react-router-dom';
+import getUser from '../../../api/admin/user/getUser';
+import ReactLoading from '../../../components/Loading';
+import getRole from '../../../utils/getRole';
+import ErrorPage from '../../ErrorPage';
 
-const LoginAksesDetail = () => {
+function LoginAksesDetail() {
   const { id } = useParams();
 
-  const [name, setName] = useState("");
-  const [username, setUsername] = useState("");
-  const [levelUser, setLevelUser] = useState("");
+  const [name, setName] = useState('');
+  const [username, setUsername] = useState('');
+  const [levelUser, setLevelUser] = useState('');
   const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const authHeader = useAuthHeader();
 
-  useEffect(() => {
-    fetchUser();
-  }, []);
-
   const fetchUser = async () => {
+    setIsLoading(true);
+
     try {
       const userResponse = await getUser(authHeader, id);
 
       setName(userResponse.name);
       setUsername(userResponse.username);
       setLevelUser(getRole(userResponse.admin_role_id));
-    } catch (error) {
-      console.error(error);
-      setError(error);
+      setIsLoading(false);
+    } catch (err) {
+      setIsLoading(false);
+      setError(err.message);
     }
   };
 
+  useEffect(() => {
+    fetchUser();
+  }, []);
+
   if (error) {
-    return (
-      <>
-        <ErrorPage />;
-      </>
-    );
+    return <ErrorPage errorMessage={error} />;
+  }
+
+  if (isLoading) {
+    return <ReactLoading />;
   }
 
   return (
     <div className="w-full h-full mt-6 bg-white rounded-lg p-9">
       <Link to="../" className="flex space-x-3 items-center mb-8">
         <ArrowLeftIcon className="w-6 h-6" />
-        <h1 className="font-semibold text-lg text-dark-gray leading-7">
-          Detail User
-        </h1>
+        <h1 className="font-semibold text-lg text-dark-gray leading-7">Detail User</h1>
       </Link>
 
       <div className="relative overflow-x-auto">
@@ -94,6 +97,6 @@ const LoginAksesDetail = () => {
       </div>
     </div>
   );
-};
+}
 
 export default LoginAksesDetail;

@@ -7,9 +7,11 @@ import TextInput from '../../../components/TextInput';
 import Button from '../../../components/Button';
 import { useToastContext } from '../../../context/ToastContext';
 import createOrganization from '../../../api/admin/organization/createOrganization';
+import ReactLoading from '../../../components/Loading';
 
 function OrganizationCreate() {
   const [organization, setOrganization] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const { showToastMessage } = useToastContext();
   const navigate = useNavigate();
@@ -18,13 +20,17 @@ function OrganizationCreate() {
   const onSubmit = async (e) => {
     e.preventDefault();
 
+    setIsLoading(true);
+
     try {
       const organizationBody = { title: organization };
       const organizationResponse = await createOrganization(authHeader, organizationBody);
 
+      setIsLoading(false);
       showToastMessage(organizationResponse);
       navigate('../');
     } catch (err) {
+      setIsLoading(false);
       showToastMessage(err.message, 'error');
     }
   };
@@ -51,26 +57,30 @@ function OrganizationCreate() {
               required
             />
           </div>
-          <div className="flex space-x-3">
-            <Button
-              type="submit"
-              className="w-full md:w-28"
-              background="bg-primary"
-              textColor="text-white"
-              icon={<CheckCircleIcon className="w-5 h-5" />}
-            >
-              Simpan
-            </Button>
-            <Link to="../">
+          {isLoading ? (
+            <ReactLoading />
+          ) : (
+            <div className="flex space-x-3">
               <Button
-                className="w-full md:w-28 font-medium"
-                background="bg-[#EAEAEA]"
-                textColor="text-dark-gray"
+                type="submit"
+                className="w-full md:w-28"
+                background="bg-primary"
+                textColor="text-white"
+                icon={<CheckCircleIcon className="w-5 h-5" />}
               >
-                Batal
+                Simpan
               </Button>
-            </Link>
-          </div>
+              <Link to="../">
+                <Button
+                  className="w-full md:w-28 font-medium"
+                  background="bg-[#EAEAEA]"
+                  textColor="text-dark-gray"
+                >
+                  Batal
+                </Button>
+              </Link>
+            </div>
+          )}
         </form>
       </div>
     </>

@@ -3,22 +3,29 @@ import React, { useEffect, useState } from 'react';
 import { useAuthHeader } from 'react-auth-kit';
 import { Link, useParams } from 'react-router-dom';
 import { getActivity } from '../../../api/admin/activity';
+import ReactLoading from '../../../components/Loading';
 import ErrorPage from '../../ErrorPage';
 
 function ActivityDetail() {
   const [activity, setActivity] = useState('');
   const [programId, setProgramId] = useState('');
   const [error, setError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const { id } = useParams();
   const authHeader = useAuthHeader();
 
   const fetchActivity = async () => {
+    setIsLoading(true);
+
     try {
       const occasionResponse = await getActivity(authHeader, id);
+
       setActivity(occasionResponse.title);
       setProgramId(occasionResponse.program_id);
+      setIsLoading(false);
     } catch (err) {
+      setIsLoading(false);
       setError(err.message);
     }
   };
@@ -29,6 +36,10 @@ function ActivityDetail() {
 
   if (error) {
     return <ErrorPage errorMessage={error} showBackButton />;
+  }
+
+  if (isLoading) {
+    return <ReactLoading />;
   }
 
   return (

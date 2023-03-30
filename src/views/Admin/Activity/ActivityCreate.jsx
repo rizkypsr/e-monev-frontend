@@ -12,11 +12,13 @@ import SelectInputModal from '../../../components/SelectInputModal';
 import { getPrograms } from '../../../api/admin/program';
 import { createActivity } from '../../../api/admin/activity';
 import { useToastContext } from '../../../context/ToastContext';
+import ReactLoading from '../../../components/Loading';
 
 function ActivityCreate() {
   const [selectedOpd, setSelectedOpd] = useState(null);
   const [openOpd, setOpenOpd] = useState(false);
   const [title, setTitle] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const [pageData, setPageData] = useState({
     items: [],
@@ -55,6 +57,8 @@ function ActivityCreate() {
   const onSubmit = async (e) => {
     e.preventDefault();
 
+    setIsLoading(true);
+
     if (selectedOpd === null) {
       showToastMessage('Anda belum memilih Nama OPD!', 'error');
       return;
@@ -67,9 +71,11 @@ function ActivityCreate() {
       };
       const activityResponse = await createActivity(authHeader, activityBody);
 
+      setIsLoading(false);
       showToastMessage(activityResponse);
       navigate('../');
     } catch (error) {
+      setIsLoading(false);
       showToastMessage(error.message, 'error');
     }
   };
@@ -139,26 +145,30 @@ function ActivityCreate() {
               </DialogContent>
             </Dialog>
           </div>
-          <div className="flex space-x-3">
-            <Button
-              type="submit"
-              className="w-full md:w-28"
-              background="bg-primary"
-              textColor="text-white"
-              icon={<CheckCircleIcon className="w-5 h-5" />}
-            >
-              Simpan
-            </Button>
-            <Link to="../">
+          {isLoading ? (
+            <ReactLoading />
+          ) : (
+            <div className="flex space-x-3">
               <Button
-                className="w-full md:w-28 font-medium"
-                background="bg-[#EAEAEA]"
-                textColor="text-dark-gray"
+                type="submit"
+                className="w-full md:w-28"
+                background="bg-primary"
+                textColor="text-white"
+                icon={<CheckCircleIcon className="w-5 h-5" />}
               >
-                Batal
+                Simpan
               </Button>
-            </Link>
-          </div>
+              <Link to="../">
+                <Button
+                  className="w-full md:w-28 font-medium"
+                  background="bg-[#EAEAEA]"
+                  textColor="text-dark-gray"
+                >
+                  Batal
+                </Button>
+              </Link>
+            </div>
+          )}
         </form>
       </div>
     </>

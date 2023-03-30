@@ -9,23 +9,29 @@ import { useToastContext } from '../../../context/ToastContext';
 import { updateOccasion } from '../../../api/admin/occasion';
 import getOccasionDetail from '../../../api/admin/occasion/getOccasionDetail';
 import ErrorPage from '../../ErrorPage';
+import ReactLoading from '../../../components/Loading';
 
 function OccasionEdit() {
   const authHeader = useAuthHeader();
   const [code, setCode] = useState('');
   const [occasion, setOccasion] = useState('');
   const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const { showToastMessage } = useToastContext();
   const { id } = useParams();
   const navigate = useNavigate();
 
   const fetchOccasionDetail = async () => {
+    setIsLoading(true);
+
     try {
       const occasionResponse = await getOccasionDetail(authHeader, id);
       setCode(occasionResponse.code);
       setOccasion(occasionResponse.title);
+      setIsLoading(false);
     } catch (err) {
+      setIsLoading(false);
       setError(err.message);
     }
   };
@@ -37,6 +43,8 @@ function OccasionEdit() {
   const onSubmit = async (e) => {
     e.preventDefault();
 
+    setIsLoading(true);
+
     try {
       const occasionBody = {
         occassion_id: id,
@@ -45,9 +53,11 @@ function OccasionEdit() {
       };
       const occasionResponse = await updateOccasion(authHeader, occasionBody);
 
+      setIsLoading(false);
       showToastMessage(occasionResponse);
       navigate('../');
     } catch (err) {
+      setIsLoading(false);
       showToastMessage(err.message, 'error');
     }
   };
@@ -88,26 +98,30 @@ function OccasionEdit() {
               required
             />
           </div>
-          <div className="flex space-x-3">
-            <Button
-              type="submit"
-              className="w-full md:w-28"
-              background="bg-primary"
-              textColor="text-white"
-              icon={<CheckCircleIcon className="w-5 h-5" />}
-            >
-              Simpan
-            </Button>
-            <Link to="../">
+          {isLoading ? (
+            <ReactLoading />
+          ) : (
+            <div className="flex space-x-3">
               <Button
-                className="w-full md:w-28 font-medium"
-                background="bg-[#EAEAEA]"
-                textColor="text-dark-gray"
+                type="submit"
+                className="w-full md:w-28"
+                background="bg-primary"
+                textColor="text-white"
+                icon={<CheckCircleIcon className="w-5 h-5" />}
               >
-                Batal
+                Simpan
               </Button>
-            </Link>
-          </div>
+              <Link to="../">
+                <Button
+                  className="w-full md:w-28 font-medium"
+                  background="bg-[#EAEAEA]"
+                  textColor="text-dark-gray"
+                >
+                  Batal
+                </Button>
+              </Link>
+            </div>
+          )}
         </form>
       </div>
     </>

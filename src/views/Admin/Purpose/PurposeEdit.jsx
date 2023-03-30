@@ -9,21 +9,27 @@ import { useToastContext } from '../../../context/ToastContext';
 import getPurpose from '../../../api/admin/purpose/getPurpose';
 import ErrorPage from '../../ErrorPage';
 import updatePurpose from '../../../api/admin/purpose/updatePurpose';
+import ReactLoading from '../../../components/Loading';
 
 function PurposeEdit() {
   const { id } = useParams();
   const [title, setTitle] = useState('');
   const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const authHeader = useAuthHeader();
   const navigate = useNavigate();
   const { showToastMessage } = useToastContext();
 
   const fetchPurpose = async () => {
+    setIsLoading(true);
+
     try {
       const purposeResponse = await getPurpose(authHeader, id);
       setTitle(purposeResponse.title);
+      setIsLoading(false);
     } catch (err) {
+      setIsLoading(false);
       setError(err.message);
     }
   };
@@ -35,6 +41,8 @@ function PurposeEdit() {
   const onSubmit = async (e) => {
     e.preventDefault();
 
+    setIsLoading(true);
+
     try {
       const purposeBody = {
         purpose_id: id,
@@ -42,9 +50,11 @@ function PurposeEdit() {
       };
       const purposeResponse = await updatePurpose(authHeader, purposeBody);
 
+      setIsLoading(false);
       showToastMessage(purposeResponse, 'success');
       navigate('../');
     } catch (err) {
+      setIsLoading(false);
       showToastMessage(err.message, 'error');
     }
   };
@@ -75,26 +85,30 @@ function PurposeEdit() {
               onChange={(e) => setTitle(e.target.value)}
             />
           </div>
-          <div className="flex space-x-3">
-            <Button
-              type="submit"
-              className="w-full md:w-28"
-              background="bg-primary"
-              textColor="text-white"
-              icon={<CheckCircleIcon className="w-5 h-5" />}
-            >
-              Simpan
-            </Button>
-            <Link to="../">
+          {isLoading ? (
+            <ReactLoading />
+          ) : (
+            <div className="flex space-x-3">
               <Button
-                className="w-full md:w-28 font-medium"
-                background="bg-[#EAEAEA]"
-                textColor="text-dark-gray"
+                type="submit"
+                className="w-full md:w-28"
+                background="bg-primary"
+                textColor="text-white"
+                icon={<CheckCircleIcon className="w-5 h-5" />}
               >
-                Batal
+                Simpan
               </Button>
-            </Link>
-          </div>
+              <Link to="../">
+                <Button
+                  className="w-full md:w-28 font-medium"
+                  background="bg-[#EAEAEA]"
+                  textColor="text-dark-gray"
+                >
+                  Batal
+                </Button>
+              </Link>
+            </div>
+          )}
         </form>
       </div>
     </>

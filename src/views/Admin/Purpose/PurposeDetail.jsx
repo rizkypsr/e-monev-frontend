@@ -3,22 +3,28 @@ import React, { useEffect, useState } from 'react';
 import { useAuthHeader } from 'react-auth-kit';
 import { Link, useParams } from 'react-router-dom';
 import getPurpose from '../../../api/admin/purpose/getPurpose';
+import ReactLoading from '../../../components/Loading';
 import ErrorPage from '../../ErrorPage';
 
 function PurposeDetail() {
   const [code, setCode] = useState('');
   const [title, setTitle] = useState('');
   const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const { id } = useParams();
   const authHeader = useAuthHeader();
 
   const fetchPurpose = async () => {
+    setIsLoading(true);
+
     try {
       const purposeResponse = await getPurpose(authHeader, id);
       setCode(purposeResponse.id);
       setTitle(purposeResponse.title);
+      setIsLoading(false);
     } catch (err) {
+      setIsLoading(false);
       setError(err.message);
     }
   };
@@ -29,6 +35,10 @@ function PurposeDetail() {
 
   if (error) {
     return <ErrorPage errorMessage={error} />;
+  }
+
+  if (isLoading) {
+    return <ReactLoading />;
   }
 
   return (

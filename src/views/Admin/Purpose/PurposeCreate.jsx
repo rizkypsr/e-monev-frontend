@@ -7,9 +7,11 @@ import TextInput from '../../../components/TextInput';
 import Button from '../../../components/Button';
 import { useToastContext } from '../../../context/ToastContext';
 import createPurpose from '../../../api/admin/purpose/createPurpose';
+import ReactLoading from '../../../components/Loading';
 
 function PurposeCreate() {
   const [title, setTitle] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const authHeader = useAuthHeader();
   const navigate = useNavigate();
@@ -18,13 +20,17 @@ function PurposeCreate() {
   const onSubmit = async (e) => {
     e.preventDefault();
 
+    setIsLoading(true);
+
     try {
       const purposeBody = { title };
       const purposeResponse = await createPurpose(authHeader, purposeBody);
 
+      setIsLoading(false);
       showToastMessage(purposeResponse);
       navigate('../');
     } catch (error) {
+      setIsLoading(false);
       showToastMessage(error.message, 'error');
     }
   };
@@ -51,26 +57,30 @@ function PurposeCreate() {
               required
             />
           </div>
-          <div className="flex space-x-3">
-            <Button
-              className="w-full md:w-28"
-              type="submit"
-              background="bg-primary"
-              textColor="text-white"
-              icon={<CheckCircleIcon className="w-5 h-5" />}
-            >
-              Simpan
-            </Button>
-            <Link to="../">
+          {isLoading ? (
+            <ReactLoading />
+          ) : (
+            <div className="flex space-x-3">
               <Button
-                className="w-full md:w-28 font-medium"
-                background="bg-[#EAEAEA]"
-                textColor="text-dark-gray"
+                className="w-full md:w-28"
+                type="submit"
+                background="bg-primary"
+                textColor="text-white"
+                icon={<CheckCircleIcon className="w-5 h-5" />}
               >
-                Batal
+                Simpan
               </Button>
-            </Link>
-          </div>
+              <Link to="../">
+                <Button
+                  className="w-full md:w-28 font-medium"
+                  background="bg-[#EAEAEA]"
+                  textColor="text-dark-gray"
+                >
+                  Batal
+                </Button>
+              </Link>
+            </div>
+          )}
         </form>
       </div>
     </>

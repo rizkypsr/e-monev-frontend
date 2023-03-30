@@ -8,6 +8,7 @@ import { useToastContext } from '../../../context/ToastContext';
 import ErrorPage from '../../ErrorPage';
 import Label from '../../../components/Label';
 import { getOrganization, updateOrganization } from '../../../api/admin/organization';
+import ReactLoading from '../../../components/Loading';
 
 function OrganizationEdit() {
   const { id } = useParams();
@@ -15,17 +16,23 @@ function OrganizationEdit() {
   const [code, setCode] = useState('');
   const [organization, setOrganization] = useState('');
   const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const authHeader = useAuthHeader();
   const { showToastMessage } = useToastContext();
   const navigate = useNavigate();
 
   const fetchOrganization = async () => {
+    setIsLoading(true);
+
     try {
       const organizationResponse = await getOrganization(authHeader, id);
+
+      setIsLoading(false);
       setCode(organizationResponse.code);
       setOrganization(organizationResponse.title);
     } catch (err) {
+      setIsLoading(false);
       setError(err.message);
     }
   };
@@ -37,6 +44,8 @@ function OrganizationEdit() {
   const onSubmit = async (e) => {
     e.preventDefault();
 
+    setIsLoading(true);
+
     try {
       const organizationBody = {
         organization_id: id,
@@ -45,10 +54,12 @@ function OrganizationEdit() {
       };
       const organizationResponse = await updateOrganization(authHeader, organizationBody);
 
+      setIsLoading(false);
       showToastMessage(organizationResponse, 'success');
       navigate('../');
     } catch (err) {
-      setError(err);
+      setError(err.message);
+      setIsLoading(true);
       showToastMessage(err.message, 'error');
     }
   };
@@ -89,26 +100,30 @@ function OrganizationEdit() {
               required
             />
           </div>
-          <div className="flex space-x-3">
-            <Button
-              type="submit"
-              className="w-full md:w-28"
-              background="bg-primary"
-              textColor="text-white"
-              icon={<CheckCircleIcon className="w-5 h-5" />}
-            >
-              Simpan
-            </Button>
-            <Link to="../">
+          {isLoading ? (
+            <ReactLoading />
+          ) : (
+            <div className="flex space-x-3">
               <Button
-                className="w-full md:w-28 font-medium"
-                background="bg-[#EAEAEA]"
-                textColor="text-dark-gray"
+                type="submit"
+                className="w-full md:w-28"
+                background="bg-primary"
+                textColor="text-white"
+                icon={<CheckCircleIcon className="w-5 h-5" />}
               >
-                Batal
+                Simpan
               </Button>
-            </Link>
-          </div>
+              <Link to="../">
+                <Button
+                  className="w-full md:w-28 font-medium"
+                  background="bg-[#EAEAEA]"
+                  textColor="text-dark-gray"
+                >
+                  Batal
+                </Button>
+              </Link>
+            </div>
+          )}
         </form>
       </div>
     </>

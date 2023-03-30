@@ -9,12 +9,14 @@ import Batik from '../../assets/images/batik.png';
 import login from '../../api/auth/login';
 import showToastMsg from '../../utils/showToast';
 import { useToastContext } from '../../context/ToastContext';
+import Loading from '../../components/Loading';
 
 function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [usernameError, setUsernameError] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const isAuthenticated = useIsAuthenticated();
   const signIn = useSignIn();
@@ -24,6 +26,7 @@ function Login() {
   const onSubmit = async (e) => {
     e.preventDefault();
 
+    setLoading(true);
     setUsernameError('');
     setPasswordError('');
 
@@ -32,13 +35,15 @@ function Login() {
       const loginResponse = await login(loginBody);
 
       if (
-        !signIn({
+        signIn({
           token: loginResponse.access_token,
           tokenType: 'Bearer',
           authState: loginResponse.payloadClient,
           expiresIn: 2880,
         })
       ) {
+        setLoading(false);
+      } else {
         showToastMsg('error', 'Terjadi kesalahan saat login');
       }
     } catch (error) {
@@ -52,6 +57,8 @@ function Login() {
         default:
           showToastMessage(error.message, 'error');
       }
+
+      setLoading(false);
     }
   };
 
@@ -124,9 +131,14 @@ function Login() {
                 Lupa Password
               </button>
             </div>
-            <Button className="w-28" type="submit" background="bg-primary" textColor="text-white">
-              Masuk
-            </Button>
+
+            {loading ? (
+              <Loading />
+            ) : (
+              <Button className="w-28" type="submit" background="bg-primary" textColor="text-white">
+                Masuk
+              </Button>
+            )}
           </form>
         </div>
       </div>

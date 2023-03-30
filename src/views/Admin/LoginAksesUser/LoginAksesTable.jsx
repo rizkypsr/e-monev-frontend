@@ -162,7 +162,6 @@ function LoginAksesTable() {
     }));
 
     fetchUsers(0, pageSize, currentPage, sorting);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage, pageSize, sorting]);
 
   useEffect(() => {
@@ -175,7 +174,6 @@ function LoginAksesTable() {
     }));
 
     fetchUsers(0, pageSize, currentPage, sorting);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search]);
 
   async function onPageSizeChanged({ value }) {

@@ -3,22 +3,29 @@ import React, { useEffect, useState } from 'react';
 import { useAuthHeader } from 'react-auth-kit';
 import { Link, useParams } from 'react-router-dom';
 import { getProgram } from '../../../api/admin/program';
+import ReactLoading from '../../../components/Loading';
 import ErrorPage from '../../ErrorPage';
 
 function ProgramDetail() {
   const [code, setCode] = useState('');
   const [program, setProgram] = useState('');
   const [error, setError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const { id } = useParams();
   const authHeader = useAuthHeader();
 
   const fetchProgram = async () => {
+    setIsLoading(true);
+
     try {
       const programResponse = await getProgram(authHeader, id);
+
       setCode(programResponse.code);
       setProgram(programResponse.title);
+      setIsLoading(false);
     } catch (err) {
+      setIsLoading(false);
       setError(err.message);
     }
   };
@@ -29,6 +36,10 @@ function ProgramDetail() {
 
   if (error) {
     return <ErrorPage />;
+  }
+
+  if (isLoading) {
+    return <ReactLoading />;
   }
 
   return (

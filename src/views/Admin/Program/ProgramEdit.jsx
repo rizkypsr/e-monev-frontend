@@ -8,23 +8,29 @@ import Button from '../../../components/Button';
 import { getProgram, updateProgram } from '../../../api/admin/program';
 import ErrorPage from '../../ErrorPage';
 import { useToastContext } from '../../../context/ToastContext';
+import ReactLoading from '../../../components/Loading';
 
 function ProgramEdit() {
   const { id } = useParams();
   const [code, setCode] = useState('');
   const [program, setProgram] = useState('');
   const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const authHeader = useAuthHeader();
   const navigate = useNavigate();
   const { showToastMessage } = useToastContext();
 
   const fetchProgram = async () => {
+    setIsLoading(true);
+
     try {
       const programResponse = await getProgram(authHeader, id);
       setCode(programResponse.code);
       setProgram(programResponse.title);
+      setIsLoading(false);
     } catch (err) {
+      setIsLoading(false);
       setError(err.message);
     }
   };
@@ -36,6 +42,8 @@ function ProgramEdit() {
   async function onSubmit(e) {
     e.preventDefault();
 
+    setIsLoading(true);
+
     try {
       const programBody = {
         program_id: id,
@@ -44,9 +52,11 @@ function ProgramEdit() {
       };
       const programResponse = await updateProgram(authHeader, programBody);
 
+      setIsLoading(false);
       showToastMessage(programResponse, 'success');
       navigate('../');
     } catch (err) {
+      setIsLoading(false);
       showToastMessage(err.message, 'error');
     }
   }
@@ -81,26 +91,30 @@ function ProgramEdit() {
               required
             />
           </div>
-          <div className="flex space-x-3">
-            <Button
-              type="submit"
-              className="w-full md:w-28"
-              background="bg-primary"
-              textColor="text-white"
-              icon={<CheckCircleIcon className="w-5 h-5" />}
-            >
-              Simpan
-            </Button>
-            <Link to="../">
+          {isLoading ? (
+            <ReactLoading />
+          ) : (
+            <div className="flex space-x-3">
               <Button
-                className="w-full md:w-28 font-medium"
-                background="bg-[#EAEAEA]"
-                textColor="text-dark-gray"
+                type="submit"
+                className="w-full md:w-28"
+                background="bg-primary"
+                textColor="text-white"
+                icon={<CheckCircleIcon className="w-5 h-5" />}
               >
-                Batal
+                Simpan
               </Button>
-            </Link>
-          </div>
+              <Link to="../">
+                <Button
+                  className="w-full md:w-28 font-medium"
+                  background="bg-[#EAEAEA]"
+                  textColor="text-dark-gray"
+                >
+                  Batal
+                </Button>
+              </Link>
+            </div>
+          )}
         </form>
       </div>
     </>
