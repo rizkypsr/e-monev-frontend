@@ -15,8 +15,8 @@ import { useToastContext } from '../../../context/ToastContext';
 import ReactLoading from '../../../components/Loading';
 
 function ActivityCreate() {
-  const [selectedOpd, setSelectedOpd] = useState(null);
-  const [openOpd, setOpenOpd] = useState(false);
+  const [selectedProgram, setSelectedProgram] = useState(null);
+  const [openProgramDialog, setOpenProgramDialog] = useState(false);
   const [title, setTitle] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -32,8 +32,8 @@ function ActivityCreate() {
   const { showToastMessage } = useToastContext();
 
   const handleSelectOpd = (opd) => {
-    setSelectedOpd(opd);
-    setOpenOpd(false);
+    setSelectedProgram(opd);
+    setOpenProgramDialog(false);
   };
 
   const fetchPrograms = async (page) => {
@@ -59,7 +59,7 @@ function ActivityCreate() {
 
     setIsLoading(true);
 
-    if (selectedOpd === null) {
+    if (selectedProgram === null) {
       showToastMessage('Anda belum memilih Nama OPD!', 'error');
       return;
     }
@@ -67,7 +67,7 @@ function ActivityCreate() {
     try {
       const activityBody = {
         title,
-        program_id: selectedOpd.id,
+        program_id: selectedProgram.id,
       };
       const activityResponse = await createActivity(authHeader, activityBody);
 
@@ -110,17 +110,17 @@ function ActivityCreate() {
             />
           </div>
           <div className="mb-6">
-            <Label>Nama OPD</Label>
-            <Dialog open={openOpd} onOpenChange={setOpenOpd}>
+            <Label>Program</Label>
+            <Dialog open={openProgramDialog} onOpenChange={setOpenProgramDialog}>
               <DialogTrigger className="w-full lg:w-2/3 xl:w-1/3">
                 <SelectInputModal
                   className="mt-2"
-                  selectedValue={selectedOpd && selectedOpd.title}
-                  label="--- Pilih Nama OPD ---"
+                  selectedValue={selectedProgram && selectedProgram.title}
+                  label="--- Pilih Program ---"
                 />
               </DialogTrigger>
 
-              <DialogContent title="Pilih Nama OPD" className="w-2/4">
+              <DialogContent title="Pilih Program" className="w-2/4">
                 <div className="relative my-6">
                   <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                     <MagnifyingGlassIcon className="w-4 h-4" />
