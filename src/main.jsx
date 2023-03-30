@@ -40,7 +40,6 @@ import ActivityEdit from './views/Admin/Activity/ActivityEdit';
 import PurposeTable from './views/Admin/Purpose/PurposeTable';
 import PurposeCreate from './views/Admin/Purpose/PurposeCreate';
 import PurposeEdit from './views/Admin/Purpose/PurposeEdit';
-import LoginAksesEdit from './views/Admin/LoginAksesUser/LoginAksesEdit';
 import LoginAksesDetail from './views/Admin/LoginAksesUser/LoginAksesDetail';
 import ErrorPage404 from './views/ErrorPage404';
 import UserLayout from './layouts/UserRoot';
