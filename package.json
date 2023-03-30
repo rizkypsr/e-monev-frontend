@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "homepage": "http://www.emonev.sorong.fe.koneksiku.my.id",
   "scripts": {
     "start": "npx http-server ./dist",
     "dev": "vite",
