@@ -7,9 +7,10 @@ import ReactLoading from '../../../components/Loading';
 import ErrorPage from '../../ErrorPage';
 
 function ActivityDetail() {
+  const [code, setCode] = useState('');
   const [activity, setActivity] = useState('');
   const [programId, setProgramId] = useState('');
-  const [error, setError] = useState(false);
+  const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const { id } = useParams();
@@ -21,6 +22,7 @@ function ActivityDetail() {
     try {
       const occasionResponse = await getActivity(authHeader, id);
 
+      setCode(occasionResponse.code);
       setActivity(occasionResponse.title);
       setProgramId(occasionResponse.program_id);
       setIsLoading(false);
@@ -46,7 +48,7 @@ function ActivityDetail() {
     <div className="w-full h-full mt-6 bg-white rounded-lg p-9">
       <Link to="../" className="flex space-x-3 items-center mb-8">
         <ArrowLeftIcon className="w-6 h-6" />
-        <h1 className="font-semibold text-lg text-dark-gray leading-7">Detail User</h1>
+        <h1 className="font-semibold text-lg text-dark-gray leading-7">Detail Kegiatan</h1>
       </Link>
 
       <div className="relative overflow-x-auto">
@@ -57,9 +59,9 @@ function ActivityDetail() {
                 scope="row"
                 className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
               >
-                No.
+                Kode
               </th>
-              <td className="px-6 py-4">{id}</td>
+              <td className="px-6 py-4">{code}</td>
             </tr>
             <tr className="bg-white">
               <th

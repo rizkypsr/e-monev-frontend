@@ -27,7 +27,12 @@ const columnHelper = createColumnHelper();
 const columns = [
   columnHelper.accessor('id', {
     cell: (info) => info.getValue(),
-    footer: (info) => info.column.id,
+    header: () => <span>ID</span>,
+  }),
+  columnHelper.accessor((row) => row.code, {
+    id: 'code',
+    cell: (info) => <i>{info.getValue()}</i>,
+    header: () => <span>Kode</span>,
   }),
   columnHelper.accessor((row) => row.title, {
     id: 'title',

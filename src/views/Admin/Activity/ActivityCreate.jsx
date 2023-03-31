@@ -31,7 +31,7 @@ function ActivityCreate() {
   const authHeader = useAuthHeader();
   const { showToastMessage } = useToastContext();
 
-  const handleSelectOpd = (opd) => {
+  const handleSelectProgram = (opd) => {
     setSelectedProgram(opd);
     setOpenProgramDialog(false);
   };
@@ -140,7 +140,7 @@ function ActivityCreate() {
                   height={500}
                   endMessage={<h1 className="font-bold text-2xl text-gray-400">...</h1>}
                 >
-                  <List data={pageData.items} onSelectValue={handleSelectOpd} />
+                  <List data={pageData.items} onSelectValue={handleSelectProgram} />
                 </InfiniteScroll>
               </DialogContent>
             </Dialog>
