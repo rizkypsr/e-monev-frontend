@@ -1,8 +1,8 @@
 import React from 'react';
-import Development from '../../Development';
+import { Outlet } from 'react-router-dom';
 
 function Laporan() {
-  return <Development />;
+  return <Outlet />;
 }
 
 export default Laporan;

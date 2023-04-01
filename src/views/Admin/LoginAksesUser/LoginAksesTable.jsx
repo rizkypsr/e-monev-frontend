@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { createColumnHelper } from '@tanstack/react-table';
 import {
   EyeIcon,
@@ -125,7 +125,6 @@ const columns = [
 ];
 
 function LoginAksesTable() {
-  const [sorting, setSorting] = useState('z-a');
   const [error, setError] = useState(false);
   const [pageSize, setPageSize] = useState(10);
   const [search, setSearch] = useState('');
@@ -137,12 +136,20 @@ function LoginAksesTable() {
   });
   const [currentPage, setCurrentPage] = useState(1);
   const [resetPage, setResetPage] = useState(false);
+  const [sorting, setSorting] = useState({ value: 'a-z', label: 'A - Z' });
 
   const authHeader = useAuthHeader();
 
   async function fetchUsers(offset, limit, pageNumber, sort) {
     try {
-      const usersData = await getUsers(authHeader, offset, limit, pageNumber, search, sort);
+      const usersData = await getUsers(
+        authHeader,
+        offset,
+        limit,
+        pageNumber,
+        search,
+        sort
+      );
       setCurrentPageData({
         rowData: usersData.result,
         isLoading: false,
@@ -161,7 +168,7 @@ function LoginAksesTable() {
       isLoading: true,
     }));
 
-    fetchUsers(0, pageSize, currentPage, sorting);
+    fetchUsers(0, pageSize, currentPage, sorting.value);
   }, [currentPage, pageSize, sorting]);
 
   useEffect(() => {
@@ -173,18 +180,24 @@ function LoginAksesTable() {
       isLoading: true,
     }));
 
-    fetchUsers(0, pageSize, currentPage, sorting);
+    fetchUsers(0, pageSize, currentPage, sorting.value);
   }, [search]);
 
-  async function onPageSizeChanged({ value }) {
-    setCurrentPage(1);
-    setResetPage((prevState) => !prevState);
-    setPageSize(Number(value));
-  }
+  const onPageSizeChanged = useCallback(
+    ({ newValue }) => {
+      setCurrentPage(1);
+      setResetPage((prevState) => !prevState);
+      setPageSize(Number(newValue));
+    },
+    [setCurrentPage, setResetPage, setPageSize]
+  );
 
-  function onSorting({ value }) {
-    setSorting(value);
-  }
+  const onSorting = useCallback(
+    ({ newValue, newLabel }) => {
+      setSorting({ value: newValue, label: newLabel });
+    },
+    [setSorting]
+  );
 
   if (error) {
     return <ErrorPage errorMessage={error} />;
@@ -209,7 +222,11 @@ function LoginAksesTable() {
         <div className="flex space-x-3">
           {/* Sorting Dropdown */}
           <div>
-            <Dropdown onSelect={onSorting} defaultValue="Z - A" label="Urutkan:">
+            <Dropdown
+              onSelect={onSorting}
+              label="Urutkan:"
+              selectedItem={sorting}
+            >
               <Dropdown.Items>
                 <li
                   value="a-z"
@@ -231,9 +248,12 @@ function LoginAksesTable() {
           <div>
             <Dropdown
               onSelect={onPageSizeChanged}
-              defaultValue="10"
               label="Tampilkan:"
               endLabel="Entri"
+              selectedItem={{
+                value: pageSize.toString(),
+                label: pageSize.toString(),
+              }}
             >
               <Dropdown.Items>
                 <li
@@ -274,7 +294,11 @@ function LoginAksesTable() {
       </div>
 
       <div className="w-full h-full mt-6 bg-white rounded-lg">
-        <Table columns={columns} data={pageData.rowData} isLoading={pageData.isLoading} />
+        <Table
+          columns={columns}
+          data={pageData.rowData}
+          isLoading={pageData.isLoading}
+        />
 
         <Pagination
           totalRows={pageData.totalData}

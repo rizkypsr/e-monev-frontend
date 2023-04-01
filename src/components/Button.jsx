@@ -15,7 +15,9 @@ function Button({
       aria-hidden="true"
       className={`font-medium rounded-lg text-sm px-3 min-w-fit py-2.5 ${
         icon ? 'flex items-center justify-center space-x-2' : ''
-      } ${background || 'bg-transparent'} ${className} ${textColor ?? 'text-dark-gray'}`}
+      } ${background || 'bg-transparent'} ${className} ${
+        textColor ?? 'text-dark-gray'
+      }`}
     >
       {icon}
       <span>{children}</span>
@@ -27,7 +29,9 @@ function Button({
       onClick={onClick}
       className={`font-medium rounded-lg text-sm px-3 min-w-fit py-2.5 ${
         icon ? 'flex items-center justify-center space-x-2' : ''
-      } ${background || 'bg-transparent'} ${className} ${textColor ?? 'text-dark-gray'}`}
+      } ${background || 'bg-transparent'} ${className} ${
+        textColor ?? 'text-dark-gray'
+      }`}
     >
       {icon}
       <span>{children}</span>

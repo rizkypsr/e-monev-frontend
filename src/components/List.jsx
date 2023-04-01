@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 const List = ({ data, onSelectValue }) => {
   const handleSelectValue = (value) => {
@@ -8,7 +8,7 @@ const List = ({ data, onSelectValue }) => {
   return (
     <div
       className="text-sm font-medium capitalize text-dark-gray"
-      style={{ maxHeight: "32rem" }}
+      style={{ maxHeight: '32rem' }}
     >
       {data.length > 0 ? (
         data.map((item, index) => {

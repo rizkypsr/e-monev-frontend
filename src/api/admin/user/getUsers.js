@@ -6,7 +6,7 @@ export default async function getUsers(
   limit = 10,
   pageNumber = 1,
   search = '',
-  sort = 'z-a',
+  sort = 'z-a'
 ) {
   try {
     const userResponse = await fetch(
@@ -20,13 +20,15 @@ export default async function getUsers(
           'Access-Control-Allow-Origin': domainUrl,
           authorization: authHeader(),
         },
-      },
+      }
     );
 
     const usersData = await userResponse.json();
 
     if (!userResponse.ok) {
-      throw new Error(`Gagal mendapatkan data dari server: ${usersData.message}`);
+      throw new Error(
+        `Gagal mendapatkan data dari server: ${usersData.message}`
+      );
     }
 
     return usersData.data;

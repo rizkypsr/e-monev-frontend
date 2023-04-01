@@ -1,12 +1,20 @@
-import { ArrowLeftIcon, CheckCircleIcon, MagnifyingGlassIcon } from '@heroicons/react/24/solid';
-import React, { useEffect, useState } from 'react';
+import {
+  ArrowLeftIcon,
+  CheckCircleIcon,
+  MagnifyingGlassIcon,
+} from '@heroicons/react/24/solid';
+import { useEffect, useState } from 'react';
 import { useAuthHeader } from 'react-auth-kit';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { getActivity, updateActivity } from '../../../api/admin/activity';
 import { getProgram, getPrograms } from '../../../api/admin/program';
 import Button from '../../../components/Button';
-import { Dialog, DialogContent, DialogTrigger } from '../../../components/DialogContent';
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+} from '../../../components/DialogContent';
 import Label from '../../../components/Label';
 import List from '../../../components/List';
 import ReactLoading from '../../../components/Loading';
@@ -134,13 +142,20 @@ function ActivityEdit() {
       <div className="w-full h-full mt-6 bg-white rounded-lg p-9">
         <Link to="../" className="flex space-x-3 items-center mb-8">
           <ArrowLeftIcon className="w-6 h-6" />
-          <h1 className="font-semibold text-lg text-dark-gray leading-7">Edit Kegiatan</h1>
+          <h1 className="font-semibold text-lg text-dark-gray leading-7">
+            Edit Kegiatan
+          </h1>
         </Link>
 
         <form className="mt-4" onSubmit={onSubmit}>
           <div className="mb-6">
             <Label>Kode</Label>
-            <TextInput className="mt-2 lg:w-2/3 xl:w-1/3" value={id} required disabled />
+            <TextInput
+              className="mt-2 lg:w-2/3 xl:w-1/3"
+              value={id}
+              required
+              disabled
+            />
           </div>
           <div className="mb-6">
             <Label>Kegiatan</Label>
@@ -154,7 +169,10 @@ function ActivityEdit() {
           </div>
           <div className="mb-6">
             <Label>Program</Label>
-            <Dialog open={openProgramDialog} onOpenChange={setOpenProgramDialog}>
+            <Dialog
+              open={openProgramDialog}
+              onOpenChange={setOpenProgramDialog}
+            >
               <DialogTrigger className="lg:w-2/3 xl:w-1/3">
                 <SelectInputModal
                   className="mt-2"
@@ -181,9 +199,14 @@ function ActivityEdit() {
                   next={loadMoreData}
                   hasMore={programData.hasMore}
                   height={500}
-                  endMessage={<h1 className="font-bold text-2xl text-gray-400">...</h1>}
+                  endMessage={
+                    <h1 className="font-bold text-2xl text-gray-400">...</h1>
+                  }
                 >
-                  <List data={programData.items} onSelectValue={handleSelectProgram} />
+                  <List
+                    data={programData.items}
+                    onSelectValue={handleSelectProgram}
+                  />
                 </InfiniteScroll>
               </DialogContent>
             </Dialog>

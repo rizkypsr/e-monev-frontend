@@ -1,4 +1,4 @@
-import { toast } from "react-toastify";
+import { toast } from 'react-toastify';
 
 export default function showToastMsg(type, message, onClose) {
   const config = {
@@ -8,13 +8,13 @@ export default function showToastMsg(type, message, onClose) {
   };
 
   switch (type) {
-    case "info":
+    case 'info':
       toast.info(message, config);
       break;
-    case "warning":
+    case 'warning':
       toast.warning(message, config);
       break;
-    case "error":
+    case 'error':
       toast.error(message, config);
       break;
     default:

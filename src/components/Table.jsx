@@ -1,10 +1,12 @@
-import { flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
+import {
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+} from '@tanstack/react-table';
 import React, { useMemo } from 'react';
 import ReactLoading from './Loading';
 
-function Table({
-  isLoading, className, data, columns,
-}) {
+function Table({ isLoading, className, data, columns }) {
   const columnData = useMemo(() => columns, [columns]);
   const rowData = useMemo(() => data, [data]);
 
@@ -33,9 +35,12 @@ function Table({
                 >
                   {header.isPlaceholder
                     ? null
-                    : flexRender(header.column.columnDef.header, header.getContext())}
+                    : flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
                 </th>
-              )),
+              ))
             )}
           </tr>
         </thead>

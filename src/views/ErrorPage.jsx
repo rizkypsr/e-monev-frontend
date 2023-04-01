@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Button from '../components/Button';
@@ -13,7 +14,11 @@ function ErrorPage({ errorMessage, showBackButton }) {
         </div>
         {showBackButton && (
           <Link to="../">
-            <Button className="mt-3" background="bg-primary" textColor="text-white">
+            <Button
+              className="mt-3"
+              background="bg-primary"
+              textColor="text-white"
+            >
               Kembali
             </Button>
           </Link>
@@ -22,5 +27,14 @@ function ErrorPage({ errorMessage, showBackButton }) {
     </div>
   );
 }
+
+ErrorPage.propTypes = {
+  errorMessage: PropTypes.string.isRequired,
+  showBackButton: PropTypes.bool,
+};
+
+ErrorPage.defaultProps = {
+  showBackButton: false,
+};
 
 export default ErrorPage;

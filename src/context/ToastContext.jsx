@@ -1,5 +1,9 @@
 import React, {
-  createContext, useContext, useState, useMemo, useCallback,
+  createContext,
+  useContext,
+  useState,
+  useMemo,
+  useCallback,
 } from 'react';
 import { ToastContainer } from 'react-toastify';
 import showToastMsg from '../utils/showToast';
@@ -25,7 +29,7 @@ function ToastProvider({ children }) {
 
   const value = useMemo(
     () => ({ showToast, showToastMessage, hideToastMessage }),
-    [showToast, showToastMessage, hideToastMessage],
+    [showToast, showToastMessage, hideToastMessage]
   );
 
   return (

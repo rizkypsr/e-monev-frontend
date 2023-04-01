@@ -1,5 +1,5 @@
-import React from "react";
-import { useMatches } from "react-router-dom";
+import React from 'react';
+import { useMatches } from 'react-router-dom';
 
 function Breadcrumb() {
   let matches = useMatches();
@@ -9,14 +9,10 @@ function Breadcrumb() {
     .map((match) => match.handle.crumb(match.data));
 
   return (
-    <nav
-      className="flex"
-      aria-label="Breadcrumb">
+    <nav className="flex" aria-label="Breadcrumb">
       <ol className="inline-flex items-center space-x-1 md:space-x-3">
         {crumbs.map((crumb, index) => (
-          <li
-            key={index}
-            className="inline-flex items-center">
+          <li key={index} className="inline-flex items-center">
             {index > 0 && <span>/</span>}
             {crumb}
           </li>

@@ -6,7 +6,7 @@ import {
   TrashIcon,
 } from '@heroicons/react/24/solid';
 import { createColumnHelper } from '@tanstack/react-table';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useAuthHeader } from 'react-auth-kit';
 import { Link } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
@@ -130,14 +130,21 @@ function PurposeTable() {
   });
   const [currentPage, setCurrentPage] = useState(1);
   const [resetPage, setResetPage] = useState(false);
-  const [sorting, setSorting] = useState('z-a');
+  const [sorting, setSorting] = useState({ value: 'a-z', label: 'A - Z' });
 
   const authHeader = useAuthHeader();
   const { showToastMessage } = useToastContext();
 
   async function fetchPurposes(offset, limit, pageNumber, sort) {
     try {
-      const purposeData = await getPurposes(authHeader, offset, limit, pageNumber, search, sort);
+      const purposeData = await getPurposes(
+        authHeader,
+        offset,
+        limit,
+        pageNumber,
+        search,
+        sort
+      );
       setCurrentPageData({
         rowData: purposeData.result,
         isLoading: false,
@@ -156,7 +163,7 @@ function PurposeTable() {
       isLoading: true,
     }));
 
-    fetchPurposes(0, pageSize, currentPage, sorting);
+    fetchPurposes(0, pageSize, currentPage, sorting.value);
   }, [currentPage, pageSize, sorting]);
 
   useEffect(() => {
@@ -168,7 +175,7 @@ function PurposeTable() {
       isLoading: true,
     }));
 
-    fetchPurposes(0, pageSize, currentPage, sorting);
+    fetchPurposes(0, pageSize, currentPage, sorting.value);
   }, [search]);
 
   const deletePurposeData = async (id) => {
@@ -182,15 +189,21 @@ function PurposeTable() {
     }
   };
 
-  async function onPageSizeChanged({ value }) {
-    setCurrentPage(1);
-    setResetPage((prevState) => !prevState);
-    setPageSize(Number(value));
-  }
+  const onPageSizeChanged = useCallback(
+    ({ newValue }) => {
+      setCurrentPage(1);
+      setResetPage((prevState) => !prevState);
+      setPageSize(Number(newValue));
+    },
+    [setCurrentPage, setResetPage, setPageSize]
+  );
 
-  function onSorting({ value }) {
-    setSorting(value);
-  }
+  const onSorting = useCallback(
+    ({ newValue, newLabel }) => {
+      setSorting({ value: newValue, label: newLabel });
+    },
+    [setSorting]
+  );
 
   if (error) {
     return <ErrorPage errorMessage={error} />;
@@ -215,7 +228,11 @@ function PurposeTable() {
         <div className="flex space-x-3">
           {/* Sorting Dropdown */}
           <div>
-            <Dropdown onSelect={onSorting} defaultValue="Z - A" label="Urutkan:">
+            <Dropdown
+              onSelect={onSorting}
+              label="Urutkan:"
+              selectedItem={sorting}
+            >
               <Dropdown.Items>
                 <li
                   value="a-z"
@@ -237,9 +254,12 @@ function PurposeTable() {
           <div>
             <Dropdown
               onSelect={onPageSizeChanged}
-              defaultValue="10"
               label="Tampilkan:"
               endLabel="Entri"
+              selectedItem={{
+                value: pageSize.toString(),
+                label: pageSize.toString(),
+              }}
             >
               <Dropdown.Items>
                 <li
@@ -283,8 +303,11 @@ function PurposeTable() {
         <Table
           columns={columns.map((column) =>
             column.cell
-              ? { ...column, cell: (props) => column.cell(props, deletePurposeData) }
-              : column,
+              ? {
+                  ...column,
+                  cell: (props) => column.cell(props, deletePurposeData),
+                }
+              : column
           )}
           data={pageData.rowData}
           isLoading={pageData.isLoading}

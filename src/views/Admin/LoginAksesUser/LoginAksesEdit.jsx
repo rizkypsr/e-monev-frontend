@@ -2,39 +2,42 @@ import {
   ArrowLeftIcon,
   CheckCircleIcon,
   MagnifyingGlassIcon,
-} from "@heroicons/react/24/solid";
-import React, { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import Label from "../../../components/Label";
-import TextInput from "../../../components/TextInput";
-import Button from "../../../components/Button";
-import SelectInputModal from "../../../components/SelectInputModal";
+} from '@heroicons/react/24/solid';
+import React, { useEffect, useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useAuthHeader } from 'react-auth-kit';
+import Label from '../../../components/Label';
+import TextInput from '../../../components/TextInput';
+import Button from '../../../components/Button';
+import SelectInputModal from '../../../components/SelectInputModal';
 import {
   Dialog,
   DialogTrigger,
   DialogContent,
-} from "../../../components/DialogContent";
-import List from "../../../components/List";
-import getUser from "../../../api/admin/user/getUser";
-import { useAuthHeader } from "react-auth-kit";
-import ErrorPage from "../../ErrorPage";
-import { getOrganizations } from "../../../api/admin/organization";
-import { useToastContext } from "../../../context/ToastContext";
-import updateUser from "../../../api/auth/updateUser";
+} from '../../../components/DialogContent';
+import List from '../../../components/List';
+import getUser from '../../../api/admin/user/getUser';
+import ErrorPage from '../../ErrorPage';
+import {
+  getOrganization,
+  getOrganizations,
+} from '../../../api/admin/organization';
+import { useToastContext } from '../../../context/ToastContext';
+import updateUser from '../../../api/auth/updateUser';
 
 function LoginAksesEdit() {
   const { id } = useParams();
 
-  const [name, setName] = useState("");
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [name, setName] = useState('');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
 
   const [selectedOpd, setSelectedOpd] = useState(null);
-  const [openOpd, setOpenOpd] = useState(false);
+  const [openOpdDialog, setOpenOpdDialog] = useState(false);
 
   const [selectedLevel, setSelectedLevel] = useState(null);
-  const [openLevel, setOpenLevel] = useState(false);
+  const [openLevelUserDialog, setOpenLevelUserDialog] = useState(false);
 
   const [opdData, setOpdData] = useState({
     items: [],
@@ -48,19 +51,10 @@ function LoginAksesEdit() {
   const { showToastMessage } = useToastContext();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchLevel();
-    fetchUser();
-  }, []);
-
-  useEffect(() => {
-    fetchOrganizations(opdData.currentPage);
-  }, [opdData.currentPage]);
-
   const fetchLevel = () => {
     setLevelData([
-      { id: 1, name: "Super Admin" },
-      { id: 2, name: "User OPD" },
+      { id: 1, name: 'Super Admin' },
+      { id: 2, name: 'User OPD' },
     ]);
   };
 
@@ -90,16 +84,26 @@ function LoginAksesEdit() {
       setName(userResponse.name);
       setUsername(userResponse.username);
 
-      //FIXME - Selected OPD not working
+      console.log(userResponse);
 
-      // setSelectedOpd({
-      //   id: userResponse.organization_id,
-      //   name: "userResponse",
-      // });
-    } catch (error) {
-      setError(error);
+      setSelectedOpd({
+        id: userResponse.organization.id,
+        title: userResponse.title,
+      });
+    } catch (err) {
+      console.log(err);
+      setError(err.message);
     }
   };
+
+  useEffect(() => {
+    fetchLevel();
+    fetchUser();
+  }, []);
+
+  useEffect(() => {
+    fetchOrganizations(opdData.currentPage);
+  }, [opdData.currentPage]);
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -116,20 +120,20 @@ function LoginAksesEdit() {
       const userResponse = await updateUser(userBody);
 
       showToastMessage(userResponse.message);
-      navigate("../");
+      navigate('../');
     } catch (error) {
-      showToastMessage(error.message, "error");
+      showToastMessage(error.message, 'error');
     }
   };
 
   const handleSelectOpd = (opd) => {
     setSelectedOpd(opd);
-    setOpenOpd(false);
+    setOpenOpdDialog(false);
   };
 
   const handleSelectLevel = (level) => {
     setSelectedLevel(level);
-    setOpenLevel(false);
+    setOpenLevelUserDialog(false);
   };
 
   if (error) {
@@ -152,7 +156,7 @@ function LoginAksesEdit() {
         <form className="mt-4" onSubmit={onSubmit}>
           <div className="mb-6">
             <Label>Nama OPD</Label>
-            <Dialog open={openOpd} onOpenChange={setOpenOpd}>
+            <Dialog open={openOpdDialog} onOpenChange={setOpenOpdDialog}>
               <DialogTrigger className="w-full lg:w-2/3 xl:w-1/3">
                 <SelectInputModal
                   className="mt-2"
@@ -180,7 +184,10 @@ function LoginAksesEdit() {
           </div>
           <div className="mb-6">
             <Label>Level User</Label>
-            <Dialog open={openLevel} onOpenChange={setOpenLevel}>
+            <Dialog
+              open={openLevelUserDialog}
+              onOpenChange={setOpenLevelUserDialog}
+            >
               <DialogTrigger className="w-full lg:w-2/3 xl:w-1/3">
                 <SelectInputModal
                   className="mt-2"

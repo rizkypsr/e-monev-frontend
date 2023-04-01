@@ -1,11 +1,11 @@
-import { PencilIcon } from "@heroicons/react/24/solid";
-import { useEffect, useState } from "react";
-import { useAuthUser } from "react-auth-kit";
-import { Link } from "react-router-dom";
-import { toast } from "react-toastify";
-import Button from "../../../components/Button";
-import Label from "../../../components/Label";
-import TextInput from "../../../components/TextInput";
+import { PencilIcon } from '@heroicons/react/24/solid';
+import { useEffect, useState } from 'react';
+import { useAuthUser } from 'react-auth-kit';
+import { Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import Button from '../../../components/Button';
+import Label from '../../../components/Label';
+import TextInput from '../../../components/TextInput';
 
 function AkunSayaForm() {
   const auth = useAuthUser();
@@ -41,7 +41,8 @@ function AkunSayaForm() {
           className="w-full md:w-28"
           background="bg-primary"
           textColor="text-white"
-          icon={<PencilIcon className="w-4 h-4" />}>
+          icon={<PencilIcon className="w-4 h-4" />}
+        >
           Edit
         </Button>
       </Link>

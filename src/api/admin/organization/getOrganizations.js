@@ -6,7 +6,7 @@ export default async function getOrganizations(
   limit = 10,
   pageNumber = 1,
   search = '',
-  sort = 'z-a',
+  sort = 'z-a'
 ) {
   try {
     const organizationResponse = await fetch(
@@ -20,13 +20,15 @@ export default async function getOrganizations(
           'Access-Control-Allow-Origin': domainUrl,
           authorization: authHeader(),
         },
-      },
+      }
     );
 
     const organizationData = await organizationResponse.json();
 
     if (!organizationResponse.ok) {
-      throw new Error(`Gagal mendapatkan data dari server: ${organizationData.message}`);
+      throw new Error(
+        `Gagal mendapatkan data dari server: ${organizationData.message}`
+      );
     }
 
     return organizationData.data;

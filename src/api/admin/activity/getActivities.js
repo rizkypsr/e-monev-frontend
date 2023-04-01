@@ -2,11 +2,11 @@ import { baseUrl, domainUrl } from '../../../utils/constants';
 
 export default async function getActivities(
   authHeader,
+  sort,
   offset = 0,
   limit = 10,
   pageNumber = 1,
-  search = '',
-  sort = 'z-a',
+  search = ''
 ) {
   try {
     const activityResponse = await fetch(
@@ -20,7 +20,7 @@ export default async function getActivities(
           'Access-Control-Allow-Origin': domainUrl,
           authorization: authHeader(),
         },
-      },
+      }
     );
 
     const activityData = await activityResponse.json();

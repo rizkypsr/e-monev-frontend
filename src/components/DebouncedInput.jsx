@@ -1,5 +1,5 @@
-import { MagnifyingGlassIcon } from "@heroicons/react/24/solid";
-import React, { useEffect, useState } from "react";
+import { MagnifyingGlassIcon } from '@heroicons/react/24/solid';
+import React, { useEffect, useState } from 'react';
 
 function DebouncedInput({ initialValue, onChange, debounce = 500, ...props }) {
   const [value, setValue] = useState(initialValue);

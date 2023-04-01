@@ -84,8 +84,12 @@ function Login() {
         </div>
 
         <div className="self-center mt-32 w-full sm:w-2/3 xl:w-1/2">
-          <h3 className="text-2xl font-semibold text-dark-gray">Selamat Datang</h3>
-          <h4 className="text-light-gray">Login dibawah untuk akses akun Anda</h4>
+          <h3 className="text-2xl font-semibold text-dark-gray">
+            Selamat Datang
+          </h3>
+          <h4 className="text-light-gray">
+            Login dibawah untuk akses akun Anda
+          </h4>
 
           <form className="mt-4" onSubmit={onSubmit}>
             <div className="mb-6">
@@ -135,7 +139,12 @@ function Login() {
             {loading ? (
               <Loading />
             ) : (
-              <Button className="w-28" type="submit" background="bg-primary" textColor="text-white">
+              <Button
+                className="w-28"
+                type="submit"
+                background="bg-primary"
+                textColor="text-white"
+              >
                 Masuk
               </Button>
             )}

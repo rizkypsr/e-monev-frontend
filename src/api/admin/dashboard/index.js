@@ -1,3 +1,3 @@
-import getCounts from "./getCounts";
+import getCounts from './getCounts';
 
 export { getCounts };

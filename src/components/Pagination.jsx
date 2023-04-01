@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from 'react';
 
 function Pagination({ pageChangeHandler, totalRows, rowsPerPage, resetPage }) {
   const [currentPage, setCurrentPage] = useState(0);
@@ -47,11 +47,12 @@ function Pagination({ pageChangeHandler, totalRows, rowsPerPage, resetPage }) {
             <button
               onClick={() => onPageSelect(i)}
               className={
-                "px-3 py-2 leading-tight text-sm font-semibold rounded-md hover:text-gray-700 " +
+                'px-3 py-2 leading-tight text-sm font-semibold rounded-md hover:text-gray-700 ' +
                 (i == currentPage
-                  ? "bg-primary border border-priimary hover:bg-gray-100 text-white"
-                  : "bg-white border border-gray-300 hover:bg-gray-100 text-dark-gray")
-              }>
+                  ? 'bg-primary border border-priimary hover:bg-gray-100 text-white'
+                  : 'bg-white border border-gray-300 hover:bg-gray-100 text-dark-gray')
+              }
+            >
               {i + 1}
             </button>
           </li>
@@ -67,11 +68,12 @@ function Pagination({ pageChangeHandler, totalRows, rowsPerPage, resetPage }) {
             key="first"
             onClick={() => onPageSelect(0)}
             className={
-              "px-3 py-2 leading-tight text-sm font-semibold rounded-md hover:text-gray-700 " +
+              'px-3 py-2 leading-tight text-sm font-semibold rounded-md hover:text-gray-700 ' +
               (currentPage === 1
-                ? "bg-primary border border-priimary hover:bg-gray-100 text-white"
-                : "bg-white border border-gray-300 hover:bg-gray-100 text-dark-gray")
-            }>
+                ? 'bg-primary border border-priimary hover:bg-gray-100 text-white'
+                : 'bg-white border border-gray-300 hover:bg-gray-100 text-dark-gray')
+            }
+          >
             1
           </button>
         );
@@ -87,11 +89,12 @@ function Pagination({ pageChangeHandler, totalRows, rowsPerPage, resetPage }) {
             onClick={() => onPageSelect(i)}
             disabled={currentPage === i}
             className={
-              "px-3 py-2 leading-tight text-sm font-semibold rounded-md hover:text-gray-700 " +
+              'px-3 py-2 leading-tight text-sm font-semibold rounded-md hover:text-gray-700 ' +
               (i === currentPage
-                ? "bg-primary border border-priimary hover:bg-gray-100 text-white"
-                : "bg-white border border-gray-300 hover:bg-gray-100 text-dark-gray")
-            }>
+                ? 'bg-primary border border-priimary hover:bg-gray-100 text-white'
+                : 'bg-white border border-gray-300 hover:bg-gray-100 text-dark-gray')
+            }
+          >
             {i + 1}
           </button>
         );
@@ -102,7 +105,8 @@ function Pagination({ pageChangeHandler, totalRows, rowsPerPage, resetPage }) {
           items.push(
             <span
               key="ellipsis2"
-              className="block p-2 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-100 hover:text-gray-700">
+              className="block p-2 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-100 hover:text-gray-700"
+            >
               ...
             </span>
           );
@@ -112,11 +116,12 @@ function Pagination({ pageChangeHandler, totalRows, rowsPerPage, resetPage }) {
             key="last"
             onClick={() => onPageSelect(noOfPages - 1)}
             className={
-              "px-3 py-2 leading-tight text-sm font-semibold rounded-md hover:text-gray-700 " +
+              'px-3 py-2 leading-tight text-sm font-semibold rounded-md hover:text-gray-700 ' +
               (noOfPages === currentPage
-                ? "bg-primary border border-priimary hover:bg-gray-100 text-white"
-                : "bg-white border border-gray-300 hover:bg-gray-100 text-dark-gray")
-            }>
+                ? 'bg-primary border border-priimary hover:bg-gray-100 text-white'
+                : 'bg-white border border-gray-300 hover:bg-gray-100 text-dark-gray')
+            }
+          >
             {noOfPages}
           </button>
         );
@@ -131,10 +136,11 @@ function Pagination({ pageChangeHandler, totalRows, rowsPerPage, resetPage }) {
       {noOfPages > 1 ? (
         <nav
           className="flex items-center justify-between w-full p-5 "
-          aria-label="Table navigation">
+          aria-label="Table navigation"
+        >
           <span className="text-sm text-gray-500">
-            Menampilkan {currentPage * rowsPerPage + 1} sampai{" "}
-            {Math.min((currentPage + 1) * rowsPerPage, totalRows)} dari{" "}
+            Menampilkan {currentPage * rowsPerPage + 1} sampai{' '}
+            {Math.min((currentPage + 1) * rowsPerPage, totalRows)} dari{' '}
             {totalRows} entri
           </span>
 
@@ -143,17 +149,20 @@ function Pagination({ pageChangeHandler, totalRows, rowsPerPage, resetPage }) {
               <button
                 onClick={onPrevPage}
                 disabled={!canGoBack}
-                className="block p-2 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-100 hover:text-gray-700 ">
+                className="block p-2 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-100 hover:text-gray-700 "
+              >
                 <svg
                   className="w-5 h-5"
                   aria-hidden="true"
                   fill="currentColor"
                   viewBox="0 0 20 20"
-                  xmlns="http://www.w3.org/2000/svg">
+                  xmlns="http://www.w3.org/2000/svg"
+                >
                   <path
                     fillRule="evenodd"
                     d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-                    clipRule="evenodd"></path>
+                    clipRule="evenodd"
+                  ></path>
                 </svg>
               </button>
             </li>
@@ -162,17 +171,20 @@ function Pagination({ pageChangeHandler, totalRows, rowsPerPage, resetPage }) {
               <button
                 onClick={onNextPage}
                 disabled={!canGoNext}
-                className="block p-2 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-100 hover:text-gray-700">
+                className="block p-2 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-100 hover:text-gray-700"
+              >
                 <svg
                   className="w-5 h-5"
                   aria-hidden="true"
                   fill="currentColor"
                   viewBox="0 0 20 20"
-                  xmlns="http://www.w3.org/2000/svg">
+                  xmlns="http://www.w3.org/2000/svg"
+                >
                   <path
                     fillRule="evenodd"
                     d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                    clipRule="evenodd"></path>
+                    clipRule="evenodd"
+                  ></path>
                 </svg>
               </button>
             </li>

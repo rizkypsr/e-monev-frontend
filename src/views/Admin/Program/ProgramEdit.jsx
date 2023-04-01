@@ -73,13 +73,20 @@ function ProgramEdit() {
       <div className="w-full h-full mt-6 bg-white rounded-lg p-9">
         <Link to="../" className="flex space-x-3 items-center mb-8">
           <ArrowLeftIcon className="w-6 h-6" />
-          <h1 className="font-semibold text-lg text-dark-gray leading-7">Edit Program</h1>
+          <h1 className="font-semibold text-lg text-dark-gray leading-7">
+            Edit Program
+          </h1>
         </Link>
 
         <form className="mt-4" onSubmit={onSubmit}>
           <div className="mb-6">
             <Label>Kode</Label>
-            <TextInput className="mt-2 lg:w-2/3 xl:w-1/3" value={code} required disabled />
+            <TextInput
+              className="mt-2 lg:w-2/3 xl:w-1/3"
+              value={code}
+              required
+              disabled
+            />
           </div>
           <div className="mb-6">
             <Label>Program</Label>

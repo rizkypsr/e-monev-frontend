@@ -1,19 +1,19 @@
-import { ArrowLeftIcon, CheckCircleIcon } from "@heroicons/react/24/solid";
-import { Link } from "react-router-dom";
-import Button from "../../../components/Button";
-import Label from "../../../components/Label";
-import TextInput from "../../../components/TextInput";
-import SuccessImg from "../../../assets/images/success.png";
-import { useState } from "react";
-import { useAuthUser, useSignOut } from "react-auth-kit";
-import updateUser from "../../../api/auth/updateUser";
-import { useToastContext } from "../../../context/ToastContext";
+import { ArrowLeftIcon, CheckCircleIcon } from '@heroicons/react/24/solid';
+import { Link } from 'react-router-dom';
+import Button from '../../../components/Button';
+import Label from '../../../components/Label';
+import TextInput from '../../../components/TextInput';
+import SuccessImg from '../../../assets/images/success.png';
+import { useState } from 'react';
+import { useAuthUser, useSignOut } from 'react-auth-kit';
+import updateUser from '../../../api/auth/updateUser';
+import { useToastContext } from '../../../context/ToastContext';
 
 function AkunSayaEdit() {
   const [username, setUsername] = useState(null);
   const [password, setPassword] = useState(null);
   const [passwordConfirmation, setPasswordConfirmation] = useState(null);
-  const [passwordError, setPasswordError] = useState("");
+  const [passwordError, setPasswordError] = useState('');
 
   const authUser = useAuthUser();
   const signOut = useSignOut();
@@ -23,7 +23,7 @@ function AkunSayaEdit() {
     e.preventDefault();
 
     if (password !== passwordConfirmation) {
-      setPasswordError("Pastikan Password yang anda masukan sama");
+      setPasswordError('Pastikan Password yang anda masukan sama');
       return;
     }
 
@@ -45,7 +45,7 @@ function AkunSayaEdit() {
       signOut();
       showToastMessage(userResponse.message);
     } else {
-      showToastMessage(userResponse.message, "error");
+      showToastMessage(userResponse.message, 'error');
     }
   };
 

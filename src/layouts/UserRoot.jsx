@@ -1,5 +1,5 @@
-import React from "react";
-import { useSignOut } from "react-auth-kit";
+import React from 'react';
+import { useSignOut } from 'react-auth-kit';
 
 function UserLayout() {
   const signOut = useSignOut();

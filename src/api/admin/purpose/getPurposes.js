@@ -6,7 +6,7 @@ export default async function getPurposes(
   limit = 10,
   pageNumber = 1,
   search = '',
-  sort = 'z-a',
+  sort = 'z-a'
 ) {
   try {
     const purposeResponse = await fetch(
@@ -20,13 +20,15 @@ export default async function getPurposes(
           'Access-Control-Allow-Origin': domainUrl,
           authorization: authHeader(),
         },
-      },
+      }
     );
 
     const purposeData = await purposeResponse.json();
 
     if (!purposeResponse.ok) {
-      throw new Error(`Gagal mendapatkan data dari server: ${purposeData.message}`);
+      throw new Error(
+        `Gagal mendapatkan data dari server: ${purposeData.message}`
+      );
     }
 
     return purposeData.data;

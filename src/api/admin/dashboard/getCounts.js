@@ -24,7 +24,16 @@ export default async function getCounts(authHeader) {
       makeRequest(`${baseUrl}/purpose/list`, authHeader),
     ]);
 
-    const [userData, occasionData, organizationData, programData, activityData, purposeData] = await Promise.all(responses.map((response) => extractTotalCount(response)));
+    const [
+      userData,
+      occasionData,
+      organizationData,
+      programData,
+      activityData,
+      purposeData,
+    ] = await Promise.all(
+      responses.map((response) => extractTotalCount(response))
+    );
 
     return {
       userCount: userData,

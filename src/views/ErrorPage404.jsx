@@ -8,7 +8,9 @@ function ErrorPage404() {
     <div className="flex justify-center items-center h-screen text-center">
       <div>
         <h1 className="text-2xl font-semibold leading-loose">Ooops!</h1>
-        <p className="mt-3 leading-loose">Nampaknya apa yang kamu cari tidak tersedia</p>
+        <p className="mt-3 leading-loose">
+          Nampaknya apa yang kamu cari tidak tersedia
+        </p>
         <p>
           <i>
             Error:

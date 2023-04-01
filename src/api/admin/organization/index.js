@@ -4,5 +4,8 @@ import updateOrganization from './updateOrganization';
 import createOrganization from './createOrganization';
 
 export {
-  getOrganizations, getOrganization, updateOrganization, createOrganization,
+  getOrganizations,
+  getOrganization,
+  updateOrganization,
+  createOrganization,
 };

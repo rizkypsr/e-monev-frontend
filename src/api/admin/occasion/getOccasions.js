@@ -6,7 +6,7 @@ export default async function getOccasions(
   limit = 10,
   pageNumber = 1,
   search = '',
-  sort = 'z-a',
+  sort = 'z-a'
 ) {
   try {
     const occasionResponse = await fetch(
@@ -20,13 +20,15 @@ export default async function getOccasions(
           'Access-Control-Allow-Origin': domainUrl,
           authorization: authHeader(),
         },
-      },
+      }
     );
 
     const occasionData = await occasionResponse.json();
 
     if (!occasionResponse.ok) {
-      throw new Error(`Gagal mendapatkan data dari server: ${occasionData.message}`);
+      throw new Error(
+        `Gagal mendapatkan data dari server: ${occasionData.message}`
+      );
     }
 
     return occasionData.data;

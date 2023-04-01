@@ -1,4 +1,8 @@
-import { ArrowLeftIcon, CheckCircleIcon, MagnifyingGlassIcon } from '@heroicons/react/24/solid';
+import {
+  ArrowLeftIcon,
+  CheckCircleIcon,
+  MagnifyingGlassIcon,
+} from '@heroicons/react/24/solid';
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthHeader } from 'react-auth-kit';
@@ -7,7 +11,11 @@ import Label from '../../../components/Label';
 import TextInput from '../../../components/TextInput';
 import Button from '../../../components/Button';
 import SelectInputModal from '../../../components/SelectInputModal';
-import { Dialog, DialogTrigger, DialogContent } from '../../../components/DialogContent';
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+} from '../../../components/DialogContent';
 import List from '../../../components/List';
 import { getOrganizations } from '../../../api/admin/organization';
 import register from '../../../api/auth/register';
@@ -43,7 +51,12 @@ function LoginAksesCreate() {
   };
 
   const fetchOrganizations = async (page) => {
-    const organizationResponse = await getOrganizations(authHeader, 0, 10, page);
+    const organizationResponse = await getOrganizations(
+      authHeader,
+      0,
+      10,
+      page
+    );
 
     if (page === opdData.totalPages) {
       setOpdData((prevData) => ({ ...prevData, hasMore: false }));
@@ -113,7 +126,9 @@ function LoginAksesCreate() {
       <div className="w-full h-full mt-6 bg-white rounded-lg p-9">
         <Link to="../" className="flex space-x-3 items-center mb-8">
           <ArrowLeftIcon className="w-6 h-6" />
-          <h1 className="font-semibold text-lg text-dark-gray leading-7">Tambah User</h1>
+          <h1 className="font-semibold text-lg text-dark-gray leading-7">
+            Tambah User
+          </h1>
         </Link>
 
         <form className="mt-4" onSubmit={onSubmit}>
@@ -146,7 +161,9 @@ function LoginAksesCreate() {
                   next={loadMoreData}
                   hasMore={opdData.hasMore}
                   height={500}
-                  endMessage={<h1 className="font-bold text-2xl text-gray-400">...</h1>}
+                  endMessage={
+                    <h1 className="font-bold text-2xl text-gray-400">...</h1>
+                  }
                 >
                   <List data={opdData.items} onSelectValue={handleSelectOpd} />
                 </InfiniteScroll>

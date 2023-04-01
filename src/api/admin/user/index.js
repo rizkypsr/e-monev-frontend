@@ -1,3 +1,3 @@
-import getUsers from "./getUsers";
+import getUsers from './getUsers';
 
 export { getUsers };

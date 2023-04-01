@@ -2,14 +2,17 @@ import { baseUrl, domainUrl } from '../../../utils/constants';
 
 export default async function getActivity(authHeader, activityId) {
   try {
-    const activityResponse = await fetch(`${baseUrl}/activity/detail/${activityId}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': domainUrl,
-        authorization: authHeader(),
-      },
-    });
+    const activityResponse = await fetch(
+      `${baseUrl}/activity/detail/${activityId}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': domainUrl,
+          authorization: authHeader(),
+        },
+      }
+    );
 
     const activityData = await activityResponse.json();
 

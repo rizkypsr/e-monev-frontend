@@ -15,7 +15,9 @@ export default async function updateOrganization(authHeader, organizationBody) {
     const organizationData = await organizationResponse.json();
 
     if (!organizationResponse.ok) {
-      throw new Error(`Terjadi kesalahan pada server ${organizationData.message}`);
+      throw new Error(
+        `Terjadi kesalahan pada server ${organizationData.message}`
+      );
     }
 
     return 'Organisasi berhasil diubah!';

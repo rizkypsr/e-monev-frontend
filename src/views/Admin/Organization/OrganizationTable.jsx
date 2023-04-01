@@ -6,7 +6,7 @@ import {
   TrashIcon,
 } from '@heroicons/react/24/solid';
 import { createColumnHelper } from '@tanstack/react-table';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useAuthHeader } from 'react-auth-kit';
 import { Link } from 'react-router-dom';
 import { getOrganizations } from '../../../api/admin/organization';
@@ -124,7 +124,6 @@ const columns = [
 
 function OrganizationTable() {
   const [search, setSearch] = useState('');
-  const [sorting, setSorting] = useState([]);
   const [pageSize, setPageSize] = useState(10);
   const [error, setError] = useState(false);
   const [pageData, setCurrentPageData] = useState({
@@ -135,6 +134,7 @@ function OrganizationTable() {
   });
   const [currentPage, setCurrentPage] = useState(1);
   const [resetPage, setResetPage] = useState(false);
+  const [sorting, setSorting] = useState({ value: 'a-z', label: 'A - Z' });
 
   const authHeader = useAuthHeader();
   const { showToastMessage } = useToastContext();
@@ -147,7 +147,7 @@ function OrganizationTable() {
         limit,
         pageNumber,
         search,
-        sort,
+        sort
       );
       setCurrentPageData({
         rowData: organizationData.result,
@@ -167,7 +167,7 @@ function OrganizationTable() {
       isLoading: true,
     }));
 
-    fetchOrganizations(0, pageSize, currentPage, sorting);
+    fetchOrganizations(0, pageSize, currentPage, sorting.value);
   }, [currentPage, pageSize, sorting]);
 
   useEffect(() => {
@@ -179,7 +179,7 @@ function OrganizationTable() {
       isLoading: true,
     }));
 
-    fetchOrganizations(0, pageSize, currentPage, sorting);
+    fetchOrganizations(0, pageSize, currentPage, sorting.value);
   }, [search]);
 
   async function deleteOccasionData(id) {
@@ -193,15 +193,21 @@ function OrganizationTable() {
     }
   }
 
-  async function onPageSizeChanged({ value }) {
-    setCurrentPage(1);
-    setResetPage((prevState) => !prevState);
-    setPageSize(Number(value));
-  }
+  const onPageSizeChanged = useCallback(
+    ({ newValue }) => {
+      setCurrentPage(1);
+      setResetPage((prevState) => !prevState);
+      setPageSize(Number(newValue));
+    },
+    [setCurrentPage, setResetPage, setPageSize]
+  );
 
-  function onSorting({ value }) {
-    setSorting(value);
-  }
+  const onSorting = useCallback(
+    ({ newValue, newLabel }) => {
+      setSorting({ value: newValue, label: newLabel });
+    },
+    [setSorting]
+  );
 
   if (error) {
     return <ErrorPage errorMessage={error} />;
@@ -226,7 +232,11 @@ function OrganizationTable() {
         <div className="flex space-x-3">
           {/* Sorting Dropdown */}
           <div>
-            <Dropdown onSelect={onSorting} defaultValue="A - Z" label="Urutkan:">
+            <Dropdown
+              onSelect={onSorting}
+              label="Urutkan:"
+              selectedItem={sorting}
+            >
               <Dropdown.Items>
                 <li
                   value="a-z"
@@ -248,9 +258,12 @@ function OrganizationTable() {
           <div>
             <Dropdown
               onSelect={onPageSizeChanged}
-              defaultValue="10"
               label="Tampilkan:"
               endLabel="Entri"
+              selectedItem={{
+                value: pageSize.toString(),
+                label: pageSize.toString(),
+              }}
             >
               <Dropdown.Items>
                 <li
@@ -294,8 +307,11 @@ function OrganizationTable() {
         <Table
           columns={columns.map((column) =>
             column.cell
-              ? { ...column, cell: (props) => column.cell(props, deleteOccasionData) }
-              : column,
+              ? {
+                  ...column,
+                  cell: (props) => column.cell(props, deleteOccasionData),
+                }
+              : column
           )}
           data={pageData.rowData}
           isLoading={pageData.isLoading}

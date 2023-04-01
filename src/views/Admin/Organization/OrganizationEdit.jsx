@@ -7,7 +7,10 @@ import Button from '../../../components/Button';
 import { useToastContext } from '../../../context/ToastContext';
 import ErrorPage from '../../ErrorPage';
 import Label from '../../../components/Label';
-import { getOrganization, updateOrganization } from '../../../api/admin/organization';
+import {
+  getOrganization,
+  updateOrganization,
+} from '../../../api/admin/organization';
 import ReactLoading from '../../../components/Loading';
 
 function OrganizationEdit() {
@@ -52,7 +55,10 @@ function OrganizationEdit() {
         title: organization,
         code,
       };
-      const organizationResponse = await updateOrganization(authHeader, organizationBody);
+      const organizationResponse = await updateOrganization(
+        authHeader,
+        organizationBody
+      );
 
       setIsLoading(false);
       showToastMessage(organizationResponse, 'success');
@@ -76,7 +82,9 @@ function OrganizationEdit() {
       <div className="w-full h-full mt-6 bg-white rounded-lg p-9">
         <Link to="../" className="flex space-x-3 items-center mb-8">
           <ArrowLeftIcon className="w-6 h-6" />
-          <h1 className="font-semibold text-lg text-dark-gray leading-7">Edit Organisasi</h1>
+          <h1 className="font-semibold text-lg text-dark-gray leading-7">
+            Edit Organisasi
+          </h1>
         </Link>
 
         <form className="mt-4" onSubmit={onSubmit}>

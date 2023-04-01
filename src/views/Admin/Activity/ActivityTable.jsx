@@ -6,7 +6,7 @@ import {
   TrashIcon,
 } from '@heroicons/react/24/solid';
 import { createColumnHelper } from '@tanstack/react-table';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useAuthHeader } from 'react-auth-kit';
 import { Link } from 'react-router-dom';
 import { deleteActivity, getActivities } from '../../../api/admin/activity';
@@ -17,11 +17,11 @@ import {
   DialogContent,
   DialogTrigger,
 } from '../../../components/DialogContent';
-import Dropdown from '../../../components/Dropdown';
 import Pagination from '../../../components/Pagination';
 import Table from '../../../components/Table';
 import { useToastContext } from '../../../context/ToastContext';
 import TrashImg from '../../../assets/images/trash.png';
+import Dropdown from '../../../components/Dropdown';
 
 const columnHelper = createColumnHelper();
 const columns = [
@@ -136,14 +136,21 @@ function ActivityTable() {
   });
   const [currentPage, setCurrentPage] = useState(1);
   const [resetPage, setResetPage] = useState(false);
-  const [sorting, setSorting] = useState('');
+  const [sorting, setSorting] = useState({ value: 'a-z', label: 'A - Z' });
 
   const authHeader = useAuthHeader();
   const { showToastMessage } = useToastContext();
 
   const fetchActivities = async (offset, limit, pageNumber, sort) => {
     try {
-      const activityData = await getActivities(authHeader, offset, limit, pageNumber, search, sort);
+      const activityData = await getActivities(
+        authHeader,
+        sort,
+        offset,
+        limit,
+        pageNumber,
+        search
+      );
       setCurrentPageData({
         rowData: activityData.result,
         isLoading: false,
@@ -162,7 +169,9 @@ function ActivityTable() {
       isLoading: true,
     }));
 
-    fetchActivities(0, pageSize, currentPage, sorting);
+    console.log(`onUseEffect: ${sorting.value}`);
+
+    fetchActivities(0, pageSize, currentPage, sorting.value);
   }, [currentPage, pageSize, sorting]);
 
   useEffect(() => {
@@ -174,7 +183,7 @@ function ActivityTable() {
       isLoading: true,
     }));
 
-    fetchActivities(0, pageSize, currentPage, sorting);
+    fetchActivities(0, pageSize, currentPage, sorting.value);
   }, [search]);
 
   const deleteActivityData = async (id) => {
@@ -188,15 +197,21 @@ function ActivityTable() {
     }
   };
 
-  async function onPageSizeChanged({ value }) {
-    setCurrentPage(1);
-    setResetPage((prevState) => !prevState);
-    setPageSize(Number(value));
-  }
+  const onPageSizeChanged = useCallback(
+    ({ newValue }) => {
+      setCurrentPage(1);
+      setResetPage((prevState) => !prevState);
+      setPageSize(Number(newValue));
+    },
+    [setCurrentPage, setResetPage, setPageSize]
+  );
 
-  function onSorting({ value }) {
-    setSorting(value);
-  }
+  const onSorting = useCallback(
+    ({ newValue, newLabel }) => {
+      setSorting({ value: newValue, label: newLabel });
+    },
+    [setSorting]
+  );
 
   return (
     <>
@@ -217,7 +232,11 @@ function ActivityTable() {
         <div className="flex space-x-3">
           {/* Sorting Dropdown */}
           <div>
-            <Dropdown onSelect={onSorting} defaultValue="Z - A" label="Urutkan:">
+            <Dropdown
+              onSelect={onSorting}
+              label="Urutkan:"
+              selectedItem={sorting}
+            >
               <Dropdown.Items>
                 <li
                   value="a-z"
@@ -239,9 +258,12 @@ function ActivityTable() {
           <div>
             <Dropdown
               onSelect={onPageSizeChanged}
-              defaultValue="10"
               label="Tampilkan:"
               endLabel="Entri"
+              selectedItem={{
+                value: pageSize.toString(),
+                label: pageSize.toString(),
+              }}
             >
               <Dropdown.Items>
                 <li
@@ -285,8 +307,11 @@ function ActivityTable() {
         <Table
           columns={columns.map((column) =>
             column.cell
-              ? { ...column, cell: (props) => column.cell(props, deleteActivityData) }
-              : column,
+              ? {
+                  ...column,
+                  cell: (props) => column.cell(props, deleteActivityData),
+                }
+              : column
           )}
           data={pageData.rowData}
           isLoading={pageData.isLoading}

@@ -1,7 +1,10 @@
 import React from 'react';
 import './index.css';
 import {
-  createBrowserRouter, createRoutesFromElements, Link, Route,
+  createBrowserRouter,
+  createRoutesFromElements,
+  Link,
+  Route,
 } from 'react-router-dom';
 import Login from './views/Auth/Login';
 import PrivateRoute from './layouts/PrivateRoute';
@@ -42,17 +45,17 @@ import OrganizationDetail from './views/Admin/Organization/OrganizationDetail';
 import ProgramDetail from './views/Admin/Program/ProgramDetail';
 import PurposeDetail from './views/Admin/Purpose/PurposeDetail';
 import ActivityDetail from './views/Admin/Activity/ActivityDetail';
-import Development from './views/Development';
+import LoginAksesEdit from './views/Admin/LoginAksesUser/LoginAksesEdit';
 
 const router = createBrowserRouter(
   createRoutesFromElements([
     <Route
       path="/"
-      element={(
+      element={
         <PrivateRoute loginPath="/login" roleId={2}>
           <UserLayout />
         </PrivateRoute>
-      )}
+      }
       errorElement={<ErrorPage404 />}
     />,
     <Route path="/login" element={<Login />} />,
@@ -61,23 +64,28 @@ const router = createBrowserRouter(
       loader={() => 'Dashboard'}
       handle={{
         crumb: () => (
-          <Link to="/admin" className="ml-1 text-sm text-dark-gray hover:text-primary md:ml-2">
+          <Link
+            to="/admin"
+            className="ml-1 text-sm text-dark-gray hover:text-primary md:ml-2"
+          >
             e-Monev
           </Link>
         ),
       }}
-      element={(
+      element={
         <PrivateRoute loginPath="/login" roleId={1}>
           <AdminLayout />
         </PrivateRoute>
-      )}
+      }
     >
       <Route
         index
         key="adminDashboard"
         loader={() => 'Dashboard'}
         handle={{
-          crumb: (data) => <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>,
+          crumb: (data) => (
+            <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
+          ),
         }}
         element={<Dashboard />}
       />
@@ -87,12 +95,18 @@ const router = createBrowserRouter(
         path="akun-saya"
         loader={() => 'Akun Saya'}
         handle={{
-          crumb: (data) => <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>,
+          crumb: (data) => (
+            <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
+          ),
         }}
         element={<AkunSaya />}
       >
         <Route index key="akunSayaForm" element={<AkunSayaForm />} />
-        <Route key="akunSayaFormEdit" path="edit/:id" element={<AkunSayaEdit />} />
+        <Route
+          key="akunSayaFormEdit"
+          path="edit/:id"
+          element={<AkunSayaEdit />}
+        />
       </Route>
       ,
       <Route
@@ -100,42 +114,76 @@ const router = createBrowserRouter(
         path="login-akses-user"
         loader={() => 'Login Akses User'}
         handle={{
-          crumb: (data) => <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>,
+          crumb: (data) => (
+            <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
+          ),
         }}
         element={<LoginAksesUser />}
       >
         <Route index key="loginAksesTable" element={<LoginAksesTable />} />
-        <Route key="loginAksesCreate" path="create" element={<LoginAksesCreate />} />
-        <Route key="loginAksesEdit" path="edit/:id" element={<Development />} />
-        <Route key="loginAksesDetail" path="detail/:id" element={<LoginAksesDetail />} />
+        <Route
+          key="loginAksesCreate"
+          path="create"
+          element={<LoginAksesCreate />}
+        />
+        <Route
+          key="loginAksesEdit"
+          path="edit/:id"
+          element={<LoginAksesEdit />}
+        />
+        <Route
+          key="loginAksesDetail"
+          path="detail/:id"
+          element={<LoginAksesDetail />}
+        />
       </Route>
       <Route
         key="urusan"
         path="urusan"
         loader={() => 'Urusan'}
         handle={{
-          crumb: (data) => <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>,
+          crumb: (data) => (
+            <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
+          ),
         }}
         element={<Occasion />}
       >
         <Route index key="urusan" element={<OccasionTable />} />
         <Route key="urusanCreate" path="create" element={<OccasionCreate />} />
         <Route key="urusanEdit" path="edit/:id" element={<OccasionEdit />} />
-        <Route key="urusanDetail" path="detail/:id" element={<OccasionDetail />} />
+        <Route
+          key="urusanDetail"
+          path="detail/:id"
+          element={<OccasionDetail />}
+        />
       </Route>
       <Route
         key="organisasi"
         path="organisasi"
         loader={() => 'Organisasi'}
         handle={{
-          crumb: (data) => <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>,
+          crumb: (data) => (
+            <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
+          ),
         }}
         element={<Organization />}
       >
         <Route index key="organisasi" element={<OrganizationTable />} />
-        <Route key="organisasiCreate" path="create" element={<OrganizationCreate />} />
-        <Route key="organisasiEdit" path="edit/:id" element={<OrganizationEdit />} />
-        <Route key="organisasiDetail" path="detail/:id" element={<OrganizationDetail />} />
+        <Route
+          key="organisasiCreate"
+          path="create"
+          element={<OrganizationCreate />}
+        />
+        <Route
+          key="organisasiEdit"
+          path="edit/:id"
+          element={<OrganizationEdit />}
+        />
+        <Route
+          key="organisasiDetail"
+          path="detail/:id"
+          element={<OrganizationDetail />}
+        />
       </Route>
       ,
       <Route
@@ -143,14 +191,20 @@ const router = createBrowserRouter(
         path="program"
         loader={() => 'Program'}
         handle={{
-          crumb: (data) => <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>,
+          crumb: (data) => (
+            <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
+          ),
         }}
         element={<Program />}
       >
         <Route index key="program" element={<ProgramTable />} />
         <Route key="programCreate" path="create" element={<ProgramCreate />} />
         <Route key="programEdit" path="edit/:id" element={<ProgramEdit />} />
-        <Route key="programDetail" path="detail/:id" element={<ProgramDetail />} />
+        <Route
+          key="programDetail"
+          path="detail/:id"
+          element={<ProgramDetail />}
+        />
       </Route>
       ,
       <Route
@@ -158,35 +212,53 @@ const router = createBrowserRouter(
         path="kegiatan"
         loader={() => 'Kegiatan'}
         handle={{
-          crumb: (data) => <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>,
+          crumb: (data) => (
+            <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
+          ),
         }}
         element={<Activity />}
       >
         <Route index key="kegiatan" element={<ActivityTable />} />
-        <Route key="kegiatanCreate" path="create" element={<ActivityCreate />} />
+        <Route
+          key="kegiatanCreate"
+          path="create"
+          element={<ActivityCreate />}
+        />
         <Route key="kegiatanEdit" path="edit/:id" element={<ActivityEdit />} />
-        <Route key="kegiatanDetail" path="detail/:id" element={<ActivityDetail />} />
+        <Route
+          key="kegiatanDetail"
+          path="detail/:id"
+          element={<ActivityDetail />}
+        />
       </Route>
       <Route
         key="sasaran"
         path="sasaran"
         loader={() => 'Sasaran'}
         handle={{
-          crumb: (data) => <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>,
+          crumb: (data) => (
+            <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
+          ),
         }}
         element={<Purpose />}
       >
         <Route index key="sasaran" element={<PurposeTable />} />
         <Route key="purposeCreate" path="create" element={<PurposeCreate />} />
         <Route key="purposeEdit" path="edit/:id" element={<PurposeEdit />} />
-        <Route key="purposeDetail" path="detail/:id" element={<PurposeDetail />} />
+        <Route
+          key="purposeDetail"
+          path="detail/:id"
+          element={<PurposeDetail />}
+        />
       </Route>
       <Route
         key="laporan"
         path="laporan"
         loader={() => 'Data Laporan'}
         handle={{
-          crumb: (data) => <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>,
+          crumb: (data) => (
+            <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
+          ),
         }}
         element={<Laporan />}
       />
@@ -195,7 +267,7 @@ const router = createBrowserRouter(
   ]),
   {
     basename: '/',
-  },
+  }
 );
 
 export default router;

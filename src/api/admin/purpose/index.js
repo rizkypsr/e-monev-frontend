@@ -1,3 +1,3 @@
-import getPurposes from "./getPurposes";
+import getPurposes from './getPurposes';
 
 export { getPurposes };

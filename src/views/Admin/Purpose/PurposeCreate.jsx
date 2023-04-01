@@ -43,7 +43,9 @@ function PurposeCreate() {
       <div className="w-full h-full mt-6 bg-white rounded-lg p-9">
         <Link to="../" className="flex space-x-3 items-center mb-8">
           <ArrowLeftIcon className="w-6 h-6" />
-          <h1 className="font-semibold text-lg text-dark-gray leading-7">Tambah Sasaran</h1>
+          <h1 className="font-semibold text-lg text-dark-gray leading-7">
+            Tambah Sasaran
+          </h1>
         </Link>
 
         <form className="mt-4" onSubmit={onSubmit}>

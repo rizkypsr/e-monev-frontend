@@ -11,7 +11,11 @@ function Development() {
           <p>Fitur Dalam Tahap Pengembangan</p>
         </div>
         <Link to="../">
-          <Button className="mt-3" background="bg-primary" textColor="text-white">
+          <Button
+            className="mt-3"
+            background="bg-primary"
+            textColor="text-white"
+          >
             Kembali
           </Button>
         </Link>

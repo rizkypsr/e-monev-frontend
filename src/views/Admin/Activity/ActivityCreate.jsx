@@ -1,4 +1,8 @@
-import { ArrowLeftIcon, CheckCircleIcon, MagnifyingGlassIcon } from '@heroicons/react/24/solid';
+import {
+  ArrowLeftIcon,
+  CheckCircleIcon,
+  MagnifyingGlassIcon,
+} from '@heroicons/react/24/solid';
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthHeader } from 'react-auth-kit';
@@ -6,7 +10,11 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import Label from '../../../components/Label';
 import TextInput from '../../../components/TextInput';
 import Button from '../../../components/Button';
-import { Dialog, DialogContent, DialogTrigger } from '../../../components/DialogContent';
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+} from '../../../components/DialogContent';
 import List from '../../../components/List';
 import SelectInputModal from '../../../components/SelectInputModal';
 import { getPrograms } from '../../../api/admin/program';
@@ -95,7 +103,9 @@ function ActivityCreate() {
       <div className="w-full h-full mt-6 bg-white rounded-lg p-9">
         <Link to="../" className="flex space-x-3 items-center mb-8">
           <ArrowLeftIcon className="w-6 h-6" />
-          <h1 className="font-semibold text-lg text-dark-gray leading-7">Tambah Program</h1>
+          <h1 className="font-semibold text-lg text-dark-gray leading-7">
+            Tambah Program
+          </h1>
         </Link>
 
         <form className="mt-4" onSubmit={onSubmit}>
@@ -111,7 +121,10 @@ function ActivityCreate() {
           </div>
           <div className="mb-6">
             <Label>Program</Label>
-            <Dialog open={openProgramDialog} onOpenChange={setOpenProgramDialog}>
+            <Dialog
+              open={openProgramDialog}
+              onOpenChange={setOpenProgramDialog}
+            >
               <DialogTrigger className="w-full lg:w-2/3 xl:w-1/3">
                 <SelectInputModal
                   className="mt-2"
@@ -138,9 +151,14 @@ function ActivityCreate() {
                   next={loadMoreData}
                   hasMore={pageData.hasMore}
                   height={500}
-                  endMessage={<h1 className="font-bold text-2xl text-gray-400">...</h1>}
+                  endMessage={
+                    <h1 className="font-bold text-2xl text-gray-400">...</h1>
+                  }
                 >
-                  <List data={pageData.items} onSelectValue={handleSelectProgram} />
+                  <List
+                    data={pageData.items}
+                    onSelectValue={handleSelectProgram}
+                  />
                 </InfiniteScroll>
               </DialogContent>
             </Dialog>

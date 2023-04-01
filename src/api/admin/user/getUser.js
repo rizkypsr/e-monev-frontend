@@ -14,7 +14,9 @@ const getUser = async (authHeader, userId) => {
     const userData = await userResponse.json();
 
     if (!userResponse.ok) {
-      throw new Error(`Gagal mendapatkan data dari server: ${userData.message}`);
+      throw new Error(
+        `Gagal mendapatkan data dari server: ${userData.message}`
+      );
     }
 
     return userData.data;

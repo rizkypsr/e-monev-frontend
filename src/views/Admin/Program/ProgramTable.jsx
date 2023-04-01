@@ -5,8 +5,8 @@ import {
   PlusIcon,
   TrashIcon,
 } from '@heroicons/react/24/solid';
-import { createColumnHelper } from '@tanstack/react-table';
-import React, { useEffect, useState } from 'react';
+import { createColumnHelper, sortingFns } from '@tanstack/react-table';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useAuthHeader } from 'react-auth-kit';
 import { Link } from 'react-router-dom';
 import { deleteProgram, getPrograms } from '../../../api/admin/program';
@@ -122,7 +122,6 @@ const columns = [
 ];
 
 function ProgramTable() {
-  const [sorting, setSorting] = useState([]);
   const [error, setError] = useState(false);
   const [pageSize, setPageSize] = useState(10);
   const [search, setSearch] = useState('');
@@ -134,13 +133,21 @@ function ProgramTable() {
   });
   const [currentPage, setCurrentPage] = useState(1);
   const [resetPage, setResetPage] = useState(false);
+  const [sorting, setSorting] = useState({ value: 'a-z', label: 'A - Z' });
 
   const authHeader = useAuthHeader();
   const { showToastMessage } = useToastContext();
 
   const fetchProgram = async (offset, limit, pageNumber, sort) => {
     try {
-      const programData = await getPrograms(authHeader, offset, limit, pageNumber, search, sort);
+      const programData = await getPrograms(
+        authHeader,
+        sort,
+        offset,
+        limit,
+        pageNumber,
+        search
+      );
       setCurrentPageData({
         rowData: programData.result,
         isLoading: false,
@@ -159,8 +166,8 @@ function ProgramTable() {
       isLoading: true,
     }));
 
-    fetchProgram(0, pageSize, currentPage, sorting);
-  }, [currentPage, pageSize]);
+    fetchProgram(0, pageSize, currentPage, sorting.value);
+  }, [currentPage, pageSize, sorting]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -171,7 +178,7 @@ function ProgramTable() {
       isLoading: true,
     }));
 
-    fetchProgram(0, pageSize, currentPage, sorting);
+    fetchProgram(0, pageSize, currentPage, sorting.value);
   }, [search]);
 
   const deleteProgramData = async (id) => {
@@ -185,15 +192,21 @@ function ProgramTable() {
     }
   };
 
-  async function onPageSizeChanged({ value }) {
-    setCurrentPage(1);
-    setResetPage((prevState) => !prevState);
-    setPageSize(Number(value));
-  }
+  const onPageSizeChanged = useCallback(
+    ({ newValue }) => {
+      setCurrentPage(1);
+      setResetPage((prevState) => !prevState);
+      setPageSize(Number(newValue));
+    },
+    [setCurrentPage, setResetPage, setPageSize]
+  );
 
-  function onSorting({ value }) {
-    setSorting(value);
-  }
+  const onSorting = useCallback(
+    ({ newValue, newLabel }) => {
+      setSorting({ value: newValue, label: newLabel });
+    },
+    [setSorting]
+  );
 
   if (error) {
     return <ErrorPage errorMessage={error} />;
@@ -218,7 +231,11 @@ function ProgramTable() {
         <div className="flex space-x-3">
           {/* Sorting Dropdown */}
           <div>
-            <Dropdown onSelect={onSorting} defaultValue="A - Z" label="Urutkan:">
+            <Dropdown
+              onSelect={onSorting}
+              label="Urutkan:"
+              selectedItem={sorting}
+            >
               <Dropdown.Items>
                 <li
                   value="a-z"
@@ -240,9 +257,12 @@ function ProgramTable() {
           <div>
             <Dropdown
               onSelect={onPageSizeChanged}
-              defaultValue="10"
               label="Tampilkan:"
               endLabel="Entri"
+              selectedItem={{
+                value: pageSize.toString(),
+                label: pageSize.toString(),
+              }}
             >
               <Dropdown.Items>
                 <li
@@ -286,8 +306,11 @@ function ProgramTable() {
         <Table
           columns={columns.map((column) =>
             column.cell
-              ? { ...column, cell: (props) => column.cell(props, deleteProgramData) }
-              : column,
+              ? {
+                  ...column,
+                  cell: (props) => column.cell(props, deleteProgramData),
+                }
+              : column
           )}
           data={pageData.rowData}
           isLoading={pageData.isLoading}

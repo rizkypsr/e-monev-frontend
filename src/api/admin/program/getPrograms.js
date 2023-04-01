@@ -2,15 +2,15 @@ import { baseUrl, domainUrl } from '../../../utils/constants';
 
 export default async function getPrograms(
   authHeader,
+  sort,
   offset = 0,
   limit = 10,
   pageNumber = 1,
-  search = '',
-  sort = 'z-a',
+  search = ''
 ) {
   try {
     const programResponse = await fetch(
-      `${baseUrl}/program/list?offset=${offset}&limit=${limit}&search=${search}&sort${sort}${
+      `${baseUrl}/program/list?offset=${offset}&limit=${limit}&search=${search}&sort=${sort}${
         pageNumber ? `&page=${pageNumber}` : ''
       }`,
       {
@@ -20,13 +20,15 @@ export default async function getPrograms(
           'Access-Control-Allow-Origin': domainUrl,
           authorization: authHeader(),
         },
-      },
+      }
     );
 
     const programData = await programResponse.json();
 
     if (!programResponse.ok) {
-      throw new Error(`Gagal mendapatkan data dari server: ${programData.message}`);
+      throw new Error(
+        `Gagal mendapatkan data dari server: ${programData.message}`
+      );
     }
 
     return programData.data;

@@ -6,7 +6,7 @@ import {
   TrashIcon,
 } from '@heroicons/react/24/solid';
 import { createColumnHelper } from '@tanstack/react-table';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useAuthHeader } from 'react-auth-kit';
 import { Link } from 'react-router-dom';
 import Button from '../../../components/Button';
@@ -127,8 +127,8 @@ function OccasionTable() {
 
   const [error, setError] = useState(false);
   const [pageSize, setPageSize] = useState(10);
-  const [sorting, setSorting] = useState('z-a');
   const [search, setSearch] = useState('');
+  const [sorting, setSorting] = useState({ value: 'a-z', label: 'A - Z' });
 
   const [pageData, setCurrentPageData] = useState({
     rowData: [],
@@ -142,7 +142,14 @@ function OccasionTable() {
 
   async function fetchOccasions(offset, limit, pageNumber, sort) {
     try {
-      const occasionsData = await getOccasions(authHeader, offset, limit, pageNumber, search, sort);
+      const occasionsData = await getOccasions(
+        authHeader,
+        offset,
+        limit,
+        pageNumber,
+        search,
+        sort
+      );
       setCurrentPageData({
         rowData: occasionsData.result,
         isLoading: false,
@@ -161,8 +168,7 @@ function OccasionTable() {
       isLoading: true,
     }));
 
-    fetchOccasions(0, pageSize, currentPage, sorting);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    fetchOccasions(0, pageSize, currentPage, sorting.value);
   }, [currentPage, pageSize, sorting]);
 
   useEffect(() => {
@@ -174,8 +180,7 @@ function OccasionTable() {
       isLoading: true,
     }));
 
-    fetchOccasions(0, pageSize, currentPage, sorting);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    fetchOccasions(0, pageSize, currentPage, sorting.value);
   }, [search]);
 
   async function deleteOccasionData(id) {
@@ -190,15 +195,18 @@ function OccasionTable() {
     }
   }
 
-  async function onPageSizeChanged({ value }) {
+  const onPageSizeChanged = useCallback(({ newValue }) => {
     setCurrentPage(1);
     setResetPage((prevState) => !prevState);
-    setPageSize(Number(value));
-  }
+    setPageSize(Number(newValue));
+  }, []);
 
-  function onSorting({ value }) {
-    setSorting(value);
-  }
+  const onSorting = useCallback(
+    ({ newValue, newLabel }) => {
+      setSorting({ value: newValue, label: newLabel });
+    },
+    [setSorting]
+  );
 
   if (error) {
     return <ErrorPage errorMessage={error} />;
@@ -223,7 +231,11 @@ function OccasionTable() {
         <div className="flex space-x-3">
           {/* Sorting Dropdown */}
           <div>
-            <Dropdown onSelect={onSorting} defaultValue="Z - A" label="Urutkan:">
+            <Dropdown
+              onSelect={onSorting}
+              label="Urutkan:"
+              selectedItem={sorting}
+            >
               <Dropdown.Items>
                 <li
                   value="a-z"
@@ -245,9 +257,12 @@ function OccasionTable() {
           <div>
             <Dropdown
               onSelect={onPageSizeChanged}
-              defaultValue="10"
               label="Tampilkan:"
               endLabel="Entri"
+              selectedItem={{
+                value: pageSize.toString(),
+                label: pageSize.toString(),
+              }}
             >
               <Dropdown.Items>
                 <li
@@ -289,9 +304,14 @@ function OccasionTable() {
 
       <div className="w-full h-full mt-6 bg-white rounded-lg">
         <Table
-          columns={columns.map((column) => (column.cell
-            ? { ...column, cell: (props) => column.cell(props, deleteOccasionData) }
-            : column))}
+          columns={columns.map((column) =>
+            column.cell
+              ? {
+                  ...column,
+                  cell: (props) => column.cell(props, deleteOccasionData),
+                }
+              : column
+          )}
           data={pageData.rowData}
           isLoading={pageData.isLoading}
         />
