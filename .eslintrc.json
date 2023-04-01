@@ -9,7 +9,8 @@
     "plugin:react/recommended",
     "plugin:react-hooks/recommended",
     "plugin:react/jsx-runtime",
-    "airbnb"
+    "airbnb",
+    "prettier"
   ],
   "overrides": [],
   "parserOptions": {
@@ -18,18 +19,14 @@
   },
   "plugins": ["react", "react-hooks"],
   "rules": {
-    "linebreak-style": "off",
-    "no-alert": "off",
-    "no-underscore-dangle": "off",
-    "import/prefer-default-export": "off",
-    "react-hooks/rules-of-hooks": "error",
-    "react/jsx-props-no-spreading": "off",
-    "default-case": "off",
-    "react/prop-types": "off",
-    "react/jsx-no-bind": "off",
-    "no-confusing-arrow": "off",
-    "implicit-arrow-linebreak": "off",
-    "function-paren-newline": "off",
+    "react/react-in-jsx-scope": "off",
+    "react-hooks/rules-of-hooks": "warn",
+    "react/button-has-type": "warn",
+    "react/prop-types": "warn",
+    "react/require-default-props": "warn",
+    "react/no-array-index-key": "error",
+    "react/no-children-prop": "error",
+    "react/jsx-no-bind": "warn",
     "prefer-spread": "warn"
   }
 }
