@@ -164,7 +164,7 @@ function LoginAksesCreate() {
                 />
               </DialogTrigger>
 
-              <DialogContent title="Pilih Level User" className="w-2/5">
+              <DialogContent title="Pilih Level User">
                 <div className="relative my-6">
                   <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                     <MagnifyingGlassIcon className="w-4 h-4" />
