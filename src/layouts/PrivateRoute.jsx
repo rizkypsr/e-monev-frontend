@@ -1,20 +1,20 @@
+import PropTypes from 'prop-types';
 import React from 'react';
-import { useIsAuthenticated, useAuthUser } from 'react-auth-kit';
+import { useIsAuthenticated } from 'react-auth-kit';
 import { Navigate, useLocation } from 'react-router-dom';
-import AccessDenied from '../views/AccessDenied';
 
-function PrivateRoute({ children, loginPath, roleId }) {
+function PrivateRoute({ children }) {
   const isAuthenticated = useIsAuthenticated();
-  const auth = useAuthUser();
   const location = useLocation();
 
   if (isAuthenticated()) {
-    if (auth().admin_role_id === roleId) {
-      return children;
-    }
-    return <AccessDenied />;
+    return children;
   }
-  return <Navigate to={loginPath} state={{ from: location }} replace />;
+  return <Navigate to="/login" state={{ from: location }} replace />;
 }
+
+PrivateRoute.propTypes = {
+  children: PropTypes.node.isRequired,
+};
 
 export default PrivateRoute;

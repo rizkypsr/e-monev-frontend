@@ -12,7 +12,7 @@ import AdminLayout from './layouts/AdminRoot';
 import AkunSaya from './views/Admin/AkunSaya/AkunSaya';
 import LoginAksesUser from './views/Admin/LoginAksesUser/LoginAksesUser';
 import Occasion from './views/Admin/Occasion/Occasion';
-import Laporan from './views/Admin/Laporan/Laporan';
+import Report from './views/Admin/Report/Report';
 import Dashboard from './views/Admin/Dashboard/Dashboard';
 import AkunSayaForm from './views/Admin/AkunSaya/AkunSayaForm';
 import AkunSayaEdit from './views/Admin/AkunSaya/AkunSayaEdit';
@@ -46,13 +46,14 @@ import ProgramDetail from './views/Admin/Program/ProgramDetail';
 import PurposeDetail from './views/Admin/Purpose/PurposeDetail';
 import ActivityDetail from './views/Admin/Activity/ActivityDetail';
 import LoginAksesEdit from './views/Admin/LoginAksesUser/LoginAksesEdit';
+import ReportTable from './views/Admin/Report/ReportTable';
 
 const router = createBrowserRouter(
   createRoutesFromElements([
     <Route
       path="/"
       element={
-        <PrivateRoute loginPath="/login" roleId={2}>
+        <PrivateRoute>
           <UserLayout />
         </PrivateRoute>
       }
@@ -73,7 +74,7 @@ const router = createBrowserRouter(
         ),
       }}
       element={
-        <PrivateRoute loginPath="/login" roleId={1}>
+        <PrivateRoute>
           <AdminLayout />
         </PrivateRoute>
       }
@@ -260,9 +261,10 @@ const router = createBrowserRouter(
             <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
           ),
         }}
-        element={<Laporan />}
-      />
-      ,
+        element={<Report />}
+      >
+        <Route index key="laporanTable" element={<ReportTable />} />
+      </Route>
     </Route>,
   ]),
   {
