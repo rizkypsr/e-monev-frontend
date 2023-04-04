@@ -1,12 +1,12 @@
 import { baseUrl, domainUrl } from '../../../utils/constants';
 
-export default async function getPrograms(
+export default async function getReports(
   authHeader,
-  { sort = 'a-z', offset = 0, limit = 10, pageNumber = 1, search = '' }
+  { offset = 0, limit = 10, pageNumber = 1, search = '', sort = 'z-a' }
 ) {
   try {
-    const programResponse = await fetch(
-      `${baseUrl}/program/list?offset=${offset}&limit=${limit}&search=${search}&sort=${sort}${
+    const reportResponse = await fetch(
+      `${baseUrl}/data-report/list?offset=${offset}&limit=${limit}&search=${search}&sort=${sort}${
         pageNumber ? `&page=${pageNumber}` : ''
       }`,
       {
@@ -19,15 +19,15 @@ export default async function getPrograms(
       }
     );
 
-    const programData = await programResponse.json();
+    const reportsData = await reportResponse.json();
 
-    if (!programResponse.ok) {
+    if (!reportResponse.ok) {
       throw new Error(
-        `Gagal mendapatkan data dari server: ${programData.message}`
+        `Gagal mendapatkan data dari server: ${reportsData.message}`
       );
     }
 
-    return programData.data;
+    return reportsData.data;
   } catch (error) {
     throw new Error(error.message);
   }

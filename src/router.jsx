@@ -47,6 +47,8 @@ import PurposeDetail from './views/Admin/Purpose/PurposeDetail';
 import ActivityDetail from './views/Admin/Activity/ActivityDetail';
 import LoginAksesEdit from './views/Admin/LoginAksesUser/LoginAksesEdit';
 import ReportTable from './views/Admin/Report/ReportTable';
+import ReportDetail from './views/Admin/Report/ReportDetail';
+import ReportEdit from './views/Admin/Report/ReportEdit';
 
 const router = createBrowserRouter(
   createRoutesFromElements([
@@ -233,7 +235,7 @@ const router = createBrowserRouter(
         />
       </Route>
       <Route
-        key="sasaran"
+        key="purpose"
         path="sasaran"
         loader={() => 'Sasaran'}
         handle={{
@@ -243,7 +245,7 @@ const router = createBrowserRouter(
         }}
         element={<Purpose />}
       >
-        <Route index key="sasaran" element={<PurposeTable />} />
+        <Route index key="purpose" element={<PurposeTable />} />
         <Route key="purposeCreate" path="create" element={<PurposeCreate />} />
         <Route key="purposeEdit" path="edit/:id" element={<PurposeEdit />} />
         <Route
@@ -253,7 +255,7 @@ const router = createBrowserRouter(
         />
       </Route>
       <Route
-        key="laporan"
+        key="report"
         path="laporan"
         loader={() => 'Data Laporan'}
         handle={{
@@ -263,7 +265,13 @@ const router = createBrowserRouter(
         }}
         element={<Report />}
       >
-        <Route index key="laporanTable" element={<ReportTable />} />
+        <Route index key="reportTable" element={<ReportTable />} />
+        <Route key="reportEdit" path="edit/:id" element={<ReportEdit />} />
+        <Route
+          key="reportDetail"
+          path="detail/:id"
+          element={<ReportDetail />}
+        />
       </Route>
     </Route>,
   ]),

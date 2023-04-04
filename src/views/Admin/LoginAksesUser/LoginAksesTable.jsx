@@ -19,9 +19,10 @@ import {
   DialogTrigger,
 } from '../../../components/DialogContent';
 import TrashImg from '../../../assets/images/trash.png';
-import { getUsers } from '../../../api/admin/user';
+import { deleteUser, getUsers } from '../../../api/admin/user';
 import Pagination from '../../../components/Pagination';
 import ErrorPage from '../../ErrorPage';
+import { useToastContext } from '../../../context/ToastContext';
 
 const columnHelper = createColumnHelper();
 
@@ -35,9 +36,10 @@ const columns = [
     cell: (info) => <i>{info.getValue()}</i>,
     header: () => <span>Username</span>,
   }),
-  columnHelper.accessor('name', {
-    header: () => 'Nama OPD',
-    cell: (info) => info.renderValue(),
+  columnHelper.accessor((row) => row.organization.title, {
+    id: 'organization',
+    cell: (info) => <i>{info.getValue()}</i>,
+    header: () => <span>Nama OPD</span>,
   }),
   columnHelper.accessor('admin_role_id', {
     header: () => <span>Level User</span>,
@@ -46,7 +48,7 @@ const columns = [
   columnHelper.accessor((row) => row.aksi, {
     id: 'aksi',
     size: 10,
-    cell: (props) => {
+    cell: (props, deleteUserData) => {
       const rowId = props.row.original.id;
       return (
         <div className="flex justify-end">
@@ -94,6 +96,7 @@ const columns = [
                   <div className="flex space-x-3 justify-center">
                     <DialogClose>
                       <Button
+                        onClick={() => deleteUserData(rowId)}
                         className="w-full md:w-28 mt-8 border border-[#EB5757]"
                         type="modal"
                         background="bg-white"
@@ -139,6 +142,7 @@ function LoginAksesTable() {
   const [sorting, setSorting] = useState({ value: 'a-z', label: 'A - Z' });
 
   const authHeader = useAuthHeader();
+  const { showToastMessage } = useToastContext();
 
   async function fetchUsers(offset, limit, pageNumber, sort) {
     try {
@@ -160,6 +164,17 @@ function LoginAksesTable() {
       setError(err.message);
     }
   }
+
+  const deleteUserData = async (userId) => {
+    try {
+      const deleteResponse = await deleteUser(authHeader, userId);
+      fetchUsers(0, pageSize, currentPage, sorting.value);
+
+      showToastMessage(deleteResponse);
+    } catch (err) {
+      showToastMessage(err.message, 'error');
+    }
+  };
 
   useEffect(() => {
     setCurrentPageData((prevState) => ({
@@ -295,7 +310,14 @@ function LoginAksesTable() {
 
       <div className="w-full h-full mt-6 bg-white rounded-lg">
         <Table
-          columns={columns}
+          columns={columns.map((column) =>
+            column.cell
+              ? {
+                  ...column,
+                  cell: (props) => column.cell(props, deleteUserData),
+                }
+              : column
+          )}
           data={pageData.rowData}
           isLoading={pageData.isLoading}
         />

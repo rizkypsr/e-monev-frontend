@@ -1,3 +1,4 @@
 import getUsers from './getUsers';
+import deleteUser from './deleteUser';
 
-export { getUsers };
+export { getUsers, deleteUser };

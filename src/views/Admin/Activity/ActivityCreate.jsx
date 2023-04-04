@@ -7,6 +7,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthHeader } from 'react-auth-kit';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import { animated, useTransition } from '@react-spring/web';
 import Label from '../../../components/Label';
 import TextInput from '../../../components/TextInput';
 import Button from '../../../components/Button';
@@ -17,7 +18,7 @@ import {
 } from '../../../components/DialogContent';
 import List from '../../../components/List';
 import SelectInputModal from '../../../components/SelectInputModal';
-import { getPrograms } from '../../../api/admin/program';
+import { createProgram, getPrograms } from '../../../api/admin/program';
 import { createActivity } from '../../../api/admin/activity';
 import { useToastContext } from '../../../context/ToastContext';
 import ReactLoading from '../../../components/Loading';
@@ -27,10 +28,11 @@ function ActivityCreate() {
   const [openProgramDialog, setOpenProgramDialog] = useState(false);
   const [title, setTitle] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-
+  const [openCreateOpd, setOpenCreateOpd] = useState(false);
   const [pageData, setPageData] = useState({
     items: [],
     hasMore: true,
+    isLoading: false,
     totalPages: 0,
     currentPage: 1,
   });
@@ -38,6 +40,23 @@ function ActivityCreate() {
   const navigate = useNavigate();
   const authHeader = useAuthHeader();
   const { showToastMessage } = useToastContext();
+  const transition = useTransition(openCreateOpd, {
+    config: {
+      duration: 120,
+    },
+    from: {
+      scale: 0,
+      opacity: 0,
+    },
+    enter: {
+      scale: 1,
+      opacity: 1,
+    },
+    leave: {
+      scale: 0,
+      opacity: 0,
+    },
+  });
 
   const handleSelectProgram = (opd) => {
     setSelectedProgram(opd);
@@ -88,6 +107,27 @@ function ActivityCreate() {
     }
   };
 
+  const handleKeyDown = async (e) => {
+    if (e.key === 'Enter') {
+      setPageData((prev) => ({ ...prev, isLoading: true }));
+      setOpenCreateOpd(false);
+
+      try {
+        const programBody = { title: e.target.value };
+        const programResponse = await createProgram(authHeader, programBody);
+
+        await fetchPrograms(pageData.currentPage);
+        setOpenCreateOpd(false);
+        setPageData((prev) => ({ ...prev, isLoading: false }));
+        showToastMessage(programResponse);
+      } catch (err) {
+        setOpenCreateOpd(false);
+        setPageData((prev) => ({ ...prev, isLoading: false }));
+        showToastMessage(err.message, 'error');
+      }
+    }
+  };
+
   const loadMoreData = async () => {
     setPageData((prevData) => ({
       ...prevData,
@@ -98,13 +138,13 @@ function ActivityCreate() {
   return (
     <>
       <div className="flex justify-between">
-        <h1 className="text-2xl font-semibold">Program</h1>
+        <h1 className="text-2xl font-semibold">Kegiatan</h1>
       </div>
       <div className="w-full h-full mt-6 bg-white rounded-lg p-9">
         <Link to="../" className="flex space-x-3 items-center mb-8">
           <ArrowLeftIcon className="w-6 h-6" />
           <h1 className="font-semibold text-lg text-dark-gray leading-7">
-            Tambah Program
+            Tambah Kegiatan
           </h1>
         </Link>
 
@@ -133,7 +173,33 @@ function ActivityCreate() {
                 />
               </DialogTrigger>
 
-              <DialogContent title="Pilih Program" className="w-2/4">
+              <DialogContent
+                addButton
+                title="Pilih Nama OPD"
+                onCreateClick={() => setOpenCreateOpd((prev) => !prev)}
+              >
+                {transition((style, isOpen) => (
+                  <div>
+                    {isOpen && (
+                      <animated.div
+                        style={style}
+                        className="w-72 bg-white rounded-md absolute z-10 -right-80 top-0 p-4"
+                      >
+                        <TextInput
+                          required
+                          placeholder="Masukan Nama Program"
+                          onKeyDown={handleKeyDown}
+                        />
+                        <p className="text-xs text-light-gray mt-2 text-left">
+                          Tekan{' '}
+                          <span className="itelic text-dark-gray">Enter</span>{' '}
+                          untuk menyimpan
+                        </p>
+                      </animated.div>
+                    )}
+                  </div>
+                ))}
+
                 <div className="relative my-6">
                   <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                     <MagnifyingGlassIcon className="w-4 h-4" />
@@ -145,21 +211,24 @@ function ActivityCreate() {
                     placeholder="Pencarian"
                   />
                 </div>
-
-                <InfiniteScroll
-                  dataLength={pageData.items.length}
-                  next={loadMoreData}
-                  hasMore={pageData.hasMore}
-                  height={500}
-                  endMessage={
-                    <h1 className="font-bold text-2xl text-gray-400">...</h1>
-                  }
-                >
-                  <List
-                    data={pageData.items}
-                    onSelectValue={handleSelectProgram}
-                  />
-                </InfiniteScroll>
+                {pageData.isLoading ? (
+                  <ReactLoading />
+                ) : (
+                  <InfiniteScroll
+                    dataLength={pageData.items.length}
+                    next={loadMoreData}
+                    hasMore={pageData.hasMore}
+                    height={500}
+                    endMessage={
+                      <h1 className="font-bold text-2xl text-gray-400">...</h1>
+                    }
+                  >
+                    <List
+                      data={pageData.items}
+                      onSelectValue={handleSelectProgram}
+                    />
+                  </InfiniteScroll>
+                )}
               </DialogContent>
             </Dialog>
           </div>

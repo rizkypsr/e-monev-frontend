@@ -1,8 +1,8 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 
-function Laporan() {
+function Report() {
   return <Outlet />;
 }
 
-export default Laporan;
+export default Report;

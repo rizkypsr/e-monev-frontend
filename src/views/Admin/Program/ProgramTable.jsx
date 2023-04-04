@@ -140,14 +140,13 @@ function ProgramTable() {
 
   const fetchProgram = async (offset, limit, pageNumber, sort) => {
     try {
-      const programData = await getPrograms(
-        authHeader,
+      const programData = await getPrograms(authHeader, {
         sort,
         offset,
         limit,
         pageNumber,
-        search
-      );
+        search,
+      });
       setCurrentPageData({
         rowData: programData.result,
         isLoading: false,

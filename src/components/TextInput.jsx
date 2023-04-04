@@ -26,13 +26,13 @@ function TextInput(props) {
           </button>
         )}
         <input
-          id={props.id}
           type={showPassword ? 'text' : type}
           name={props.name}
           placeholder={props.placeholder}
           disabled={props.disabled}
           value={props.value}
           onChange={props.onChange}
+          onKeyDown={props.onKeyDown}
           className={`${
             props.disabled
               ? 'bg-[#F2F2F2] border border-[#BDBDBD]'

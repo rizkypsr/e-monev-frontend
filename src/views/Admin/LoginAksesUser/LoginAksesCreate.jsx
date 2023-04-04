@@ -7,6 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthHeader } from 'react-auth-kit';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import { animated, useSpring, useTransition } from '@react-spring/web';
 import Label from '../../../components/Label';
 import TextInput from '../../../components/TextInput';
 import Button from '../../../components/Button';
@@ -17,7 +18,10 @@ import {
   DialogContent,
 } from '../../../components/DialogContent';
 import List from '../../../components/List';
-import { getOrganizations } from '../../../api/admin/organization';
+import {
+  createOrganization,
+  getOrganizations,
+} from '../../../api/admin/organization';
 import register from '../../../api/auth/register';
 import { useToastContext } from '../../../context/ToastContext';
 import ReactLoading from '../../../components/Loading';
@@ -28,9 +32,11 @@ function LoginAksesCreate() {
   const [password, setPassword] = useState('');
   const [selectedOpd, setSelectedOpd] = useState(null);
   const [openOpd, setOpenOpd] = useState(false);
+  const [openCreateOpd, setOpenCreateOpd] = useState(false);
   const [selectedLevel, setSelectedLevel] = useState(null);
   const [openLevel, setOpenLevel] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [opdLoading, setOpdLoading] = useState(false);
   const [opdData, setOpdData] = useState({
     items: [],
     hasMore: true,
@@ -42,6 +48,24 @@ function LoginAksesCreate() {
   const authHeader = useAuthHeader();
   const navigate = useNavigate();
   const { showToastMessage } = useToastContext();
+
+  const transition = useTransition(openCreateOpd, {
+    config: {
+      duration: 120,
+    },
+    from: {
+      scale: 0,
+      opacity: 0,
+    },
+    enter: {
+      scale: 1,
+      opacity: 1,
+    },
+    leave: {
+      scale: 0,
+      opacity: 0,
+    },
+  });
 
   const fetchLevel = async () => {
     setLevelData([
@@ -118,6 +142,28 @@ function LoginAksesCreate() {
     setOpenLevel(false);
   };
 
+  const handleKeyDown = async (e) => {
+    if (e.key === 'Enter') {
+      setOpdLoading(true);
+      setOpenCreateOpd(false);
+
+      try {
+        const organizationBody = { title: e.target.value };
+        const organizationResponse = await createOrganization(
+          authHeader,
+          organizationBody
+        );
+
+        await fetchOrganizations(opdData.currentPage);
+        setOpdLoading(false);
+        showToastMessage(organizationResponse);
+      } catch (err) {
+        setOpdLoading(false);
+        showToastMessage(err.message, 'error');
+      }
+    }
+  };
+
   return (
     <>
       <div className="flex justify-between">
@@ -143,7 +189,33 @@ function LoginAksesCreate() {
                 />
               </DialogTrigger>
 
-              <DialogContent title="Pilih Nama OPD">
+              <DialogContent
+                addButton
+                title="Pilih Nama OPD"
+                onCreateClick={() => setOpenCreateOpd((prev) => !prev)}
+              >
+                {transition((style, isOpen) => (
+                  <div>
+                    {isOpen && (
+                      <animated.div
+                        style={style}
+                        className="w-72 bg-white rounded-md absolute z-10 -right-80 top-0 p-4"
+                      >
+                        <TextInput
+                          required
+                          placeholder="Masukan Nama OPD"
+                          onKeyDown={handleKeyDown}
+                        />
+                        <p className="text-xs text-light-gray mt-2 text-left">
+                          Tekan{' '}
+                          <span className="itelic text-dark-gray">Enter</span>{' '}
+                          untuk menyimpan
+                        </p>
+                      </animated.div>
+                    )}
+                  </div>
+                ))}
+
                 <div className="relative my-6">
                   <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                     <MagnifyingGlassIcon className="w-4 h-4" />
@@ -155,18 +227,24 @@ function LoginAksesCreate() {
                     placeholder="Pencarian"
                   />
                 </div>
-
-                <InfiniteScroll
-                  dataLength={opdData.items.length}
-                  next={loadMoreData}
-                  hasMore={opdData.hasMore}
-                  height={500}
-                  endMessage={
-                    <h1 className="font-bold text-2xl text-gray-400">...</h1>
-                  }
-                >
-                  <List data={opdData.items} onSelectValue={handleSelectOpd} />
-                </InfiniteScroll>
+                {opdLoading ? (
+                  <ReactLoading />
+                ) : (
+                  <InfiniteScroll
+                    dataLength={opdData.items.length}
+                    next={loadMoreData}
+                    hasMore={opdData.hasMore}
+                    height={500}
+                    endMessage={
+                      <h1 className="font-bold text-2xl text-gray-400">...</h1>
+                    }
+                  >
+                    <List
+                      data={opdData.items}
+                      onSelectValue={handleSelectOpd}
+                    />
+                  </InfiniteScroll>
+                )}
               </DialogContent>
             </Dialog>
           </div>

@@ -7,8 +7,13 @@ import { useEffect, useState } from 'react';
 import { useAuthHeader } from 'react-auth-kit';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import { animated, useTransition } from '@react-spring/web';
 import { getActivity, updateActivity } from '../../../api/admin/activity';
-import { getProgram, getPrograms } from '../../../api/admin/program';
+import {
+  createProgram,
+  getProgram,
+  getPrograms,
+} from '../../../api/admin/program';
 import Button from '../../../components/Button';
 import {
   Dialog,
@@ -31,16 +36,35 @@ function ActivityEdit() {
   const [programData, setProgramData] = useState({
     items: [],
     hasMore: true,
+    isLoading: false,
     totalPages: 0,
     currentPage: 1,
   });
   const [title, setTitle] = useState('');
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [openCreateOpd, setOpenCreateOpd] = useState(false);
 
   const authHeader = useAuthHeader();
   const { showToastMessage } = useToastContext();
   const navigate = useNavigate();
+  const transition = useTransition(openCreateOpd, {
+    config: {
+      duration: 120,
+    },
+    from: {
+      scale: 0,
+      opacity: 0,
+    },
+    enter: {
+      scale: 1,
+      opacity: 1,
+    },
+    leave: {
+      scale: 0,
+      opacity: 0,
+    },
+  });
 
   const handleSelectProgram = (opd) => {
     setSelectedProgram(opd);
@@ -118,6 +142,27 @@ function ActivityEdit() {
     }
   };
 
+  const handleKeyDown = async (e) => {
+    if (e.key === 'Enter') {
+      setProgramData((prev) => ({ ...prev, isLoading: true }));
+      setOpenCreateOpd(false);
+
+      try {
+        const programBody = { title: e.target.value };
+        const programResponse = await createProgram(authHeader, programBody);
+
+        await fetchPrograms(programData.currentPage);
+        setOpenCreateOpd(false);
+        setProgramData((prev) => ({ ...prev, isLoading: false }));
+        showToastMessage(programResponse);
+      } catch (err) {
+        setOpenCreateOpd(false);
+        setProgramData((prev) => ({ ...prev, isLoading: false }));
+        showToastMessage(err.message, 'error');
+      }
+    }
+  };
+
   useEffect(() => {
     fetchActivity();
   }, []);
@@ -181,7 +226,33 @@ function ActivityEdit() {
                 />
               </DialogTrigger>
 
-              <DialogContent title="Pilih Program">
+              <DialogContent
+                addButton
+                title="Pilih Nama OPD"
+                onCreateClick={() => setOpenCreateOpd((prev) => !prev)}
+              >
+                {transition((style, isOpen) => (
+                  <div>
+                    {isOpen && (
+                      <animated.div
+                        style={style}
+                        className="w-72 bg-white rounded-md absolute z-10 -right-80 top-0 p-4"
+                      >
+                        <TextInput
+                          required
+                          placeholder="Masukan Nama Program"
+                          onKeyDown={handleKeyDown}
+                        />
+                        <p className="text-xs text-light-gray mt-2 text-left">
+                          Tekan{' '}
+                          <span className="itelic text-dark-gray">Enter</span>{' '}
+                          untuk menyimpan
+                        </p>
+                      </animated.div>
+                    )}
+                  </div>
+                ))}
+
                 <div className="relative my-6">
                   <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                     <MagnifyingGlassIcon className="w-4 h-4" />
@@ -193,21 +264,24 @@ function ActivityEdit() {
                     placeholder="Pencarian"
                   />
                 </div>
-
-                <InfiniteScroll
-                  dataLength={programData.items.length}
-                  next={loadMoreData}
-                  hasMore={programData.hasMore}
-                  height={500}
-                  endMessage={
-                    <h1 className="font-bold text-2xl text-gray-400">...</h1>
-                  }
-                >
-                  <List
-                    data={programData.items}
-                    onSelectValue={handleSelectProgram}
-                  />
-                </InfiniteScroll>
+                {programData.isLoading ? (
+                  <ReactLoading />
+                ) : (
+                  <InfiniteScroll
+                    dataLength={programData.items.length}
+                    next={loadMoreData}
+                    hasMore={programData.hasMore}
+                    height={500}
+                    endMessage={
+                      <h1 className="font-bold text-2xl text-gray-400">...</h1>
+                    }
+                  >
+                    <List
+                      data={programData.items}
+                      onSelectValue={handleSelectProgram}
+                    />
+                  </InfiniteScroll>
+                )}
               </DialogContent>
             </Dialog>
           </div>
