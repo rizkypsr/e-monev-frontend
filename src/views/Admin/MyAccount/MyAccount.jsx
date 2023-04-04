@@ -1,7 +1,7 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 
-function AkunSaya() {
+export default function MyAccount() {
   return (
     <>
       <h1 className="font-semibold text-2xl mb-8">Akun Saya</h1>
@@ -12,5 +12,3 @@ function AkunSaya() {
     </>
   );
 }
-
-export default AkunSaya;

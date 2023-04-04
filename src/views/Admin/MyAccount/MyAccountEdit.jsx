@@ -1,19 +1,20 @@
 import { ArrowLeftIcon, CheckCircleIcon } from '@heroicons/react/24/solid';
 import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { useAuthUser, useSignOut } from 'react-auth-kit';
 import Button from '../../../components/Button';
 import Label from '../../../components/Label';
 import TextInput from '../../../components/TextInput';
-import SuccessImg from '../../../assets/images/success.png';
-import { useState } from 'react';
-import { useAuthUser, useSignOut } from 'react-auth-kit';
 import updateUser from '../../../api/auth/updateUser';
 import { useToastContext } from '../../../context/ToastContext';
+import ReactLoading from '../../../components/Loading';
 
-function AkunSayaEdit() {
+export default function MyAccountEdit() {
   const [username, setUsername] = useState(null);
   const [password, setPassword] = useState(null);
   const [passwordConfirmation, setPasswordConfirmation] = useState(null);
   const [passwordError, setPasswordError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const authUser = useAuthUser();
   const signOut = useSignOut();
@@ -22,30 +23,28 @@ function AkunSayaEdit() {
   const onSubmit = async (e) => {
     e.preventDefault();
 
+    setLoading(true);
+
     if (password !== passwordConfirmation) {
       setPasswordError('Pastikan Password yang anda masukan sama');
+      setLoading(false);
       return;
     }
 
     const requestBody = {
       user_id: authUser().id,
+      ...(username && { username }),
+      ...(password && { password }),
     };
 
-    if (username) {
-      requestBody.username = username;
-    }
-
-    if (password) {
-      requestBody.password = password;
-    }
-
-    const userResponse = await updateUser(requestBody);
-
-    if (userResponse.statusCode === 200) {
-      signOut();
+    try {
+      const userResponse = await updateUser(requestBody);
       showToastMessage(userResponse.message);
-    } else {
-      showToastMessage(userResponse.message, 'error');
+      signOut();
+    } catch (error) {
+      showToastMessage(error.message, 'error');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -89,29 +88,31 @@ function AkunSayaEdit() {
           />
         </div>
 
-        <div className="flex space-x-3">
-          <Button
-            className="w-full md:w-28"
-            type="submit"
-            background="bg-primary"
-            textColor="text-white"
-            icon={<CheckCircleIcon className="w-5 h-5" />}
-          >
-            Simpan
-          </Button>
-          <Link to="../">
+        {loading ? (
+          <ReactLoading />
+        ) : (
+          <div className="flex space-x-3">
             <Button
-              className="w-full md:w-28 font-medium"
-              background="bg-[#EAEAEA]"
-              textColor="text-dark-gray"
+              className="w-full md:w-28"
+              type="submit"
+              background="bg-primary"
+              textColor="text-white"
+              icon={<CheckCircleIcon className="w-5 h-5" />}
             >
-              Batal
+              Simpan
             </Button>
-          </Link>
-        </div>
+            <Link to="../">
+              <Button
+                className="w-full md:w-28 font-medium"
+                background="bg-[#EAEAEA]"
+                textColor="text-dark-gray"
+              >
+                Batal
+              </Button>
+            </Link>
+          </div>
+        )}
       </form>
     </>
   );
 }
-
-export default AkunSayaEdit;

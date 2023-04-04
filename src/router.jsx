@@ -9,13 +9,12 @@ import {
 import Login from './views/Auth/Login';
 import PrivateRoute from './layouts/PrivateRoute';
 import AdminLayout from './layouts/AdminRoot';
-import AkunSaya from './views/Admin/AkunSaya/AkunSaya';
+import MyAccount from './views/Admin/MyAccount/MyAccount';
 import LoginAksesUser from './views/Admin/LoginAksesUser/LoginAksesUser';
 import Occasion from './views/Admin/Occasion/Occasion';
 import Report from './views/Admin/Report/Report';
 import Dashboard from './views/Admin/Dashboard/Dashboard';
-import AkunSayaForm from './views/Admin/AkunSaya/AkunSayaForm';
-import AkunSayaEdit from './views/Admin/AkunSaya/AkunSayaEdit';
+import AkunSayaEdit from './views/Admin/MyAccount/MyAccountEdit';
 import LoginAksesTable from './views/Admin/LoginAksesUser/LoginAksesTable';
 import LoginAksesCreate from './views/Admin/LoginAksesUser/LoginAksesCreate';
 import OccasionTable from './views/Admin/Occasion/OccasionTable';
@@ -49,6 +48,7 @@ import LoginAksesEdit from './views/Admin/LoginAksesUser/LoginAksesEdit';
 import ReportTable from './views/Admin/Report/ReportTable';
 import ReportDetail from './views/Admin/Report/ReportDetail';
 import ReportEdit from './views/Admin/Report/ReportEdit';
+import MyAccountForm from './views/Admin/MyAccount/MyAccountForm';
 
 const router = createBrowserRouter(
   createRoutesFromElements([
@@ -94,7 +94,7 @@ const router = createBrowserRouter(
       />
       ,
       <Route
-        key="akunSaya"
+        key="myAccount"
         path="akun-saya"
         loader={() => 'Akun Saya'}
         handle={{
@@ -102,9 +102,9 @@ const router = createBrowserRouter(
             <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
           ),
         }}
-        element={<AkunSaya />}
+        element={<MyAccount />}
       >
-        <Route index key="akunSayaForm" element={<AkunSayaForm />} />
+        <Route index key="akunSayaForm" element={<MyAccountForm />} />
         <Route
           key="akunSayaFormEdit"
           path="edit/:id"
