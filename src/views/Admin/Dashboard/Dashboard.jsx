@@ -43,34 +43,46 @@ function Dashboard() {
 
       <div className="bg-white rounded-lg grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-y-7 p-8 shadow-2xl shadow-[#F3F6FF]">
         <CountBox
+          linkTo="urusan"
+          title="urusan"
           count={counts.occasionCount}
           color="#56CCF2"
-          hoverColor="solid-shadow-blue"
+          className="hover:solid-shadow-blue"
         />
         <CountBox
+          linkTo="organisasi"
+          title="organisasi"
           count={counts.organizationCount}
           color="#BB6BD9"
-          hoverColor="solid-shadow-purple"
+          className="hover:solid-shadow-purple"
         />
         <CountBox
+          linkTo="program"
+          title="program"
           count={counts.programCount}
           color="#6FCF97"
-          hoverColor="solid-shadow-green"
+          className="hover:solid-shadow-green"
         />
         <CountBox
+          linkTo="kegiatan"
+          title="kegiatan"
           count={counts.activityCount}
           color="#F2C94C"
-          hoverColor="solid-shadow-yellow"
+          className="hover:solid-shadow-yellow"
         />
         <CountBox
+          linkTo="sasaran"
+          title="sasaran"
           count={counts.purposeCount}
           color="#F2994A"
-          hoverColor="solid-shadow-orange"
+          className="hover:solid-shadow-orange"
         />
         <CountBox
+          linkTo="login-akses-user"
+          title="user"
           count={counts.userCount}
           color="#BDBDBD"
-          hoverColor="solid-shadow-gray"
+          className="hover:solid-shadow-gray"
         />
       </div>
     </>
