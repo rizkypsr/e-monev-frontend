@@ -6,10 +6,8 @@ import { getActivity } from '../../../api/admin/activity';
 import ReactLoading from '../../../components/Loading';
 import ErrorPage from '../../ErrorPage';
 
-function ActivityDetail() {
-  const [code, setCode] = useState('');
+export default function ActivityDetail() {
   const [activity, setActivity] = useState('');
-  const [programId, setProgramId] = useState('');
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -22,9 +20,7 @@ function ActivityDetail() {
     try {
       const occasionResponse = await getActivity(authHeader, id);
 
-      setCode(occasionResponse.code);
-      setActivity(occasionResponse.title);
-      setProgramId(occasionResponse.program_id);
+      setActivity(occasionResponse);
       setIsLoading(false);
     } catch (err) {
       setIsLoading(false);
@@ -63,7 +59,7 @@ function ActivityDetail() {
               >
                 Kode
               </th>
-              <td className="px-6 py-4">{code}</td>
+              <td className="px-6 py-4">{activity.code}</td>
             </tr>
             <tr className="bg-white">
               <th
@@ -72,16 +68,25 @@ function ActivityDetail() {
               >
                 ID Program
               </th>
-              <td className="px-6 py-4">{programId}</td>
+              <td className="px-6 py-4">{activity.program_id}</td>
             </tr>
             <tr className="bg-light-blue">
               <th
                 scope="row"
                 className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
               >
+                Nama Program
+              </th>
+              <td className="px-6 py-4">Coming Soon</td>
+            </tr>
+            <tr className="bg-white">
+              <th
+                scope="row"
+                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+              >
                 Kegiatan
               </th>
-              <td className="px-6 py-4">{activity}</td>
+              <td className="px-6 py-4">{activity.title}</td>
             </tr>
           </tbody>
         </table>
@@ -89,5 +94,3 @@ function ActivityDetail() {
     </div>
   );
 }
-
-export default ActivityDetail;
