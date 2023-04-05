@@ -133,7 +133,10 @@ function ProgramTable() {
   });
   const [currentPage, setCurrentPage] = useState(1);
   const [resetPage, setResetPage] = useState(false);
-  const [sorting, setSorting] = useState({ value: 'a-z', label: 'A - Z' });
+  const [sorting, setSorting] = useState({
+    value: 'terbaru',
+    label: 'Terbaru',
+  });
 
   const authHeader = useAuthHeader();
   const { showToastMessage } = useToastContext();
@@ -237,16 +240,16 @@ function ProgramTable() {
             >
               <Dropdown.Items>
                 <li
-                  value="a-z"
+                  value="terbaru"
                   className="block px-4 py-2 font-semibold cursor-pointer hover:bg-gray-100"
                 >
-                  A - Z
+                  Terbaru
                 </li>
                 <li
-                  value="z-a"
+                  value="terlama"
                   className="block px-4 py-2 font-semibold cursor-pointer hover:bg-gray-100"
                 >
-                  Z - A
+                  Terlama
                 </li>
               </Dropdown.Items>
             </Dropdown>

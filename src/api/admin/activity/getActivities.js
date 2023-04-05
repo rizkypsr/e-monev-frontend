@@ -2,11 +2,7 @@ import { baseUrl, domainUrl } from '../../../utils/constants';
 
 export default async function getActivities(
   authHeader,
-  sort,
-  offset = 0,
-  limit = 10,
-  pageNumber = 1,
-  search = ''
+  { sort = 'terbaru', offset = 0, limit = 10, pageNumber = 1, search = '' }
 ) {
   try {
     const activityResponse = await fetch(

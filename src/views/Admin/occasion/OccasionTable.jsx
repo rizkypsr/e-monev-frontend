@@ -128,7 +128,10 @@ function OccasionTable() {
   const [error, setError] = useState(false);
   const [pageSize, setPageSize] = useState(10);
   const [search, setSearch] = useState('');
-  const [sorting, setSorting] = useState({ value: 'a-z', label: 'A - Z' });
+  const [sorting, setSorting] = useState({
+    value: 'terbaru',
+    label: 'Terbaru',
+  });
 
   const [pageData, setCurrentPageData] = useState({
     rowData: [],
@@ -237,16 +240,16 @@ function OccasionTable() {
             >
               <Dropdown.Items>
                 <li
-                  value="a-z"
+                  value="terbaru"
                   className="block px-4 py-2 font-semibold cursor-pointer hover:bg-gray-100"
                 >
-                  A - Z
+                  Terbaru
                 </li>
                 <li
-                  value="z-a"
+                  value="terlama"
                   className="block px-4 py-2 font-semibold cursor-pointer hover:bg-gray-100"
                 >
-                  Z - A
+                  Terlama
                 </li>
               </Dropdown.Items>
             </Dropdown>
