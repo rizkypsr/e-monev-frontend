@@ -10,9 +10,10 @@ import { useToastContext } from '../../../context/ToastContext';
 import { createOccasion } from '../../../api/admin/occasion';
 import ReactLoading from '../../../components/Loading';
 
-function OccasionCreate() {
-  const [occasion, setOccasion] = useState('');
+export default function OccasionCreate() {
+  const [title, setTitle] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [titleError, setTitleError] = useState('');
 
   const authHeader = useAuthHeader();
   const navigate = useNavigate();
@@ -21,10 +22,17 @@ function OccasionCreate() {
   async function onSubmit(e) {
     e.preventDefault();
 
+    setTitleError('');
+
+    if (!title) {
+      setTitleError('Urusan belum diisi');
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      const occasionBody = { title: occasion };
+      const occasionBody = { title };
       const occasionResponse = await createOccasion(authHeader, occasionBody);
 
       setIsLoading(false);
@@ -55,10 +63,10 @@ function OccasionCreate() {
             <Label>Urusan</Label>
             <TextInput
               className="mt-2 lg:w-2/3 xl:w-1/3"
-              name="title"
-              value={occasion}
               placeholder="Masukkan Urusan"
-              onChange={(e) => setOccasion(e.target.value)}
+              value={title}
+              error={titleError}
+              onChange={(e) => setTitle(e.target.value)}
             />
           </div>
           {isLoading ? (
@@ -90,5 +98,3 @@ function OccasionCreate() {
     </>
   );
 }
-
-export default OccasionCreate;
