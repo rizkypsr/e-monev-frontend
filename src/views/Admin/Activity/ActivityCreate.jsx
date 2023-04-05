@@ -36,6 +36,8 @@ function ActivityCreate() {
     totalPages: 0,
     currentPage: 1,
   });
+  const [titleError, setTitleError] = useState('');
+  const [programError, setProgramError] = useState('');
 
   const navigate = useNavigate();
   const authHeader = useAuthHeader();
@@ -64,7 +66,10 @@ function ActivityCreate() {
   };
 
   const fetchPrograms = async (page) => {
-    const programResponse = await getPrograms(authHeader, 0, 10, page);
+    const programResponse = await getPrograms(authHeader, {
+      limit: 15,
+      pageNumber: page,
+    });
 
     if (page === pageData.totalPages) {
       setPageData((prevData) => ({ ...prevData, hasMore: false }));
@@ -84,12 +89,23 @@ function ActivityCreate() {
   const onSubmit = async (e) => {
     e.preventDefault();
 
-    setIsLoading(true);
+    const errors = {};
 
-    if (selectedProgram === null) {
-      showToastMessage('Anda belum memilih Nama OPD!', 'error');
+    if (!title) {
+      errors.title = 'Kegiatan harus diisi';
+    }
+
+    if (!selectedProgram) {
+      errors.program = 'Program belum dipilih';
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setTitleError(errors.title || '');
+      setProgramError(errors.program || '');
       return;
     }
+
+    setIsLoading(true);
 
     try {
       const activityBody = {
@@ -116,9 +132,19 @@ function ActivityCreate() {
         const programBody = { title: e.target.value };
         const programResponse = await createProgram(authHeader, programBody);
 
-        await fetchPrograms(pageData.currentPage);
+        setPageData((prev) => ({
+          ...prev,
+          isLoading: false,
+          items: [
+            {
+              id: programResponse.data.id,
+              title: programResponse.data.title,
+            },
+            ...prev.items,
+          ],
+        }));
+
         setOpenCreateOpd(false);
-        setPageData((prev) => ({ ...prev, isLoading: false }));
         showToastMessage(programResponse);
       } catch (err) {
         setOpenCreateOpd(false);
@@ -152,10 +178,10 @@ function ActivityCreate() {
           <div className="mb-6">
             <Label>Kegiatan</Label>
             <TextInput
-              required
               className="mt-2 lg:w-2/3 xl:w-1/3"
               placeholder="Masukan Nama Kegiatan"
               value={title}
+              error={titleError}
               onChange={(e) => setTitle(e.target.value)}
             />
           </div>
@@ -170,6 +196,7 @@ function ActivityCreate() {
                   className="mt-2"
                   selectedValue={selectedProgram && selectedProgram.title}
                   label="--- Pilih Program ---"
+                  error={programError}
                 />
               </DialogTrigger>
 
@@ -219,9 +246,6 @@ function ActivityCreate() {
                     next={loadMoreData}
                     hasMore={pageData.hasMore}
                     height={500}
-                    endMessage={
-                      <h1 className="font-bold text-2xl text-gray-400">...</h1>
-                    }
                   >
                     <List
                       data={pageData.items}
