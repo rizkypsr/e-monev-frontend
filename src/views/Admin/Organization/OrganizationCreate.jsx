@@ -10,8 +10,9 @@ import createOrganization from '../../../api/admin/organization/createOrganizati
 import ReactLoading from '../../../components/Loading';
 
 function OrganizationCreate() {
-  const [organization, setOrganization] = useState('');
+  const [title, setTitle] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [titleError, setTitleError] = useState('');
 
   const { showToastMessage } = useToastContext();
   const navigate = useNavigate();
@@ -20,17 +21,24 @@ function OrganizationCreate() {
   const onSubmit = async (e) => {
     e.preventDefault();
 
+    setTitleError('');
+
+    if (!title) {
+      setTitleError('Organisasi harus diisi');
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      const organizationBody = { title: organization };
+      const organizationBody = { title };
       const organizationResponse = await createOrganization(
         authHeader,
         organizationBody
       );
 
       setIsLoading(false);
-      showToastMessage(organizationResponse);
+      showToastMessage(organizationResponse.message);
       navigate('../');
     } catch (err) {
       setIsLoading(false);
@@ -57,9 +65,9 @@ function OrganizationCreate() {
             <TextInput
               className="mt-2 lg:w-2/3 xl:w-1/3"
               placeholder="Masukan Organisasi"
-              value={organization}
-              onChange={(e) => setOrganization(e.target.value)}
-              required
+              value={title}
+              error={titleError}
+              onChange={(e) => setTitle(e.target.value)}
             />
           </div>
           {isLoading ? (
