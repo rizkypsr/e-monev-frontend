@@ -36,10 +36,10 @@ function LoginAksesCreate() {
   const [selectedLevel, setSelectedLevel] = useState(null);
   const [openLevel, setOpenLevel] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [opdLoading, setOpdLoading] = useState(false);
   const [opdData, setOpdData] = useState({
     items: [],
     hasMore: true,
+    isLoading: false,
     totalPages: 0,
     currentPage: 1,
   });
@@ -75,12 +75,10 @@ function LoginAksesCreate() {
   };
 
   const fetchOrganizations = async (page) => {
-    const organizationResponse = await getOrganizations(
-      authHeader,
-      0,
-      10,
-      page
-    );
+    const organizationResponse = await getOrganizations(authHeader, {
+      limit: 20,
+      pageNumber: page,
+    });
 
     if (page === opdData.totalPages) {
       setOpdData((prevData) => ({ ...prevData, hasMore: false }));
@@ -110,6 +108,16 @@ function LoginAksesCreate() {
 
   const onSubmit = async (e) => {
     e.preventDefault();
+
+    if (selectedOpd === null) {
+      showToastMessage('Nama OPD belum dipilih!', 'error');
+      return;
+    }
+
+    if (selectedLevel === null) {
+      showToastMessage('Level user belum dipilih!', 'error');
+      return;
+    }
 
     setIsLoading(true);
 
@@ -144,7 +152,10 @@ function LoginAksesCreate() {
 
   const handleKeyDown = async (e) => {
     if (e.key === 'Enter') {
-      setOpdLoading(true);
+      setOpdData((prev) => ({
+        ...prev,
+        isLoading: true,
+      }));
       setOpenCreateOpd(false);
 
       try {
@@ -154,11 +165,24 @@ function LoginAksesCreate() {
           organizationBody
         );
 
-        await fetchOrganizations(opdData.currentPage);
-        setOpdLoading(false);
+        setOpdData((prev) => ({
+          ...prev,
+          isLoading: false,
+          items: [
+            {
+              id: organizationResponse.data.id,
+              title: organizationResponse.data.title,
+            },
+            ...prev.items,
+          ],
+        }));
+
         showToastMessage(organizationResponse);
       } catch (err) {
-        setOpdLoading(false);
+        setOpdData((prev) => ({
+          ...prev,
+          isLoading: false,
+        }));
         showToastMessage(err.message, 'error');
       }
     }
@@ -227,7 +251,7 @@ function LoginAksesCreate() {
                     placeholder="Pencarian"
                   />
                 </div>
-                {opdLoading ? (
+                {opdData.isLoading ? (
                   <ReactLoading />
                 ) : (
                   <InfiniteScroll
@@ -235,9 +259,6 @@ function LoginAksesCreate() {
                     next={loadMoreData}
                     hasMore={opdData.hasMore}
                     height={500}
-                    endMessage={
-                      <h1 className="font-bold text-2xl text-gray-400">...</h1>
-                    }
                   >
                     <List
                       data={opdData.items}
