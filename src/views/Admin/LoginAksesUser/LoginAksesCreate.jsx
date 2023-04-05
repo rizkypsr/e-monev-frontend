@@ -44,6 +44,11 @@ function LoginAksesCreate() {
     currentPage: 1,
   });
   const [levelData, setLevelData] = useState([]);
+  const [opdError, setOpdError] = useState('');
+  const [levelError, setLevelError] = useState('');
+  const [nameError, setNameError] = useState('');
+  const [usernameError, setUsernameError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
 
   const authHeader = useAuthHeader();
   const navigate = useNavigate();
@@ -109,13 +114,34 @@ function LoginAksesCreate() {
   const onSubmit = async (e) => {
     e.preventDefault();
 
-    if (selectedOpd === null) {
-      showToastMessage('Nama OPD belum dipilih!', 'error');
-      return;
+    const errors = {};
+
+    if (!selectedOpd) {
+      errors.opd = 'Nama OPD harus dipilih';
     }
 
-    if (selectedLevel === null) {
-      showToastMessage('Level user belum dipilih!', 'error');
+    if (!selectedLevel) {
+      errors.level = 'Level user harus dipilih';
+    }
+
+    if (!name) {
+      errors.name = 'Nama harus diisi';
+    }
+
+    if (!username) {
+      errors.username = 'Username harus diisi';
+    }
+
+    if (!password) {
+      errors.password = 'Password harus diisi';
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setOpdError(errors.opd || '');
+      setLevelError(errors.level || '');
+      setNameError(errors.name || '');
+      setUsernameError(errors.username || '');
+      setPasswordError(errors.password || '');
       return;
     }
 
@@ -210,6 +236,7 @@ function LoginAksesCreate() {
                   className="mt-2"
                   selectedValue={selectedOpd && selectedOpd.title}
                   label="--- Pilih Nama OPD ---"
+                  error={opdError}
                 />
               </DialogTrigger>
 
@@ -277,6 +304,7 @@ function LoginAksesCreate() {
                   className="mt-2"
                   selectedValue={selectedLevel && selectedLevel.name}
                   label="--- Pilih Level User ---"
+                  error={levelError}
                 />
               </DialogTrigger>
 
@@ -300,31 +328,31 @@ function LoginAksesCreate() {
           <div className="mb-6">
             <Label htmlFor="username">Nama</Label>
             <TextInput
-              required
               className="mt-2 lg:w-2/3 xl:w-1/3"
               placeholder="Masukan Nama"
               value={name}
+              error={nameError}
               onChange={(e) => setName(e.target.value)}
             />
           </div>
           <div className="mb-6">
             <Label htmlFor="username">Username</Label>
             <TextInput
-              required
               className="mt-2 lg:w-2/3 xl:w-1/3"
               placeholder="Masukan Username"
               value={username}
+              error={usernameError}
               onChange={(e) => setUsername(e.target.value)}
             />
           </div>
           <div className="mb-6">
             <Label htmlFor="password">Password</Label>
             <TextInput
-              required
               className="mt-2 lg:w-2/3 xl:w-1/3"
               type="password"
               placeholder="Masukan Password"
               value={password}
+              error={passwordError}
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
