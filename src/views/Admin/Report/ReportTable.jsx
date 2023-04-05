@@ -18,12 +18,13 @@ import {
 import TrashImg from '../../../assets/images/trash.png';
 import Dropdown from '../../../components/Dropdown';
 import ErrorPage from '../../ErrorPage';
-import { getTriwulan } from '../../../api/admin/report';
+import { deleteReport, getTriwulan } from '../../../api/admin/report';
 import ReactLoading from '../../../components/Loading';
 import Table from '../../../components/Table';
 import Pagination from '../../../components/Pagination';
 import getReports from '../../../api/admin/report/getReports';
 import formattedDate from '../../../utils/formattedDate';
+import { useToastContext } from '../../../context/ToastContext';
 
 const columnHelper = createColumnHelper();
 const columns = [
@@ -133,24 +134,24 @@ const columns = [
 ];
 
 const months = [
-  'Januari',
-  'Februari',
-  'Maret',
-  'April',
-  'Mei',
-  'Juni',
-  'Juli',
-  'Agustus',
-  'September',
-  'Oktober',
-  'November',
-  'Desember',
+  { id: 1, name: 'Januari' },
+  { id: 2, name: 'Februari' },
+  { id: 3, name: 'Maret' },
+  { id: 4, name: 'April' },
+  { id: 5, name: 'Mei' },
+  { id: 6, name: 'Juni' },
+  { id: 7, name: 'Juli' },
+  { id: 8, name: 'Agustus' },
+  { id: 9, name: 'September' },
+  { id: 10, name: 'Oktober' },
+  { id: 11, name: 'November' },
+  { id: 12, name: 'Desember' },
 ];
 
 const years = Array.from({ length: 38 }, (_, i) => (2023 + i).toString());
 
 export default function ReportTable() {
-  const [triwulan, setTriwulan] = useState([]);
+  const [triwulanList, setTriwulanList] = useState([]);
   const [selectedMonth, setSelectedMonth] = useState({});
   const [selectedTriwulan, setSelectedTriwulan] = useState({});
   const [selectedYear, setSelectedYear] = useState({});
@@ -167,13 +168,14 @@ export default function ReportTable() {
   const [error, setError] = useState(null);
 
   const authHeader = useAuthHeader();
+  const { showToastMessage } = useToastContext();
 
   const fetchTriwulan = async () => {
     setIsLoading(true);
 
     try {
       const triwulanResponse = await getTriwulan();
-      setTriwulan(triwulanResponse);
+      setTriwulanList(triwulanResponse);
       setIsLoading(false);
     } catch (err) {
       setError(err.message);
@@ -181,7 +183,7 @@ export default function ReportTable() {
     }
   };
 
-  const fetchReports = async (pageNumber, search) => {
+  const fetchReports = async (pageNumber, search, month, year, triwulan) => {
     setCurrentPageData((prev) => ({
       ...prev,
       isLoading: true,
@@ -191,6 +193,9 @@ export default function ReportTable() {
       const reportResponse = await getReports(authHeader, {
         pageNumber,
         search,
+        month,
+        year,
+        triwulan,
       });
 
       setCurrentPageData((prev) => ({
@@ -209,7 +214,16 @@ export default function ReportTable() {
     }
   };
 
-  const deleteReportData = () => '';
+  const deleteReportData = async (reportId) => {
+    try {
+      const deleteResponse = await deleteReport(authHeader, reportId);
+      fetchReports(currentPage, pageData.search);
+
+      showToastMessage(deleteResponse);
+    } catch (err) {
+      showToastMessage(err.message, 'error');
+    }
+  };
 
   useEffect(() => {
     fetchReports(currentPage, pageData.search);
@@ -225,19 +239,37 @@ export default function ReportTable() {
       searchLoading: true,
     }));
 
-    fetchReports(currentPage, pageData.search);
-  }, [pageData.search]);
+    fetchReports(
+      currentPage,
+      pageData.search,
+      selectedMonth.value,
+      selectedYear.value,
+      selectedTriwulan.value
+    );
+  }, [pageData.search, selectedMonth, selectedYear, selectedTriwulan]);
 
-  const onSelectMonth = useCallback((m) => {
-    setSelectedMonth(m);
+  const onSelectMonth = useCallback(({ newValue: value, newLabel: label }) => {
+    setSelectedMonth({
+      value,
+      label,
+    });
   }, []);
 
-  const onSelectTriwulan = useCallback((t) => {
-    setSelectedTriwulan(t);
-  }, []);
+  const onSelectTriwulan = useCallback(
+    ({ newValue: value, newLabel: label }) => {
+      setSelectedTriwulan({
+        value,
+        label,
+      });
+    },
+    []
+  );
 
-  const onSelectYear = useCallback((t) => {
-    setSelectedYear(t);
+  const onSelectYear = useCallback(({ newValue: value, newLabel: label }) => {
+    setSelectedYear({
+      value,
+      label,
+    });
   }, []);
 
   if (error) {
@@ -265,13 +297,20 @@ export default function ReportTable() {
             minWidth="11rem"
           >
             <Dropdown.Items>
+              <li
+                key="initial"
+                value={null}
+                className="block px-4 py-2 cursor-pointer hover:bg-gray-100"
+              >
+                --Pilih Bulan--
+              </li>
               {months.map((month) => (
                 <li
-                  key={month}
-                  value={month}
+                  key={month.id}
+                  value={month.id}
                   className="block px-4 py-2 cursor-pointer hover:bg-gray-100"
                 >
-                  {month}
+                  {month.name}
                 </li>
               ))}
             </Dropdown.Items>
@@ -286,6 +325,13 @@ export default function ReportTable() {
             minWidth="11rem"
           >
             <Dropdown.Items>
+              <li
+                key="initial"
+                value={null}
+                className="block px-4 py-2 cursor-pointer hover:bg-gray-100"
+              >
+                --Pilih Tahun--
+              </li>
               {years.map((year) => (
                 <li
                   key={year}
@@ -307,10 +353,17 @@ export default function ReportTable() {
             minWidth="11rem"
           >
             <Dropdown.Items>
-              {triwulan.map((trw) => (
+              <li
+                key="initial"
+                value={null}
+                className="block px-4 py-2 cursor-pointer hover:bg-gray-100"
+              >
+                --Pilih Triwulan--
+              </li>
+              {triwulanList.map((trw) => (
                 <li
                   key={trw.id}
-                  value={trw.name}
+                  value={trw.id}
                   className="block px-4 py-2 cursor-pointer hover:bg-gray-100"
                 >
                   {trw.name}

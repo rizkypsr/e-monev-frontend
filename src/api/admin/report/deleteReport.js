@@ -1,8 +1,8 @@
 import { baseUrl, domainUrl } from '../../../utils/constants';
 import makeRequest from '../../../utils/makeRequest';
 
-export default async function getReport(authHeader, reportId) {
-  const url = new URL(`${baseUrl}/data-report/detail/${reportId}`);
+export default async function deleteReport(authHeader, reportId) {
+  const url = new URL(`${baseUrl}/data-report/delete`);
 
   const headers = {
     'Content-Type': 'application/json',
@@ -11,9 +11,12 @@ export default async function getReport(authHeader, reportId) {
   };
 
   const response = await makeRequest(url.toString(), {
-    method: 'GET',
+    method: 'PATCH',
     headers,
+    body: JSON.stringify({
+      data_report_id: reportId,
+    }),
   });
 
-  return response.data.result;
+  return response.message;
 }

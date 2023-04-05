@@ -1,25 +1,20 @@
 import { baseUrl, domainUrl } from '../../../utils/constants';
+import makeRequest from '../../../utils/makeRequest';
 
 export default async function updateReport(authHeader, requestBody) {
-  try {
-    const reportResponse = await fetch(`${baseUrl}/data-report/update`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': domainUrl,
-        authorization: authHeader(),
-      },
-      body: JSON.stringify(requestBody),
-    });
+  const url = `${baseUrl}/data-report/update`;
 
-    const reportData = await reportResponse.json();
+  const headers = {
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': domainUrl,
+    authorization: authHeader(),
+  };
 
-    if (!reportResponse.ok) {
-      throw new Error(`Terjadi kesalahan pada server: ${reportData.message}`);
-    }
+  const response = await makeRequest(url.toString(), {
+    method: 'PATCH',
+    headers,
+    body: JSON.stringify(requestBody),
+  });
 
-    return reportData.message;
-  } catch (error) {
-    throw new Error(error.message);
-  }
+  return response.message;
 }
