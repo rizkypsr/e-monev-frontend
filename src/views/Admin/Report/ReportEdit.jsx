@@ -103,8 +103,14 @@ export default function ReportEdit() {
     },
   };
   const transitionCreateOpd = useTransition(openCreateOpd, transationConfig);
-  const transitionCreateOccasion = useTransition(openCreateOccasion, transationConfig);
-  const transitionCreateProgram = useTransition(openCreateProgram, transationConfig);
+  const transitionCreateOccasion = useTransition(
+    openCreateOccasion,
+    transationConfig
+  );
+  const transitionCreateProgram = useTransition(
+    openCreateProgram,
+    transationConfig
+  );
 
   useEffect(() => {
     const fetchReport = async (reportId) => {
@@ -158,7 +164,11 @@ export default function ReportEdit() {
 
   async function fetchOccasions(page) {
     try {
-      const occasionsResponse = await getOccasions(authHeader, 0, 10, page);
+      const occasionsResponse = await getOccasions(authHeader, {
+        limit: 15,
+        pageNumber: page,
+      });
+
       setOccasions((prevData) => ({
         ...prevData,
         items: [...prevData.items, ...occasionsResponse.result],
@@ -174,12 +184,10 @@ export default function ReportEdit() {
 
   async function fetchOrganizations(page) {
     try {
-      const organizationResponse = await getOrganizations(
-        authHeader,
-        0,
-        10,
-        page
-      );
+      const organizationResponse = await getOrganizations(authHeader, {
+        limit: 15,
+        pageNumber: page,
+      });
       setOrganizations((prevData) => ({
         ...prevData,
         items: [...prevData.items, ...organizationResponse.result],
@@ -197,8 +205,7 @@ export default function ReportEdit() {
   async function fetchPrograms(page) {
     try {
       const programResponse = await getPrograms(authHeader, {
-        offset: 0,
-        limit: 10,
+        limit: 15,
         pageNumber: page,
       });
       setPrograms((prevData) => ({
@@ -294,9 +301,19 @@ export default function ReportEdit() {
         const occasionBody = { title: e.target.value };
         const occasionResponse = await createOccasion(authHeader, occasionBody);
 
-        await fetchOccasions(occasions.currentPage);
         setOpenCreateOccasion(false);
-        setOccasions((prev) => ({ ...prev, isLoading: false }));
+        setOccasions((prev) => ({
+          ...prev,
+          isLoading: false,
+          items: [
+            {
+              id: occasionResponse.data.id,
+              title: occasionResponse.data.title,
+            },
+            ...prev.items,
+          ],
+        }));
+
         showToastMessage(occasionResponse);
       } catch (err) {
         setOpenCreateOccasion(false);
@@ -313,15 +330,24 @@ export default function ReportEdit() {
 
       try {
         const organizationBody = { title: e.target.value };
-        const programResponse = await createOrganization(
+        const organizationResponse = await createOrganization(
           authHeader,
           organizationBody
         );
 
-        await fetchOrganizations(organizations.currentPage);
         setOpenCreateOpd(false);
-        setOrganizations((prev) => ({ ...prev, isLoading: false }));
-        showToastMessage(programResponse);
+        setOrganizations((prev) => ({
+          ...prev,
+          isLoading: false,
+          items: [
+            {
+              id: organizationResponse.data.id,
+              title: organizationResponse.data.title,
+            },
+            ...prev.items,
+          ],
+        }));
+        showToastMessage(organizationResponse);
       } catch (err) {
         setOpenCreateOpd(false);
         setOrganizations((prev) => ({ ...prev, isLoading: false }));
@@ -339,9 +365,18 @@ export default function ReportEdit() {
         const programBody = { title: e.target.value };
         const programResponse = await createProgram(authHeader, programBody);
 
-        await fetchPrograms(programs.currentPage);
         setOpenCreateProgram(false);
-        setPrograms((prev) => ({ ...prev, isLoading: false }));
+        setPrograms((prev) => ({
+          ...prev,
+          isLoading: false,
+          items: [
+            {
+              id: programResponse.data.id,
+              title: programResponse.data.title,
+            },
+            ...prev.items,
+          ],
+        }));
         showToastMessage(programResponse);
       } catch (err) {
         setOpenCreateProgram(false);

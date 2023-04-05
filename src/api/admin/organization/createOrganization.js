@@ -20,7 +20,7 @@ export default async function createOrganization(authHeader, body) {
       );
     }
 
-    return organizationData.message;
+    return organizationData;
   } catch (error) {
     throw new Error(error.message);
   }

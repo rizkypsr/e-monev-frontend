@@ -72,7 +72,10 @@ function ActivityEdit() {
   };
 
   const fetchPrograms = async (page) => {
-    const programResponse = await getPrograms(authHeader, 0, 10, page);
+    const programResponse = await getPrograms(authHeader, {
+      limit: 15,
+      pageNumber: page,
+    });
 
     if (page === programData.totalPages) {
       setProgramData((prevData) => ({ ...prevData, hasMore: false }));
@@ -151,9 +154,19 @@ function ActivityEdit() {
         const programBody = { title: e.target.value };
         const programResponse = await createProgram(authHeader, programBody);
 
-        await fetchPrograms(programData.currentPage);
+        setProgramData((prev) => ({
+          ...prev,
+          isLoading: false,
+          items: [
+            {
+              id: programResponse.data.id,
+              title: programResponse.data.title,
+            },
+            ...prev.items,
+          ],
+        }));
+
         setOpenCreateOpd(false);
-        setProgramData((prev) => ({ ...prev, isLoading: false }));
         showToastMessage(programResponse);
       } catch (err) {
         setOpenCreateOpd(false);
@@ -272,9 +285,6 @@ function ActivityEdit() {
                     next={loadMoreData}
                     hasMore={programData.hasMore}
                     height={500}
-                    endMessage={
-                      <h1 className="font-bold text-2xl text-gray-400">...</h1>
-                    }
                   >
                     <List
                       data={programData.items}

@@ -2,11 +2,7 @@ import { baseUrl, domainUrl } from '../../../utils/constants';
 
 export default async function getOccasions(
   authHeader,
-  offset = 0,
-  limit = 10,
-  pageNumber = 1,
-  search = '',
-  sort = 'z-a'
+  { offset = 0, limit = 10, pageNumber = 1, search = '', sort = 'terbaru' }
 ) {
   try {
     const occasionResponse = await fetch(

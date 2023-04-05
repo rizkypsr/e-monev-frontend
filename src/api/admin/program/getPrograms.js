@@ -2,7 +2,7 @@ import { baseUrl, domainUrl } from '../../../utils/constants';
 
 export default async function getPrograms(
   authHeader,
-  { sort = 'a-z', offset = 0, limit = 10, pageNumber = 1, search = '' }
+  { sort = 'terbaru', offset = 0, limit = 10, pageNumber = 1, search = '' }
 ) {
   try {
     const programResponse = await fetch(

@@ -18,7 +18,7 @@ export default async function createProgram(authHeader, body) {
       throw new Error(`Terjadi kesalahan pada server: ${programData.message}`);
     }
 
-    return programData.message;
+    return programData;
   } catch (error) {
     throw new Error(error.message);
   }

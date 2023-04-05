@@ -142,14 +142,13 @@ function OccasionTable() {
 
   async function fetchOccasions(offset, limit, pageNumber, sort) {
     try {
-      const occasionsData = await getOccasions(
-        authHeader,
+      const occasionsData = await getOccasions(authHeader, {
         offset,
         limit,
         pageNumber,
         search,
-        sort
-      );
+        sort,
+      });
       setCurrentPageData({
         rowData: occasionsData.result,
         isLoading: false,

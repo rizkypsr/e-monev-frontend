@@ -141,14 +141,13 @@ function OrganizationTable() {
 
   async function fetchOrganizations(offset, limit, pageNumber, sort) {
     try {
-      const organizationData = await getOrganizations(
-        authHeader,
+      const organizationData = await getOrganizations(authHeader, {
         offset,
         limit,
         pageNumber,
         search,
-        sort
-      );
+        sort,
+      });
       setCurrentPageData({
         rowData: organizationData.result,
         isLoading: false,

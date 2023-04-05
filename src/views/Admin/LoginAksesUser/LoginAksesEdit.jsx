@@ -80,12 +80,10 @@ function LoginAksesEdit() {
   };
 
   const fetchOrganizations = async (page) => {
-    const organizationResponse = await getOrganizations(
-      authHeader,
-      0,
-      10,
-      page
-    );
+    const organizationResponse = await getOrganizations(authHeader, {
+      limit: 15,
+      pageNumber: page,
+    });
 
     if (page === opdData.totalPages) {
       setOpdData((prevData) => ({ ...prevData, hasMore: false }));
@@ -184,8 +182,18 @@ function LoginAksesEdit() {
           organizationBody
         );
 
-        await fetchOrganizations(opdData.currentPage);
-        setOpdData((prev) => ({ ...prev, isLoading: false }));
+        setOpdData((prev) => ({
+          ...prev,
+          isLoading: false,
+          items: [
+            {
+              id: organizationResponse.data.id,
+              title: organizationResponse.data.title,
+            },
+            ...prev.items,
+          ],
+        }));
+
         showToastMessage(organizationResponse);
       } catch (err) {
         setOpdData((prev) => ({ ...prev, isLoading: false }));
