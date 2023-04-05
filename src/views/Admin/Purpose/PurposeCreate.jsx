@@ -12,6 +12,7 @@ import ReactLoading from '../../../components/Loading';
 function PurposeCreate() {
   const [title, setTitle] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [titleError, setTitleError] = useState('');
 
   const authHeader = useAuthHeader();
   const navigate = useNavigate();
@@ -19,6 +20,13 @@ function PurposeCreate() {
 
   const onSubmit = async (e) => {
     e.preventDefault();
+
+    setTitleError('');
+
+    if (!title) {
+      setTitleError('Program harus diisi');
+      return;
+    }
 
     setIsLoading(true);
 
@@ -55,8 +63,8 @@ function PurposeCreate() {
               className="mt-2 lg:w-2/3 xl:w-1/3"
               placeholder="Masukan Nama Program"
               value={title}
+              error={titleError}
               onChange={(e) => setTitle(e.target.value)}
-              required
             />
           </div>
           {isLoading ? (
