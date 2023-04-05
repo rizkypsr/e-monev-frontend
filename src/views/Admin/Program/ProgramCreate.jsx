@@ -10,8 +10,9 @@ import { createProgram } from '../../../api/admin/program';
 import ReactLoading from '../../../components/Loading';
 
 function ProgramCreate() {
-  const [program, setProgram] = useState('');
+  const [title, setTitle] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [titleError, setTitleError] = useState('');
 
   const authHeader = useAuthHeader();
   const navigate = useNavigate();
@@ -20,14 +21,21 @@ function ProgramCreate() {
   const onSubmit = async (e) => {
     e.preventDefault();
 
+    setTitleError('');
+
+    if (!title) {
+      setTitleError('Program harus diisi');
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      const programBody = { title: program };
+      const programBody = { title };
       const programResponse = await createProgram(authHeader, programBody);
 
       setIsLoading(false);
-      showToastMessage(programResponse);
+      showToastMessage(programResponse.message);
       navigate('../');
     } catch (error) {
       setIsLoading(false);
@@ -54,9 +62,9 @@ function ProgramCreate() {
             <TextInput
               className="mt-2 lg:w-2/3 xl:w-1/3"
               placeholder="Masukan Program"
-              value={program}
-              onChange={(e) => setProgram(e.target.value)}
-              required
+              value={title}
+              error={titleError}
+              onChange={(e) => setTitle(e.target.value)}
             />
           </div>
           {isLoading ? (
