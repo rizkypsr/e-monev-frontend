@@ -1,5 +1,5 @@
+import PropTypes from 'prop-types';
 import { ArrowLeftIcon, CheckCircleIcon } from '@heroicons/react/24/solid';
-import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import { useAuthUser, useSignOut } from 'react-auth-kit';
 import Button from '../../../components/Button';
@@ -9,32 +9,39 @@ import updateUser from '../../../api/auth/updateUser';
 import { useToastContext } from '../../../context/ToastContext';
 import ReactLoading from '../../../components/Loading';
 
-export default function MyAccountEdit() {
-  const [username, setUsername] = useState(null);
-  const [password, setPassword] = useState(null);
-  const [passwordConfirmation, setPasswordConfirmation] = useState(null);
-  const [passwordError, setPasswordError] = useState('');
+export default function MyAccountEdit({ onBack }) {
+  const [account, setAccount] = useState({
+    username: '',
+    password: '',
+    passwordConfirmation: '',
+  });
+  const [passwordConfirmationError, setPasswordConfirmationError] =
+    useState('');
   const [loading, setLoading] = useState(false);
 
   const authUser = useAuthUser();
   const signOut = useSignOut();
   const { showToastMessage } = useToastContext();
 
-  const onSubmit = async (e) => {
-    e.preventDefault();
+  const onSubmit = async (event) => {
+    event.preventDefault();
 
-    setLoading(true);
-
-    if (password !== passwordConfirmation) {
-      setPasswordError('Pastikan Password yang anda masukan sama');
-      setLoading(false);
+    if (!account.username && !account.password) {
+      showToastMessage('Anda tidak merubah apapun!', 'error');
       return;
     }
 
+    if (account.password !== account.passwordConfirmation) {
+      setPasswordConfirmationError('Pastikan Password yang anda masukan sama');
+      return;
+    }
+
+    setLoading(true);
+
     const requestBody = {
       user_id: authUser().id,
-      ...(username && { username }),
-      ...(password && { password }),
+      ...(account.username && { username: account.username }),
+      ...(account.password && { password: account.password }),
     };
 
     try {
@@ -48,43 +55,60 @@ export default function MyAccountEdit() {
     }
   };
 
+  const handleOnChange = (event) => {
+    event.preventDefault();
+
+    setAccount({
+      ...account,
+      [event.target.name]: event.target.value,
+    });
+  };
+
   return (
     <>
-      <Link to="../" className="flex space-x-3 items-center mb-8">
+      <button
+        type="button"
+        className="flex space-x-3 items-center mb-8"
+        onClick={() => onBack()}
+      >
         <ArrowLeftIcon className="w-6 h-6" />
         <h1 className="font-semibold text-lg text-dark-gray leading-7">
           Ubah akun saya
         </h1>
-      </Link>
+      </button>
       <form className="mt-4" onSubmit={onSubmit}>
         <div className="mb-6">
           <Label>Username Baru</Label>
           <TextInput
+            name="username"
             className="mt-2 lg:w-2/3 xl:w-1/3"
             placeholder="Masukan Username Baru"
-            onChange={(e) => setUsername(e.target.value)}
+            value={account.username}
+            onChange={handleOnChange}
           />
         </div>
         <div className="mb-6">
           <Label>Password</Label>
           <TextInput
-            className="mt-2 lg:w-2/3 xl:w-1/3"
+            name="password"
             type="password"
-            disableIcon={false}
+            className="mt-2 lg:w-2/3 xl:w-1/3"
             placeholder="Masukan Password"
-            onChange={(e) => setPassword(e.target.value)}
-            error={passwordError}
+            value={account.password}
+            error={passwordConfirmationError}
+            onChange={handleOnChange}
           />
         </div>
         <div className="mb-6">
           <Label>Ulangi Password</Label>
           <TextInput
-            className="mt-2 lg:w-2/3 xl:w-1/3"
+            name="passwordConfirmation"
             type="password"
-            disableIcon={false}
+            className="mt-2 lg:w-2/3 xl:w-1/3"
             placeholder="Masukan Ulang Password"
-            onChange={(e) => setPasswordConfirmation(e.target.value)}
-            error={passwordError}
+            value={account.passwordConfirmation}
+            error={passwordConfirmationError}
+            onChange={handleOnChange}
           />
         </div>
 
@@ -101,18 +125,21 @@ export default function MyAccountEdit() {
             >
               Simpan
             </Button>
-            <Link to="../">
-              <Button
-                className="w-full md:w-28 font-medium"
-                background="bg-[#EAEAEA]"
-                textColor="text-dark-gray"
-              >
-                Batal
-              </Button>
-            </Link>
+            <Button
+              className="w-full md:w-28 font-medium"
+              background="bg-[#EAEAEA]"
+              textColor="text-dark-gray"
+              onClick={() => onBack()}
+            >
+              Batal
+            </Button>
           </div>
         )}
       </form>
     </>
   );
 }
+
+MyAccountEdit.propTypes = {
+  onBack: PropTypes.func.isRequired,
+};

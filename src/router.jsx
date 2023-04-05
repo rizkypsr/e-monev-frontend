@@ -14,7 +14,6 @@ import LoginAksesUser from './views/Admin/LoginAksesUser/LoginAksesUser';
 import Occasion from './views/Admin/Occasion/Occasion';
 import Report from './views/Admin/Report/Report';
 import Dashboard from './views/Admin/Dashboard/Dashboard';
-import AkunSayaEdit from './views/Admin/MyAccount/MyAccountEdit';
 import LoginAksesTable from './views/Admin/LoginAksesUser/LoginAksesTable';
 import LoginAksesCreate from './views/Admin/LoginAksesUser/LoginAksesCreate';
 import OccasionTable from './views/Admin/Occasion/OccasionTable';
@@ -105,11 +104,6 @@ const router = createBrowserRouter(
         element={<MyAccount />}
       >
         <Route index key="akunSayaForm" element={<MyAccountForm />} />
-        <Route
-          key="akunSayaFormEdit"
-          path="edit/:id"
-          element={<AkunSayaEdit />}
-        />
       </Route>
       ,
       <Route
