@@ -15,10 +15,10 @@ export default async function createOccasion(authHeader, body) {
     const occasionData = await occasionResponse.json();
 
     if (!occasionResponse.ok) {
-      throw new Error(`Terjadi kesalahan pada server: ${occasionData.message}`);
+      throw new Error(`${occasionData.message}`);
     }
 
-    return occasionData.message;
+    return occasionData;
   } catch (error) {
     throw new Error(error.message);
   }
