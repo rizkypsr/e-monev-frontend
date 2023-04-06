@@ -51,16 +51,71 @@ import MyAccountForm from './views/Admin/MyAccount/MyAccountForm';
 
 const router = createBrowserRouter(
   createRoutesFromElements([
+    <Route path="/login" element={<Login />} />,
     <Route
       path="/"
+      loader={() => 'Dashboard'}
+      handle={{
+        crumb: () => (
+          <Link
+            to="/"
+            className="ml-1 text-sm text-dark-gray hover:text-primary md:ml-2"
+          >
+            e-Montir
+          </Link>
+        ),
+      }}
       element={
         <PrivateRoute>
           <UserLayout />
         </PrivateRoute>
       }
       errorElement={<ErrorPage404 />}
-    />,
-    <Route path="/login" element={<Login />} />,
+    >
+      <Route
+        index
+        key="userDashboard"
+        loader={() => 'Dashboard'}
+        handle={{
+          crumb: (data) => (
+            <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
+          ),
+        }}
+        element={<Dashboard />}
+      />
+      <Route
+        key="myAccount"
+        path="akun-saya"
+        loader={() => 'Akun Saya'}
+        handle={{
+          crumb: (data) => (
+            <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
+          ),
+        }}
+        element={<MyAccount />}
+      >
+        <Route index key="akunSayaForm" element={<MyAccountForm />} />
+      </Route>
+      <Route
+        key="report"
+        path="laporan"
+        loader={() => 'Data Laporan'}
+        handle={{
+          crumb: (data) => (
+            <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
+          ),
+        }}
+        element={<Report />}
+      >
+        <Route index key="reportTable" element={<ReportTable />} />
+        <Route key="reportEdit" path="edit/:id" element={<ReportEdit />} />
+        <Route
+          key="reportDetail"
+          path="detail/:id"
+          element={<ReportDetail />}
+        />
+      </Route>
+    </Route>,
     <Route
       path="/admin"
       loader={() => 'Dashboard'}
@@ -91,7 +146,6 @@ const router = createBrowserRouter(
         }}
         element={<Dashboard />}
       />
-      ,
       <Route
         key="myAccount"
         path="akun-saya"
@@ -105,7 +159,6 @@ const router = createBrowserRouter(
       >
         <Route index key="akunSayaForm" element={<MyAccountForm />} />
       </Route>
-      ,
       <Route
         key="loginAksesUser"
         path="login-akses-user"
