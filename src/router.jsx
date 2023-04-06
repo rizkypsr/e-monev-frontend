@@ -70,7 +70,7 @@ const router = createBrowserRouter(
             to="/admin"
             className="ml-1 text-sm text-dark-gray hover:text-primary md:ml-2"
           >
-            e-Monev
+            e-Montir
           </Link>
         ),
       }}
