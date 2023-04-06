@@ -1,25 +1,17 @@
-import { baseUrl, domainUrl } from '../../../utils/constants';
+import { baseUrl } from '../../../utils/constants';
+import makeRequest from '../../../utils/makeRequest';
 
 export default async function updatePurpose(authHeader, purposeBody) {
-  try {
-    const purposeResponse = await fetch(`${baseUrl}/purpose/update`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': domainUrl,
-        authorization: authHeader(),
-      },
-      body: JSON.stringify(purposeBody),
-    });
+  const url = `${baseUrl}/purpose/update`;
+  const headers = {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      authorization: authHeader(),
+    },
+    body: JSON.stringify(purposeBody),
+  };
 
-    const purposeData = await purposeResponse.json();
-
-    if (!purposeResponse.ok) {
-      throw new Error(`Terjadi kesalahan pada server: ${purposeData.message}`);
-    }
-
-    return purposeData.message;
-  } catch (error) {
-    throw new Error(error.message);
-  }
+  const purposeResponse = await makeRequest(url, headers);
+  return purposeResponse.message;
 }

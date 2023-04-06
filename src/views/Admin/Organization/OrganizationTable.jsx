@@ -142,12 +142,12 @@ function OrganizationTable() {
   const authHeader = useAuthHeader();
   const { showToastMessage } = useToastContext();
 
-  async function fetchOrganizations(offset, limit, pageNumber, sort) {
+  async function fetchOrganizations(offset, limit, page, sort) {
     try {
       const organizationData = await getOrganizations(authHeader, {
         offset,
         limit,
-        pageNumber,
+        page,
         search,
         sort,
       });

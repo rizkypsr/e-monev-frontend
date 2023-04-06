@@ -1,25 +1,16 @@
-import { baseUrl, domainUrl } from '../../../utils/constants';
+import { baseUrl } from '../../../utils/constants';
+import makeRequest from '../../../utils/makeRequest';
 
 export default async function updateOccasion(authHeader, occasionBody) {
-  try {
-    const occasionResponse = await fetch(`${baseUrl}/occassion/update`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': domainUrl,
-        authorization: authHeader(),
-      },
-      body: JSON.stringify(occasionBody),
-    });
-
-    const occasionData = await occasionResponse.json();
-
-    if (!occasionResponse.ok) {
-      throw new Error(`Terjadi kesalahan pada server: ${occasionData.message}`);
-    }
-
-    return occasionData.message;
-  } catch (error) {
-    throw new Error(error.message);
-  }
+  const url = `${baseUrl}/occassion/update`;
+  const headers = {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      authorization: authHeader(),
+    },
+    body: JSON.stringify(occasionBody),
+  };
+  const occasionResponse = await makeRequest(url, headers);
+  return occasionResponse.message;
 }

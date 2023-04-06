@@ -1,34 +1,34 @@
-import { baseUrl, domainUrl } from '../../../utils/constants';
+import { baseUrl } from '../../../utils/constants';
+import makeRequest from '../../../utils/makeRequest';
 
-export default async function getPurposes(
-  authHeader,
-  { offset = 0, limit = 10, pageNumber = 1, search = '', sort = 'terbaru' }
-) {
-  try {
-    const purposeResponse = await fetch(
-      `${baseUrl}/purpose/list?offset=${offset}&limit=${limit}&search=${search}&sort=${sort}${
-        pageNumber ? `&page=${pageNumber}` : ''
-      }`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': domainUrl,
-          authorization: authHeader(),
-        },
-      }
-    );
+export default async function getPurposes(authHeader, options = {}) {
+  const {
+    offset = 0,
+    limit = 10,
+    page = 1,
+    search = '',
+    sort = 'terbaru',
+  } = options;
 
-    const purposeData = await purposeResponse.json();
+  const queryParams = {
+    offset,
+    limit,
+    page,
+    search,
+    sort,
+  };
 
-    if (!purposeResponse.ok) {
-      throw new Error(
-        `Gagal mendapatkan data dari server: ${purposeData.message}`
-      );
-    }
+  const url = new URL(`${baseUrl}/purpose/list`);
+  url.search = new URLSearchParams(queryParams).toString();
 
-    return purposeData.data;
-  } catch (error) {
-    throw new Error(error.message);
-  }
+  const headers = {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      authorization: authHeader(),
+    },
+  };
+
+  const purposeResponse = await makeRequest(url, headers);
+  return purposeResponse.data;
 }

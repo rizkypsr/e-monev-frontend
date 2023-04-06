@@ -7,6 +7,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuthHeader } from 'react-auth-kit';
 import { animated, useTransition } from '@react-spring/web';
+import InfiniteScroll from 'react-infinite-scroll-component';
 import Label from '../../../components/Label';
 import TextInput from '../../../components/TextInput';
 import Button from '../../../components/Button';
@@ -17,7 +18,6 @@ import {
   DialogContent,
 } from '../../../components/DialogContent';
 import List from '../../../components/List';
-import getUser from '../../../api/admin/user/getUser';
 import ErrorPage from '../../ErrorPage';
 import {
   createOrganization,
@@ -26,7 +26,7 @@ import {
 import { useToastContext } from '../../../context/ToastContext';
 import updateUser from '../../../api/auth/updateUser';
 import ReactLoading from '../../../components/Loading';
-import InfiniteScroll from 'react-infinite-scroll-component';
+import { getUser } from '../../../api/admin/user';
 
 function LoginAksesEdit() {
   const { id } = useParams();
@@ -82,7 +82,7 @@ function LoginAksesEdit() {
   const fetchOrganizations = async (page) => {
     const organizationResponse = await getOrganizations(authHeader, {
       limit: 15,
-      pageNumber: page,
+      page,
     });
 
     if (page === opdData.totalPages) {

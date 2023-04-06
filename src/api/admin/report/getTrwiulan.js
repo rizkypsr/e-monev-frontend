@@ -1,4 +1,4 @@
-import { baseUrl, domainUrl } from '../../../utils/constants';
+import { baseUrl } from '../../../utils/constants';
 
 export default async function getTriwulan() {
   try {
@@ -6,7 +6,6 @@ export default async function getTriwulan() {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': domainUrl,
       },
     });
 

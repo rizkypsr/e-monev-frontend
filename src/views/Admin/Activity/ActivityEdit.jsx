@@ -205,21 +205,16 @@ function ActivityEdit() {
           </h1>
         </Link>
 
-        <form className="mt-4" onSubmit={onSubmit}>
+        <form className="mt-4 lg:w-2/3 xl:w-1/3" onSubmit={onSubmit}>
           <div className="mb-6">
             <Label>Kode</Label>
-            <TextInput
-              className="mt-2 lg:w-2/3 xl:w-1/3"
-              value={id}
-              required
-              disabled
-            />
+            <TextInput className="mt-2" value={id} required disabled />
           </div>
           <div className="mb-6">
             <Label>Kegiatan</Label>
             <TextInput
               required
-              className="mt-2 lg:w-2/3 xl:w-1/3"
+              className="mt-2"
               placeholder="Masukan Nama Kegiatan"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
@@ -231,7 +226,7 @@ function ActivityEdit() {
               open={openProgramDialog}
               onOpenChange={setOpenProgramDialog}
             >
-              <DialogTrigger className="lg:w-2/3 xl:w-1/3">
+              <DialogTrigger className="w-full">
                 <SelectInputModal
                   className="mt-2"
                   selectedValue={selectedProgram && selectedProgram.title}

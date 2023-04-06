@@ -2,10 +2,10 @@ import { ArrowLeftIcon } from '@heroicons/react/24/solid';
 import React, { useEffect, useState } from 'react';
 import { useAuthHeader } from 'react-auth-kit';
 import { Link, useParams } from 'react-router-dom';
-import getUser from '../../../api/admin/user/getUser';
 import ReactLoading from '../../../components/Loading';
 import getRole from '../../../utils/getRole';
 import ErrorPage from '../../ErrorPage';
+import { getUser } from '../../../api/admin/user';
 
 function LoginAksesDetail() {
   const { id } = useParams();

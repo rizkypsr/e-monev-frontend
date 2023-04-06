@@ -1,4 +1,4 @@
-import { baseUrl, domainUrl } from '../../../utils/constants';
+import { baseUrl } from '../../../utils/constants';
 import makeRequest from '../../../utils/makeRequest';
 
 export default async function updateReport(authHeader, requestBody) {
@@ -6,7 +6,6 @@ export default async function updateReport(authHeader, requestBody) {
 
   const headers = {
     'Content-Type': 'application/json',
-    'Access-Control-Allow-Origin': domainUrl,
     authorization: authHeader(),
   };
 
