@@ -82,7 +82,7 @@ function LoginAksesCreate() {
   const fetchOrganizations = async (page) => {
     const organizationResponse = await getOrganizations(authHeader, {
       limit: 20,
-      pageNumber: page,
+      page,
     });
 
     if (page === opdData.totalPages) {

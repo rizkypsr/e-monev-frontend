@@ -1,25 +1,16 @@
-import { baseUrl, domainUrl } from '../../../utils/constants';
+import { baseUrl } from '../../../utils/constants';
+import makeRequest from '../../../utils/makeRequest';
 
-export default async function createOccasion(authHeader, body) {
-  try {
-    const occasionResponse = await fetch(`${baseUrl}/occassion/create`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': domainUrl,
-        authorization: authHeader(),
-      },
-      body: JSON.stringify(body),
-    });
-
-    const occasionData = await occasionResponse.json();
-
-    if (!occasionResponse.ok) {
-      throw new Error(`${occasionData.message}`);
-    }
-
-    return occasionData;
-  } catch (error) {
-    throw new Error(error.message);
-  }
+export default async function createOccasion(authHeader, occasionBody) {
+  const url = `${baseUrl}/occassion/create`;
+  const headers = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      authorization: authHeader(),
+    },
+    body: JSON.stringify(occasionBody),
+  };
+  const occasionResponse = await makeRequest(url, headers);
+  return occasionResponse;
 }

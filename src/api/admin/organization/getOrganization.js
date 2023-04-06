@@ -1,29 +1,15 @@
-import { baseUrl, domainUrl } from '../../../utils/constants';
+import { baseUrl } from '../../../utils/constants';
+import makeRequest from '../../../utils/makeRequest';
 
 export default async function getOrganization(authHeader, organizationId) {
-  try {
-    const organizationResponse = await fetch(
-      `${baseUrl}/org/detail/${organizationId}`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': domainUrl,
-          authorization: authHeader(),
-        },
-      }
-    );
-
-    const organizationData = await organizationResponse.json();
-
-    if (!organizationResponse.ok) {
-      throw new Error(
-        `Gagal mendapatkan data dari server ${organizationData.message}`
-      );
-    }
-
-    return organizationData.data.result;
-  } catch (error) {
-    throw new Error(error.message);
-  }
+  const url = `${baseUrl}/org/detail/${organizationId}`;
+  const headers = {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      authorization: authHeader(),
+    },
+  };
+  const organizationResponse = await makeRequest(url, headers);
+  return organizationResponse.data.result;
 }

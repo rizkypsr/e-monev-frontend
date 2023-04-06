@@ -11,13 +11,10 @@ import { animated, useTransition } from '@react-spring/web';
 import Label from '../../../components/Label';
 import Button from '../../../components/Button';
 import { useToastContext } from '../../../context/ToastContext';
-import getPurpose from '../../../api/admin/purpose/getPurpose';
 import ErrorPage from '../../ErrorPage';
-import updatePurpose from '../../../api/admin/purpose/updatePurpose';
 import ReactLoading from '../../../components/Loading';
-import getReport from '../../../api/admin/report/getReport';
 import Dropdown from '../../../components/Dropdown';
-import { getTriwulan } from '../../../api/admin/report';
+import { getReport, getTriwulan } from '../../../api/admin/report';
 import {
   Dialog,
   DialogContent,

@@ -1,34 +1,41 @@
-import { baseUrl, domainUrl } from '../../../utils/constants';
+import { baseUrl } from '../../../utils/constants';
+import makeRequest from '../../../utils/makeRequest';
 
-export default async function getReports(
-  authHeader,
-  { offset = 0, limit = 10, pageNumber = 1, search = '', sort = 'z-a' }
-) {
-  try {
-    const reportResponse = await fetch(
-      `${baseUrl}/data-report/list?offset=${offset}&limit=${limit}&search=${search}&sort=${sort}${
-        pageNumber ? `&page=${pageNumber}` : ''
-      }`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': domainUrl,
-          authorization: authHeader(),
-        },
-      }
-    );
+export default async function getReports(authHeader, options = {}) {
+  const {
+    offset = 0,
+    limit = 10,
+    pageNumber = 1,
+    search = '',
+    sort = 'terbaru',
+    month,
+    year,
+    triwulan,
+  } = options;
 
-    const reportsData = await reportResponse.json();
+  const queryParams = {
+    offset,
+    limit,
+    page: pageNumber,
+    search,
+    sort,
+    ...(month && { month }),
+    ...(year && { year }),
+    ...(triwulan && { triwulan_id: triwulan }),
+  };
 
-    if (!reportResponse.ok) {
-      throw new Error(
-        `Gagal mendapatkan data dari server: ${reportsData.message}`
-      );
-    }
+  const url = new URL(`${baseUrl}/data-report/list`);
+  url.search = new URLSearchParams(queryParams).toString();
 
-    return reportsData.data;
-  } catch (error) {
-    throw new Error(error.message);
-  }
+  const headers = {
+    'Content-Type': 'application/json',
+    authorization: authHeader(),
+  };
+
+  const response = await makeRequest(url.toString(), {
+    method: 'GET',
+    headers,
+  });
+
+  return response.data;
 }

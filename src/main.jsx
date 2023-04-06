@@ -6,11 +6,11 @@ import ToastProvider from './context/ToastContext';
 import router from './router';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  // <React.StrictMode>
+  <React.StrictMode>
     <AuthProvider>
       <ToastProvider>
         <RouterProvider router={router} />
       </ToastProvider>
     </AuthProvider>
-  // </React.StrictMode>
+  </React.StrictMode>
 );

@@ -1,38 +1,20 @@
 import { baseUrl, domainUrl } from '../../../utils/constants';
+import makeRequest from '../../../utils/makeRequest';
 
-export default async function getUsers(
-  authHeader,
-  offset = 0,
-  limit = 10,
-  pageNumber = 1,
-  search = '',
-  sort = 'z-a'
-) {
-  try {
-    const userResponse = await fetch(
-      `${baseUrl}/user/list?offset=${offset}&limit=${limit}&search=${search}&sort=${sort}${
-        pageNumber ? `&page=${pageNumber}` : ''
-      }`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': domainUrl,
-          authorization: authHeader(),
-        },
-      }
-    );
+export default async function getUsers(authHeader, options = {}) {
+  const url = new URL(`${baseUrl}/user/list`);
+  url.search = new URLSearchParams(options).toString();
 
-    const usersData = await userResponse.json();
+  const headers = {
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': domainUrl,
+    authorization: authHeader(),
+  };
 
-    if (!userResponse.ok) {
-      throw new Error(
-        `Gagal mendapatkan data dari server: ${usersData.message}`
-      );
-    }
+  const response = await makeRequest(url.toString(), {
+    method: 'GET',
+    headers,
+  });
 
-    return usersData.data;
-  } catch (error) {
-    throw new Error(error.message);
-  }
+  return response.data;
 }

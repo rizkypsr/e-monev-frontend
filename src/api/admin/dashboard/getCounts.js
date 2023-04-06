@@ -3,25 +3,30 @@ import makeRequest from '../../../utils/makeRequest';
 
 async function extractTotalCount(response) {
   if (response.status === 'fulfilled') {
-    const data = await response.value.json();
-    if (response.value.ok) {
-      return data.data.total;
-    }
-    throw new Error(data.message);
+    const data = await response.value.data;
+    return data.total;
   }
 
   throw new Error(response.reason);
 }
 
 export default async function getCounts(authHeader) {
+  const headers = {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      authorization: authHeader(),
+    },
+  };
+
   try {
     const responses = await Promise.allSettled([
-      makeRequest(`${baseUrl}/user/list`, authHeader),
-      makeRequest(`${baseUrl}/occassion/list`, authHeader),
-      makeRequest(`${baseUrl}/org/list`, authHeader),
-      makeRequest(`${baseUrl}/program/list`, authHeader),
-      makeRequest(`${baseUrl}/activity/list`, authHeader),
-      makeRequest(`${baseUrl}/purpose/list`, authHeader),
+      makeRequest(`${baseUrl}/user/list`, headers),
+      makeRequest(`${baseUrl}/occassion/list`, headers),
+      makeRequest(`${baseUrl}/org/list`, headers),
+      makeRequest(`${baseUrl}/program/list`, headers),
+      makeRequest(`${baseUrl}/activity/list`, headers),
+      makeRequest(`${baseUrl}/purpose/list`, headers),
     ]);
 
     const [
@@ -44,6 +49,6 @@ export default async function getCounts(authHeader) {
       purposeCount: purposeData,
     };
   } catch (error) {
-    throw new Error(`Terjadi kesalahan pada server: ${error.message}`);
+    throw new Error(error.message);
   }
 }

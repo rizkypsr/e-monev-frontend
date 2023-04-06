@@ -1,25 +1,17 @@
-import { baseUrl, domainUrl } from '../../../utils/constants';
+import { baseUrl } from '../../../utils/constants';
+import makeRequest from '../../../utils/makeRequest';
 
 export default async function updateProgram(authHeader, programBody) {
-  try {
-    const programResponse = await fetch(`${baseUrl}/program/update`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': domainUrl,
-        authorization: authHeader(),
-      },
-      body: JSON.stringify(programBody),
-    });
+  const url = `${baseUrl}/program/update`;
+  const headers = {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      authorization: authHeader(),
+    },
+    body: JSON.stringify(programBody),
+  };
 
-    const programData = await programResponse.json();
-
-    if (!programResponse.ok) {
-      throw new Error(`Terjadi kesalahan pada server: ${programData.message}`);
-    }
-
-    return programData.message;
-  } catch (error) {
-    throw new Error(error.message);
-  }
+  const programResponse = await makeRequest(url, headers);
+  return programResponse.message;
 }

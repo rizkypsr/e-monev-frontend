@@ -1,14 +1,10 @@
-import { domainUrl } from './constants';
+export default async function makeRequest(url, options = {}) {
+  const response = await fetch(url, options);
+  const responseData = await response.json();
 
-export default async function makeRequest(url, authHeader) {
-  const response = await fetch(url, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': domainUrl,
-      authorization: authHeader(),
-    },
-  });
+  if (!response.ok) {
+    throw new Error(responseData.message || 'Terjadi kesalahan pada server');
+  }
 
-  return response;
+  return responseData;
 }

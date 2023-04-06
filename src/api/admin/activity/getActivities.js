@@ -1,36 +1,34 @@
-import { baseUrl, domainUrl } from '../../../utils/constants';
+import { baseUrl } from '../../../utils/constants';
+import makeRequest from '../../../utils/makeRequest';
 
-export default async function getActivities(
-  authHeader,
-  sort,
-  offset = 0,
-  limit = 10,
-  pageNumber = 1,
-  search = ''
-) {
-  try {
-    const activityResponse = await fetch(
-      `${baseUrl}/activity/list?offset=${offset}&limit=${limit}&search=${search}&sort=${sort}${
-        pageNumber ? `&page=${pageNumber}` : ''
-      }`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': domainUrl,
-          authorization: authHeader(),
-        },
-      }
-    );
+export default async function getActivities(authHeader, options = {}) {
+  const {
+    offset = 0,
+    limit = 10,
+    page = 1,
+    search = '',
+    sort = 'terbaru',
+  } = options;
 
-    const activityData = await activityResponse.json();
+  const queryParams = {
+    offset,
+    limit,
+    page,
+    search,
+    sort,
+  };
 
-    if (!activityResponse.ok) {
-      throw new Error(activityData.message);
-    }
+  const url = new URL(`${baseUrl}/activity/list`);
+  url.search = new URLSearchParams(queryParams).toString();
 
-    return activityData.data;
-  } catch (error) {
-    throw new Error(error.message);
-  }
+  const headers = {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      authorization: authHeader(),
+    },
+  };
+
+  const activityResponse = await makeRequest(url, headers);
+  return activityResponse.data;
 }

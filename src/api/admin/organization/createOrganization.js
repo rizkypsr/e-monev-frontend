@@ -1,27 +1,16 @@
-import { baseUrl, domainUrl } from '../../../utils/constants';
+import { baseUrl } from '../../../utils/constants';
+import makeRequest from '../../../utils/makeRequest';
 
-export default async function createOrganization(authHeader, body) {
-  try {
-    const organizationResponse = await fetch(`${baseUrl}/org/create`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': domainUrl,
-        authorization: authHeader(),
-      },
-      body: JSON.stringify(body),
-    });
-
-    const organizationData = await organizationResponse.json();
-
-    if (!organizationResponse.ok) {
-      throw new Error(
-        `Terjadi kesalahan pada server ${organizationData.message}`
-      );
-    }
-
-    return organizationData;
-  } catch (error) {
-    throw new Error(error.message);
-  }
+export default async function createOrganization(authHeader, organizationBody) {
+  const url = `${baseUrl}/org/create`;
+  const headers = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      authorization: authHeader(),
+    },
+    body: JSON.stringify(organizationBody),
+  };
+  const organizationResponse = await makeRequest(url, headers);
+  return organizationResponse;
 }

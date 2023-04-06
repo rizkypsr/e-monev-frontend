@@ -1,29 +1,15 @@
-import { baseUrl, domainUrl } from '../../../utils/constants';
+import { baseUrl } from '../../../utils/constants';
+import makeRequest from '../../../utils/makeRequest';
 
 export default async function getProgram(authHeader, programId) {
-  try {
-    const programResponse = await fetch(
-      `${baseUrl}/program/detail/${programId}`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': domainUrl,
-          authorization: authHeader(),
-        },
-      }
-    );
-
-    const programData = await programResponse.json();
-
-    if (!programResponse.ok) {
-      throw new Error(
-        `Gagal mendapatkan data dari server: ${programData.message}`
-      );
-    }
-
-    return programData.data.result;
-  } catch (error) {
-    throw new Error(error.message);
-  }
+  const url = `${baseUrl}/program/detail/${programId}`;
+  const headers = {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      authorization: authHeader(),
+    },
+  };
+  const programResponse = await makeRequest(url, headers);
+  return programResponse.data.result;
 }

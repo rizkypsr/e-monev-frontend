@@ -1,29 +1,18 @@
-import { baseUrl, domainUrl } from '../../../utils/constants';
+import { baseUrl } from '../../../utils/constants';
+import makeRequest from '../../../utils/makeRequest';
 
 export default async function getReport(authHeader, reportId) {
-  try {
-    const reportResponse = await fetch(
-      `${baseUrl}/data-report/detail/${reportId}`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': domainUrl,
-          authorization: authHeader(),
-        },
-      }
-    );
+  const url = new URL(`${baseUrl}/data-report/detail/${reportId}`);
 
-    const reportData = await reportResponse.json();
+  const headers = {
+    'Content-Type': 'application/json',
+    authorization: authHeader(),
+  };
 
-    if (!reportResponse.ok) {
-      throw new Error(
-        `Gagal mendapatkan data dari server: ${reportData.message}`
-      );
-    }
+  const response = await makeRequest(url.toString(), {
+    method: 'GET',
+    headers,
+  });
 
-    return reportData.data.result;
-  } catch (error) {
-    throw new Error(error.message);
-  }
+  return response.data.result;
 }

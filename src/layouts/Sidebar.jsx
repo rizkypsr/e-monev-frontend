@@ -34,7 +34,7 @@ function Sidebar() {
         >
           <img src={Logo} className="h-12 mr-4 sm:h-9" alt="E-Monev Logo" />
           <div className="flex flex-col">
-            <span className="font-semibold whitespace-nowrap">E-MONEV</span>
+            <span className="font-semibold whitespace-nowrap">E-MONTIR PEMDA</span>
             <span className="text-xs">KABUPATEN SORONG</span>
           </div>
         </a>

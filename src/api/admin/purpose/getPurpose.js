@@ -1,29 +1,15 @@
-import { baseUrl, domainUrl } from '../../../utils/constants';
+import { baseUrl } from '../../../utils/constants';
+import makeRequest from '../../../utils/makeRequest';
 
 export default async function getPurpose(authHeader, purposeId) {
-  try {
-    const purposeResponse = await fetch(
-      `${baseUrl}/purpose/detail/${purposeId}`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': domainUrl,
-          authorization: authHeader(),
-        },
-      }
-    );
-
-    const purposeData = await purposeResponse.json();
-
-    if (!purposeResponse.ok) {
-      throw new Error(
-        `Gagal mendapatkan data dari server: ${purposeData.message}`
-      );
-    }
-
-    return purposeData.data.result;
-  } catch (error) {
-    throw new Error(error.message);
-  }
+  const url = `${baseUrl}/purpose/detail/${purposeId}`;
+  const headers = {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      authorization: authHeader(),
+    },
+  };
+  const purposeResponse = await makeRequest(url, headers);
+  return purposeResponse.data.result;
 }

@@ -1,25 +1,17 @@
-import { baseUrl, domainUrl } from '../../../utils/constants';
+import { baseUrl } from '../../../utils/constants';
+import makeRequest from '../../../utils/makeRequest';
 
 export default async function updateActivity(authHeader, activityBody) {
-  try {
-    const activityResponse = await fetch(`${baseUrl}/activity/update`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': domainUrl,
-        authorization: authHeader(),
-      },
-      body: JSON.stringify(activityBody),
-    });
+  const url = `${baseUrl}/activity/update`;
+  const headers = {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      authorization: authHeader(),
+    },
+    body: JSON.stringify(activityBody),
+  };
 
-    const activityData = await activityResponse.json();
-
-    if (!activityResponse.ok) {
-      throw new Error(activityData.message);
-    }
-
-    return activityData.message;
-  } catch (error) {
-    throw new Error(error.message);
-  }
+  const activityResponse = await makeRequest(url, headers);
+  return activityResponse.message;
 }
