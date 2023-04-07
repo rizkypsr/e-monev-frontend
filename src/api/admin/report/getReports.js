@@ -32,10 +32,10 @@ export default async function getReports(authHeader, options = {}) {
     authorization: authHeader(),
   };
 
-  const response = await makeRequest(url.toString(), {
+  const reportResponse = await makeRequest(url.toString(), {
     method: 'GET',
     headers,
   });
 
-  return response.data;
+  return reportResponse.data;
 }
