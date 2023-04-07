@@ -39,10 +39,10 @@ const columns = [
     cell: (info) => <i>{info.getValue()}</i>,
     header: () => <span>Kegiatan</span>,
   }),
-  columnHelper.accessor((row) => row.program_id, {
-    id: 'programId',
+  columnHelper.accessor((row) => row.program.title, {
+    id: 'program',
     cell: (info) => <i>{info.getValue()}</i>,
-    header: () => <span>ID Program</span>,
+    header: () => <span>Program</span>,
   }),
   columnHelper.accessor((row) => row.aksi, {
     id: 'aksi',
