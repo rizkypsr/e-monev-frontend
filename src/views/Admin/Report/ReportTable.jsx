@@ -183,7 +183,7 @@ export default function ReportTable() {
     }
   };
 
-  const fetchReports = async (pageNumber, search, month, year, triwulan) => {
+  const fetchReports = async (page, search, month, year, triwulan) => {
     setCurrentPageData((prev) => ({
       ...prev,
       isLoading: true,
@@ -191,7 +191,7 @@ export default function ReportTable() {
 
     try {
       const reportResponse = await getReports(authHeader, {
-        pageNumber,
+        page,
         search,
         month,
         year,
@@ -226,7 +226,13 @@ export default function ReportTable() {
   };
 
   useEffect(() => {
-    fetchReports(currentPage, pageData.search);
+    fetchReports(
+      currentPage,
+      pageData.search,
+      selectedMonth.value,
+      selectedYear.value,
+      selectedTriwulan.value
+    );
     fetchTriwulan();
   }, []);
 

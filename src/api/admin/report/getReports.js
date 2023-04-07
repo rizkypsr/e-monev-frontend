@@ -5,7 +5,7 @@ export default async function getReports(authHeader, options = {}) {
   const {
     offset = 0,
     limit = 10,
-    pageNumber = 1,
+    page = 1,
     search = '',
     sort = 'terbaru',
     month,
@@ -16,7 +16,7 @@ export default async function getReports(authHeader, options = {}) {
   const queryParams = {
     offset,
     limit,
-    page: pageNumber,
+    page,
     search,
     sort,
     ...(month && { month }),
