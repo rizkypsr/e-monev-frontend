@@ -43,7 +43,7 @@ function Dashboard() {
       </h1>
 
       <div className="bg-white rounded-lg grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-y-7 p-8 shadow-2xl shadow-[#F3F6FF]">
-        {authUser.current.role === 1 ? (
+        {authUser.current().admin_role_id === 1 ? (
           <>
             <CountBox
               linkTo="urusan"
