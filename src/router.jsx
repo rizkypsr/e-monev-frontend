@@ -48,6 +48,9 @@ import ReportTable from './views/Admin/Report/ReportTable';
 import ReportDetail from './views/Admin/Report/ReportDetail';
 import ReportEdit from './views/Admin/Report/ReportEdit';
 import MyAccountForm from './views/Admin/MyAccount/MyAccountForm';
+import Master from './views/User/Master/Master';
+import MasterCreate from './views/User/Master/MasterCreate';
+import TriwulanCreate from './views/User/Triwulan/TriwulanCreate';
 
 const router = createBrowserRouter(
   createRoutesFromElements([
@@ -114,6 +117,32 @@ const router = createBrowserRouter(
           path="detail/:id"
           element={<ReportDetail />}
         />
+      </Route>
+      <Route
+        key="master"
+        path="data-master"
+        loader={() => 'Tambah Data Master'}
+        handle={{
+          crumb: (data) => (
+            <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
+          ),
+        }}
+        element={<Master />}
+      >
+        <Route index key="masterCreate" element={<MasterCreate />} />
+      </Route>
+      <Route
+        key="triwulan"
+        path="data-triwulan"
+        loader={() => 'Tambah Data Triwulan'}
+        handle={{
+          crumb: (data) => (
+            <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
+          ),
+        }}
+        element={<Master />}
+      >
+        <Route index key="triwulanCreate" element={<TriwulanCreate />} />
       </Route>
     </Route>,
     <Route

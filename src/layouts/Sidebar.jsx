@@ -176,7 +176,7 @@ function Sidebar() {
           {authUser().admin_role_id === 2 && (
             <>
               <NavLink
-                to="/triwulan"
+                to="/data-triwulan"
                 className={({ isActive }) =>
                   [
                     'flex items-center p-2',
@@ -190,7 +190,7 @@ function Sidebar() {
                 <span className="ml-3">Tambah Data Triwulan</span>
               </NavLink>
               <NavLink
-                to="/master"
+                to="/data-master"
                 className={({ isActive }) =>
                   [
                     'flex items-center p-2',

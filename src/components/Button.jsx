@@ -16,7 +16,7 @@ function Button({
       aria-hidden="true"
       className={`font-medium rounded-lg text-sm px-3 min-w-fit py-2.5 ${
         icon ? 'flex items-center justify-center space-x-2' : ''
-      } ${background} ${className} ${textColor}`}
+      } ${className} ${background}  ${textColor}`}
     >
       {icon}
       <span>{children}</span>
@@ -26,7 +26,7 @@ function Button({
       // eslint-disable-next-line react/button-has-type
       type={type}
       onClick={onClick}
-      className={`font-medium rounded-lg text-sm px-3 min-w-fit py-2.5 ${
+      className={`font-medium rounded-lg text-sm min-w-fit py-2.5 ${
         icon ? 'flex items-center justify-center space-x-2' : ''
       } ${background || 'bg-transparent'} ${className} ${textColor}`}
     >

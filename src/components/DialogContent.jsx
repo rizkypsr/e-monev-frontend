@@ -13,7 +13,7 @@ export const DialogContent = React.forwardRef(
       <DialogPrimitive.Overlay className="bg-gray-900 fixed z-40 inset-0 opacity-40" />
       <DialogPrimitive.Content
         ref={forwardedRef}
-        className={`bg-white rounded-md fixed top-1/2 left-1/2 -translate-x-1/2 z-50 -translate-y-1/2 p-9 max-w-3xl text-center w-2/6 ${className}`}
+        className={`bg-white rounded-md fixed top-1/2 left-1/2 -translate-x-1/2 z-50 -translate-y-1/2 p-9 max-w-3xl text-center w-2/6 h-5/6 ${className}`}
       >
         <div className="flex justify-between">
           <DialogPrimitive.Title className="font-semibold text-xl leading-8">
