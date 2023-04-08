@@ -38,7 +38,7 @@ function Dashboard() {
   return (
     <>
       <h1 className="font-semibold text-2xl mb-8">
-        Halo Admin, selamat datang di halaman elektronik aplikasi&nbsp;
+        Halo {authUser.current().admin_role_id === 1 ? 'Admin' : 'User OPD'}, selamat datang di halaman elektronik aplikasi&nbsp;
         <span className="italic">e-Montir Pemda</span>
       </h1>
 
