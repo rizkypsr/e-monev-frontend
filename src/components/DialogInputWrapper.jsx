@@ -78,7 +78,7 @@ export default function DialogInputWrapper({
           />
         </DialogTrigger>
 
-        <DialogContent title={`Pilih ${label}`}>
+        <DialogContent className="h-5/6" title={`Pilih ${label}`}>
           {networkError ? (
             <ErrorPage errorMessage={networkError} />
           ) : (
