@@ -57,7 +57,17 @@ export default function MyAccountForm() {
   };
 
   if (authenticated) {
-    return <MyAccountEdit onBack={() => setAuthenticated(false)} />;
+    return (
+      <MyAccountEdit
+        onBack={() => {
+          setAccount({
+            ...account,
+            password: '',
+          });
+          setAuthenticated(false);
+        }}
+      />
+    );
   }
 
   return (
