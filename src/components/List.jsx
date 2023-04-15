@@ -1,9 +1,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-function List({ name, data, onSelectValue }) {
-  const handleSelectValue = (value, propName) => {
-    onSelectValue(value, propName);
+function List({ data, onSelectValue }) {
+  const handleSelectValue = (value) => {
+    onSelectValue(value);
   };
 
   return (
@@ -18,7 +18,7 @@ function List({ name, data, onSelectValue }) {
             key={index}
             type="button"
             className="w-full py-3 text-left border-b border-[#E0E0E0] capitalize"
-            onClick={() => handleSelectValue(item, name)}
+            onClick={() => handleSelectValue(item)}
           >
             {item.title ? item.title : item.name}
           </button>
@@ -32,7 +32,6 @@ function List({ name, data, onSelectValue }) {
 
 List.propTypes = {
   data: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.any)).isRequired,
-  name: PropTypes.string.isRequired,
   onSelectValue: PropTypes.func.isRequired,
 };
 

@@ -187,20 +187,22 @@ export default function MasterCreate() {
           </div>
           <div className="mb-3">
             <Label className="mb-2">Urusan</Label>
-            {occasions.map((ocs, index) => (
-              <DialogInputWrapper
-                trailingIcon={index > 0}
-                // eslint-disable-next-line react/no-array-index-key
-                key={index}
-                label="Urusan"
-                selectedItem={ocs.title}
-                onFetching={getOccasions}
-                onSelect={(value) =>
-                  handleSelectOccasion({ id: ocs.id, value })
-                }
-                onDelete={() => removeOccasionComponent(index)}
-              />
-            ))}
+            <div className='space-y-3'>
+              {occasions.map((ocs, index) => (
+                <DialogInputWrapper
+                  trailingIcon={index > 0}
+                  // eslint-disable-next-line react/no-array-index-key
+                  key={index}
+                  label="Urusan"
+                  selectedItem={ocs.title}
+                  onFetching={getOccasions}
+                  onSelect={(value) =>
+                    handleSelectOccasion({ id: ocs.id, value })
+                  }
+                  onDelete={() => removeOccasionComponent(index)}
+                />
+              ))}
+            </div>
           </div>
           {errors.occasion && (
             <p className="mt-2 text-xs text-red-600">{errors.occasion}</p>
