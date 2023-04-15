@@ -144,13 +144,13 @@ function ActivityTable() {
   const authHeader = useAuthHeader();
   const { showToastMessage } = useToastContext();
 
-  const fetchActivities = async (offset, limit, pageNumber, sort) => {
+  const fetchActivities = async (offset, limit, page, sort) => {
     try {
       const activityData = await getActivities(authHeader, {
         sort,
         offset,
         limit,
-        pageNumber,
+        page,
         search,
       });
       setCurrentPageData({

@@ -138,12 +138,12 @@ function PurposeTable() {
   const authHeader = useAuthHeader();
   const { showToastMessage } = useToastContext();
 
-  async function fetchPurposes(offset, limit, pageNumber, sort) {
+  async function fetchPurposes(offset, limit, page, sort) {
     try {
       const purposeData = await getPurposes(authHeader, {
         offset,
         limit,
-        pageNumber,
+        page,
         search,
         sort,
       });
