@@ -30,6 +30,7 @@ function LoginAksesCreate() {
   const [name, setName] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [newOpd, setNewOpd] = useState('');
   const [selectedOpd, setSelectedOpd] = useState(null);
   const [openOpd, setOpenOpd] = useState(false);
   const [openCreateOpd, setOpenCreateOpd] = useState(false);
@@ -185,7 +186,7 @@ function LoginAksesCreate() {
       setOpenCreateOpd(false);
 
       try {
-        const organizationBody = { title: e.target.value };
+        const organizationBody = { title: newOpd };
         const organizationResponse = await createOrganization(
           authHeader,
           organizationBody
@@ -255,6 +256,8 @@ function LoginAksesCreate() {
                         <TextInput
                           required
                           placeholder="Masukan Nama OPD"
+                          value={newOpd}
+                          onChange={(e) => setNewOpd(e.target.value)}
                           onKeyDown={handleKeyDown}
                         />
                         <p className="text-xs text-light-gray mt-2 text-left">
