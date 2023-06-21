@@ -4,11 +4,12 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import React, { useMemo } from 'react';
+import PropTypes from 'prop-types';
 import ReactLoading from './Loading';
 
-function Table({ isLoading, className, data, columns }) {
+export default function Table({ className, columns, rows, isLoading }) {
   const columnData = useMemo(() => columns, [columns]);
-  const rowData = useMemo(() => data, [data]);
+  const rowData = useMemo(() => rows, [rows]);
 
   const table = useReactTable({
     columns: columnData,
@@ -60,4 +61,14 @@ function Table({ isLoading, className, data, columns }) {
   );
 }
 
-export default Table;
+Table.propTypes = {
+  className: PropTypes.string,
+  isLoading: PropTypes.bool,
+  columns: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.any)).isRequired,
+  rows: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.any)).isRequired,
+};
+
+Table.defaultProps = {
+  className: null,
+  isLoading: false,
+};

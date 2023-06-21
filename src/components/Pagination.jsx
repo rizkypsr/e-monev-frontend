@@ -1,6 +1,12 @@
+import PropTypes from 'prop-types';
 import React, { useEffect, useMemo, useState } from 'react';
 
-function Pagination({ pageChangeHandler, totalRows, rowsPerPage, resetPage }) {
+export default function Pagination({
+  pageChangeHandler,
+  totalRows,
+  rowsPerPage,
+  resetPage,
+}) {
   const [currentPage, setCurrentPage] = useState(0);
   const [canGoBack, setCanGoBack] = useState(false);
   const [canGoNext, setCanGoNext] = useState(true);
@@ -9,7 +15,7 @@ function Pagination({ pageChangeHandler, totalRows, rowsPerPage, resetPage }) {
   const noOfPages = Math.ceil(totalRows / rowsPerPage);
 
   // Creating an array with length equal to no.of pages
-  const pagesArr = [...new Array(noOfPages)];
+  // const pagesArr = [...new Array(noOfPages)];
 
   const onNextPage = () => setCurrentPage(currentPage + 1);
   const onPrevPage = () => setCurrentPage(currentPage - 1);
@@ -45,13 +51,13 @@ function Pagination({ pageChangeHandler, totalRows, rowsPerPage, resetPage }) {
         items.push(
           <li key={i}>
             <button
+              type="button"
               onClick={() => onPageSelect(i)}
-              className={
-                'px-3 py-2 leading-tight text-sm font-semibold rounded-md hover:text-gray-700 ' +
-                (i == currentPage
+              className={`px-3 py-2 leading-tight text-sm font-semibold rounded-md hover:text-gray-700 ${
+                i === currentPage
                   ? 'bg-primary border border-priimary hover:bg-gray-100 text-white'
-                  : 'bg-white border border-gray-300 hover:bg-gray-100 text-dark-gray')
-              }
+                  : 'bg-white border border-gray-300 hover:bg-gray-100 text-dark-gray'
+              }`}
             >
               {i + 1}
             </button>
@@ -66,13 +72,13 @@ function Pagination({ pageChangeHandler, totalRows, rowsPerPage, resetPage }) {
         items.push(
           <button
             key="first"
+            type="button"
             onClick={() => onPageSelect(0)}
-            className={
-              'px-3 py-2 leading-tight text-sm font-semibold rounded-md hover:text-gray-700 ' +
-              (currentPage === 1
+            className={`px-3 py-2 leading-tight text-sm font-semibold rounded-md hover:text-gray-700 ${
+              currentPage === 1
                 ? 'bg-primary border border-priimary hover:bg-gray-100 text-white'
-                : 'bg-white border border-gray-300 hover:bg-gray-100 text-dark-gray')
-            }
+                : 'bg-white border border-gray-300 hover:bg-gray-100 text-dark-gray'
+            }`}
           >
             1
           </button>
@@ -86,14 +92,14 @@ function Pagination({ pageChangeHandler, totalRows, rowsPerPage, resetPage }) {
         items.push(
           <button
             key={i}
+            type="button"
             onClick={() => onPageSelect(i)}
             disabled={currentPage === i}
-            className={
-              'px-3 py-2 leading-tight text-sm font-semibold rounded-md hover:text-gray-700 ' +
-              (i === currentPage
+            className={`px-3 py-2 leading-tight text-sm font-semibold rounded-md hover:text-gray-700 ${
+              i === currentPage
                 ? 'bg-primary border border-priimary hover:bg-gray-100 text-white'
-                : 'bg-white border border-gray-300 hover:bg-gray-100 text-dark-gray')
-            }
+                : 'bg-white border border-gray-300 hover:bg-gray-100 text-dark-gray'
+            }`}
           >
             {i + 1}
           </button>
@@ -114,13 +120,13 @@ function Pagination({ pageChangeHandler, totalRows, rowsPerPage, resetPage }) {
         items.push(
           <button
             key="last"
+            type="button"
             onClick={() => onPageSelect(noOfPages - 1)}
-            className={
-              'px-3 py-2 leading-tight text-sm font-semibold rounded-md hover:text-gray-700 ' +
-              (noOfPages === currentPage
+            className={`px-3 py-2 leading-tight text-sm font-semibold rounded-md hover:text-gray-700 ${
+              noOfPages === currentPage
                 ? 'bg-primary border border-priimary hover:bg-gray-100 text-white'
-                : 'bg-white border border-gray-300 hover:bg-gray-100 text-dark-gray')
-            }
+                : 'bg-white border border-gray-300 hover:bg-gray-100 text-dark-gray'
+            }`}
           >
             {noOfPages}
           </button>
@@ -131,68 +137,75 @@ function Pagination({ pageChangeHandler, totalRows, rowsPerPage, resetPage }) {
     return items;
   }, [currentPage, noOfPages]);
 
-  return (
-    <>
-      {noOfPages > 1 ? (
-        <nav
-          className="flex items-center justify-between w-full p-5 "
-          aria-label="Table navigation"
-        >
-          <span className="text-sm text-gray-500">
-            Menampilkan {currentPage * rowsPerPage + 1} sampai{' '}
-            {Math.min((currentPage + 1) * rowsPerPage, totalRows)} dari{' '}
-            {totalRows} entri
-          </span>
+  if (noOfPages > 1) {
+    return (
+      <nav
+        className="flex items-center justify-between w-full p-5 "
+        aria-label="Table navigation"
+      >
+        <span className="text-sm text-gray-500">
+          Menampilkan {currentPage * rowsPerPage + 1} sampai{' '}
+          {Math.min((currentPage + 1) * rowsPerPage, totalRows)} dari{' '}
+          {totalRows} entri
+        </span>
 
-          <ul className="inline-flex items-center space-x-2">
-            <li>
-              <button
-                onClick={onPrevPage}
-                disabled={!canGoBack}
-                className="block p-2 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-100 hover:text-gray-700 "
+        <ul className="inline-flex items-center space-x-2">
+          <li>
+            <button
+              type="button"
+              onClick={onPrevPage}
+              disabled={!canGoBack}
+              className="block p-2 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-100 hover:text-gray-700 "
+            >
+              <svg
+                className="w-5 h-5"
+                aria-hidden="true"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
               >
-                <svg
-                  className="w-5 h-5"
-                  aria-hidden="true"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-                    clipRule="evenodd"
-                  ></path>
-                </svg>
-              </button>
-            </li>
-            {paginationItems}
-            <li>
-              <button
-                onClick={onNextPage}
-                disabled={!canGoNext}
-                className="block p-2 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-100 hover:text-gray-700"
+                <path
+                  fillRule="evenodd"
+                  d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
+          </li>
+          {paginationItems}
+          <li>
+            <button
+              type="button"
+              onClick={onNextPage}
+              disabled={!canGoNext}
+              className="block p-2 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-100 hover:text-gray-700"
+            >
+              <svg
+                className="w-5 h-5"
+                aria-hidden="true"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
               >
-                <svg
-                  className="w-5 h-5"
-                  aria-hidden="true"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                    clipRule="evenodd"
-                  ></path>
-                </svg>
-              </button>
-            </li>
-          </ul>
-        </nav>
-      ) : null}
-    </>
-  );
+                <path
+                  fillRule="evenodd"
+                  d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
+          </li>
+        </ul>
+      </nav>
+    );
+  }
+
+  return null;
 }
 
-export default Pagination;
+Pagination.propTypes = {
+  pageChangeHandler: PropTypes.func.isRequired,
+  resetPage: PropTypes.func.isRequired,
+  rowsPerPage: PropTypes.number.isRequired,
+  totalRows: PropTypes.number.isRequired,
+};

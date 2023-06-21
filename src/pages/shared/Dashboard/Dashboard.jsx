@@ -1,10 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useAuthHeader, useAuthUser } from 'react-auth-kit';
 import { getCounts } from '../../../api/admin/dashboard';
-import ErrorPage from '../../ErrorPage';
+import ErrorPage from '../../../views/ErrorPage';
 import CountBox from './components/CountBox';
 
-function Dashboard() {
+export default function Dashboard() {
   const [counts, setCounts] = useState({
     userCount: 0,
     occasionCount: 0,
@@ -38,7 +38,8 @@ function Dashboard() {
   return (
     <>
       <h1 className="font-semibold text-2xl mb-8">
-        Halo {authUser.current().admin_role_id === 1 ? 'Admin' : 'User OPD'}, selamat datang di halaman elektronik aplikasi&nbsp;
+        Halo {authUser.current().admin_role_id === 1 ? 'Admin' : 'User OPD'},
+        Selamat Datang di halaman elektronik aplikasi&nbsp;
         <span className="italic">e-Montir Pemda</span>
       </h1>
 
@@ -101,5 +102,3 @@ function Dashboard() {
     </>
   );
 }
-
-export default Dashboard;

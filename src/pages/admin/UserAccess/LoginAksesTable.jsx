@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { createColumnHelper } from '@tanstack/react-table';
 import {
   EyeIcon,
@@ -21,7 +21,7 @@ import {
 import TrashImg from '../../../assets/images/trash.png';
 import { deleteUser, getUsers } from '../../../api/admin/user';
 import Pagination from '../../../components/Pagination';
-import ErrorPage from '../../ErrorPage';
+import ErrorPage from '../../../views/ErrorPage';
 import { useToastContext } from '../../../context/ToastContext';
 
 const columnHelper = createColumnHelper();
@@ -127,50 +127,54 @@ const columns = [
   }),
 ];
 
-function LoginAksesTable() {
-  const [error, setError] = useState(false);
-  const [pageSize, setPageSize] = useState(10);
-  const [search, setSearch] = useState('');
-  const [pageData, setCurrentPageData] = useState({
-    rowData: [],
+export default function UserAccessTable() {
+  const [tableData, setTableData] = useState({
+    rows: [],
     isLoading: false,
+    currentPage: 1,
+    pageSize: 10,
     totalPages: 0,
-    totalData: 0,
+    totalRows: 0,
+    search: '',
+    sort: {
+      value: 'terbaru',
+      label: 'Terbaru',
+    },
   });
-  const [currentPage, setCurrentPage] = useState(1);
   const [resetPage, setResetPage] = useState(false);
-  const [sorting, setSorting] = useState({
-    value: 'terbaru',
-    label: 'Terbaru',
-  });
+  const [sorting, setSorting] = useState();
+  const [error, setError] = useState(null);
 
-  const authHeader = useAuthHeader();
+  const authHeader = useRef(useAuthHeader());
   const { showToastMessage } = useToastContext();
 
-  async function fetchUsers(offset, limit, pageNumber, sort) {
+  const fetchUsers = async () => {
+    const { pageSize, currentPage, search, sort } = tableData;
+
     try {
       const usersData = await getUsers(authHeader, {
-        offset,
-        limit,
-        page: pageNumber,
+        offset: 0,
+        limit: pageSize,
+        page: currentPage,
         search,
         sort,
       });
-      setCurrentPageData({
-        rowData: usersData.result,
+      setTableData({
+        ...tableData,
+        rows: usersData.result,
         isLoading: false,
         totalPages: usersData.pages,
-        totalData: usersData.total,
+        totalRows: usersData.total,
       });
     } catch (err) {
       setError(err.message);
     }
-  }
+  };
 
   const deleteUserData = async (userId) => {
     try {
       const deleteResponse = await deleteUser(authHeader, userId);
-      fetchUsers(0, pageSize, currentPage, sorting.value);
+      fetchUsers();
 
       showToastMessage(deleteResponse);
     } catch (err) {
@@ -179,34 +183,43 @@ function LoginAksesTable() {
   };
 
   useEffect(() => {
-    setCurrentPageData((prevState) => ({
+    setTableData((prevState) => ({
       ...prevState,
-      rowData: [],
+      rows: [],
       isLoading: true,
     }));
 
-    fetchUsers(0, pageSize, currentPage, sorting.value);
-  }, [currentPage, pageSize, sorting]);
+    fetchUsers();
+  }, [tableData.sort]);
 
   useEffect(() => {
-    setCurrentPage(1);
+    setTableData({
+      ...tableData,
+      currentPage: 1,
+    });
     setResetPage((prevState) => !prevState);
-    setCurrentPageData((prevState) => ({
+    setTableData((prevState) => ({
       ...prevState,
-      rowData: [],
+      rows: [],
       isLoading: true,
     }));
 
-    fetchUsers(0, pageSize, currentPage, sorting.value);
-  }, [search]);
+    fetchUsers();
+  }, [tableData.search]);
 
   const onPageSizeChanged = useCallback(
     ({ newValue }) => {
-      setCurrentPage(1);
+      setTableData({
+        ...tableData,
+        currentPage: 1,
+      });
       setResetPage((prevState) => !prevState);
-      setPageSize(Number(newValue));
+      setTableData({
+        ...tableData,
+        pageSize: Number(newValue),
+      });
     },
-    [setCurrentPage, setResetPage, setPageSize]
+    [setResetPage]
   );
 
   const onSorting = useCallback(
@@ -268,8 +281,8 @@ function LoginAksesTable() {
               label="Tampilkan:"
               endLabel="Entri"
               selectedItem={{
-                value: pageSize.toString(),
-                label: pageSize.toString(),
+                value: tableData.pageSize.toString(),
+                label: tableData.pageSize.toString(),
               }}
             >
               <Dropdown.Items>
@@ -302,8 +315,13 @@ function LoginAksesTable() {
           </div>
           <input
             type="search"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            value={tableData.search}
+            onChange={(e) =>
+              setTableData({
+                ...tableData,
+                search: e.target.value,
+              })
+            }
             className="bg-gray-50 text-light-gray border-none text-sm rounded-lg focus:ring-0 block w-full pl-10 p-2.5 shadow"
             placeholder="Pencarian"
           />
@@ -320,19 +338,22 @@ function LoginAksesTable() {
                 }
               : column
           )}
-          data={pageData.rowData}
-          isLoading={pageData.isLoading}
+          rows={tableData.rows}
+          isLoading={tableData.isLoading}
         />
 
         <Pagination
-          totalRows={pageData.totalData}
-          pageChangeHandler={setCurrentPage}
-          rowsPerPage={pageSize}
+          totalRows={tableData.totalRows}
+          pageChangeHandler={(currentPage) =>
+            setTableData({
+              ...tableData,
+              currentPage,
+            })
+          }
+          rowsPerPage={tableData.pageSize}
           resetPage={resetPage}
         />
       </div>
     </>
   );
 }
-
-export default LoginAksesTable;

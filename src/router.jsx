@@ -10,12 +10,12 @@ import Login from './views/Auth/Login';
 import PrivateRoute from './layouts/PrivateRoute';
 import AdminLayout from './layouts/AdminRoot';
 import MyAccount from './views/Admin/MyAccount/MyAccount';
-import LoginAksesUser from './views/Admin/LoginAksesUser/LoginAksesUser';
+import LoginAksesUser from './pages/admin/UserAccess/UserAccess';
 import Occasion from './views/Admin/Occasion/Occasion';
 import Report from './views/Admin/Report/Report';
-import Dashboard from './views/Admin/Dashboard/Dashboard';
-import LoginAksesTable from './views/Admin/LoginAksesUser/LoginAksesTable';
-import LoginAksesCreate from './views/Admin/LoginAksesUser/LoginAksesCreate';
+import Dashboard from './pages/shared/Dashboard/Dashboard';
+import UserAccessTable from './pages/admin/UserAccess/LoginAksesTable';
+import LoginAksesCreate from './pages/admin/UserAccess/LoginAksesCreate';
 import OccasionTable from './views/Admin/Occasion/OccasionTable';
 import OccasionCreate from './views/Admin/Occasion/OccasionCreate';
 import OccasionEdit from './views/Admin/Occasion/OccasionEdit';
@@ -35,7 +35,7 @@ import ActivityEdit from './views/Admin/Activity/ActivityEdit';
 import PurposeTable from './views/Admin/Purpose/PurposeTable';
 import PurposeCreate from './views/Admin/Purpose/PurposeCreate';
 import PurposeEdit from './views/Admin/Purpose/PurposeEdit';
-import LoginAksesDetail from './views/Admin/LoginAksesUser/LoginAksesDetail';
+import LoginAksesDetail from './pages/admin/UserAccess/LoginAksesDetail';
 import ErrorPage404 from './views/ErrorPage404';
 import UserLayout from './layouts/UserRoot';
 import OccasionDetail from './views/Admin/Occasion/OccasionDetail';
@@ -43,7 +43,7 @@ import OrganizationDetail from './views/Admin/Organization/OrganizationDetail';
 import ProgramDetail from './views/Admin/Program/ProgramDetail';
 import PurposeDetail from './views/Admin/Purpose/PurposeDetail';
 import ActivityDetail from './views/Admin/Activity/ActivityDetail';
-import LoginAksesEdit from './views/Admin/LoginAksesUser/LoginAksesEdit';
+import LoginAksesEdit from './pages/admin/UserAccess/LoginAksesEdit';
 import ReportTable from './views/Admin/Report/ReportTable';
 import ReportDetail from './views/Admin/Report/ReportDetail';
 import ReportEdit from './views/Admin/Report/ReportEdit';
@@ -199,7 +199,7 @@ const router = createBrowserRouter(
         }}
         element={<LoginAksesUser />}
       >
-        <Route index key="loginAksesTable" element={<LoginAksesTable />} />
+        <Route index key="loginAksesTable" element={<UserAccessTable />} />
         <Route
           key="loginAksesCreate"
           path="create"
