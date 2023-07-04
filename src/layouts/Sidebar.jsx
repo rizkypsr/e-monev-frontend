@@ -21,12 +21,16 @@ import TargetIcon from '../components/icons/TargetIcon';
 import ReportIcon from '../components/icons/ReportIcon';
 import LogoutIcon from '../components/icons/LogoutIcon';
 
-function Sidebar() {
+function Sidebar({ isOpen, onHide }) {
   const signOut = useSignOut();
   const authUser = useAuthUser();
 
   return (
-    <aside className="shadow-xl fixed top-0 left-0 z-40 w-64 h-screen transition-transform -translate-x-full md:translate-x-0">
+    <aside
+      className={`shadow-xl fixed top-0 left-0 z-40 w-64 h-screen transition-transform ${
+        isOpen ? 'translate-x-0' : '-translate-x-full'
+      }`}
+    >
       <div className="h-full overflow-y-auto bg-white flex flex-col">
         <a
           href="/"
@@ -56,6 +60,7 @@ function Sidebar() {
         <ul className="space-y-2 px-3 font-medium leading-5">
           <NavLink
             end
+            onClick={onHide}
             to={authUser().admin_role_id === 1 ? '/admin' : '/'}
             className={({ isActive }) =>
               [
@@ -73,6 +78,7 @@ function Sidebar() {
             to={
               authUser().admin_role_id === 1 ? '/admin/akun-saya' : '/akun-saya'
             }
+            onClick={onHide}
             className={({ isActive }) =>
               [
                 'flex items-center p-2',
@@ -89,6 +95,7 @@ function Sidebar() {
             <>
               <NavLink
                 to="/admin/login-akses-user"
+                onClick={onHide}
                 className={({ isActive }) =>
                   [
                     'flex items-center p-2',
@@ -103,6 +110,7 @@ function Sidebar() {
               </NavLink>
               <NavLink
                 to="/admin/urusan"
+                onClick={onHide}
                 className={({ isActive }) =>
                   [
                     'flex items-center p-2',
@@ -117,6 +125,7 @@ function Sidebar() {
               </NavLink>
               <NavLink
                 to="/admin/organisasi"
+                onClick={onHide}
                 className={({ isActive }) =>
                   [
                     'flex items-center p-2',
@@ -131,6 +140,7 @@ function Sidebar() {
               </NavLink>
               <NavLink
                 to="/admin/program"
+                onClick={onHide}
                 className={({ isActive }) =>
                   [
                     'flex items-center p-2',
@@ -145,6 +155,7 @@ function Sidebar() {
               </NavLink>
               <NavLink
                 to="/admin/kegiatan"
+                onClick={onHide}
                 className={({ isActive }) =>
                   [
                     'flex items-center p-2',
@@ -159,6 +170,7 @@ function Sidebar() {
               </NavLink>
               <NavLink
                 to="/admin/sasaran"
+                onClick={onHide}
                 className={({ isActive }) =>
                   [
                     'flex items-center p-2',
@@ -177,6 +189,7 @@ function Sidebar() {
             <>
               <NavLink
                 to="/data-triwulan"
+                onClick={onHide}
                 className={({ isActive }) =>
                   [
                     'flex items-center p-2',
@@ -191,6 +204,7 @@ function Sidebar() {
               </NavLink>
               <NavLink
                 to="/data-master"
+                onClick={onHide}
                 className={({ isActive }) =>
                   [
                     'flex items-center p-2',
@@ -207,6 +221,7 @@ function Sidebar() {
           )}
           <NavLink
             to={authUser().admin_role_id === 1 ? '/admin/laporan' : '/laporan'}
+            onClick={onHide}
             className={({ isActive }) =>
               [
                 'flex items-center p-2',

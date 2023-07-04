@@ -4,7 +4,7 @@ import { useAuthHeader } from 'react-auth-kit';
 import { Link, useParams } from 'react-router-dom';
 import ReactLoading from '../../../components/Loading';
 import getRole from '../../../utils/getRole';
-import ErrorPage from '../../../views/ErrorPage';
+import ErrorPage from '../../ErrorPage';
 import { getUser } from '../../../api/admin/user';
 
 function LoginAksesDetail() {

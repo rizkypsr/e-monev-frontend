@@ -21,7 +21,7 @@ import {
 import TrashImg from '../../../assets/images/trash.png';
 import { deleteUser, getUsers } from '../../../api/admin/user';
 import Pagination from '../../../components/Pagination';
-import ErrorPage from '../../../views/ErrorPage';
+import ErrorPage from '../../ErrorPage';
 import { useToastContext } from '../../../context/ToastContext';
 
 const columnHelper = createColumnHelper();
@@ -159,6 +159,7 @@ export default function UserAccessTable() {
         search,
         sort,
       });
+      console.log(usersData);
       setTableData({
         ...tableData,
         rows: usersData.result,

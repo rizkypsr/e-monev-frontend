@@ -18,7 +18,7 @@ import {
   DialogContent,
 } from '../../../components/DialogContent';
 import List from '../../../components/List';
-import ErrorPage from '../../../views/ErrorPage';
+import ErrorPage from '../../ErrorPage';
 import {
   createOrganization,
   getOrganizations,
