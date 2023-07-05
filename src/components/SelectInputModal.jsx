@@ -22,7 +22,7 @@ SelectInputModal.propTypes = {
   className: PropTypes.string,
   error: PropTypes.string,
   label: PropTypes.string.isRequired,
-  selectedValue: PropTypes.string,
+  selectedValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 };
 
 SelectInputModal.defaultProps = {

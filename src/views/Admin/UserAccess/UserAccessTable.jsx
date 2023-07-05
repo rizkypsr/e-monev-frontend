@@ -127,7 +127,7 @@ const columns = [
   }),
 ];
 
-function LoginAksesTable() {
+function UserAccessTable() {
   const [error, setError] = useState(false);
   const [pageSize, setPageSize] = useState(10);
   const [search, setSearch] = useState('');
@@ -320,7 +320,7 @@ function LoginAksesTable() {
                 }
               : column
           )}
-          data={pageData.rowData}
+          rows={pageData.rowData}
           isLoading={pageData.isLoading}
         />
 
@@ -335,4 +335,4 @@ function LoginAksesTable() {
   );
 }
 
-export default LoginAksesTable;
+export default UserAccessTable;

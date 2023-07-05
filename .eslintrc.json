@@ -27,6 +27,8 @@
     "react/no-array-index-key": "error",
     "react/no-children-prop": "error",
     "react/jsx-no-bind": "warn",
-    "prefer-spread": "warn"
+    "prefer-spread": "warn",
+    "import/no-extraneous-dependencies": ["error", {"devDependencies": true}],
+    "no-param-reassign": ["error", { "props": false }]
   }
 }

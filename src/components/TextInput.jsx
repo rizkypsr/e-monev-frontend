@@ -10,6 +10,7 @@ export default function TextInput({
   value,
   required,
   disabled,
+  leadingIcon,
   trailingIcon,
   error,
   onChange,
@@ -20,15 +21,33 @@ export default function TextInput({
     setShowPassword(!showPassword);
   };
 
-  // const type = props.type || 'text';
-
   return (
     <>
-      <div className={`relative ${className}`}>
+      <div
+        className={`flex items-center justify-between rounded-lg pr-2 ${
+          disabled
+            ? 'bg-[#F2F2F2] border border-[#BDBDBD]'
+            : 'bg-white border border-dark-gray'
+        } ${error ? 'border-red-600' : ''} ${className}`}
+      >
+        <div className="flex items-center w-full">
+          {leadingIcon && <p className="text-sm ml-3">Rp</p>}
+          <input
+            type={showPassword ? 'text' : type}
+            name={name}
+            placeholder={placeholder}
+            disabled={disabled}
+            value={value}
+            onChange={onChange}
+            onKeyDown={onKeyDown}
+            className={` text-gray-900 bg-transparent text-sm focus:ring-0 border-0 w-full`}
+            required={required}
+          />
+        </div>
         {type === 'password' && !trailingIcon && (
           <button
             type="button"
-            className="absolute inset-y-0 right-0 flex items-center pr-3 focus:border-none focus:outline-none"
+            className="flex items-center pr-3 focus:border-none focus:outline-none"
             onClick={togglePasswordVisibility}
           >
             {showPassword ? (
@@ -38,23 +57,6 @@ export default function TextInput({
             )}
           </button>
         )}
-        <input
-          type={showPassword ? 'text' : type}
-          name={name}
-          placeholder={placeholder}
-          disabled={disabled}
-          value={value}
-          onChange={onChange}
-          onKeyDown={onKeyDown}
-          className={`${
-            disabled
-              ? 'bg-[#F2F2F2] border border-[#BDBDBD]'
-              : 'bg-white border border-dark-gray'
-          } text-gray-900 text-sm rounded-lg focus:ring-0 focus:border-dark-gray block w-full p-2.5 ${
-            error ? 'border-red-600' : ''
-          }`}
-          required={required}
-        />
       </div>
       {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
     </>
@@ -65,9 +67,10 @@ TextInput.propTypes = {
   className: PropTypes.string,
   type: PropTypes.string,
   name: PropTypes.string,
-  value: PropTypes.string.isRequired,
+  value: PropTypes.string,
   required: PropTypes.bool,
   disabled: PropTypes.bool,
+  leadingIcon: PropTypes.bool,
   trailingIcon: PropTypes.bool,
   error: PropTypes.string,
   onChange: PropTypes.func,
@@ -79,8 +82,10 @@ TextInput.defaultProps = {
   className: null,
   type: 'text',
   name: null,
+  value: '',
   required: false,
   disabled: false,
+  leadingIcon: false,
   trailingIcon: false,
   error: null,
   placeholder: null,

@@ -5,7 +5,7 @@ import {
   PlusIcon,
   TrashIcon,
 } from '@heroicons/react/24/solid';
-import { createColumnHelper, sortingFns } from '@tanstack/react-table';
+import { createColumnHelper } from '@tanstack/react-table';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useAuthHeader } from 'react-auth-kit';
 import { Link } from 'react-router-dom';
@@ -147,7 +147,7 @@ function ProgramTable() {
         sort,
         offset,
         limit,
-        pageNumber,
+        page: pageNumber,
         search,
       });
       setCurrentPageData({
@@ -314,7 +314,7 @@ function ProgramTable() {
                 }
               : column
           )}
-          data={pageData.rowData}
+          rows={pageData.rowData}
           isLoading={pageData.isLoading}
         />
 

@@ -10,15 +10,11 @@ import Login from './views/Auth/Login';
 import PrivateRoute from './layouts/PrivateRoute';
 import AdminLayout from './layouts/AdminRoot';
 import MyAccount from './views/Admin/MyAccount/MyAccount';
-import LoginAksesUser from './views/Admin/LoginAksesUser/LoginAksesUser';
-import Occasion from './views/Admin/Occasion/Occasion';
+import LoginAksesUser from './views/Admin/UserAccess/UserAccess';
 import Report from './views/Admin/Report/Report';
-import Dashboard from './views/Admin/Dashboard/Dashboard';
-import LoginAksesTable from './views/Admin/LoginAksesUser/LoginAksesTable';
-import LoginAksesCreate from './views/Admin/LoginAksesUser/LoginAksesCreate';
-import OccasionTable from './views/Admin/Occasion/OccasionTable';
-import OccasionCreate from './views/Admin/Occasion/OccasionCreate';
-import OccasionEdit from './views/Admin/Occasion/OccasionEdit';
+import Dashboard from './pages/shared/Dashboard/Dashboard';
+import UserAccessTable from './views/Admin/UserAccess/UserAccessTable';
+import LoginAksesCreate from './views/Admin/UserAccess/LoginAksesCreate';
 import OrganizationTable from './views/Admin/Organization/OrganizationTable';
 import OrganizationCreate from './views/Admin/Organization/OrganizationCreate';
 import OrganizationEdit from './views/Admin/Organization/OrganizationEdit';
@@ -35,32 +31,120 @@ import ActivityEdit from './views/Admin/Activity/ActivityEdit';
 import PurposeTable from './views/Admin/Purpose/PurposeTable';
 import PurposeCreate from './views/Admin/Purpose/PurposeCreate';
 import PurposeEdit from './views/Admin/Purpose/PurposeEdit';
-import LoginAksesDetail from './views/Admin/LoginAksesUser/LoginAksesDetail';
+import LoginAksesDetail from './views/Admin/UserAccess/LoginAksesDetail';
 import ErrorPage404 from './views/ErrorPage404';
 import UserLayout from './layouts/UserRoot';
-import OccasionDetail from './views/Admin/Occasion/OccasionDetail';
 import OrganizationDetail from './views/Admin/Organization/OrganizationDetail';
 import ProgramDetail from './views/Admin/Program/ProgramDetail';
 import PurposeDetail from './views/Admin/Purpose/PurposeDetail';
 import ActivityDetail from './views/Admin/Activity/ActivityDetail';
-import LoginAksesEdit from './views/Admin/LoginAksesUser/LoginAksesEdit';
+import LoginAksesEdit from './views/Admin/UserAccess/LoginAksesEdit';
 import ReportTable from './views/Admin/Report/ReportTable';
 import ReportDetail from './views/Admin/Report/ReportDetail';
 import ReportEdit from './views/Admin/Report/ReportEdit';
 import MyAccountForm from './views/Admin/MyAccount/MyAccountForm';
+import Master from './views/User/Master/Master';
+import MasterCreate from './views/User/Master/MasterCreate';
+import TriwulanCreate from './views/User/Triwulan/TriwulanCreate';
+import Occasion from './views/Admin/occasion/Occasion';
+import OccasionTable from './views/Admin/occasion/OccasionTable';
+import OccasionCreate from './views/Admin/occasion/OccasionCreate';
+import OccasionEdit from './views/Admin/occasion/OccasionEdit';
+import OccasionDetail from './views/Admin/occasion/OccasionDetail';
 
 const router = createBrowserRouter(
   createRoutesFromElements([
+    <Route path="/login" element={<Login />} />,
     <Route
       path="/"
+      loader={() => 'Dashboard'}
+      handle={{
+        crumb: () => (
+          <Link
+            to="/"
+            className="ml-1 text-sm text-dark-gray hover:text-primary md:ml-2"
+          >
+            e-Montir
+          </Link>
+        ),
+      }}
       element={
         <PrivateRoute>
           <UserLayout />
         </PrivateRoute>
       }
       errorElement={<ErrorPage404 />}
-    />,
-    <Route path="/login" element={<Login />} />,
+    >
+      <Route
+        index
+        key="userDashboard"
+        loader={() => 'Dashboard'}
+        handle={{
+          crumb: (data) => (
+            <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
+          ),
+        }}
+        element={<Dashboard />}
+      />
+      <Route
+        key="myAccount"
+        path="akun-saya"
+        loader={() => 'Akun Saya'}
+        handle={{
+          crumb: (data) => (
+            <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
+          ),
+        }}
+        element={<MyAccount />}
+      >
+        <Route index key="akunSayaForm" element={<MyAccountForm />} />
+      </Route>
+      <Route
+        key="report"
+        path="laporan"
+        loader={() => 'Data Laporan'}
+        handle={{
+          crumb: (data) => (
+            <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
+          ),
+        }}
+        element={<Report />}
+      >
+        <Route index key="reportTable" element={<ReportTable />} />
+        <Route key="reportEdit" path="edit/:id" element={<ReportEdit />} />
+        <Route
+          key="reportDetail"
+          path="detail/:id"
+          element={<ReportDetail />}
+        />
+      </Route>
+      <Route
+        key="master"
+        path="data-master"
+        loader={() => 'Tambah Data Master'}
+        handle={{
+          crumb: (data) => (
+            <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
+          ),
+        }}
+        element={<Master />}
+      >
+        <Route index key="masterCreate" element={<MasterCreate />} />
+      </Route>
+      <Route
+        key="triwulan"
+        path="data-triwulan"
+        loader={() => 'Tambah Data Triwulan'}
+        handle={{
+          crumb: (data) => (
+            <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
+          ),
+        }}
+        element={<Master />}
+      >
+        <Route index key="triwulanCreate" element={<TriwulanCreate />} />
+      </Route>
+    </Route>,
     <Route
       path="/admin"
       loader={() => 'Dashboard'}
@@ -91,7 +175,6 @@ const router = createBrowserRouter(
         }}
         element={<Dashboard />}
       />
-      ,
       <Route
         key="myAccount"
         path="akun-saya"
@@ -105,7 +188,6 @@ const router = createBrowserRouter(
       >
         <Route index key="akunSayaForm" element={<MyAccountForm />} />
       </Route>
-      ,
       <Route
         key="loginAksesUser"
         path="login-akses-user"
@@ -117,7 +199,7 @@ const router = createBrowserRouter(
         }}
         element={<LoginAksesUser />}
       >
-        <Route index key="loginAksesTable" element={<LoginAksesTable />} />
+        <Route index key="loginAksesTable" element={<UserAccessTable />} />
         <Route
           key="loginAksesCreate"
           path="create"

@@ -1,8 +1,6 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 
-function LoginAksesUser() {
+export default function UserAccess() {
   return <Outlet />;
 }
-
-export default LoginAksesUser;

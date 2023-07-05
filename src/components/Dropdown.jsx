@@ -11,6 +11,7 @@ function Dropdown({
   children,
   onSelect,
   selectedItem,
+  error,
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedLabel, setSelectedLabel] = useState('');
@@ -33,7 +34,9 @@ function Dropdown({
         style={minWidth && { minWidth }}
         className={`rounded-lg px-4 text-sm py-2.5 w-full text-center bg-white inline-flex items-center ${className} ${
           labelPosition === 'right' ? 'justify-center' : 'justify-between'
-        } ${dropdownStyle === 'fill' ? 'shadow' : 'border border-dark-gray'}`}
+        } ${dropdownStyle === 'fill' ? 'shadow' : 'border border-dark-gray'} ${
+          error && 'border-red-600'
+        }`}
         onClick={toggle}
         type="button"
       >
@@ -79,6 +82,7 @@ function Dropdown({
 
         {endLabel && <div className="ml-2">{endLabel}</div>}
       </button>
+      {error && <p className="mt-2 text-xs text-red-600 absolute">{error}</p>}
       {isOpen && (
         <div className="absolute z-10 left-0 right-0 mt-2 bg-white divide-y divide-gray-100 rounded-lg shadow max-h-96 overflow-auto">
           <ul className="text-sm">
@@ -119,6 +123,7 @@ Dropdown.propTypes = {
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     label: PropTypes.string,
   }).isRequired,
+  error: PropTypes.string,
 };
 
 Dropdown.defaultProps = {
@@ -127,6 +132,7 @@ Dropdown.defaultProps = {
   minWidth: null,
   endLabel: null,
   labelPosition: 'right',
+  error: '',
 };
 
 Items.propTypes = {

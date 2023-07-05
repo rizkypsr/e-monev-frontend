@@ -2,15 +2,17 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';
 import { AuthProvider } from 'react-auth-kit';
+import { Provider } from 'react-redux';
 import ToastProvider from './context/ToastContext';
 import router from './router';
+import store from './redux/store';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <AuthProvider>
-      <ToastProvider>
+  <AuthProvider>
+    <ToastProvider>
+      <Provider store={store}>
         <RouterProvider router={router} />
-      </ToastProvider>
-    </AuthProvider>
-  </React.StrictMode>
+      </Provider>
+    </ToastProvider>
+  </AuthProvider>
 );

@@ -1,34 +1,35 @@
-import { baseUrl, domainUrl } from '../../../utils/constants';
+import { baseUrl } from '../../../utils/constants';
+import makeRequest from '../../../utils/makeRequest';
 
-export default async function getOccasions(
-  authHeader,
-  { offset = 0, limit = 10, pageNumber = 1, search = '', sort = 'terbaru' }
-) {
-  try {
-    const occasionResponse = await fetch(
-      `${baseUrl}/occassion/list?offset=${offset}&limit=${limit}&search=${search}&sort=${sort}${
-        pageNumber ? `&page=${pageNumber}` : ''
-      }`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': domainUrl,
-          authorization: authHeader(),
-        },
-      }
-    );
+export default async function getOccasions(authHeader, options = {}) {
+  const {
+    offset = 0,
+    limit = 10,
+    page = 1,
+    search = '',
+    sort = 'terbaru',
+  } = options;
 
-    const occasionData = await occasionResponse.json();
+  const queryParams = {
+    offset,
+    limit,
+    page,
+    search,
+    sort,
+  };
 
-    if (!occasionResponse.ok) {
-      throw new Error(
-        `Gagal mendapatkan data dari server: ${occasionData.message}`
-      );
-    }
+  const url = new URL(`${baseUrl}/occassion/list`);
+  url.search = new URLSearchParams(queryParams).toString();
 
-    return occasionData.data;
-  } catch (error) {
-    throw new Error(error.message);
-  }
+  const headers = {
+    'Content-Type': 'application/json',
+    authorization: authHeader(),
+  };
+
+  const occasionResponse = await makeRequest(url.toString(), {
+    method: 'GET',
+    headers,
+  });
+
+  return occasionResponse.data;
 }
