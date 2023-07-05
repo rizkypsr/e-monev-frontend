@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { createColumnHelper } from '@tanstack/react-table';
 import {
   EyeIcon,
@@ -127,55 +127,50 @@ const columns = [
   }),
 ];
 
-export default function UserAccessTable() {
-  const [tableData, setTableData] = useState({
-    rows: [],
+function UserAccessTable() {
+  const [error, setError] = useState(false);
+  const [pageSize, setPageSize] = useState(10);
+  const [search, setSearch] = useState('');
+  const [pageData, setCurrentPageData] = useState({
+    rowData: [],
     isLoading: false,
-    currentPage: 1,
-    pageSize: 10,
     totalPages: 0,
-    totalRows: 0,
-    search: '',
-    sort: {
-      value: 'terbaru',
-      label: 'Terbaru',
-    },
+    totalData: 0,
   });
+  const [currentPage, setCurrentPage] = useState(1);
   const [resetPage, setResetPage] = useState(false);
-  const [sorting, setSorting] = useState();
-  const [error, setError] = useState(null);
+  const [sorting, setSorting] = useState({
+    value: 'terbaru',
+    label: 'Terbaru',
+  });
 
-  const authHeader = useRef(useAuthHeader());
+  const authHeader = useAuthHeader();
   const { showToastMessage } = useToastContext();
 
-  const fetchUsers = async () => {
-    const { pageSize, currentPage, search, sort } = tableData;
-
+  async function fetchUsers(offset, limit, pageNumber, sort) {
     try {
       const usersData = await getUsers(authHeader, {
-        offset: 0,
-        limit: pageSize,
-        page: currentPage,
+        offset,
+        limit,
+        pageNumber,
         search,
         sort,
       });
-      console.log(usersData);
-      setTableData({
-        ...tableData,
-        rows: usersData.result,
+      setCurrentPageData({
+        rowData: usersData.result,
         isLoading: false,
         totalPages: usersData.pages,
-        totalRows: usersData.total,
+        totalData: usersData.total,
       });
     } catch (err) {
       setError(err.message);
     }
-  };
+  }
 
   const deleteUserData = async (userId) => {
     try {
       const deleteResponse = await deleteUser(authHeader, userId);
-      fetchUsers();
+      fetchUsers(0, pageSize, currentPage, sorting.value);
 
       showToastMessage(deleteResponse);
     } catch (err) {
@@ -184,43 +179,34 @@ export default function UserAccessTable() {
   };
 
   useEffect(() => {
-    setTableData((prevState) => ({
+    setCurrentPageData((prevState) => ({
       ...prevState,
-      rows: [],
+      rowData: [],
       isLoading: true,
     }));
 
-    fetchUsers();
-  }, [tableData.sort]);
+    fetchUsers(0, pageSize, currentPage, sorting.value);
+  }, [currentPage, pageSize, sorting]);
 
   useEffect(() => {
-    setTableData({
-      ...tableData,
-      currentPage: 1,
-    });
+    setCurrentPage(1);
     setResetPage((prevState) => !prevState);
-    setTableData((prevState) => ({
+    setCurrentPageData((prevState) => ({
       ...prevState,
-      rows: [],
+      rowData: [],
       isLoading: true,
     }));
 
-    fetchUsers();
-  }, [tableData.search]);
+    fetchUsers(0, pageSize, currentPage, sorting.value);
+  }, [search]);
 
   const onPageSizeChanged = useCallback(
     ({ newValue }) => {
-      setTableData({
-        ...tableData,
-        currentPage: 1,
-      });
+      setCurrentPage(1);
       setResetPage((prevState) => !prevState);
-      setTableData({
-        ...tableData,
-        pageSize: Number(newValue),
-      });
+      setPageSize(Number(newValue));
     },
-    [setResetPage]
+    [setCurrentPage, setResetPage, setPageSize]
   );
 
   const onSorting = useCallback(
@@ -282,8 +268,8 @@ export default function UserAccessTable() {
               label="Tampilkan:"
               endLabel="Entri"
               selectedItem={{
-                value: tableData.pageSize.toString(),
-                label: tableData.pageSize.toString(),
+                value: pageSize.toString(),
+                label: pageSize.toString(),
               }}
             >
               <Dropdown.Items>
@@ -316,13 +302,8 @@ export default function UserAccessTable() {
           </div>
           <input
             type="search"
-            value={tableData.search}
-            onChange={(e) =>
-              setTableData({
-                ...tableData,
-                search: e.target.value,
-              })
-            }
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
             className="bg-gray-50 text-light-gray border-none text-sm rounded-lg focus:ring-0 block w-full pl-10 p-2.5 shadow"
             placeholder="Pencarian"
           />
@@ -339,22 +320,19 @@ export default function UserAccessTable() {
                 }
               : column
           )}
-          rows={tableData.rows}
-          isLoading={tableData.isLoading}
+          rows={pageData.rowData}
+          isLoading={pageData.isLoading}
         />
 
         <Pagination
-          totalRows={tableData.totalRows}
-          pageChangeHandler={(currentPage) =>
-            setTableData({
-              ...tableData,
-              currentPage,
-            })
-          }
-          rowsPerPage={tableData.pageSize}
+          totalRows={pageData.totalData}
+          pageChangeHandler={setCurrentPage}
+          rowsPerPage={pageSize}
           resetPage={resetPage}
         />
       </div>
     </>
   );
 }
+
+export default UserAccessTable;

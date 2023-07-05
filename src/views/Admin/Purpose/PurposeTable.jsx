@@ -311,7 +311,7 @@ function PurposeTable() {
                 }
               : column
           )}
-          data={pageData.rowData}
+          rows={pageData.rowData}
           isLoading={pageData.isLoading}
         />
 

@@ -378,7 +378,11 @@ export default function ReportTable() {
             </Dropdown.Items>
           </Dropdown>
 
-          <Button className="px-3" background="bg-primary" textColor="text-white">
+          <Button
+            className="px-3"
+            background="bg-primary"
+            textColor="text-white"
+          >
             Preview
           </Button>
         </div>
@@ -413,7 +417,7 @@ export default function ReportTable() {
                   }
                 : column
             )}
-            data={pageData.rowData}
+            rows={pageData.rowData}
             isLoading={pageData.isLoading}
           />
 

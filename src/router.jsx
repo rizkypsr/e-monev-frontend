@@ -13,7 +13,7 @@ import MyAccount from './views/Admin/MyAccount/MyAccount';
 import LoginAksesUser from './views/Admin/UserAccess/UserAccess';
 import Report from './views/Admin/Report/Report';
 import Dashboard from './pages/shared/Dashboard/Dashboard';
-import UserAccessTable from './views/Admin/UserAccess/LoginAksesTable';
+import UserAccessTable from './views/Admin/UserAccess/UserAccessTable';
 import LoginAksesCreate from './views/Admin/UserAccess/LoginAksesCreate';
 import OrganizationTable from './views/Admin/Organization/OrganizationTable';
 import OrganizationCreate from './views/Admin/Organization/OrganizationCreate';

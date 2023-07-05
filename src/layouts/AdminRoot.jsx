@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuthUser } from 'react-auth-kit';
 import { useMediaQuery } from 'react-responsive';
@@ -15,12 +15,34 @@ function AdminLayout() {
 
   const [sidebarVisible, setSidebarVisible] = useState(isDesktopOrLaptop);
 
+  const sidebarRef = useRef(null);
+  const hamburgerRef = useRef(null);
+
   useEffect(() => {
     if (isTabletOrMobile) {
       setSidebarVisible(false);
     } else {
       setSidebarVisible(true);
     }
+  }, [isTabletOrMobile]);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (
+        sidebarRef.current &&
+        !sidebarRef.current.contains(event.target) &&
+        !hamburgerRef.current.contains(event.target) &&
+        isTabletOrMobile
+      ) {
+        setSidebarVisible(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
   }, [isTabletOrMobile]);
 
   const toggleSidebar = () => {
@@ -43,7 +65,8 @@ function AdminLayout() {
     <div className="h-screen">
       <div className="flex justify-end">
         <button
-          className="inline-flex items-center p-2 mt-2 ml-3 text-sm md:hidden focus:outline-none"
+          ref={hamburgerRef}
+          className="hamburger-menu inline-flex items-center p-2 mt-2 ml-3 text-sm md:hidden focus:outline-none"
           type="button"
           onClick={toggleSidebar}
         >
@@ -63,7 +86,9 @@ function AdminLayout() {
         </button>
       </div>
 
-      <Sidebar isOpen={sidebarVisible} onHide={handleMenuClick} />
+      <div ref={sidebarRef}>
+        <Sidebar isOpen={sidebarVisible} onHide={handleMenuClick} />
+      </div>
       <div className="bg-[#F3F6FF] md:ml-64 min-h-screen">
         <header className="px-8 py-4 bg-white">
           <Breadcrumb />

@@ -205,7 +205,7 @@ export default function Pagination({
 
 Pagination.propTypes = {
   pageChangeHandler: PropTypes.func.isRequired,
-  resetPage: PropTypes.func.isRequired,
+  resetPage: PropTypes.bool.isRequired,
   rowsPerPage: PropTypes.number.isRequired,
   totalRows: PropTypes.number.isRequired,
 };
