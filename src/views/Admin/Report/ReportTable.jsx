@@ -378,13 +378,15 @@ export default function ReportTable() {
             </Dropdown.Items>
           </Dropdown>
 
-          <Button
-            className="px-3"
-            background="bg-primary"
-            textColor="text-white"
-          >
-            Preview
-          </Button>
+          <Link to="preview">
+            <Button
+              className="px-3"
+              background="bg-primary"
+              textColor="text-white"
+            >
+              Preview
+            </Button>
+          </Link>
         </div>
 
         <div className="relative w-1/3">

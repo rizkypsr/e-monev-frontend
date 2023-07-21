@@ -2,12 +2,13 @@ import {
   ArrowLeftIcon,
   CheckCircleIcon,
   MagnifyingGlassIcon,
+  PlusCircleIcon,
 } from '@heroicons/react/24/solid';
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthHeader } from 'react-auth-kit';
-import InfiniteScroll from 'react-infinite-scroll-component';
-import { animated, useTransition } from '@react-spring/web';
+import { useTransition } from '@react-spring/web';
+import uuid from 'react-uuid';
 import Label from '../../../components/Label';
 import TextInput from '../../../components/TextInput';
 import Button from '../../../components/Button';
@@ -25,6 +26,7 @@ import {
 import register from '../../../api/auth/register';
 import { useToastContext } from '../../../context/ToastContext';
 import ReactLoading from '../../../components/Loading';
+import DialogInputWrapper from '../../../components/DialogInputWrapper';
 
 function LoginAksesCreate() {
   const [name, setName] = useState('');
@@ -37,13 +39,11 @@ function LoginAksesCreate() {
   const [selectedLevel, setSelectedLevel] = useState(null);
   const [openLevel, setOpenLevel] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [opdData, setOpdData] = useState({
-    items: [],
-    hasMore: true,
-    isLoading: false,
-    totalPages: 0,
-    currentPage: 1,
-  });
+  const [opdData, setOpdData] = useState([
+    {
+      id: uuid(),
+    },
+  ]);
   const [levelData, setLevelData] = useState([]);
   const [opdError, setOpdError] = useState('');
   const [levelError, setLevelError] = useState('');
@@ -77,24 +77,8 @@ function LoginAksesCreate() {
     setLevelData([
       { id: 1, name: 'Super Admin' },
       { id: 2, name: 'User OPD' },
+      { id: 3, name: 'Admin Bidang' },
     ]);
-  };
-
-  const fetchOrganizations = async (page) => {
-    const organizationResponse = await getOrganizations(authHeader, {
-      limit: 20,
-      page,
-    });
-
-    if (page === opdData.totalPages) {
-      setOpdData((prevData) => ({ ...prevData, hasMore: false }));
-    }
-
-    setOpdData((prevData) => ({
-      ...prevData,
-      items: [...prevData.items, ...organizationResponse.result],
-      totalPages: organizationResponse.pages,
-    }));
   };
 
   useEffect(() => {
@@ -102,14 +86,20 @@ function LoginAksesCreate() {
   }, []);
 
   useEffect(() => {
-    fetchOrganizations(opdData.currentPage);
-  }, [opdData.currentPage]);
+    if (selectedLevel != null && selectedLevel.id !== 3) {
+      setOpdData([
+        {
+          id: uuid(),
+        },
+      ]);
+    }
+  }, [selectedLevel]);
 
-  const loadMoreData = async () => {
-    setOpdData((prevData) => ({
-      ...prevData,
-      currentPage: prevData.currentPage + 1,
-    }));
+  const removeOpdComponent = (indexToRemove) => {
+    const newOrganization = opdData.filter(
+      (_, index) => index !== indexToRemove
+    );
+    setOpdData(newOrganization);
   };
 
   const onSubmit = async (e) => {
@@ -167,9 +157,21 @@ function LoginAksesCreate() {
     }
   };
 
-  const handleSelectOpd = (opd) => {
-    setSelectedOpd(opd);
-    setOpenOpd(false);
+  const handleSelectOpd = (item) => {
+    const newOrganizations = [...opdData];
+    const updatedValue = newOrganizations.map((ocs) => {
+      if (ocs.id === item.id) {
+        return item.value;
+      }
+      return ocs;
+    });
+
+    setOpdData(updatedValue);
+  };
+
+  const addOpdComponent = () => {
+    const id = uuid();
+    setOpdData([...opdData, { id }]);
   };
 
   const handleSelectLevel = (level) => {
@@ -230,75 +232,34 @@ function LoginAksesCreate() {
 
         <form className="mt-4" onSubmit={onSubmit}>
           <div className="mb-6">
-            <Label>Nama OPD</Label>
-            <Dialog open={openOpd} onOpenChange={setOpenOpd}>
-              <DialogTrigger className="w-full lg:w-2/3 xl:w-1/3">
-                <SelectInputModal
-                  className="mt-2"
-                  selectedValue={selectedOpd && selectedOpd.title}
-                  label="--- Pilih Nama OPD ---"
-                  error={opdError}
+            <Label className="mb-2">Urusan</Label>
+            <div className="space-y-3 lg:w-2/3 xl:w-1/3">
+              {opdData.map((ocs, index) => (
+                <DialogInputWrapper
+                  trailingIcon={index > 0}
+                  // eslint-disable-next-line react/no-array-index-key
+                  key={index}
+                  label="Urusan"
+                  selectedItem={ocs.title}
+                  onFetching={getOrganizations}
+                  onSelect={(value) => handleSelectOpd({ id: ocs.id, value })}
+                  onDelete={() => removeOpdComponent(index)}
                 />
-              </DialogTrigger>
-
-              <DialogContent
-                addButton
-                title="Pilih Nama OPD"
-                onCreateClick={() => setOpenCreateOpd((prev) => !prev)}
-              >
-                {transition((style, isOpen) => (
-                  <div>
-                    {isOpen && (
-                      <animated.div
-                        style={style}
-                        className="w-72 bg-white rounded-md absolute z-10 -right-80 top-0 p-4"
-                      >
-                        <TextInput
-                          required
-                          placeholder="Masukan Nama OPD"
-                          value={newOpd}
-                          onChange={(e) => setNewOpd(e.target.value)}
-                          onKeyDown={handleKeyDown}
-                        />
-                        <p className="text-xs text-light-gray mt-2 text-left">
-                          Tekan{' '}
-                          <span className="itelic text-dark-gray">Enter</span>{' '}
-                          untuk menyimpan
-                        </p>
-                      </animated.div>
-                    )}
-                  </div>
-                ))}
-
-                <div className="relative my-6">
-                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                    <MagnifyingGlassIcon className="w-4 h-4" />
-                  </div>
-                  <input
-                    type="search"
-                    id="search"
-                    className="bg-gray-50 text-light-gray border-none text-sm rounded-lg focus:ring-0 block w-full pl-10 p-2.5 shadow"
-                    placeholder="Pencarian"
-                  />
-                </div>
-                {opdData.isLoading ? (
-                  <ReactLoading />
-                ) : (
-                  <InfiniteScroll
-                    dataLength={opdData.items.length}
-                    next={loadMoreData}
-                    hasMore={opdData.hasMore}
-                    height={500}
-                  >
-                    <List
-                      data={opdData.items}
-                      onSelectValue={handleSelectOpd}
-                    />
-                  </InfiniteScroll>
-                )}
-              </DialogContent>
-            </Dialog>
+              ))}
+            </div>
           </div>
+          {selectedLevel != null && selectedLevel.id === 3 && (
+            <div className="mb-6">
+              <Button
+                className="px-0"
+                onClick={addOpdComponent}
+                textColor="text-[#2F80ED]"
+                icon={<PlusCircleIcon className="w-8 h-8" />}
+              >
+                Tambah OPD Lain
+              </Button>
+            </div>
+          )}
           <div className="mb-6">
             <Label>Level User</Label>
             <Dialog open={openLevel} onOpenChange={setOpenLevel}>

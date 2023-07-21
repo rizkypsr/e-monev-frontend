@@ -24,12 +24,22 @@ import { useToastContext } from '../../../context/ToastContext';
 import ReactLoading from '../../../components/Loading';
 
 function ActivityCreate() {
+  const [selectedActivity, setSelectedActivity] = useState(null);
   const [selectedProgram, setSelectedProgram] = useState(null);
+  const [openActivityDialog, setOpenActivityDialog] = useState(false);
   const [openProgramDialog, setOpenProgramDialog] = useState(false);
   const [title, setTitle] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [openCreateActivity, setOpenCreateActivity] = useState(false);
   const [openCreateOpd, setOpenCreateOpd] = useState(false);
   const [pageData, setPageData] = useState({
+    items: [],
+    hasMore: true,
+    isLoading: false,
+    totalPages: 0,
+    currentPage: 1,
+  });
+  const [activityData, setActivityData] = useState({
     items: [],
     hasMore: true,
     isLoading: false,
@@ -59,6 +69,29 @@ function ActivityCreate() {
       opacity: 0,
     },
   });
+
+  const transitionCreateActivity = useTransition(openCreateActivity, {
+    config: {
+      duration: 120,
+    },
+    from: {
+      scale: 0,
+      opacity: 0,
+    },
+    enter: {
+      scale: 1,
+      opacity: 1,
+    },
+    leave: {
+      scale: 0,
+      opacity: 0,
+    },
+  });
+
+  const handleSelectActivity = (activity) => {
+    setSelectedActivity(activity);
+    setOpenActivityDialog(false);
+  };
 
   const handleSelectProgram = (opd) => {
     setSelectedProgram(opd);
@@ -161,6 +194,13 @@ function ActivityCreate() {
     }));
   };
 
+  const loadMoreActivityData = async () => {
+    setActivityData((prevData) => ({
+      ...prevData,
+      currentPage: prevData.currentPage + 1,
+    }));
+  };
+
   return (
     <>
       <div className="flex justify-between">
@@ -176,10 +216,80 @@ function ActivityCreate() {
 
         <form className="mt-4" onSubmit={onSubmit}>
           <div className="mb-6">
-            <Label>Kegiatan</Label>
+            <Label>Nama Kegiatan</Label>
+            <Dialog
+              open={openActivityDialog}
+              onOpenChange={setOpenActivityDialog}
+            >
+              <DialogTrigger className="w-full lg:w-2/3 xl:w-1/3">
+                <SelectInputModal
+                  className="mt-2"
+                  selectedValue={selectedActivity && selectedActivity.title}
+                  label="--- Pilih Nama Kegiatan ---"
+                />
+              </DialogTrigger>
+
+              <DialogContent
+                addButton
+                title="Pilih Nama Kegiatan"
+                onCreateClick={() => setOpenCreateActivity((prev) => !prev)}
+              >
+                {transitionCreateActivity((style, isOpen) => (
+                  <div>
+                    {isOpen && (
+                      <animated.div
+                        style={style}
+                        className="w-72 bg-white rounded-md absolute z-10 -right-80 top-0 p-4"
+                      >
+                        <TextInput
+                          required
+                          placeholder="Masukan Nama Kegiatan"
+                          onKeyDown={handleKeyDown}
+                        />
+                        <p className="text-xs text-light-gray mt-2 text-left">
+                          Tekan{' '}
+                          <span className="itelic text-dark-gray">Enter</span>{' '}
+                          untuk menyimpan
+                        </p>
+                      </animated.div>
+                    )}
+                  </div>
+                ))}
+
+                <div className="relative my-6">
+                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <MagnifyingGlassIcon className="w-4 h-4" />
+                  </div>
+                  <input
+                    type="search"
+                    id="search"
+                    className="bg-gray-50 text-light-gray border-none text-sm rounded-lg focus:ring-0 block w-full pl-10 p-2.5 shadow"
+                    placeholder="Pencarian"
+                  />
+                </div>
+                {activityData.isLoading ? (
+                  <ReactLoading />
+                ) : (
+                  <InfiniteScroll
+                    dataLength={activityData.items.length}
+                    next={loadMoreActivityData}
+                    hasMore={activityData.hasMore}
+                    height={500}
+                  >
+                    <List
+                      data={activityData.items}
+                      onSelectValue={handleSelectActivity}
+                    />
+                  </InfiniteScroll>
+                )}
+              </DialogContent>
+            </Dialog>
+          </div>
+          <div className="mb-6">
+            <Label>Nama Sub Bagian</Label>
             <TextInput
               className="mt-2 lg:w-2/3 xl:w-1/3"
-              placeholder="Masukan Nama Kegiatan"
+              placeholder="Masukan Nama Sub Kegiatan"
               value={title}
               error={titleError}
               onChange={(e) => setTitle(e.target.value)}

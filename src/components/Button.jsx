@@ -26,7 +26,7 @@ function Button({
       // eslint-disable-next-line react/button-has-type
       type={type}
       onClick={onClick}
-      className={`font-medium rounded-lg text-sm min-w-fit px-3 py-2.5 ${
+      className={`font-medium rounded-lg text-sm min-w-fit px-3 py-2.5 h-10 ${
         icon ? 'flex items-center justify-center space-x-2' : ''
       } ${background || 'bg-transparent'} ${className} ${textColor}`}
     >

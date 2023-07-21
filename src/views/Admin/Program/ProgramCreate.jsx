@@ -1,5 +1,8 @@
-import { ArrowLeftIcon, CheckCircleIcon } from '@heroicons/react/24/solid';
-import { Label } from 'flowbite-react';
+import {
+  ArrowLeftIcon,
+  CheckCircleIcon,
+  MagnifyingGlassIcon,
+} from '@heroicons/react/24/solid';
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthHeader } from 'react-auth-kit';
@@ -8,15 +11,35 @@ import Button from '../../../components/Button';
 import { useToastContext } from '../../../context/ToastContext';
 import { createProgram } from '../../../api/admin/program';
 import ReactLoading from '../../../components/Loading';
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+} from '../../../components/DialogContent';
+import SelectInputModal from '../../../components/SelectInputModal';
+import List from '../../../components/List';
+import Label from '../../../components/Label';
+
+const purposes = [
+  { id: 1, name: 'Urusan 1' },
+  { id: 2, name: 'Urusan 2' },
+];
 
 function ProgramCreate() {
   const [title, setTitle] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [titleError, setTitleError] = useState('');
+  const [selectedPurpose, setSelectedPurpose] = useState(null);
+  const [openPurpose, setOpenPurpose] = useState(false);
 
   const authHeader = useAuthHeader();
   const navigate = useNavigate();
   const { showToastMessage } = useToastContext();
+
+  const handleSelectPurpose = (opd) => {
+    setSelectedPurpose(opd);
+    setOpenPurpose(false);
+  };
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -67,6 +90,36 @@ function ProgramCreate() {
               onChange={(e) => setTitle(e.target.value)}
             />
           </div>
+
+          <div className="mb-6">
+            <Label>Urusan</Label>
+            <Dialog open={openPurpose} onOpenChange={setOpenPurpose}>
+              <DialogTrigger className="w-full lg:w-2/3 xl:w-1/3">
+                <SelectInputModal
+                  className="mt-2"
+                  selectedValue={selectedPurpose && selectedPurpose.name}
+                  label="--- Pilih Urusan ---"
+                />
+              </DialogTrigger>
+
+              <DialogContent title="Pilih Urusan">
+                <div className="relative my-6">
+                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <MagnifyingGlassIcon className="w-4 h-4" />
+                  </div>
+                  <input
+                    type="search"
+                    id="search"
+                    className="bg-gray-50 text-light-gray border-none text-sm rounded-lg focus:ring-0 block w-full pl-10 p-2.5 shadow"
+                    placeholder="Pencarian"
+                  />
+                </div>
+
+                <List data={purposes} onSelectValue={handleSelectPurpose} />
+              </DialogContent>
+            </Dialog>
+          </div>
+
           {isLoading ? (
             <ReactLoading />
           ) : (

@@ -23,13 +23,14 @@ import { deleteUser, getUsers } from '../../../api/admin/user';
 import Pagination from '../../../components/Pagination';
 import ErrorPage from '../../ErrorPage';
 import { useToastContext } from '../../../context/ToastContext';
+import formattedDate from '../../../utils/formattedDate';
 
 const columnHelper = createColumnHelper();
 
 const columns = [
   columnHelper.accessor('id', {
     cell: (info) => info.getValue(),
-    header: () => <span>ID</span>,
+    header: () => <span>NO URUT</span>,
   }),
   columnHelper.accessor((row) => row.username, {
     id: 'username',
@@ -44,6 +45,11 @@ const columns = [
   columnHelper.accessor('admin_role_id', {
     header: () => <span>Level User</span>,
     cell: (info) => (info.renderValue() === 1 ? 'Super Admin' : 'User OPD'),
+  }),
+  columnHelper.accessor((row) => row.created_at, {
+    id: 'created_at',
+    cell: (info) => <i>{formattedDate(info.getValue())}</i>,
+    header: () => <span>Tanggal Dibuat</span>,
   }),
   columnHelper.accessor((row) => row.aksi, {
     id: 'aksi',

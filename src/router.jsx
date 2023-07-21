@@ -12,7 +12,7 @@ import AdminLayout from './layouts/AdminRoot';
 import MyAccount from './views/Admin/MyAccount/MyAccount';
 import LoginAksesUser from './views/Admin/UserAccess/UserAccess';
 import Report from './views/Admin/Report/Report';
-import Dashboard from './pages/shared/Dashboard/Dashboard';
+import Dashboard from './views/shared/Dashboard/Dashboard';
 import UserAccessTable from './views/Admin/UserAccess/UserAccessTable';
 import LoginAksesCreate from './views/Admin/UserAccess/LoginAksesCreate';
 import OrganizationTable from './views/Admin/Organization/OrganizationTable';
@@ -51,6 +51,7 @@ import OccasionTable from './views/Admin/occasion/OccasionTable';
 import OccasionCreate from './views/Admin/occasion/OccasionCreate';
 import OccasionEdit from './views/Admin/occasion/OccasionEdit';
 import OccasionDetail from './views/Admin/occasion/OccasionDetail';
+import ReportPreview from './views/shared/report/ReportPreview';
 
 const router = createBrowserRouter(
   createRoutesFromElements([
@@ -116,6 +117,11 @@ const router = createBrowserRouter(
           key="reportDetail"
           path="detail/:id"
           element={<ReportDetail />}
+        />
+        <Route
+          key="userReportPreview"
+          path="preview"
+          element={<ReportPreview />}
         />
       </Route>
       <Route
@@ -347,6 +353,11 @@ const router = createBrowserRouter(
           key="reportDetail"
           path="detail/:id"
           element={<ReportDetail />}
+        />
+        <Route
+          key="adminReportPreview"
+          path="preview"
+          element={<ReportPreview />}
         />
       </Route>
     </Route>,

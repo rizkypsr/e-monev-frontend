@@ -1,5 +1,8 @@
-import React, { useState } from 'react';
-import { CheckCircleIcon } from '@heroicons/react/24/solid';
+import React, { useCallback, useState } from 'react';
+import {
+  CheckCircleIcon,
+  MagnifyingGlassIcon,
+} from '@heroicons/react/24/solid';
 import { Link } from 'react-router-dom';
 import Label from '../../../components/Label';
 import TextInput from '../../../components/TextInput';
@@ -10,28 +13,68 @@ import DialogInputWrapper from '../../../components/DialogInputWrapper';
 import { getPurposes } from '../../../api/admin/purpose';
 import { getActivities } from '../../../api/admin/activity';
 import formatRupiah from '../../../utils/formatRupiah';
+import Dropdown from '../../../components/Dropdown';
+import List from '../../../components/List';
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+} from '../../../components/DialogContent';
+import SelectInputModal from '../../../components/SelectInputModal';
+
+const jenisPengadaan = [
+  { id: 1, name: 'Barang' },
+  { id: 2, name: 'Pekerjaan Konstruksi' },
+  { id: 3, name: 'Jasa Konsultasi' },
+  { id: 4, name: 'Jasa Lainnya' },
+];
+const caraPengadaan = [
+  { id: 1, name: 'Swakelola' },
+  { id: 2, name: 'Pengadaan Langsung' },
+  { id: 3, name: 'Seleksi' },
+  { id: 4, name: 'Tender' },
+  { id: 5, name: 'Penunjukan Langsung' },
+];
 
 export default function TriwulanCreate() {
   const [data, setData] = useState({
     purpose: {},
     activity: {},
-    targetRPJMDK: '',
-    targetRPJMDRP: '',
-    capaianRPJMDK: '',
-    capaianRPJMDRP: '',
-    targetRKPDPK: '',
-    targetRKPDPR: '',
-    triwulanK: '',
-    triwulanR: '',
-    realisasiCapaianK: '3',
-    realisasiCapaianR: formatRupiah('3000000'),
-    realisasiKerjaK: '33',
-    realisasiKerjaR: formatRupiah('3000000'),
-    tingkatanCapaianK: '33',
-    tingkatanCapaianR: formatRupiah('1400000'),
+    sumberDana: '',
+    paguDana: '',
+    opdPengelola: '',
+    pptk: '',
+    nomorTanggalKontrak: '',
+    kontraktor: '',
+    jangkaWaktuPelaksanaan: '',
+    nilaiKontrak: '',
+    realisasiFisik: '',
+    realisasiKeuangan: '',
+    volumeKegiatan: '',
+    outputKegiatan: '',
+    manfaatKegiatanLangsung: '',
+    manfaatKegiatanTidakLangsung: '',
+    jumlahTenagaKerjaLokal: '',
+    jumlahTenagaKerjaNonLokal: '',
+    hambatan: '',
+    solusiPermasalahan: '',
   });
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [openJenisPengadaan, setOpenJenisPengadaan] = useState(false);
+  const [selectedJenisPengadaan, setSelectedJenisPengadaan] = useState(null);
+  const [openCaraPengadaan, setOpenCaraPengadaan] = useState(false);
+  const [selectedCaraPengadaan, setSelectedCaraPengadaan] = useState(null);
+
+  const handleSelectJenisPengadaan = (opd) => {
+    setSelectedJenisPengadaan(opd);
+    setOpenJenisPengadaan(false);
+  };
+
+  const handleSelectCaraPengadaan = (level) => {
+    setSelectedCaraPengadaan(level);
+    setOpenCaraPengadaan(false);
+  };
 
   const handleSelectPurpose = (item) => {
     setData({
@@ -59,6 +102,14 @@ export default function TriwulanCreate() {
     const { name, value } = e.target;
     setData({
       ...data,
+      [name]: value,
+    });
+  };
+
+  const handleCurrencyInputChange = (e) => {
+    const { name, value } = e.target;
+    setData({
+      ...data,
       [name]: formatRupiah(value),
     });
   };
@@ -81,9 +132,9 @@ export default function TriwulanCreate() {
           </div>
 
           <div>
-            <Label className="mb-2">Sasaran</Label>
+            <Label className="mb-2">Nama Kegiatan</Label>
             <DialogInputWrapper
-              label="Sasaran"
+              label="Kegiatan"
               selectedItem={data.purpose.title}
               onFetching={getPurposes}
               error={errors.purpose}
@@ -92,9 +143,9 @@ export default function TriwulanCreate() {
           </div>
 
           <div>
-            <Label className="mb-2">Indikator Kegiatan</Label>
+            <Label className="mb-2">Lokasi Kegiatan</Label>
             <DialogInputWrapper
-              label="Kegiatan"
+              label="Lokasi Kegiatan"
               selectedItem={data.activity.title}
               onFetching={getActivities}
               error={errors.activity}
@@ -103,7 +154,7 @@ export default function TriwulanCreate() {
           </div>
 
           <div>
-            <Label>Target RPJMD (K)</Label>
+            <Label>Sumber Dana</Label>
             <TextInput
               name="targetRPJMDK"
               className="mt-2"
@@ -113,141 +164,247 @@ export default function TriwulanCreate() {
             />
           </div>
           <div>
-            <Label>Target RPJMD (Rp)</Label>
+            <Label>Pagu Dana (Rp)</Label>
             <TextInput
               leadingIcon
-              name="targetRPJMDRP"
+              name="paguDana"
               className="mt-2"
               placeholder="Tulis disini..."
-              value={data.targetRPJMDRP}
-              onChange={handleNumberInputChange}
+              value={data.paguDana}
+              onChange={handleCurrencyInputChange}
             />
           </div>
 
           <div>
-            <Label>Capaian RPJMD s/d Tahun Lalu(K)</Label>
+            <Label>OPD Pengelolad</Label>
             <TextInput
               className="mt-2"
-              name="capaianRPJMDK"
+              name="opdPengelola"
               placeholder="Tulis disini..."
-              value={data.capaianRPJMDK}
+              value={data.opdPengelola}
               onChange={handleTextInputChange}
             />
           </div>
           <div>
-            <Label>Capaian RPJMD s/d Tahun Lalu(K) (Rp)</Label>
+            <Label>Nama PPTK</Label>
             <TextInput
-              leadingIcon
-              name="capaianRPJMDRP"
+              name="pptk"
               className="mt-2"
               placeholder="Tulis disini..."
-              value={data.capaianRPJMDRP}
-              onChange={handleNumberInputChange}
+              value={data.pptk}
+              onChange={handleTextInputChange}
             />
           </div>
 
           <div>
-            <Label>Target RKPDP Tahun Sekarang (K)</Label>
+            <Label>Nomor dan Tanggal Kontrak</Label>
             <TextInput
               className="mt-2"
-              name="targetRKPDPK"
+              name="nomorTanggalKontrak"
               placeholder="Tulis disini..."
-              value={data.targetRKPDPK}
+              value={data.nomorTanggalKontrak}
               onChange={handleTextInputChange}
             />
           </div>
           <div>
-            <Label>Target RKPDP Tahun Sekarang (Rp)</Label>
+            <Label>Nama Kontraktor</Label>
             <TextInput
-              leadingIcon
-              name="targetRKPDPR"
+              name="kontraktor"
               className="mt-2"
               placeholder="Tulis disini..."
-              value={data.targetRKPDPR}
-              onChange={handleNumberInputChange}
+              value={data.kontraktor}
+              onChange={handleTextInputChange}
             />
           </div>
 
           <div>
-            <Label>Triwulan 1 (K)</Label>
+            <Label>Jangka Waktu Pelaksanaan</Label>
             <TextInput
               className="mt-2"
-              name="triwulanK"
+              name="jangkaWaktuPelaksanaan"
               placeholder="Tulis disini..."
-              value={data.triwulanK}
+              value={data.jangkaWaktuPelaksanaan}
               onChange={handleTextInputChange}
             />
           </div>
           <div>
-            <Label>Triwulan 1 (Rp)</Label>
+            <Label>Nilai Kontrak</Label>
             <TextInput
               leadingIcon
-              name="triwulanR"
+              name="nilaiKontrak"
               className="mt-2"
               placeholder="Tulis disini..."
-              value={data.triwulanR}
+              value={data.nilaiKontrak}
+              onChange={handleCurrencyInputChange}
+            />
+          </div>
+          <div>
+            <Label>Realisasi Fisik</Label>
+            <TextInput
+              className="mt-2"
+              placeholder="Tulis dalam persen (%)"
+              name="realisasiFisik"
+              type="number"
+              value={data.realisasiFisik}
               onChange={handleNumberInputChange}
             />
           </div>
-
           <div>
-            <Label>Realisasi Capaian Kinerja RKPD (K)</Label>
+            <Label>Realisasi Keuangan</Label>
             <TextInput
-              disabled
               className="mt-2"
-              placeholder="Tulis disini..."
-              value={data.realisasiCapaianK}
+              type="number"
+              placeholder="Tulis dalam persen (%)"
+              name="realisasiKeuangan"
+              value={data.realisasiKeuangan}
+              onChange={handleNumberInputChange}
             />
           </div>
           <div>
-            <Label>Realisasi Capaian Kinerja RKPD (Rp)</Label>
+            <Label>Volume Kegiatan</Label>
             <TextInput
-              leadingIcon
-              disabled
               className="mt-2"
               placeholder="Tulis disini..."
-              value={data.realisasiCapaianR}
-            />
-          </div>
-
-          <div>
-            <Label>Realisasi Kerja dan Anggaran RPJMD (K)</Label>
-            <TextInput
-              disabled
-              className="mt-2"
-              placeholder="Tulis disini..."
-              value={data.realisasiKerjaK}
+              name="volumeKegiatan"
+              value={data.volumeKegiatan}
+              onChange={handleTextInputChange}
             />
           </div>
           <div>
-            <Label>Realisasi Kerja dan Anggaran RPJMD (Rp)</Label>
+            <Label>Output Kegiatan</Label>
             <TextInput
-              leadingIcon
-              disabled
               className="mt-2"
               placeholder="Tulis disini..."
-              value={data.realisasiKerjaR}
+              name="outputKegiatan"
+              value={data.outputKegiatan}
+              onChange={handleTextInputChange}
             />
           </div>
-
           <div>
-            <Label>Tingkatan Capaian Kinerja dan Realisasi RPJMD (K)</Label>
+            <Label>Manfaat Kegiatan (Kelompok sasaran Langsung)</Label>
             <TextInput
-              disabled
               className="mt-2"
               placeholder="Tulis disini..."
-              value={data.tingkatanCapaianK}
+              name="manfaatKegiatanLangsung"
+              value={data.manfaatKegiatanLangsung}
+              onChange={handleTextInputChange}
+            />
+          </div>
+          <div>
+            <Label>Manfaat Kegiatan (Kelompok sasaran Tidak Langsung)</Label>
+            <TextInput
+              className="mt-2"
+              placeholder="Tulis disini..."
+              name="manfaatKegiatanTidakLangsung"
+              value={data.manfaatKegiatanTidakLangsung}
+              onChange={handleTextInputChange}
+            />
+          </div>
+          <div>
+            <Label>Jumlah Tenaga Kerja (Lokal)</Label>
+            <TextInput
+              className="mt-2"
+              placeholder="Tulis disini..."
+              name="jumlahTenagaKerjaLokal"
+              value={data.jumlahTenagaKerjaLokal}
+              onChange={handleTextInputChange}
+            />
+          </div>
+          <div>
+            <Label>Jumlah Tenaga Kerja (Non Lokal)</Label>
+            <TextInput
+              className="mt-2"
+              placeholder="Tulis disini..."
+              name="jumlahTenagaKerjaNonLokal"
+              value={data.jumlahTenagaKerjaNonLokal}
+              onChange={handleTextInputChange}
+            />
+          </div>
+          <div>
+            <Label>Hambatan dan Permasalahan</Label>
+            <TextInput
+              className="mt-2"
+              placeholder="Tulis disini..."
+              name="hambatan"
+              value={data.hambatan}
+              onChange={handleTextInputChange}
+            />
+          </div>
+          <div>
+            <Label>Solusi Permasalahan</Label>
+            <TextInput
+              className="mt-2"
+              placeholder="Tulis disini..."
+              name="solusiPermasalahan"
+              value={data.solusiPermasalahan}
+              onChange={handleTextInputChange}
             />
           </div>
           <div className="mb-4">
-            <Label>Tingkatan Capaian Kinerja dan Realisasi RPJMD (Rp)</Label>
-            <TextInput
-              leadingIcon
-              disabled
-              className="mt-2"
-              placeholder="Tulis disini..."
-              value={data.tingkatanCapaianR}
-            />
+            <Label className="mb-2">Jenis Pengadaan</Label>
+            <Dialog
+              open={openJenisPengadaan}
+              onOpenChange={setOpenJenisPengadaan}
+            >
+              <DialogTrigger className="w-full">
+                <SelectInputModal
+                  className="mt-2"
+                  selectedValue={
+                    selectedJenisPengadaan && selectedJenisPengadaan.name
+                  }
+                  label="--- Pilih Jenis Pengadaan ---"
+                />
+              </DialogTrigger>
+
+              <DialogContent
+                title="Pilih Jenis Pengadaan"
+                onCreateClick={() => setOpenJenisPengadaan((prev) => !prev)}
+              >
+                <List
+                  data={jenisPengadaan}
+                  onSelectValue={handleSelectJenisPengadaan}
+                />
+              </DialogContent>
+            </Dialog>
+          </div>
+
+          <div>
+            <Label className="mb-2">Cara Pengadaan</Label>
+            <Dialog
+              open={openCaraPengadaan}
+              onOpenChange={setOpenCaraPengadaan}
+            >
+              <DialogTrigger className="w-full">
+                <SelectInputModal
+                  className="mt-2"
+                  selectedValue={
+                    selectedCaraPengadaan && selectedCaraPengadaan.name
+                  }
+                  label="--- Pilih Cara Pengadaan ---"
+                />
+              </DialogTrigger>
+
+              <DialogContent
+                title="Pilih Cara Pengadaan"
+                onCreateClick={() => setOpenCaraPengadaan((prev) => !prev)}
+              >
+                <List
+                  data={caraPengadaan}
+                  onSelectValue={handleSelectCaraPengadaan}
+                />
+              </DialogContent>
+            </Dialog>
+          </div>
+
+          <div className="col-span-2 mb-4">
+            <Button
+              className="w-full md:w-28"
+              background="bg-primary"
+              textColor="text-white"
+              icon={<CheckCircleIcon className="w-5 h-5" />}
+            >
+              UPLOAD PDF, JPG,PNG, Video (5 MB)
+            </Button>
           </div>
 
           {isLoading ? (
