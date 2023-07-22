@@ -235,25 +235,23 @@ function Sidebar({ isOpen, onHide }) {
             <ReportIcon />
             <span className="ml-3">Data Laporan</span>
           </NavLink>
-          <NavLink
-            to={
-              authUser().admin_role_id === 1
-                ? '/admin/konfigurasi'
-                : '/konfigurasi'
-            }
-            onClick={onHide}
-            className={({ isActive }) =>
-              [
-                'flex items-center p-2',
-                isActive ? 'text-blue-600' : 'text-black',
-              ]
-                .filter(Boolean)
-                .join(' ')
-            }
-          >
-            <ConfigurationIcon />
-            <span className="ml-3">Konfigurasi</span>
-          </NavLink>
+          {authUser().admin_role_id === 1 && (
+            <NavLink
+              to="/admin/konfigurasi"
+              onClick={onHide}
+              className={({ isActive }) =>
+                [
+                  'flex items-center p-2',
+                  isActive ? 'text-blue-600' : 'text-black',
+                ]
+                  .filter(Boolean)
+                  .join(' ')
+              }
+            >
+              <ConfigurationIcon />
+              <span className="ml-3">Konfigurasi</span>
+            </NavLink>
+          )}
         </ul>
         <Dialog>
           <DialogContent className="py-12">
