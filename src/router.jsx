@@ -52,6 +52,7 @@ import OccasionCreate from './views/Admin/occasion/OccasionCreate';
 import OccasionEdit from './views/Admin/occasion/OccasionEdit';
 import OccasionDetail from './views/Admin/occasion/OccasionDetail';
 import ReportPreview from './views/shared/report/ReportPreview';
+import Configuration from './views/Admin/Configuration/Configuration';
 
 const router = createBrowserRouter(
   createRoutesFromElements([
@@ -360,6 +361,11 @@ const router = createBrowserRouter(
           element={<ReportPreview />}
         />
       </Route>
+      <Route
+        key="configuration"
+        path="konfigurasi"
+        element={<Configuration />}
+      />
     </Route>,
   ]),
   {

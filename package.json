@@ -22,6 +22,7 @@
     "@react-spring/web": "^9.7.1",
     "@reduxjs/toolkit": "^1.9.3",
     "@tanstack/react-table": "^8.7.9",
+    "@wojtekmaj/react-daterange-picker": "^5.3.0",
     "dotenv": "^16.0.3",
     "flowbite": "^1.6.3",
     "flowbite-react": "^0.3.8",
