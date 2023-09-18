@@ -6,10 +6,11 @@ import Logo from '../../assets/images/big_logo.png';
 import Label from '../../components/Label';
 import TextInput from '../../components/TextInput';
 import Button from '../../components/Button';
-import Img1 from '../../assets/images/img1.jpeg';
-import Img2 from '../../assets/images/img2.jpeg';
-import Img3 from '../../assets/images/img3.jpeg';
+import Img1 from '../../assets/images/img1.jpg';
+import Img2 from '../../assets/images/img2.jpg';
+import Img3 from '../../assets/images/img3.jpg';
 import Img4 from '../../assets/images/img4.jpeg';
+import Img5 from '../../assets/images/img5.jpg';
 import login from '../../api/auth/login';
 import { useToastContext } from '../../context/ToastContext';
 import Loading from '../../components/Loading';
@@ -96,9 +97,8 @@ function Login() {
           arrows={false}
           adaptiveHeight
           autoplay
-          autoplaySpeed={5000}
         >
-          {[Img1, Img2, Img3, Img4].map((img, index) => (
+          {[Img1, Img2, Img3, Img4, Img5].map((img, index) => (
             // eslint-disable-next-line react/no-array-index-key
             <div key={index}>
               <img

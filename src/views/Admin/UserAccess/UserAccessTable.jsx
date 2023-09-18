@@ -37,7 +37,7 @@ const columns = [
     cell: (info) => <i>{info.getValue()}</i>,
     header: () => <span>Username</span>,
   }),
-  columnHelper.accessor((row) => row.organization.title, {
+  columnHelper.accessor((row) => row.organization?.title, {
     id: 'organization',
     cell: (info) => <i>{info.getValue()}</i>,
     header: () => <span>Nama OPD</span>,
