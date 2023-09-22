@@ -40,7 +40,28 @@ function ActivityCreate() {
     currentPage: 1,
   });
   const [activityData, setActivityData] = useState({
-    items: [],
+    items: [
+      {
+        title: 'Kegiatan 1',
+        name: 'Kegiatan 1',
+      },
+      {
+        title: 'Kegiatan 2',
+        name: 'Kegiatan 2',
+      },
+      {
+        title: 'Kegiatan 3',
+        name: 'Kegiatan 3',
+      },
+      {
+        title: 'Kegiatan 4',
+        name: 'Kegiatan 4',
+      },
+      {
+        title: 'Kegiatan 5',
+        name: 'Kegiatan 5',
+      },
+    ],
     hasMore: true,
     isLoading: false,
     totalPages: 0,
@@ -354,7 +375,7 @@ function ActivityCreate() {
                   <InfiniteScroll
                     dataLength={pageData.items.length}
                     next={loadMoreData}
-                    hasMore={pageData.hasMore}
+                    hasMore={false}
                     height={500}
                   >
                     <List

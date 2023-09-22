@@ -7,7 +7,6 @@ import {
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthHeader } from 'react-auth-kit';
-import { useTransition } from '@react-spring/web';
 import uuid from 'react-uuid';
 import Label from '../../../components/Label';
 import TextInput from '../../../components/TextInput';
@@ -55,23 +54,23 @@ function LoginAksesCreate() {
   const navigate = useNavigate();
   const { showToastMessage } = useToastContext();
 
-  const transition = useTransition(openCreateOpd, {
-    config: {
-      duration: 120,
-    },
-    from: {
-      scale: 0,
-      opacity: 0,
-    },
-    enter: {
-      scale: 1,
-      opacity: 1,
-    },
-    leave: {
-      scale: 0,
-      opacity: 0,
-    },
-  });
+  // const transition = useTransition(openCreateOpd, {
+  //   config: {
+  //     duration: 120,
+  //   },
+  //   from: {
+  //     scale: 0,
+  //     opacity: 0,
+  //   },
+  //   enter: {
+  //     scale: 1,
+  //     opacity: 1,
+  //   },
+  //   leave: {
+  //     scale: 0,
+  //     opacity: 0,
+  //   },
+  // });
 
   const fetchLevel = async () => {
     setLevelData([
@@ -128,6 +127,8 @@ function LoginAksesCreate() {
     }
 
     if (Object.keys(errors).length > 0) {
+      console.log(errors);
+
       setOpdError(errors.opd || '');
       setLevelError(errors.level || '');
       setNameError(errors.name || '');
@@ -143,7 +144,7 @@ function LoginAksesCreate() {
         username,
         password,
         name,
-        admin_role_id: selectedLevel.id,
+        admin_role_id: selectedLevel.id === 3 ? 1 : selectedLevel.id,
         organization_id: selectedOpd.id,
       };
       const userResponse = await register(userBody);
@@ -167,6 +168,7 @@ function LoginAksesCreate() {
     });
 
     setOpdData(updatedValue);
+    setSelectedOpd(updatedValue[0]);
   };
 
   const addOpdComponent = () => {
@@ -232,14 +234,14 @@ function LoginAksesCreate() {
 
         <form className="mt-4" onSubmit={onSubmit}>
           <div className="mb-6">
-            <Label className="mb-2">Urusan</Label>
+            <Label className="mb-2">OPD</Label>
             <div className="space-y-3 lg:w-2/3 xl:w-1/3">
               {opdData.map((ocs, index) => (
                 <DialogInputWrapper
                   trailingIcon={index > 0}
                   // eslint-disable-next-line react/no-array-index-key
                   key={index}
-                  label="Urusan"
+                  label="OPD"
                   selectedItem={ocs.title}
                   onFetching={getOrganizations}
                   onSelect={(value) => handleSelectOpd({ id: ocs.id, value })}
@@ -297,6 +299,7 @@ function LoginAksesCreate() {
               value={name}
               error={nameError}
               onChange={(e) => setName(e.target.value)}
+              onKeyDown={handleKeyDown}
             />
           </div>
           <div className="mb-6">
@@ -307,6 +310,7 @@ function LoginAksesCreate() {
               value={username}
               error={usernameError}
               onChange={(e) => setUsername(e.target.value)}
+              onKeyDown={handleKeyDown}
             />
           </div>
           <div className="mb-6">
@@ -318,6 +322,7 @@ function LoginAksesCreate() {
               value={password}
               error={passwordError}
               onChange={(e) => setPassword(e.target.value)}
+              onKeyDown={handleKeyDown}
             />
           </div>
           {isLoading ? (

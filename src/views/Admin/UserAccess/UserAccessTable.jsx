@@ -158,7 +158,7 @@ function UserAccessTable() {
       const usersData = await getUsers(authHeader, {
         offset,
         limit,
-        pageNumber,
+        page: pageNumber,
         search,
         sort,
       });

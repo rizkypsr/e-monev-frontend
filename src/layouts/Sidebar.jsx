@@ -32,7 +32,7 @@ function Sidebar({ isOpen, onHide }) {
         isOpen ? 'translate-x-0' : '-translate-x-full'
       }`}
     >
-      <div className="h-full overflow-y-auto bg-white flex flex-col">
+      <div className="h-full overflow-y-auto bg-gray-300 flex flex-col">
         <a
           href="/"
           className="flex items-center pl-4 py-5 border-b border-gray-20"
@@ -58,7 +58,7 @@ function Sidebar({ isOpen, onHide }) {
             <span className="text-xs">{authUser().name}</span>
           </div>
         </div>
-        <ul className="space-y-2 px-3 font-medium leading-5">
+        <ul className="space-y-2 px-6 font-medium leading-5">
           <NavLink
             end
             onClick={onHide}
