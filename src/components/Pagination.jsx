@@ -5,7 +5,7 @@ export default function Pagination({
   pageChangeHandler,
   totalRows,
   rowsPerPage,
-  resetPage,
+  // resetPage,
 }) {
   const [currentPage, setCurrentPage] = useState(0);
   const [canGoBack, setCanGoBack] = useState(false);
@@ -39,9 +39,9 @@ export default function Pagination({
     pageChangeHandler(currentPage + 1);
   }, [currentPage]);
 
-  useEffect(() => {
-    setCurrentPage(0);
-  }, [resetPage]);
+  // useEffect(() => {
+  //   setCurrentPage(0);
+  // }, [resetPage]);
 
   const paginationItems = useMemo(() => {
     const items = [];
@@ -205,7 +205,6 @@ export default function Pagination({
 
 Pagination.propTypes = {
   pageChangeHandler: PropTypes.func.isRequired,
-  resetPage: PropTypes.bool.isRequired,
   rowsPerPage: PropTypes.number.isRequired,
   totalRows: PropTypes.number.isRequired,
 };

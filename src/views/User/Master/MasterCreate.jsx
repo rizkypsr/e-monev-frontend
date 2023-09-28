@@ -1,5 +1,5 @@
 import { CheckCircleIcon, PlusCircleIcon } from '@heroicons/react/24/solid';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthHeader } from 'react-auth-kit';
 import uuid from 'react-uuid';
@@ -8,7 +8,6 @@ import Label from '../../../components/Label';
 import TextInput from '../../../components/TextInput';
 import ReactLoading from '../../../components/Loading';
 import Button from '../../../components/Button';
-import { getTriwulan } from '../../../api/admin/report';
 import { getOrganizations } from '../../../api/admin/organization';
 import DialogInputWrapper from '../../../components/DialogInputWrapper';
 import { getOccasions } from '../../../api/admin/occasion';
@@ -27,127 +26,145 @@ import {
   setTriwulan,
 } from '../../../redux/master/masterSlice';
 import { getPrograms } from '../../../api/admin/program';
+import getTriwulan from '../../../api/static/getTriwulan';
+import { useForm } from 'react-hook-form';
+import { useInfiniteQuery, useMutation } from 'react-query';
+import DropdownDialog from '../../../components/DropdownDialog';
+
+const initalParams = {
+  limit: 0,
+  page: 1,
+  sort: 'terbaru',
+};
+
+const initialOccassions = [
+  {
+    selected: null,
+  },
+];
 
 export default function MasterCreate() {
-  const { organization, occasions, indicator, purpose, triwulan, program } =
-    useSelector((state) => state.master);
-  const dispatch = useDispatch();
-  const [isLoading, setIsLoading] = useState(false);
-  const [errors, setErrors] = useState({});
-
-  const authHeader = useRef(useAuthHeader());
-  const { showToastMessage } = useToastContext();
+  const authHeader = useAuthHeader();
   const navigate = useNavigate();
+  const { showToastMessage } = useToastContext();
+
+  const [selectedTriwulan, setSelectedTriwulan] = useState(null);
+  const [selectedOpd, setSelectedOpd] = useState(null);
+  const [selectedPurpose, setSelectedPurpose] = useState(null);
+
+  const [occassions, setOccassions] = useState(initialOccassions);
+
+  const triwulanQuery = useInfiniteQuery({
+    queryKey: ['get_triwulan'],
+    queryFn: ({ pageParam = 1 }) => getTriwulan(authHeader()),
+    getNextPageParam: (lastPage) => lastPage.nextId ?? undefined,
+    getPreviousPageParam: (firstPage) => firstPage.previousId ?? undefined,
+  });
+
+  const opdQuery = useInfiniteQuery({
+    queryKey: ['get_organizations'],
+    queryFn: ({ pageParam = 1 }) =>
+      getOrganizations(initalParams, authHeader()),
+    getNextPageParam: (lastPage) => lastPage.nextId ?? undefined,
+    getPreviousPageParam: (firstPage) => firstPage.previousId ?? undefined,
+  });
+
+  const occassionQuery = useInfiniteQuery({
+    queryKey: ['get_occassions'],
+    queryFn: ({ pageParam = 1 }) => getOccasions(initalParams, authHeader()),
+    getNextPageParam: (lastPage) => lastPage.nextId ?? undefined,
+    getPreviousPageParam: (firstPage) => firstPage.previousId ?? undefined,
+  });
+
+  const purposesQuery = useInfiniteQuery({
+    queryKey: ['get_purposes'],
+    queryFn: ({ pageParam = 1 }) => getPurposes(initalParams, authHeader()),
+    getNextPageParam: (lastPage) => lastPage.nextId ?? undefined,
+    getPreviousPageParam: (firstPage) => firstPage.previousId ?? undefined,
+  });
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm();
+
+  useEffect(() => {
+    setValue('created_at', formattedDate(Date.now()));
+  }, []);
 
   const removeOccasionComponent = (indexToRemove) => {
-    const newOccasions = occasions.filter(
+    const newOccasions = occassions.filter(
       (_, index) => index !== indexToRemove
     );
-    dispatch(setOccasions(newOccasions));
+    setOccassions(newOccasions);
   };
 
   const handleSelectTriwulan = (item) => {
-    dispatch(
-      setTriwulan({
-        id: item.newValue,
-        name: item.newLabel,
-      })
-    );
+    setSelectedTriwulan(item);
   };
 
-  const handleSelectOccasion = (item) => {
-    const newOccasions = [...occasions];
+  const handleSelectOpd = (item) => {
+    setSelectedOpd(item);
+  };
 
-    const updatedValue = newOccasions.map((ocs) => {
-      if (ocs.id === item.id) {
-        return item.value;
-      }
-      return ocs;
+  const handleSelectOccassion = (item, index) => {
+    setOccassions((prevOccassions) => {
+      const updatedOccassions = [...prevOccassions];
+      updatedOccassions[index] = { selected: item };
+      return updatedOccassions;
     });
-
-    dispatch(setOccasions(updatedValue));
-  };
-
-  const handleSelectOrganization = (item) => {
-    dispatch(setOrganization(item));
   };
 
   const handleSelectPurpose = (item) => {
-    dispatch(setPurpose(item));
-  };
-
-  const handleSelectProgram = (item) => {
-    dispatch(setProgram(item));
-  };
-
-  const handleIndicatorOnChange = (e) => {
-    dispatch(setIndicator(e.target.value));
+    setSelectedPurpose(item);
   };
 
   const addOccasionComponent = () => {
-    const id = uuid();
-    dispatch(setOccasions([...occasions, { id }]));
+    setOccassions([
+      ...occassions,
+      {
+        selected: null,
+      },
+    ]);
   };
 
-  const onSubmit = async (e) => {
-    e.preventDefault();
+  const createMutation = useMutation(createMaster);
 
-    const errorList = {};
-
-    const isOccasionExist = occasions.every(
-      (obj) => Object.keys(obj).length > 1
-    );
-
-    if (occasions.length <= 0 || !isOccasionExist) {
-      errorList.occasion = 'Urusan belum dipilih';
-    }
-
-    if (Object.keys(triwulan).length === 0) {
-      errorList.triwulan = 'Triwulan belum dipilih!';
-    }
-
-    if (Object.keys(organization).length === 0) {
-      errorList.organization = 'Organisasi belum dipilih!';
-    }
-
-    if (Object.keys(purpose).length === 0) {
-      errorList.purpose = 'Sasaran RPJMD belum dipilih!';
-    }
-
-    if (Object.keys(program).length === 0) {
-      errorList.program = 'Program belum dipilih!';
-    }
-
-    if (!indicator) {
-      errorList.indicator = 'Indikator Kegiatan belum diisi!';
-    }
-
-    if (Object.keys(errorList).length > 0) {
-      setErrors(errorList);
+  const onSubmit = () => {
+    if (!selectedTriwulan || !selectedOpd || !selectedPurpose) {
+      showToastMessage('Pastikan semua data terisi', 'error');
       return;
     }
 
-    setIsLoading(true);
-
-    try {
-      const masterBody = {
-        triwulan_id: triwulan.id,
-        organization_id: organization.id,
-        purpose_id: purpose.id,
-        program_id: program.id,
-        occassions: occasions.map((ocs) => ocs.id),
-      };
-
-      const masterResponse = await createMaster(authHeader.current, masterBody);
-
-      dispatch(resetAll());
-      showToastMessage(masterResponse);
-    } catch (err) {
-      showToastMessage(err.message, 'error');
-    } finally {
-      setIsLoading(false);
-      navigate('/');
+    for (let index = 0; index < occassions.length; index += 1) {
+      if (occassions[index].selected === null) {
+        showToastMessage('Pastikan semua data terisi', 'error');
+        return;
+      }
     }
+
+    createMutation.mutate(
+      {
+        body: {
+          triwulan_id: selectedTriwulan.id,
+          organization_id: selectedOpd.id,
+          purpose_id: selectedPurpose.id,
+          occassions: occassions.map((ocs) => Number(ocs.selected.id)),
+        },
+        token: authHeader(),
+      },
+      {
+        onSuccess: () => {
+          showToastMessage('Berhasil membuat Data Master');
+          navigate('/laporan');
+        },
+        onError: (error) => {
+          showToastMessage(error.message, 'error');
+        },
+      }
+    );
   };
 
   return (
@@ -156,50 +173,52 @@ export default function MasterCreate() {
         <h1 className="text-2xl font-semibold">Tambah Data Master</h1>
       </div>
       <div className="w-full h-full mt-6 bg-white rounded-lg p-9">
-        <form className="w-4/5" onSubmit={onSubmit}>
-          <div className="flex space-x-3 mb-3 items-center">
+        <form className="w-4/5 space-y-6" onSubmit={handleSubmit(onSubmit)}>
+          <div className="grid grid-cols-2 space-x-3">
             <div className="flex-grow">
-              <Label>Tanggal</Label>
+              <Label className="mb-2">Tanggal</Label>
               <TextInput
-                disabled
-                className="mt-2"
-                value={formattedDate(Date.now())}
+                id="created_at"
+                name="created_at"
+                width="w-full"
+                register={register('created_at', {
+                  disabled: true,
+                })}
+                error={errors.created_at?.message}
               />
             </div>
             <div className="flex-grow">
-              <Label>Triwulan</Label>
-              <DropdownWrapper
-                onFetching={getTriwulan}
-                onSelect={handleSelectTriwulan}
-                error={errors.triwulan}
+              <Label className="mb-2">Triwulan</Label>
+              <DropdownDialog
+                label="Pilih Triwulan"
+                data={triwulanQuery.data}
+                value={selectedTriwulan}
+                onChange={handleSelectTriwulan}
               />
             </div>
           </div>
-          <div className="mb-3">
+
+          <div>
             <Label className="mb-2">Organisasi Perangkat Daerah (OPD)</Label>
-            <DialogInputWrapper
-              label="Organisasi"
-              selectedItem={organization.title}
-              onFetching={getOrganizations}
-              onSelect={handleSelectOrganization}
-              error={errors.organization}
+            <DropdownDialog
+              label="Pilih OPD"
+              data={opdQuery.data}
+              value={selectedOpd}
+              maxWidth="max-w-full"
+              onChange={handleSelectOpd}
             />
           </div>
-          <div className="mb-3">
+          <div>
             <Label className="mb-2">Urusan</Label>
-            <div className='space-y-3'>
-              {occasions.map((ocs, index) => (
-                <DialogInputWrapper
-                  trailingIcon={index > 0}
-                  // eslint-disable-next-line react/no-array-index-key
-                  key={index}
-                  label="Urusan"
-                  selectedItem={ocs.title}
-                  onFetching={getOccasions}
-                  onSelect={(value) =>
-                    handleSelectOccasion({ id: ocs.id, value })
-                  }
-                  onDelete={() => removeOccasionComponent(index)}
+            <div className="space-y-3">
+              {occassions.map((opd, index) => (
+                <DropdownDialog
+                  label="Pilih Urusan"
+                  data={occassionQuery.data}
+                  value={opd.selected}
+                  maxWidth="max-w-full"
+                  onChange={(value) => handleSelectOccassion(value, index)}
+                  onDelete={index > 0 && (() => removeOccasionComponent(index))}
                 />
               ))}
             </div>
@@ -207,9 +226,8 @@ export default function MasterCreate() {
           {errors.occasion && (
             <p className="mt-2 text-xs text-red-600">{errors.occasion}</p>
           )}
-          <div className="mb-3">
+          <div>
             <Button
-              className="px-0"
               onClick={addOccasionComponent}
               textColor="text-[#2F80ED]"
               icon={<PlusCircleIcon className="w-8 h-8" />}
@@ -217,40 +235,21 @@ export default function MasterCreate() {
               Tambah Urusan Lain
             </Button>
           </div>
-          <div className="mb-3">
+          <div>
             <Label className="mb-2">Sasaran RPJMD</Label>
-            <DialogInputWrapper
-              label="Sasaran"
-              selectedItem={purpose.title}
-              onFetching={getPurposes}
-              error={errors.purpose}
-              onSelect={handleSelectPurpose}
+            <DropdownDialog
+              label="Pilih Sasaran RPJMD"
+              data={purposesQuery.data}
+              value={selectedPurpose}
+              maxWidth="max-w-full"
+              onChange={handleSelectPurpose}
             />
           </div>
-          <div className="mb-3">
-            <Label className="mb-2">Program</Label>
-            <DialogInputWrapper
-              label="Program"
-              selectedItem={program.title}
-              onFetching={getPrograms}
-              error={errors.program}
-              onSelect={handleSelectProgram}
-            />
-          </div>
-          <div className="mb-6">
-            <Label>Indikator Kegiatan</Label>
-            <TextInput
-              className="mt-2"
-              placeholder="Tulis Indikator Kegiatan"
-              value={indicator}
-              onChange={handleIndicatorOnChange}
-              error={errors.indicator}
-            />
-          </div>
-          {isLoading ? (
+
+          {false ? (
             <ReactLoading />
           ) : (
-            <div className="flex space-x-3">
+            <div className="flex space-x-3 !mt-10">
               <Button
                 type="submit"
                 className="w-full md:w-28"

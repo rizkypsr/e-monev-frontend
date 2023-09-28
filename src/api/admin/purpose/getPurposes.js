@@ -1,34 +1,22 @@
-import { baseUrl } from '../../../utils/constants';
-import makeRequest from '../../../utils/makeRequest';
+import axiosClient from '../../../config/axios';
 
-export default async function getPurposes(authHeader, options = {}) {
-  const {
-    offset = 0,
-    limit = 10,
-    page = 1,
-    search = '',
-    sort = 'terbaru',
-  } = options;
+export default async function getPurposes(params, token) {
+  try {
+    const response = await axiosClient.get('/purpose/list', {
+      params,
+      headers: {
+        Authorization: token,
+      },
+    });
 
-  const queryParams = {
-    offset,
-    limit,
-    page,
-    search,
-    sort,
-  };
+    const responseData = response.data;
 
-  const url = new URL(`${baseUrl}/purpose/list`);
-  url.search = new URLSearchParams(queryParams).toString();
+    if (responseData.statusCode !== 200) {
+      throw new Error(responseData.message);
+    }
 
-  const headers = {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      authorization: authHeader(),
-    },
-  };
-
-  const purposeResponse = await makeRequest(url, headers);
-  return purposeResponse.data;
+    return responseData;
+  } catch (err) {
+    throw new Error(err);
+  }
 }

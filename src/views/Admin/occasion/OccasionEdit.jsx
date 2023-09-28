@@ -1,69 +1,64 @@
 import { ArrowLeftIcon, CheckCircleIcon } from '@heroicons/react/24/solid';
 import { Label } from 'flowbite-react';
-import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuthHeader } from 'react-auth-kit';
+import { useMutation, useQuery } from 'react-query';
+import { useForm } from 'react-hook-form';
 import TextInput from '../../../components/TextInput';
 import Button from '../../../components/Button';
 import { useToastContext } from '../../../context/ToastContext';
 import { updateOccasion } from '../../../api/admin/occasion';
-import getOccasionDetail from '../../../api/admin/occasion/getOccasionDetail';
 import ErrorPage from '../../ErrorPage';
 import ReactLoading from '../../../components/Loading';
+import getOccassion from '../../../api/admin/occasion/getOccasionDetail';
 
 function OccasionEdit() {
   const authHeader = useAuthHeader();
-  const [code, setCode] = useState('');
-  const [occasion, setOccasion] = useState('');
-  const [error, setError] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-
   const { showToastMessage } = useToastContext();
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const fetchOccasionDetail = async () => {
-    setIsLoading(true);
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm();
 
-    try {
-      const occasionResponse = await getOccasionDetail(authHeader, id);
-      setCode(occasionResponse.code);
-      setOccasion(occasionResponse.title);
-      setIsLoading(false);
-    } catch (err) {
-      setIsLoading(false);
-      setError(err.message);
-    }
+  const { isLoading, isError, error } = useQuery({
+    queryKey: ['get_occassion'],
+    queryFn: () => getOccassion(id, authHeader()),
+    onSuccess: (result) => {
+      setValue('title', result.data.title);
+    },
+  });
+
+  const updateMutation = useMutation(updateOccasion);
+
+  const onSubmit = (formData) => {
+    updateMutation.mutate(
+      {
+        body: {
+          ...formData,
+          occassion_id: id,
+        },
+        token: authHeader(),
+      },
+      {
+        onSuccess: () => {
+          showToastMessage('Berhasil membuat Urusan');
+          navigate('/admin/urusan');
+        },
+      }
+    );
   };
 
-  useEffect(() => {
-    fetchOccasionDetail();
-  }, []);
+  if (isError) {
+    return <ErrorPage errorMessage={error.message} />;
+  }
 
-  const onSubmit = async (e) => {
-    e.preventDefault();
-
-    setIsLoading(true);
-
-    try {
-      const occasionBody = {
-        occassion_id: id,
-        title: occasion,
-        code,
-      };
-      const occasionResponse = await updateOccasion(authHeader, occasionBody);
-
-      setIsLoading(false);
-      showToastMessage(occasionResponse);
-      navigate('../');
-    } catch (err) {
-      setIsLoading(false);
-      showToastMessage(err.message, 'error');
-    }
-  };
-
-  if (error) {
-    return <ErrorPage errorMessage={error} />;
+  if (isLoading) {
+    return <ReactLoading />;
   }
 
   return (
@@ -79,28 +74,20 @@ function OccasionEdit() {
           </h1>
         </Link>
 
-        <form className="mt-4" onSubmit={onSubmit}>
-          <div className="mb-6">
-            <Label>Kode</Label>
-            <TextInput
-              className="mt-2 lg:w-2/3 xl:w-1/3"
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-              required
-              disabled
-            />
-          </div>
+        <form className="mt-4" onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-6">
             <Label>Urusan</Label>
             <TextInput
-              className="mt-2 lg:w-2/3 xl:w-1/3"
-              value={occasion}
-              onChange={(e) => setOccasion(e.target.value)}
-              placeholder="Masukan Urusan"
-              required
+              id="title"
+              name="title"
+              placeholder="Urusan"
+              register={register('title', {
+                required: 'Urusan wajib diisi!',
+              })}
+              error={errors.title?.message}
             />
           </div>
-          {isLoading ? (
+          {updateMutation.isLoading ? (
             <ReactLoading />
           ) : (
             <div className="flex space-x-3">

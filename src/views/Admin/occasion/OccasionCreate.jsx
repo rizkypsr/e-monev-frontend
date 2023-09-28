@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { ArrowLeftIcon, CheckCircleIcon } from '@heroicons/react/24/solid';
 import { Label } from 'flowbite-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthHeader } from 'react-auth-kit';
+import { useMutation } from 'react-query';
+import { useForm } from 'react-hook-form';
 import TextInput from '../../../components/TextInput';
 import Button from '../../../components/Button';
 import 'react-toastify/dist/ReactToastify.css';
@@ -11,38 +13,37 @@ import { createOccasion } from '../../../api/admin/occasion';
 import ReactLoading from '../../../components/Loading';
 
 export default function OccasionCreate() {
-  const [title, setTitle] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [titleError, setTitleError] = useState('');
-
   const authHeader = useAuthHeader();
   const navigate = useNavigate();
   const { showToastMessage } = useToastContext();
 
-  async function onSubmit(e) {
-    e.preventDefault();
+  const createMutation = useMutation(createOccasion);
 
-    setTitleError('');
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
 
-    if (!title) {
-      setTitleError('Urusan belum diisi');
-      return;
-    }
-
-    setIsLoading(true);
-
-    try {
-      const occasionBody = { title };
-      const occasionResponse = await createOccasion(authHeader, occasionBody);
-
-      setIsLoading(false);
-      showToastMessage(occasionResponse);
-      navigate('../');
-    } catch (error) {
-      setIsLoading(false);
-      showToastMessage(error.message, 'error');
-    }
-  }
+  const onSubmit = (formData) => {
+    createMutation.mutate(
+      {
+        body: {
+          ...formData,
+        },
+        token: authHeader(),
+      },
+      {
+        onSuccess: () => {
+          showToastMessage('Berhasil membuat Urusan');
+          navigate('/admin/urusan');
+        },
+        onError: (error) => {
+          showToastMessage(error.message, 'error');
+        },
+      }
+    );
+  };
 
   return (
     <>
@@ -58,18 +59,20 @@ export default function OccasionCreate() {
           </h1>
         </Link>
 
-        <form className="mt-4" onSubmit={onSubmit}>
+        <form className="mt-4" onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-6">
             <Label>Urusan</Label>
             <TextInput
-              className="mt-2 lg:w-2/3 xl:w-1/3"
-              placeholder="Masukkan Urusan"
-              value={title}
-              error={titleError}
-              onChange={(e) => setTitle(e.target.value)}
+              id="title"
+              name="title"
+              placeholder="Urusan"
+              register={register('title', {
+                required: 'Urusan wajib diisi!',
+              })}
+              error={errors.title?.message}
             />
           </div>
-          {isLoading ? (
+          {createMutation.isLoading ? (
             <ReactLoading />
           ) : (
             <div className="flex space-x-3">

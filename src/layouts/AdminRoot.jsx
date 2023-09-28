@@ -57,9 +57,9 @@ function AdminLayout() {
     }
   };
 
-  if (auth().admin_role_id !== 1) {
-    return <Navigate to="/" replace />;
-  }
+  // if (auth().admin_role_id !== 1) {
+  //   return <Navigate to="/" replace />;
+  // }
 
   return (
     <div className="h-screen">

@@ -53,6 +53,9 @@ import OccasionEdit from './views/Admin/occasion/OccasionEdit';
 import OccasionDetail from './views/Admin/occasion/OccasionDetail';
 import ReportPreview from './views/shared/report/ReportPreview';
 import Configuration from './views/Admin/Configuration/Configuration';
+import ReportMasterTable from './views/Admin/Report/ReportMasterTable';
+import ReportTriwulanTable from './views/Admin/Report/ReportTriwulanTable';
+import ReportTableWrapper from './views/Admin/Report/ReportTableWrapper';
 
 const router = createBrowserRouter(
   createRoutesFromElements([
@@ -112,7 +115,20 @@ const router = createBrowserRouter(
         }}
         element={<Report />}
       >
-        <Route index key="reportTable" element={<ReportTable />} />
+        <Route path="" key="reportTable" element={<ReportTableWrapper />}>
+          <Route key="reportTable" path="" element={<ReportTable />} />
+          <Route
+            key="reportMasterTable"
+            path="data-master"
+            element={<ReportMasterTable />}
+          />
+          <Route
+            key="reportTriwulanTable"
+            path="data-triwulan"
+            element={<ReportTriwulanTable />}
+          />
+        </Route>
+
         <Route key="reportEdit" path="edit/:id" element={<ReportEdit />} />
         <Route
           key="reportDetail"

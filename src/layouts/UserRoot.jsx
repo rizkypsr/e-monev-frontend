@@ -57,7 +57,7 @@ function UserLayout() {
     }
   };
 
-  if (auth().admin_role_id !== 2) {
+  if (auth().role.id !== 2) {
     return <Navigate to="/admin" replace />;
   }
 

@@ -1,19 +1,23 @@
-import { baseUrl } from '../../../utils/constants';
-import makeRequest from '../../../utils/makeRequest';
+import axiosClient from '../../../config/axios';
 
-export default async function createMaster(authHeader, requestBody) {
-  const url = `${baseUrl}/data-master/create`;
+async function createTriwulan({ body, token }) {
+  try {
+    const response = await axiosClient.post('/data-master/create', body, {
+      headers: {
+        Authorization: token,
+      },
+    });
 
-  const headers = {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      authorization: authHeader(),
-    },
-    body: JSON.stringify(requestBody),
-  };
+    const responseData = response.data;
 
-  const response = await makeRequest(url, headers);
+    if (responseData.statusCode !== 200) {
+      throw new Error(responseData.message);
+    }
 
-  return response.message;
+    return responseData;
+  } catch (err) {
+    throw new Error(err);
+  }
 }
+
+export default createTriwulan;

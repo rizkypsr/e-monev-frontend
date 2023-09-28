@@ -1,18 +1,29 @@
-import { baseUrl } from '../../../utils/constants';
-import makeRequest from '../../../utils/makeRequest';
+import axiosClient from '../../../config/axios';
 
-export default async function deleteOccasion(authHeader, occasionId) {
-  const url = `${baseUrl}/occassion/delete`;
-  const headers = {
-    method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-      authorization: authHeader(),
-    },
-    body: JSON.stringify({
-      occassion_id: occasionId,
-    }),
-  };
-  const occasionResponse = await makeRequest(url, headers);
-  return occasionResponse.message;
+async function deleteOccassion({ id, token }) {
+  try {
+    const response = await axiosClient.patch(
+      '/occassion/delete',
+      {
+        occassion_id: id,
+      },
+      {
+        headers: {
+          Authorization: token,
+        },
+      }
+    );
+
+    const responseData = response.data;
+
+    if (responseData.statusCode !== 200) {
+      throw new Error(responseData.message);
+    }
+
+    return responseData;
+  } catch (err) {
+    throw new Error(err);
+  }
 }
+
+export default deleteOccassion;

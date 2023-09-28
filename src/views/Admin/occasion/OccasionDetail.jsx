@@ -1,40 +1,36 @@
 import { ArrowLeftIcon } from '@heroicons/react/24/solid';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useAuthHeader } from 'react-auth-kit';
 import { Link, useParams } from 'react-router-dom';
-import getOccasionDetail from '../../../api/admin/occasion/getOccasionDetail';
+import { useQuery } from 'react-query';
 import ReactLoading from '../../../components/Loading';
 import ErrorPage from '../../ErrorPage';
+import getOccassion from '../../../api/admin/occasion/getOccasionDetail';
+
+const initialData = {
+  code: '',
+  title: '',
+};
 
 function OccasionDetail() {
-  const [code, setCode] = useState('');
-  const [occasion, setOccasion] = useState('');
-  const [error, setError] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [occassion, setOccassion] = useState(initialData);
 
   const { id } = useParams();
   const authHeader = useAuthHeader();
 
-  const fetchOccasion = async () => {
-    setIsLoading(true);
+  const { isLoading, isError, error } = useQuery({
+    queryKey: ['get_occassion'],
+    queryFn: () => getOccassion(id, authHeader()),
+    onSuccess: (result) => {
+      setOccassion({
+        code: result.data.code,
+        title: result.data.title,
+      });
+    },
+  });
 
-    try {
-      const occasionResponse = await getOccasionDetail(authHeader, id);
-      setCode(occasionResponse.code);
-      setOccasion(occasionResponse.title);
-      setIsLoading(false);
-    } catch (err) {
-      setIsLoading(false);
-      setError(error.message);
-    }
-  };
-
-  useEffect(() => {
-    fetchOccasion();
-  }, []);
-
-  if (error) {
-    return <ErrorPage errorMessage={error} />;
+  if (isError) {
+    return <ErrorPage errorMessage={error.message} />;
   }
 
   if (isLoading) {
@@ -69,7 +65,7 @@ function OccasionDetail() {
               >
                 Kode
               </th>
-              <td className="px-6 py-4">{code}</td>
+              <td className="px-6 py-4">{occassion.code}</td>
             </tr>
             <tr className="bg-light-blue">
               <th
@@ -78,7 +74,7 @@ function OccasionDetail() {
               >
                 Urusan
               </th>
-              <td className="px-6 py-4">{occasion}</td>
+              <td className="px-6 py-4">{occassion.title}</td>
             </tr>
           </tbody>
         </table>

@@ -22,13 +22,17 @@
     "react/react-in-jsx-scope": "off",
     "react-hooks/rules-of-hooks": "warn",
     "react/button-has-type": "warn",
-    "react/prop-types": "warn",
+    "react/prop-types": "off",
     "react/require-default-props": "warn",
     "react/no-array-index-key": "error",
     "react/no-children-prop": "error",
     "react/jsx-no-bind": "warn",
     "prefer-spread": "warn",
-    "import/no-extraneous-dependencies": ["error", {"devDependencies": true}],
-    "no-param-reassign": ["error", { "props": false }]
+    "import/no-extraneous-dependencies": ["error", { "devDependencies": true }],
+    "no-param-reassign": ["error", { "props": false }],
+    "react/jsx-props-no-spreading": "off",
+    "jsx-a11y/no-static-element-interactions": "off",
+    "jsx-a11y/click-events-have-key-events": "off",
+    "jsx-a11y/no-noninteractive-element-interactions": "off"
   }
 }

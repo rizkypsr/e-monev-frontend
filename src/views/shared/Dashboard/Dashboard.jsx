@@ -1,11 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useAuthHeader, useAuthUser } from 'react-auth-kit';
 import {
   ArrowDownTrayIcon,
   MagnifyingGlassIcon,
 } from '@heroicons/react/24/solid';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import { getCounts } from '../../../api/admin/dashboard';
+import { useQuery } from 'react-query';
 import ErrorPage from '../../ErrorPage';
 import CountBox from './components/CountBox';
 import SelectInputModal from '../../../components/SelectInputModal';
@@ -19,17 +19,59 @@ import {
 } from '../../../components/DialogContent';
 import Button from '../../../components/Button';
 import Label from '../../../components/Label';
+import { getUsers } from '../../../api/admin/user';
+import { getOccasions } from '../../../api/admin/occasion';
+import { getPrograms } from '../../../api/admin/program';
+import { getActivities } from '../../../api/admin/activity';
+import { getPurposes } from '../../../api/admin/purpose';
+
+const initialParams = {
+  limit: 0,
+  page: 0,
+};
 
 export default function Dashboard() {
-  const [counts, setCounts] = useState({
-    userCount: 0,
-    occasionCount: 0,
-    organizationCount: 0,
-    programCount: 0,
-    activityCount: 0,
-    purposeCount: 0,
+  const authHeader = useAuthHeader();
+  const authUser = useAuthUser();
+
+  const token = useMemo(() => authHeader(), [authHeader]);
+
+  const occassionsQuery = useQuery({
+    queryKey: ['get_occassions', initialParams],
+    queryFn: () => getOccasions(initialParams, authHeader()),
+    enabled: token !== null,
   });
-  const [error, setError] = useState(null);
+
+  const organizationsQuery = useQuery({
+    queryKey: ['get_organizations', initialParams],
+    queryFn: () => getOrganizations(initialParams, authHeader()),
+    enabled: token !== null,
+  });
+
+  const programsQuery = useQuery({
+    queryKey: ['get_programs', initialParams],
+    queryFn: () => getPrograms(initialParams, authHeader()),
+    enabled: token !== null,
+  });
+
+  const activitiesQuery = useQuery({
+    queryKey: ['get_activities', initialParams],
+    queryFn: () => getActivities(initialParams, authHeader()),
+    enabled: token !== null,
+  });
+
+  const purposesQuery = useQuery({
+    queryKey: ['get_purposes', initialParams],
+    queryFn: () => getPurposes(initialParams, authHeader()),
+    enabled: token !== null,
+  });
+
+  const usersQuery = useQuery({
+    queryKey: ['get_users', initialParams],
+    queryFn: () => getUsers(initialParams, authHeader()),
+    enabled: token !== null,
+  });
+
   const [openOpd, setOpenOpd] = useState(false);
   const [selectedOpd, setSelectedOpd] = useState(null);
   const [opdData, setOpdData] = useState({
@@ -40,41 +82,43 @@ export default function Dashboard() {
     currentPage: 1,
   });
 
-  const authUser = useRef(useAuthUser());
-  const authHeaderRef = useRef(useAuthHeader());
+  // useEffect(() => {
+  //   async function fetchCounts() {
+  //     try {
+  //       const countsData = await getCounts(authHeaderRef.current);
+  //       setCounts(countsData);
+  //     } catch (err) {
+  //       setError(err.message);
+  //     }
+  //   }
 
-  useEffect(() => {
-    async function fetchCounts() {
-      try {
-        const countsData = await getCounts(authHeaderRef.current);
-        setCounts(countsData);
-      } catch (err) {
-        setError(err.message);
-      }
-    }
-
-    fetchCounts();
-  }, []);
+  //   fetchCounts();
+  // }, []);
 
   const fetchOrganizations = async (page) => {
-    const organizationResponse = await getOrganizations(authHeaderRef.current, {
-      limit: 20,
-      page,
-    });
+    if (token) {
+      const organizationResponse = await getOrganizations(
+        {
+          limit: 10,
+          page,
+        },
+        token
+      );
 
-    if (page === opdData.totalPages) {
-      setOpdData((prevData) => ({ ...prevData, hasMore: false }));
+      if (page === opdData.totalPages) {
+        setOpdData((prevData) => ({ ...prevData, hasMore: false }));
+      }
+
+      setOpdData((prevData) => ({
+        ...prevData,
+        items: [...prevData.items, ...organizationResponse.data.result],
+        totalPages: organizationResponse.data.total,
+      }));
     }
-
-    setOpdData((prevData) => ({
-      ...prevData,
-      items: [...prevData.items, ...organizationResponse.result],
-      totalPages: organizationResponse.pages,
-    }));
   };
 
   useEffect(() => {
-    fetchOrganizations(opdData.currentPage);
+    fetchOrganizations(opdData.currentPage, token);
   }, [opdData.currentPage]);
 
   const loadMoreData = async () => {
@@ -89,20 +133,20 @@ export default function Dashboard() {
     setOpenOpd(false);
   };
 
-  if (error) {
-    return <ErrorPage errorMessage={error} />;
+  if (usersQuery.isError) {
+    return <ErrorPage errorMessage={usersQuery.error} />;
   }
 
   return (
     <>
       <h1 className="font-semibold text-2xl mb-8">
-        Halo {authUser.current().admin_role_id === 1 ? 'Admin' : 'User OPD'},
-        Selamat Datang di halaman elektronik aplikasi&nbsp;
+        Halo {authUser().role.id === 1 ? 'Admin' : 'User OPD'}, Selamat Datang
+        di halaman elektronik aplikasi&nbsp;
         <span className="italic">e-Montir Pemda</span>
       </h1>
 
       <div className="flex flex-col space-y-4 lg:flex-row justify-center lg:justify-between mb-8 lg:items-center">
-        {authUser.current().admin_role_id === 1 && (
+        {authUser().role.id === 1 && (
           <div>
             <Label>OPD</Label>
             <Dialog open={openOpd} onOpenChange={setOpenOpd}>
@@ -169,56 +213,56 @@ export default function Dashboard() {
       </div>
 
       <div className="bg-white rounded-lg grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-y-7 p-8 shadow-2xl shadow-[#F3F6FF]">
-        {authUser.current().admin_role_id === 1 ? (
+        {authUser().role.name.toLowerCase() === 'superadmin' ? (
           <>
             <CountBox
               linkTo="urusan"
               title="urusan"
-              count={counts.occasionCount}
+              count={occassionsQuery.data?.data.total || 0}
               color="#56CCF2"
               className="hover:solid-shadow-blue"
             />
             <CountBox
               linkTo="organisasi"
               title="organisasi"
-              count={counts.organizationCount}
+              count={organizationsQuery.data?.data.total || 0}
               color="#BB6BD9"
               className="hover:solid-shadow-purple"
             />
             <CountBox
-              linkTo="/"
+              linkTo="program"
               title="program"
-              count={counts.programCount}
+              count={programsQuery.data?.data.total || 0}
               color="#6FCF97"
               className="hover:solid-shadow-green"
             />
             <CountBox
               linkTo="kegiatan"
               title="kegiatan"
-              count={counts.activityCount}
+              count={activitiesQuery.data?.data.total || 0}
               color="#F2C94C"
               className="hover:solid-shadow-yellow"
             />
             <CountBox
               linkTo="sasaran"
               title="sasaran"
-              count={counts.purposeCount}
+              count={purposesQuery.data?.data.total || 0}
               color="#F2994A"
               className="hover:solid-shadow-orange"
             />
             <CountBox
               linkTo="login-akses-user"
               title="user"
-              count={counts.userCount}
+              count={usersQuery.data?.data.total || 0}
               color="#BDBDBD"
               className="hover:solid-shadow-gray"
             />
           </>
         ) : (
           <CountBox
-            linkTo="#"
+            linkTo="/"
             title="program"
-            count={counts.programCount}
+            count={programsQuery.data?.data.total || 0}
             color="#6FCF97"
             className="hover:solid-shadow-green"
           />

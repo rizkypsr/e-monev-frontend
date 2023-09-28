@@ -1,40 +1,36 @@
 import { ArrowLeftIcon } from '@heroicons/react/24/solid';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useAuthHeader } from 'react-auth-kit';
 import { Link, useParams } from 'react-router-dom';
+import { useQuery } from 'react-query';
 import { getOrganization } from '../../../api/admin/organization';
 import ReactLoading from '../../../components/Loading';
 import ErrorPage from '../../ErrorPage';
 
+const initialData = {
+  code: '',
+  title: '',
+};
+
 function OrganizationDetail() {
-  const [code, setCode] = useState('');
-  const [title, setTitle] = useState('');
-  const [error, setError] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [organization, setOrganization] = useState(initialData);
 
   const { id } = useParams();
   const authHeader = useAuthHeader();
 
-  const fetchOrganization = async () => {
-    setIsLoading(true);
+  const { isLoading, isError, error } = useQuery({
+    queryKey: ['get_organization'],
+    queryFn: () => getOrganization(id, authHeader()),
+    onSuccess: (result) => {
+      setOrganization({
+        code: result.data.code,
+        title: result.data.title,
+      });
+    },
+  });
 
-    try {
-      const organizationResponse = await getOrganization(authHeader, id);
-      setCode(organizationResponse.code);
-      setTitle(organizationResponse.title);
-      setIsLoading(false);
-    } catch (err) {
-      setError(error.message);
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchOrganization();
-  }, []);
-
-  if (error) {
-    return <ErrorPage errorMessage={error} />;
+  if (isError) {
+    return <ErrorPage errorMessage={error.message} />;
   }
 
   if (isLoading) {
@@ -69,7 +65,7 @@ function OrganizationDetail() {
               >
                 Kode
               </th>
-              <td className="px-6 py-4">{code}</td>
+              <td className="px-6 py-4">{organization.code}</td>
             </tr>
             <tr className="bg-light-blue">
               <th
@@ -78,7 +74,7 @@ function OrganizationDetail() {
               >
                 Urusan
               </th>
-              <td className="px-6 py-4">{title}</td>
+              <td className="px-6 py-4">{organization.title}</td>
             </tr>
           </tbody>
         </table>

@@ -1,41 +1,24 @@
-import { baseUrl } from '../../../utils/constants';
-import makeRequest from '../../../utils/makeRequest';
+import axiosClient from '../../../config/axios';
 
-export default async function getReports(authHeader, options = {}) {
-  const {
-    offset = 0,
-    limit = 10,
-    page = 1,
-    search = '',
-    sort = 'terbaru',
-    month,
-    year,
-    triwulan,
-  } = options;
+async function getReports(params, token) {
+  try {
+    const response = await axiosClient.get('/data-report/list', {
+      params,
+      headers: {
+        Authorization: token,
+      },
+    });
 
-  const queryParams = {
-    offset,
-    limit,
-    page,
-    search,
-    sort,
-    ...(month && { month }),
-    ...(year && { year }),
-    ...(triwulan && { triwulan_id: triwulan }),
-  };
+    const responseData = response.data;
 
-  const url = new URL(`${baseUrl}/data-report/list`);
-  url.search = new URLSearchParams(queryParams).toString();
+    if (responseData.statusCode !== 200) {
+      throw new Error(responseData.message);
+    }
 
-  const headers = {
-    'Content-Type': 'application/json',
-    authorization: authHeader(),
-  };
-
-  const reportResponse = await makeRequest(url.toString(), {
-    method: 'GET',
-    headers,
-  });
-
-  return reportResponse.data;
+    return responseData;
+  } catch (err) {
+    throw new Error(err);
+  }
 }
+
+export default getReports;

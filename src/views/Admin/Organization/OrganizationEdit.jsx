@@ -1,7 +1,8 @@
 import { ArrowLeftIcon, CheckCircleIcon } from '@heroicons/react/24/solid';
-import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuthHeader } from 'react-auth-kit';
+import { useForm } from 'react-hook-form';
+import { useMutation, useQuery } from 'react-query';
 import TextInput from '../../../components/TextInput';
 import Button from '../../../components/Button';
 import { useToastContext } from '../../../context/ToastContext';
@@ -14,64 +15,52 @@ import {
 import ReactLoading from '../../../components/Loading';
 
 function OrganizationEdit() {
-  const { id } = useParams();
-
-  const [code, setCode] = useState('');
-  const [organization, setOrganization] = useState('');
-  const [error, setError] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-
   const authHeader = useAuthHeader();
   const { showToastMessage } = useToastContext();
+  const { id } = useParams();
   const navigate = useNavigate();
 
-  const fetchOrganization = async () => {
-    setIsLoading(true);
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm();
 
-    try {
-      const organizationResponse = await getOrganization(authHeader, id);
+  const { isLoading, isError, error } = useQuery({
+    queryKey: ['get_organization'],
+    queryFn: () => getOrganization(id, authHeader()),
+    onSuccess: (result) => {
+      setValue('title', result.data.title);
+    },
+  });
 
-      setIsLoading(false);
-      setCode(organizationResponse.code);
-      setOrganization(organizationResponse.title);
-    } catch (err) {
-      setIsLoading(false);
-      setError(err.message);
-    }
+  const updateMutation = useMutation(updateOrganization);
+
+  const onSubmit = (formData) => {
+    updateMutation.mutate(
+      {
+        body: {
+          ...formData,
+          organization_id: id,
+        },
+        token: authHeader(),
+      },
+      {
+        onSuccess: () => {
+          showToastMessage('Berhasil membuat Organisasi');
+          navigate('/admin/organisasi');
+        },
+      }
+    );
   };
 
-  useEffect(() => {
-    fetchOrganization();
-  }, []);
+  if (isError) {
+    return <ErrorPage errorMessage={error.message} />;
+  }
 
-  const onSubmit = async (e) => {
-    e.preventDefault();
-
-    setIsLoading(true);
-
-    try {
-      const organizationBody = {
-        organization_id: id,
-        title: organization,
-        code,
-      };
-      const organizationResponse = await updateOrganization(
-        authHeader,
-        organizationBody
-      );
-
-      setIsLoading(false);
-      showToastMessage(organizationResponse, 'success');
-      navigate('../');
-    } catch (err) {
-      setError(err.message);
-      setIsLoading(true);
-      showToastMessage(err.message, 'error');
-    }
-  };
-
-  if (error) {
-    return <ErrorPage errorMessage={error} />;
+  if (isLoading) {
+    return <ReactLoading />;
   }
 
   return (
@@ -87,28 +76,21 @@ function OrganizationEdit() {
           </h1>
         </Link>
 
-        <form className="mt-4" onSubmit={onSubmit}>
+        <form className="mt-4" onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-6">
             <Label>Kode</Label>
             <TextInput
-              className="mt-2 lg:w-2/3 xl:w-1/3"
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-              required
-              disabled
+              id="title"
+              name="title"
+              placeholder="Organisasi"
+              register={register('title', {
+                required: 'Organisasi wajib diisi!',
+              })}
+              error={errors.title?.message}
             />
           </div>
-          <div className="mb-6">
-            <Label>Organisasi</Label>
-            <TextInput
-              className="mt-2 lg:w-2/3 xl:w-1/3"
-              placeholder="Masukan Organisasi"
-              value={organization}
-              onChange={(e) => setOrganization(e.target.value)}
-              required
-            />
-          </div>
-          {isLoading ? (
+
+          {updateMutation.isLoading ? (
             <ReactLoading />
           ) : (
             <div className="flex space-x-3">

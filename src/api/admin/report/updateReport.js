@@ -1,19 +1,23 @@
-import { baseUrl } from '../../../utils/constants';
-import makeRequest from '../../../utils/makeRequest';
+import axiosClient from '../../../config/axios';
 
-export default async function updateReport(authHeader, requestBody) {
-  const url = `${baseUrl}/data-report/update`;
+async function updateReport({ body, token }) {
+  try {
+    const response = await axiosClient.patch('/data-report/update', body, {
+      headers: {
+        Authorization: token,
+      },
+    });
 
-  const headers = {
-    'Content-Type': 'application/json',
-    authorization: authHeader(),
-  };
+    const responseData = response.data;
 
-  const response = await makeRequest(url.toString(), {
-    method: 'PATCH',
-    headers,
-    body: JSON.stringify(requestBody),
-  });
+    if (responseData.statusCode !== 200) {
+      throw new Error(responseData.message);
+    }
 
-  return response.message;
+    return responseData;
+  } catch (err) {
+    throw new Error(err);
+  }
 }
+
+export default updateReport;

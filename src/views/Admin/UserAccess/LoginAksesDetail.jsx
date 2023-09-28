@@ -1,45 +1,39 @@
 import { ArrowLeftIcon } from '@heroicons/react/24/solid';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useAuthHeader } from 'react-auth-kit';
 import { Link, useParams } from 'react-router-dom';
+import { useQuery } from 'react-query';
 import ReactLoading from '../../../components/Loading';
-import getRole from '../../../utils/getRole';
 import ErrorPage from '../../ErrorPage';
 import { getUser } from '../../../api/admin/user';
+
+const initialUser = {
+  name: '',
+  username: '',
+  levelUser: '',
+};
 
 function LoginAksesDetail() {
   const { id } = useParams();
 
-  const [name, setName] = useState('');
-  const [username, setUsername] = useState('');
-  const [levelUser, setLevelUser] = useState('');
-  const [error, setError] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [user, setUser] = useState(initialUser);
 
   const authHeader = useAuthHeader();
 
-  const fetchUser = async () => {
-    setIsLoading(true);
+  const { isLoading, isError, error } = useQuery({
+    queryKey: ['get_user'],
+    queryFn: () => getUser(id, authHeader()),
+    onSuccess: (result) => {
+      setUser({
+        name: result.data.name,
+        username: result.data.username,
+        levelUser: result.data.role.name,
+      });
+    },
+  });
 
-    try {
-      const userResponse = await getUser(authHeader, id);
-
-      setName(userResponse.name);
-      setUsername(userResponse.username);
-      setLevelUser(getRole(userResponse.admin_role_id));
-      setIsLoading(false);
-    } catch (err) {
-      setIsLoading(false);
-      setError(err.message);
-    }
-  };
-
-  useEffect(() => {
-    fetchUser();
-  }, []);
-
-  if (error) {
-    return <ErrorPage errorMessage={error} />;
+  if (isError) {
+    return <ErrorPage errorMessage={error.message} />;
   }
 
   if (isLoading) {
@@ -74,7 +68,7 @@ function LoginAksesDetail() {
               >
                 Nama
               </th>
-              <td className="px-6 py-4">{name}</td>
+              <td className="px-6 py-4">{user.name}</td>
             </tr>
             <tr className="bg-light-blue">
               <th
@@ -83,7 +77,7 @@ function LoginAksesDetail() {
               >
                 Username
               </th>
-              <td className="px-6 py-4">{username}</td>
+              <td className="px-6 py-4">{user.username}</td>
             </tr>
             <tr className="bg-white">
               <th
@@ -92,7 +86,7 @@ function LoginAksesDetail() {
               >
                 Level User
               </th>
-              <td className="px-6 py-4">{levelUser}</td>
+              <td className="px-6 py-4">{user.levelUser}</td>
             </tr>
           </tbody>
         </table>

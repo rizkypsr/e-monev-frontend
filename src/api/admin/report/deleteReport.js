@@ -1,21 +1,29 @@
-import { baseUrl } from '../../../utils/constants';
-import makeRequest from '../../../utils/makeRequest';
+import axiosClient from '../../../config/axios';
 
-export default async function deleteReport(authHeader, reportId) {
-  const url = new URL(`${baseUrl}/data-report/delete`);
+async function deleteReport({ id, token }) {
+  try {
+    const response = await axiosClient.patch(
+      '/data-report/delete',
+      {
+        data_report_id: id,
+      },
+      {
+        headers: {
+          Authorization: token,
+        },
+      }
+    );
 
-  const headers = {
-    'Content-Type': 'application/json',
-    authorization: authHeader(),
-  };
+    const responseData = response.data;
 
-  const response = await makeRequest(url.toString(), {
-    method: 'PATCH',
-    headers,
-    body: JSON.stringify({
-      data_report_id: reportId,
-    }),
-  });
+    if (responseData.statusCode !== 200) {
+      throw new Error(responseData.message);
+    }
 
-  return response.message;
+    return responseData;
+  } catch (err) {
+    throw new Error(err);
+  }
 }
+
+export default deleteReport;

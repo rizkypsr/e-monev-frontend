@@ -1,35 +1,24 @@
-import { baseUrl } from '../../../utils/constants';
-import makeRequest from '../../../utils/makeRequest';
+import axiosClient from '../../../config/axios';
 
-export default async function getOccasions(authHeader, options = {}) {
-  const {
-    offset = 0,
-    limit = 10,
-    page = 1,
-    search = '',
-    sort = 'terbaru',
-  } = options;
+async function getOccassions(params, token) {
+  try {
+    const response = await axiosClient.get('/occassion/list', {
+      params,
+      headers: {
+        Authorization: token,
+      },
+    });
 
-  const queryParams = {
-    offset,
-    limit,
-    page,
-    search,
-    sort,
-  };
+    const responseData = response.data;
 
-  const url = new URL(`${baseUrl}/occassion/list`);
-  url.search = new URLSearchParams(queryParams).toString();
+    if (responseData.statusCode !== 200) {
+      throw new Error(responseData.message);
+    }
 
-  const headers = {
-    'Content-Type': 'application/json',
-    authorization: authHeader(),
-  };
-
-  const occasionResponse = await makeRequest(url.toString(), {
-    method: 'GET',
-    headers,
-  });
-
-  return occasionResponse.data;
+    return responseData;
+  } catch (err) {
+    throw new Error(err);
+  }
 }
+
+export default getOccassions;

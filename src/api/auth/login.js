@@ -1,24 +1,20 @@
-import { baseUrl, domainUrl } from '../../utils/constants';
+import axiosClient from '../../config/axios';
 
-export default async function login(body) {
+export default async function login({ username, password }) {
   try {
-    const loginResponse = await fetch(`${baseUrl}/user/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': domainUrl,
-      },
-      body: JSON.stringify(body),
+    const response = await axiosClient.post('/user/login', {
+      username,
+      password,
     });
 
-    const loginData = await loginResponse.json();
+    const responseData = response.data;
 
-    if (!loginResponse.ok) {
-      throw new Error(loginData.message);
+    if (responseData.statusCode !== 200) {
+      throw new Error(responseData.message);
     }
 
-    return loginData;
-  } catch (error) {
-    throw new Error(error.message);
+    return responseData;
+  } catch (err) {
+    throw new Error(err);
   }
 }
