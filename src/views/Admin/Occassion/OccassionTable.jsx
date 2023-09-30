@@ -156,7 +156,7 @@ const initialParams = {
   sort: 'terbaru',
 };
 
-function OccasionTable() {
+const OccassionTable = () => {
   const authHeader = useAuthHeader();
   const { showToastMessage } = useToastContext();
   const queryClient = useQueryClient();
@@ -213,6 +213,13 @@ function OccasionTable() {
         search: e.target.value,
       });
     }, 500);
+  };
+
+  const onPaginationChange = (currentPage) => {
+    setFilterParams({
+      ...filterParams,
+      page: currentPage,
+    });
   };
 
   if (isError) {
@@ -284,14 +291,13 @@ function OccasionTable() {
         />
 
         <Pagination
-          totalRows={data?.data.pages || 0}
-          pageChangeHandler={() => {}}
-          rowsPerPage={data?.data.pages || 0}
-          resetPage={() => {}}
+          totalRows={data?.data.total || 0}
+          pageChangeHandler={onPaginationChange}
+          rowsPerPage={filterParams.limit}
         />
       </div>
     </>
   );
-}
+};
 
-export default OccasionTable;
+export default OccassionTable;

@@ -3,6 +3,7 @@ import { EyeIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/solid';
 import { useAuthHeader } from 'react-auth-kit';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { createColumnHelper } from '@tanstack/react-table';
+import { useEffect, useState } from 'react';
 import TrashImg from '../../../assets/images/trash.png';
 import Button from '../../../components/Button';
 import ErrorPage from '../../ErrorPage';
@@ -126,13 +127,27 @@ const columns = [
   }),
 ];
 
-export default function ReportTable() {
-  const queryClient = useQueryClient();
+const initialParams = {
+  limit: 10,
+  page: 1,
+  search: '',
+  sort: 'terbaru',
+  month: null,
+  year: null,
+  triwulan_id: null,
+};
+
+const ReportTable = () => {
   const authHeader = useAuthHeader();
+  const queryClient = useQueryClient();
   const { showToastMessage } = useToastContext();
   const [searchParams] = useSearchParams();
 
-  const filterParams = Object.fromEntries(searchParams.entries());
+  const [filterParams, setFilterParams] = useState(initialParams);
+
+  useEffect(() => {
+    setFilterParams(Object.fromEntries(searchParams.entries()));
+  }, [searchParams]);
 
   const { isLoading, isError, error, data } = useQuery({
     queryKey: ['get_reports', filterParams],
@@ -159,7 +174,12 @@ export default function ReportTable() {
     );
   };
 
-  const resetPage = () => {};
+  const onPaginationChange = (currentPage) => {
+    setFilterParams({
+      ...filterParams,
+      page: currentPage,
+    });
+  };
 
   if (isError) {
     return <ErrorPage errorMessage={error.message} />;
@@ -182,10 +202,10 @@ export default function ReportTable() {
 
       <Pagination
         totalRows={data?.data.total || 0}
-        pageChangeHandler={() => {}}
-        rowsPerPage={10}
-        // resetPage={false}
+        pageChangeHandler={onPaginationChange}
+        rowsPerPage={filterParams.limit}
       />
     </div>
   );
-}
+};
+export default ReportTable;

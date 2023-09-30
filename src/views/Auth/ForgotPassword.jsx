@@ -1,5 +1,5 @@
 import { useAuthUser, useIsAuthenticated, useSignIn } from 'react-auth-kit';
-import { Link, Navigate } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import Slider from 'react-slick';
 import { useMutation } from 'react-query';
 import { useForm } from 'react-hook-form';
@@ -17,10 +17,9 @@ import { useToastContext } from '../../context/ToastContext';
 import Loading from '../../components/Loading';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
+import forgotPassword from '../../api/auth/forgotPassword';
 
-function Login() {
-  const isAuthenticated = useIsAuthenticated();
-  const signIn = useSignIn();
+function ForgotPassword() {
   const auth = useAuthUser();
   const { showToastMessage } = useToastContext();
 
@@ -30,44 +29,28 @@ function Login() {
     formState: { errors },
   } = useForm();
 
-  const loginMutation = useMutation(login);
+  const forgotPasswordMutation = useMutation(forgotPassword);
 
   const onSubmit = (data) => {
-    const { username, password } = data;
+    const { email } = data;
 
-    loginMutation.mutate(
+    forgotPasswordMutation.mutate(
       {
-        username,
-        password,
+        email,
       },
       {
-        onSuccess: (res) => {
-          if (res.statusCode === 200) {
-            signIn({
-              token: res.access_token,
-              tokenType: 'Bearer',
-              authState: res.payloadClient,
-              expiresIn: 2880,
-            });
-          }
+        onSuccess: () => {
+          showToastMessage(`Berhasil mengirim, Cek email Anda`);
         },
         onError: (error) => {
           showToastMessage(
-            `Terjadi kesalahan saat login: ${error.message}`,
+            `Terjadi kesalahan saat mengirim email: ${error.message}`,
             'error'
           );
         },
       }
     );
   };
-
-  if (isAuthenticated()) {
-    if (auth().role.id === 1) {
-      return <Navigate to="/admin" />;
-    }
-
-    return <Navigate to="/" />;
-  }
 
   return (
     <div className="lg:flex h-screen">
@@ -115,56 +98,27 @@ function Login() {
 
           <div className="self-center mt-32 w-full sm:w-2/3 xl:w-1/2">
             <h3 className="text-2xl font-semibold text-dark-gray">
-              Selamat Datang
+              Lupa Password
             </h3>
             <h4 className="text-light-gray">
-              Login dibawah untuk akses akun Anda
+              Masukan email untuk merubah password
             </h4>
 
             <form className="mt-4" onSubmit={handleSubmit(onSubmit)}>
               <div className="mb-6">
-                <Label htmlFor="username">Username</Label>
+                <Label htmlFor="username">Email</Label>
                 <TextInput
-                  id="username"
-                  name="username"
-                  placeholder="Masukan Username"
-                  register={register('username', {
-                    required: 'Username wajib diisi!',
+                  id="email"
+                  name="email"
+                  placeholder="Masukan Email"
+                  register={register('email', {
+                    required: 'Email wajib diisi!',
                   })}
-                  error={errors.username?.message}
+                  error={errors.email?.message}
                 />
               </div>
-              <div className="mb-6">
-                <Label htmlFor="password">Password</Label>
-                <TextInput
-                  id="password"
-                  type="password"
-                  name="password"
-                  placeholder="Masukan Password"
-                  register={register('password', {
-                    required: 'Password wajib diisi!',
-                  })}
-                  error={errors.password?.message}
-                />
-              </div>
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center">
-                  <input
-                    id="remember"
-                    type="checkbox"
-                    className="w-4 h-4 border rounded border-light-gray focus:ring-3 focus:ring-blue-300"
-                  />
-                  <Label htmlFor="remember" className="ml-2">
-                    Ingatkan Saya
-                  </Label>
-                </div>
 
-                <Link to="/forgot-password" className="text-sm text-primary">
-                  Lupa Password
-                </Link>
-              </div>
-
-              {loginMutation.isLoading ? (
+              {forgotPasswordMutation.isLoading ? (
                 <Loading />
               ) : (
                 <Button
@@ -173,7 +127,7 @@ function Login() {
                   background="bg-primary"
                   textColor="text-white"
                 >
-                  Masuk
+                  Ubah Password
                 </Button>
               )}
             </form>
@@ -184,4 +138,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default ForgotPassword;

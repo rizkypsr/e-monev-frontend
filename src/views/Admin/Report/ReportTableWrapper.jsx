@@ -5,7 +5,7 @@ import {
   MagnifyingGlassIcon,
 } from '@heroicons/react/24/solid';
 import { useQuery } from 'react-query';
-import { useAuthHeader } from 'react-auth-kit';
+import { useAuthHeader, useAuthUser } from 'react-auth-kit';
 import DropdownSelect from '../../../components/DropdownSelect';
 import useSearchParamsState from '../../../hooks/useSearchParamsState';
 import getTriwulan from '../../../api/static/getTriwulan';
@@ -57,8 +57,9 @@ const initialFilterParams = {
   sort: 'terbaru',
 };
 
-function ReportTableWrapper() {
+const ReportTableWrapper = () => {
   const authHeader = useAuthHeader();
+  const authUser = useAuthUser();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
@@ -142,7 +143,9 @@ function ReportTableWrapper() {
 
     const queryString = objectToQueryString(initialFilterParams);
 
-    navigate(`/laporan?${queryString}`);
+    const path = authUser().role.name === 'Superadmin' ? '/admin' : '';
+
+    navigate(`${path}/laporan?${queryString}`);
   };
 
   useEffect(() => {
@@ -264,6 +267,6 @@ function ReportTableWrapper() {
       <Outlet />
     </>
   );
-}
+};
 
 export default ReportTableWrapper;

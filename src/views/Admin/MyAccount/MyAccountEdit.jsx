@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types';
 import { ArrowLeftIcon, CheckCircleIcon } from '@heroicons/react/24/solid';
 import { useAuthHeader, useAuthUser, useSignOut } from 'react-auth-kit';
 import { useForm } from 'react-hook-form';
@@ -10,7 +9,7 @@ import updateUser from '../../../api/auth/updateUser';
 import { useToastContext } from '../../../context/ToastContext';
 import ReactLoading from '../../../components/Loading';
 
-export default function MyAccountEdit({ onBack }) {
+const MyAccountEdit = ({ onBack }) => {
   const authUser = useAuthUser();
   const authHeader = useAuthHeader();
   const signOut = useSignOut();
@@ -61,8 +60,6 @@ export default function MyAccountEdit({ onBack }) {
       },
     });
   };
-
-  console.log(errors);
 
   return (
     <>
@@ -148,8 +145,6 @@ export default function MyAccountEdit({ onBack }) {
       </form>
     </>
   );
-}
-
-MyAccountEdit.propTypes = {
-  onBack: PropTypes.func.isRequired,
 };
+
+export default MyAccountEdit;

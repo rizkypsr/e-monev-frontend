@@ -2,14 +2,15 @@ import { Dialog, Transition } from '@headlessui/react';
 import { ChevronDownIcon, TrashIcon } from '@heroicons/react/24/solid';
 import { Fragment, useState } from 'react';
 
-function DropdownDialog({
+const DropdownDialog = ({
   label,
   data,
   value,
-  maxWidth = ' max-w-md',
+  maxWidth = 'max-w-md',
   onChange,
   onDelete,
-}) {
+  error,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const closeModal = () => {
@@ -27,7 +28,7 @@ function DropdownDialog({
 
   return (
     <div className={`text-sm ${maxWidth}`}>
-      <div className={`${onDelete && 'flex items-center space-x-3'}`}>
+      <div className={`bg-white ${onDelete && 'flex items-center space-x-3'}`}>
         <div
           onClick={openModal}
           className="flex flex-grow border cursor-pointer justify-between border-dark-gray rounded-lg px-4 py-3 leading-4 text-dark-gray capitalize items-center space-x-3"
@@ -43,6 +44,8 @@ function DropdownDialog({
           />
         )}
       </div>
+
+      {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
 
       <Transition appear show={isOpen} as={Fragment}>
         <Dialog as="div" className="relative z-50" onClose={closeModal}>
@@ -109,6 +112,6 @@ function DropdownDialog({
       </Transition>
     </div>
   );
-}
+};
 
 export default DropdownDialog;

@@ -1,7 +1,7 @@
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/solid';
 import React, { useState } from 'react';
 
-export default function TextInput({
+const TextInput = ({
   className,
   type,
   placeholder,
@@ -11,7 +11,7 @@ export default function TextInput({
   error,
   register,
   width = 'max-w-md',
-}) {
+}) => {
   const [showPassword, setShowPassword] = useState(false);
 
   const disabledClass = disabled
@@ -55,4 +55,6 @@ export default function TextInput({
       {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
     </>
   );
-}
+};
+
+export default TextInput;

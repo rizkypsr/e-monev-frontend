@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { EyeIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/solid';
 import { useAuthHeader } from 'react-auth-kit';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { useEffect, useState } from 'react';
 import Button from '../../../components/Button';
 import {
   Dialog,
@@ -12,13 +13,11 @@ import {
 } from '../../../components/DialogContent';
 import TrashImg from '../../../assets/images/trash.png';
 import ErrorPage from '../../ErrorPage';
-import { deleteReport, getReports } from '../../../api/admin/report';
+import { deleteReport } from '../../../api/admin/report';
 import Table from '../../../components/Table';
 import Pagination from '../../../components/Pagination';
-import formattedDate from '../../../utils/formattedDate';
 import { useToastContext } from '../../../context/ToastContext';
 import getTriwulanReport from '../../../api/admin/report/getTriwulanReport';
-import { useEffect, useState } from 'react';
 
 const columnHelper = createColumnHelper();
 const columns = [
@@ -221,30 +220,26 @@ const initialParams = {
   sort: 'terbaru',
   month: null,
   year: null,
-  triwulan_id: null,
+  fund_source_id: null,
 };
 
-export default function ReportTriwulanTable() {
+const ReportTriwulanTable = () => {
   const [searchParams] = useSearchParams();
 
-  const params = Object.fromEntries(searchParams.entries());
+  const [filterParams, setFilterParams] = useState(initialParams);
+
+  useEffect(() => {
+    setFilterParams(Object.fromEntries(searchParams.entries()));
+  }, [searchParams]);
 
   const queryClient = useQueryClient();
   const authHeader = useAuthHeader();
   const { showToastMessage } = useToastContext();
 
-  const [filterParams, setFilterParams] = useState(initialParams);
-
-  useEffect(() => {
-    setFilterParams({
-      ...filterParams,
-      ...params,
-    });
-  }, [searchParams]);
-
   const { isLoading, isError, error, data } = useQuery({
     queryKey: ['get_triwulan_reports', filterParams],
     queryFn: () => getTriwulanReport(filterParams, authHeader()),
+    keepPreviousData: true,
   });
 
   const deleteMutation = useMutation(deleteReport);
@@ -296,8 +291,10 @@ export default function ReportTriwulanTable() {
       <Pagination
         totalRows={data?.data.total || 0}
         pageChangeHandler={onPaginationChange}
-        rowsPerPage={10}
+        rowsPerPage={filterParams.limit}
       />
     </div>
   );
-}
+};
+
+export default ReportTriwulanTable;

@@ -11,7 +11,7 @@ import { useToastContext } from '../../../context/ToastContext';
 import ReactLoading from '../../../components/Loading';
 import MyAccountEdit from './MyAccountEdit';
 
-export default function MyAccountForm() {
+const MyAccountForm = () => {
   const auth = useAuthUser();
 
   const [authenticated, setAuthenticated] = useState(false);
@@ -29,7 +29,7 @@ export default function MyAccountForm() {
 
   useEffect(() => {
     setValue('username', auth().username);
-  }, [auth]);
+  }, [auth, setValue]);
 
   const onSubmit = (data) => {
     const { username, password } = data;
@@ -70,16 +70,16 @@ export default function MyAccountForm() {
       <div className="mb-6">
         <Label htmlFor="username">Username</Label>
         <TextInput
-          disabled
-          className="mt-2 lg:w-2/3 xl:w-1/3"
           placeholder="Masukan Username"
-          register={register('username')}
+          register={register('username', {
+            disabled: true,
+          })}
+          disabled
         />
       </div>
       <div className="mb-6">
         <Label htmlFor="password">Password</Label>
         <TextInput
-          className="mt-2 lg:w-2/3 xl:w-1/3"
           type="password"
           placeholder="Masukan Password"
           register={register('password', {
@@ -103,4 +103,6 @@ export default function MyAccountForm() {
       )}
     </form>
   );
-}
+};
+
+export default MyAccountForm;

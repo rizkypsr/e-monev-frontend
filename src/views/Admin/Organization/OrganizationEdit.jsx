@@ -14,10 +14,10 @@ import {
 } from '../../../api/admin/organization';
 import ReactLoading from '../../../components/Loading';
 
-function OrganizationEdit() {
-  const authHeader = useAuthHeader();
-  const { showToastMessage } = useToastContext();
+const OrganizationEdit = () => {
   const { id } = useParams();
+  const { showToastMessage } = useToastContext();
+  const authHeader = useAuthHeader();
   const navigate = useNavigate();
 
   const {
@@ -78,7 +78,7 @@ function OrganizationEdit() {
 
         <form className="mt-4" onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-6">
-            <Label>Kode</Label>
+            <Label className="mb-2">Organisasi</Label>
             <TextInput
               id="title"
               name="title"
@@ -118,6 +118,6 @@ function OrganizationEdit() {
       </div>
     </>
   );
-}
+};
 
 export default OrganizationEdit;

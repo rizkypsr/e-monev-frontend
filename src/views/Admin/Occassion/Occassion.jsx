@@ -1,6 +1,6 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 
-const Report = () => <Outlet />;
+const Occassion = () => <Outlet />;
 
-export default Report;
+export default Occassion;

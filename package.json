@@ -32,6 +32,7 @@
     "npm": "^9.8.1",
     "pdfjs-dist": "^3.8.162",
     "prop-types": "^15.8.1",
+    "query-string": "^8.1.0",
     "react": "^18.2.0",
     "react-auth-kit": "^2.12.7",
     "react-cookie": "^4.1.1",

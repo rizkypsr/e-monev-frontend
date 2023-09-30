@@ -1,10 +1,9 @@
 import axiosClient from '../../config/axios';
 
-export default async function login({ username, password }) {
+async function forgotPassword({ email }) {
   try {
-    const response = await axiosClient.post('/user/login', {
-      username,
-      password,
+    const response = await axiosClient.post('/user/forgot-password', {
+      email,
     });
 
     const responseData = response.data;
@@ -15,6 +14,8 @@ export default async function login({ username, password }) {
 
     return responseData;
   } catch (err) {
-    throw new Error('Username atau password salah');
+    throw new Error(err);
   }
 }
+
+export default forgotPassword;

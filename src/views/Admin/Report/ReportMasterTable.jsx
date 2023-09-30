@@ -1,8 +1,9 @@
 import { createColumnHelper } from '@tanstack/react-table';
-import { Link, useParams, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { EyeIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/solid';
 import { useAuthHeader } from 'react-auth-kit';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { useEffect, useState } from 'react';
 import Button from '../../../components/Button';
 import {
   Dialog,
@@ -17,7 +18,6 @@ import Table from '../../../components/Table';
 import Pagination from '../../../components/Pagination';
 import formattedDate from '../../../utils/formattedDate';
 import { useToastContext } from '../../../context/ToastContext';
-import { useEffect, useState } from 'react';
 
 const columnHelper = createColumnHelper();
 const columns = [
@@ -137,7 +137,7 @@ const initialParams = {
   triwulan_id: null,
 };
 
-export default function ReportMasterTable() {
+const ReportMasterTable = () => {
   const [searchParams] = useSearchParams();
 
   const params = Object.fromEntries(searchParams.entries());
@@ -180,6 +180,13 @@ export default function ReportMasterTable() {
     );
   };
 
+  const onPaginationChange = (currentPage) => {
+    setFilterParams({
+      ...filterParams,
+      page: currentPage,
+    });
+  };
+
   if (isError) {
     return <ErrorPage errorMessage={error.message} />;
   }
@@ -200,10 +207,12 @@ export default function ReportMasterTable() {
       />
 
       <Pagination
-        totalRows={30}
-        pageChangeHandler={() => {}}
-        rowsPerPage={30}
+        totalRows={data?.data.total || 0}
+        pageChangeHandler={onPaginationChange}
+        rowsPerPage={filterParams.limit}
       />
     </div>
   );
-}
+};
+
+export default ReportMasterTable;

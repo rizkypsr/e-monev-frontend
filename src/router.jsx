@@ -14,7 +14,7 @@ import LoginAksesUser from './views/Admin/UserAccess/UserAccess';
 import Report from './views/Admin/Report/Report';
 import Dashboard from './views/shared/Dashboard/Dashboard';
 import UserAccessTable from './views/Admin/UserAccess/UserAccessTable';
-import LoginAksesCreate from './views/Admin/UserAccess/LoginAksesCreate';
+import UserAccessCreate from './views/Admin/UserAccess/UserAccessCreate';
 import OrganizationTable from './views/Admin/Organization/OrganizationTable';
 import OrganizationCreate from './views/Admin/Organization/OrganizationCreate';
 import OrganizationEdit from './views/Admin/Organization/OrganizationEdit';
@@ -31,14 +31,14 @@ import ActivityEdit from './views/Admin/Activity/ActivityEdit';
 import PurposeTable from './views/Admin/Purpose/PurposeTable';
 import PurposeCreate from './views/Admin/Purpose/PurposeCreate';
 import PurposeEdit from './views/Admin/Purpose/PurposeEdit';
-import LoginAksesDetail from './views/Admin/UserAccess/LoginAksesDetail';
+import UserAccessDetail from './views/Admin/UserAccess/UserAccessDetail';
 import ErrorPage404 from './views/ErrorPage404';
 import UserLayout from './layouts/UserRoot';
 import OrganizationDetail from './views/Admin/Organization/OrganizationDetail';
 import ProgramDetail from './views/Admin/Program/ProgramDetail';
 import PurposeDetail from './views/Admin/Purpose/PurposeDetail';
 import ActivityDetail from './views/Admin/Activity/ActivityDetail';
-import LoginAksesEdit from './views/Admin/UserAccess/LoginAksesEdit';
+import UserAccessEdit from './views/Admin/UserAccess/UserAccessEdit';
 import ReportTable from './views/Admin/Report/ReportTable';
 import ReportDetail from './views/Admin/Report/ReportDetail';
 import ReportEdit from './views/Admin/Report/ReportEdit';
@@ -46,20 +46,22 @@ import MyAccountForm from './views/Admin/MyAccount/MyAccountForm';
 import Master from './views/User/Master/Master';
 import MasterCreate from './views/User/Master/MasterCreate';
 import TriwulanCreate from './views/User/Triwulan/TriwulanCreate';
-import Occasion from './views/Admin/occasion/Occasion';
-import OccasionTable from './views/Admin/occasion/OccasionTable';
-import OccasionCreate from './views/Admin/occasion/OccasionCreate';
-import OccasionEdit from './views/Admin/occasion/OccasionEdit';
-import OccasionDetail from './views/Admin/occasion/OccasionDetail';
+import Occassion from './views/Admin/Occassion/Occassion';
+import OccassionTable from './views/Admin/Occassion/OccassionTable';
+import OccasionCreate from './views/Admin/Occassion/OccassionCreate';
+import OccassionEdit from './views/Admin/Occassion/OccassionEdit';
+import OccassionDetail from './views/Admin/Occassion/OccassionDetail';
 import ReportPreview from './views/shared/report/ReportPreview';
 import Configuration from './views/Admin/Configuration/Configuration';
 import ReportMasterTable from './views/Admin/Report/ReportMasterTable';
 import ReportTriwulanTable from './views/Admin/Report/ReportTriwulanTable';
 import ReportTableWrapper from './views/Admin/Report/ReportTableWrapper';
+import ForgotPassword from './views/Auth/ForgotPassword';
 
 const router = createBrowserRouter(
   createRoutesFromElements([
     <Route path="/login" element={<Login />} />,
+    <Route path="/forgot-password" element={<ForgotPassword />} />,
     <Route
       path="/"
       loader={() => 'Dashboard'}
@@ -226,17 +228,17 @@ const router = createBrowserRouter(
         <Route
           key="loginAksesCreate"
           path="create"
-          element={<LoginAksesCreate />}
+          element={<UserAccessCreate />}
         />
         <Route
           key="loginAksesEdit"
           path="edit/:id"
-          element={<LoginAksesEdit />}
+          element={<UserAccessEdit />}
         />
         <Route
           key="loginAksesDetail"
           path="detail/:id"
-          element={<LoginAksesDetail />}
+          element={<UserAccessDetail />}
         />
       </Route>
       <Route
@@ -248,15 +250,15 @@ const router = createBrowserRouter(
             <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
           ),
         }}
-        element={<Occasion />}
+        element={<Occassion />}
       >
-        <Route index key="urusan" element={<OccasionTable />} />
+        <Route index key="urusan" element={<OccassionTable />} />
         <Route key="urusanCreate" path="create" element={<OccasionCreate />} />
-        <Route key="urusanEdit" path="edit/:id" element={<OccasionEdit />} />
+        <Route key="urusanEdit" path="edit/:id" element={<OccassionEdit />} />
         <Route
           key="urusanDetail"
           path="detail/:id"
-          element={<OccasionDetail />}
+          element={<OccassionDetail />}
         />
       </Route>
       <Route
@@ -354,7 +356,7 @@ const router = createBrowserRouter(
         />
       </Route>
       <Route
-        key="report"
+        key="adminReport"
         path="laporan"
         loader={() => 'Data Laporan'}
         handle={{
@@ -364,15 +366,28 @@ const router = createBrowserRouter(
         }}
         element={<Report />}
       >
-        <Route index key="reportTable" element={<ReportTable />} />
-        <Route key="reportEdit" path="edit/:id" element={<ReportEdit />} />
+        <Route path="" key="reportTableAdmin" element={<ReportTableWrapper />}>
+          <Route key="reportTableAdmin" path="" element={<ReportTable />} />
+          <Route
+            key="reportMasterTableAdmin"
+            path="data-master"
+            element={<ReportMasterTable />}
+          />
+          <Route
+            key="reportTriwulanTableAdmin"
+            path="data-triwulan"
+            element={<ReportTriwulanTable />}
+          />
+        </Route>
+
+        <Route key="reportEditAdmin" path="edit/:id" element={<ReportEdit />} />
         <Route
-          key="reportDetail"
+          key="reportDetailAdmin"
           path="detail/:id"
           element={<ReportDetail />}
         />
         <Route
-          key="adminReportPreview"
+          key="userReportPreviewAdmin"
           path="preview"
           element={<ReportPreview />}
         />

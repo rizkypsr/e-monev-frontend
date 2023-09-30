@@ -17,11 +17,11 @@ const initialData = {
   activity: '',
   indicator: '',
 };
-export default function ReportDetail() {
-  const [report, setReport] = useState(initialData);
-
+const ReportDetail = () => {
   const { id } = useParams();
   const authHeader = useAuthHeader();
+
+  const [report, setReport] = useState(initialData);
 
   const { isLoading, isError, error } = useQuery({
     queryKey: ['get_report'],
@@ -109,4 +109,6 @@ export default function ReportDetail() {
       </div>
     </div>
   );
-}
+};
+
+export default ReportDetail;

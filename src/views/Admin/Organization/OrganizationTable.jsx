@@ -156,7 +156,8 @@ const initialParams = {
   search: '',
   sort: 'terbaru',
 };
-function OrganizationTable() {
+
+const OrganizationTable = () => {
   const authHeader = useAuthHeader();
   const { showToastMessage } = useToastContext();
   const queryClient = useQueryClient();
@@ -213,6 +214,13 @@ function OrganizationTable() {
         search: e.target.value,
       });
     }, 500);
+  };
+
+  const onPaginationChange = (currentPage) => {
+    setFilterParams({
+      ...filterParams,
+      page: currentPage,
+    });
   };
 
   if (isError) {
@@ -284,14 +292,13 @@ function OrganizationTable() {
         />
 
         <Pagination
-          totalRows={data?.data.pages || 0}
-          pageChangeHandler={() => {}}
-          rowsPerPage={data?.data.pages || 0}
-          resetPage={() => {}}
+          totalRows={data?.data.total || 0}
+          pageChangeHandler={onPaginationChange}
+          rowsPerPage={10}
         />
       </div>
     </>
   );
-}
+};
 
 export default OrganizationTable;

@@ -1,7 +1,8 @@
 import { ArrowLeftIcon, CheckCircleIcon } from '@heroicons/react/24/solid';
-import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuthHeader } from 'react-auth-kit';
+import { useForm } from 'react-hook-form';
+import { useMutation, useQuery } from 'react-query';
 import Label from '../../../components/Label';
 import TextInput from '../../../components/TextInput';
 import Button from '../../../components/Button';
@@ -11,56 +12,53 @@ import ErrorPage from '../../ErrorPage';
 import updatePurpose from '../../../api/admin/purpose/updatePurpose';
 import ReactLoading from '../../../components/Loading';
 
-function PurposeEdit() {
+const PurposeEdit = () => {
   const { id } = useParams();
-  const [title, setTitle] = useState('');
-  const [error, setError] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-
+  const { showToastMessage } = useToastContext();
   const authHeader = useAuthHeader();
   const navigate = useNavigate();
-  const { showToastMessage } = useToastContext();
 
-  const fetchPurpose = async () => {
-    setIsLoading(true);
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm();
 
-    try {
-      const purposeResponse = await getPurpose(authHeader, id);
-      setTitle(purposeResponse.title);
-      setIsLoading(false);
-    } catch (err) {
-      setIsLoading(false);
-      setError(err.message);
-    }
+  const { isLoading, isError, error } = useQuery({
+    queryKey: ['get_purpose'],
+    queryFn: () => getPurpose(id, authHeader()),
+    onSuccess: (result) => {
+      setValue('title', result.data.title);
+    },
+  });
+
+  const updateMutation = useMutation(updatePurpose);
+
+  const onSubmit = (formData) => {
+    updateMutation.mutate(
+      {
+        body: {
+          ...formData,
+          purpose_id: id,
+        },
+        token: authHeader(),
+      },
+      {
+        onSuccess: () => {
+          showToastMessage('Berhasil mengubah Sasaran');
+          navigate('/admin/sasaran');
+        },
+      }
+    );
   };
 
-  useEffect(() => {
-    fetchPurpose();
-  }, []);
+  if (isError) {
+    return <ErrorPage errorMessage={error.message} />;
+  }
 
-  const onSubmit = async (e) => {
-    e.preventDefault();
-
-    setIsLoading(true);
-
-    try {
-      const purposeBody = {
-        purpose_id: id,
-        title,
-      };
-      const purposeResponse = await updatePurpose(authHeader, purposeBody);
-
-      setIsLoading(false);
-      showToastMessage(purposeResponse, 'success');
-      navigate('../');
-    } catch (err) {
-      setIsLoading(false);
-      showToastMessage(err.message, 'error');
-    }
-  };
-
-  if (error) {
-    return <ErrorPage errorMessage={error} />;
+  if (isLoading) {
+    return <ReactLoading />;
   }
 
   return (
@@ -76,18 +74,19 @@ function PurposeEdit() {
           </h1>
         </Link>
 
-        <form className="mt-4" onSubmit={onSubmit}>
+        <form className="mt-4" onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-6">
-            <Label>Indikator Program</Label>
+            <Label className="mb-2">Indikator Program</Label>
             <TextInput
-              required
-              className="mt-2 lg:w-2/3 xl:w-1/3"
-              placeholder="Masukan Nama Program"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Masukan Indikator Program"
+              register={register('title', {
+                required: 'Indikator Program wajib diisi!',
+              })}
+              error={errors.title?.message}
             />
           </div>
-          {isLoading ? (
+
+          {updateMutation.isLoading ? (
             <ReactLoading />
           ) : (
             <div className="flex space-x-3">
@@ -115,6 +114,6 @@ function PurposeEdit() {
       </div>
     </>
   );
-}
+};
 
 export default PurposeEdit;

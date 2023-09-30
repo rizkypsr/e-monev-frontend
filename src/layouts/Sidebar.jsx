@@ -22,7 +22,7 @@ import ReportIcon from '../components/icons/ReportIcon';
 import LogoutIcon from '../components/icons/LogoutIcon';
 import ConfigurationIcon from '../components/icons/ConfigurationIcon';
 
-function Sidebar({ isOpen }) {
+const Sidebar = ({ isOpen }) => {
   const signOut = useSignOut();
   const authUser = useAuthUser();
 
@@ -138,7 +138,7 @@ function Sidebar({ isOpen }) {
             if (sidebar.roles.includes(authUser().role.name.toLowerCase())) {
               return (
                 <NavLink
-                  end
+                  end={sidebar.label === 'Dashboard'}
                   key={sidebar.label}
                   to={sidebar.path}
                   className={({ isActive }) =>
@@ -209,6 +209,6 @@ function Sidebar({ isOpen }) {
       </div>
     </aside>
   );
-}
+};
 
 export default Sidebar;

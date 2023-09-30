@@ -1,6 +1,6 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 
-export default function UserAccess() {
-  return <Outlet />;
-}
+const UserAccess = () => <Outlet />;
+
+export default UserAccess;

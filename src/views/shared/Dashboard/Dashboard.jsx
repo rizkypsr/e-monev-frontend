@@ -1,22 +1,10 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useAuthHeader, useAuthUser } from 'react-auth-kit';
-import {
-  ArrowDownTrayIcon,
-  MagnifyingGlassIcon,
-} from '@heroicons/react/24/solid';
-import InfiniteScroll from 'react-infinite-scroll-component';
-import { useQuery } from 'react-query';
+import { ArrowDownTrayIcon } from '@heroicons/react/24/solid';
+import { useInfiniteQuery, useQuery } from 'react-query';
 import ErrorPage from '../../ErrorPage';
 import CountBox from './components/CountBox';
-import SelectInputModal from '../../../components/SelectInputModal';
 import { getOrganizations } from '../../../api/admin/organization';
-import ReactLoading from '../../../components/Loading';
-import List from '../../../components/List';
-import {
-  Dialog,
-  DialogContent,
-  DialogTrigger,
-} from '../../../components/DialogContent';
 import Button from '../../../components/Button';
 import Label from '../../../components/Label';
 import { getUsers } from '../../../api/admin/user';
@@ -24,17 +12,25 @@ import { getOccasions } from '../../../api/admin/occasion';
 import { getPrograms } from '../../../api/admin/program';
 import { getActivities } from '../../../api/admin/activity';
 import { getPurposes } from '../../../api/admin/purpose';
+import DropdownDialog from '../../../components/DropdownDialog';
 
 const initialParams = {
   limit: 0,
   page: 0,
 };
 
-export default function Dashboard() {
+const intialOpdparams = {
+  limit: 10,
+  page: 1,
+};
+
+const Dashboard = () => {
   const authHeader = useAuthHeader();
   const authUser = useAuthUser();
 
   const token = useMemo(() => authHeader(), [authHeader]);
+
+  const [selectedOpd, setSelectedOpd] = useState(null);
 
   const occassionsQuery = useQuery({
     queryKey: ['get_occassions', initialParams],
@@ -72,65 +68,16 @@ export default function Dashboard() {
     enabled: token !== null,
   });
 
-  const [openOpd, setOpenOpd] = useState(false);
-  const [selectedOpd, setSelectedOpd] = useState(null);
-  const [opdData, setOpdData] = useState({
-    items: [],
-    hasMore: true,
-    isLoading: false,
-    totalPages: 0,
-    currentPage: 1,
+  const opdQuery = useInfiniteQuery({
+    queryKey: ['get_organizations'],
+    queryFn: async ({ pageParam = 1 }) =>
+      getOrganizations(intialOpdparams, authHeader()),
+    getNextPageParam: (lastPage) => lastPage.nextId ?? undefined,
+    getPreviousPageParam: (firstPage) => firstPage.previousId ?? undefined,
   });
-
-  // useEffect(() => {
-  //   async function fetchCounts() {
-  //     try {
-  //       const countsData = await getCounts(authHeaderRef.current);
-  //       setCounts(countsData);
-  //     } catch (err) {
-  //       setError(err.message);
-  //     }
-  //   }
-
-  //   fetchCounts();
-  // }, []);
-
-  const fetchOrganizations = async (page) => {
-    if (token) {
-      const organizationResponse = await getOrganizations(
-        {
-          limit: 10,
-          page,
-        },
-        token
-      );
-
-      if (page === opdData.totalPages) {
-        setOpdData((prevData) => ({ ...prevData, hasMore: false }));
-      }
-
-      setOpdData((prevData) => ({
-        ...prevData,
-        items: [...prevData.items, ...organizationResponse.data.result],
-        totalPages: organizationResponse.data.total,
-      }));
-    }
-  };
-
-  useEffect(() => {
-    fetchOrganizations(opdData.currentPage, token);
-  }, [opdData.currentPage]);
-
-  const loadMoreData = async () => {
-    setOpdData((prevData) => ({
-      ...prevData,
-      currentPage: prevData.currentPage + 1,
-    }));
-  };
 
   const handleSelectOpd = (opd) => {
     setSelectedOpd(opd);
-    setOpenOpd(false);
   };
 
   if (usersQuery.isError) {
@@ -145,52 +92,21 @@ export default function Dashboard() {
         <span className="italic">e-Montir Pemda</span>
       </h1>
 
-      <div className="flex flex-col space-y-4 lg:flex-row justify-center lg:justify-between mb-8 lg:items-center">
+      <div className="flex flex-col space-y-4 lg:space-y-0 lg:flex-row justify-center lg:justify-between mb-8 lg:items-end">
         {authUser().role.id === 1 && (
-          <div>
-            <Label>OPD</Label>
-            <Dialog open={openOpd} onOpenChange={setOpenOpd}>
-              <DialogTrigger className="w-full lg:w-72">
-                <SelectInputModal
-                  className="mt-2 bg-white"
-                  selectedValue={selectedOpd && selectedOpd.title}
-                  label="--- Pilih OPD ---"
-                />
-              </DialogTrigger>
-
-              <DialogContent title="Pilih Nama OPD">
-                <div className="relative my-6">
-                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                    <MagnifyingGlassIcon className="w-4 h-4" />
-                  </div>
-                  <input
-                    type="search"
-                    id="search"
-                    className="bg-gray-50 text-light-gray border-none text-sm rounded-lg focus:ring-0 block w-full pl-10 p-2.5 shadow"
-                    placeholder="Pencarian"
-                  />
-                </div>
-                {opdData.isLoading ? (
-                  <ReactLoading />
-                ) : (
-                  <InfiniteScroll
-                    dataLength={opdData.items.length}
-                    next={loadMoreData}
-                    hasMore={opdData.hasMore}
-                    height={500}
-                  >
-                    <List
-                      data={opdData.items}
-                      onSelectValue={handleSelectOpd}
-                    />
-                  </InfiniteScroll>
-                )}
-              </DialogContent>
-            </Dialog>
+          <div className="flex-1">
+            <Label className="mb-2">OPD</Label>
+            <DropdownDialog
+              label="Pilih OPD"
+              data={opdQuery.data}
+              value={selectedOpd}
+              onChange={handleSelectOpd}
+              maxWidth="max-w-sm"
+            />
           </div>
         )}
 
-        <div className="flex space-x-2">
+        <div className="flex space-x-2 flex-3">
           <Button
             className="w-28 lg:w-auto"
             type="submit"
@@ -270,4 +186,6 @@ export default function Dashboard() {
       </div>
     </>
   );
-}
+};
+
+export default Dashboard;

@@ -1,28 +1,20 @@
-import {
-  ArrowLeftIcon,
-  CheckCircleIcon,
-  PlusCircleIcon,
-} from '@heroicons/react/24/solid';
-import React, { useState, useEffect, useTransition } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { ArrowLeftIcon, CheckCircleIcon } from '@heroicons/react/24/solid';
+import React, { useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuthHeader } from 'react-auth-kit';
-import uuid from 'react-uuid';
-import Label from '../../../components/Label';
-import Button from '../../../components/Button';
-
-import {
-  createOrganization,
-  getOrganizations,
-} from '../../../api/admin/organization';
-import { useToastContext } from '../../../context/ToastContext';
-import ReactLoading from '../../../components/Loading';
-import DropdownDialog from '../../../components/DropdownDialog';
-import { useInfiniteQuery, useMutation } from 'react-query';
-import getRole from '../../../utils/getRole';
-import getRoles from '../../../api/static/getRoles';
-import TextInput from '../../../components/TextInput';
+import { useInfiniteQuery, useMutation, useQuery } from 'react-query';
 import { useForm } from 'react-hook-form';
-import doRegister from '../../../api/auth/register';
+import Label from '../../../components/Label';
+import TextInput from '../../../components/TextInput';
+import Button from '../../../components/Button';
+import ErrorPage from '../../ErrorPage';
+import { getOrganizations } from '../../../api/admin/organization';
+import { useToastContext } from '../../../context/ToastContext';
+import updateUser from '../../../api/auth/updateUser';
+import ReactLoading from '../../../components/Loading';
+import { getUser } from '../../../api/admin/user';
+import DropdownDialog from '../../../components/DropdownDialog';
+import getRoles from '../../../api/static/getRoles';
 
 let initialParams = {
   limit: 10,
@@ -31,58 +23,38 @@ let initialParams = {
   sort: 'terbaru',
 };
 
-function LoginAksesCreate() {
-  const [newOpd, setNewOpd] = useState('');
+const UserAccessEdit = () => {
+  const { id } = useParams();
+
   const [selectedOpd, setSelectedOpd] = useState(null);
-  const [openOpd, setOpenOpd] = useState(false);
-  const [openCreateOpd, setOpenCreateOpd] = useState(false);
   const [selectedLevel, setSelectedLevel] = useState(null);
-  const [openLevel, setOpenLevel] = useState(false);
-  const [opdData, setOpdData] = useState([
-    {
-      id: uuid(),
-    },
-  ]);
-  const [opd, setOpd] = useState(null);
-  const [levelUser, setLevelUser] = useState(null);
-  const [levelData, setLevelData] = useState([]);
-  const [opdError, setOpdError] = useState('');
-  const [levelError, setLevelError] = useState('');
-  const [nameError, setNameError] = useState('');
-  const [usernameError, setUsernameError] = useState('');
-  const [passwordError, setPasswordError] = useState('');
-  const [filterParams, setFilterParams] = useState(initialParams);
 
   const authHeader = useAuthHeader();
-  const navigate = useNavigate();
   const { showToastMessage } = useToastContext();
-
-  // const transition = useTransition(openCreateOpd, {
-  //   config: {
-  //     duration: 120,
-  //   },
-  //   from: {
-  //     scale: 0,
-  //     opacity: 0,
-  //   },
-  //   enter: {
-  //     scale: 1,
-  //     opacity: 1,
-  //   },
-  //   leave: {
-  //     scale: 0,
-  //     opacity: 0,
-  //   },
-  // });
+  const navigate = useNavigate();
 
   const {
-    data,
-    isSuccess,
-    isLoading,
-    hasNextPage,
-    fetchNextPage,
-    isFetchingNextPage,
-  } = useInfiniteQuery({
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm();
+
+  const userQuery = useQuery({
+    queryKey: ['get_user'],
+    queryFn: () => getUser(id, authHeader()),
+    onSuccess: (data) => {
+      setValue('name', data.data.name);
+      setValue('username', data.data.username);
+      setValue('opd', data.data.organization_id);
+      setValue('level', data.data.role_id);
+
+      setSelectedLevel(data.data.role);
+      setSelectedOpd(data.data.organization);
+    },
+  });
+
+  const opdQuery = useInfiniteQuery({
     queryKey: ['get_organizations'],
     queryFn: async ({ pageParam = 1 }) => {
       initialParams = {
@@ -101,63 +73,48 @@ function LoginAksesCreate() {
     queryFn: () => getRoles(authHeader()),
   });
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
-
-  const createMutation = useMutation(doRegister);
-
-  // useEffect(() => {
-  //   if (selectedLevel != null && selectedLevel.id !== 3) {
-  //     setOpdData([
-  //       {
-  //         id: uuid(),
-  //       },
-  //     ]);
-  //   }
-  // }, [selectedLevel]);
-
-  const removeOpdComponent = (indexToRemove) => {
-    const newOrganization = opdData.filter(
-      (_, index) => index !== indexToRemove
-    );
-    setOpdData(newOrganization);
-  };
+  const updateMutation = useMutation(updateUser);
 
   const onSubmit = (formData) => {
-    createMutation.mutate(
-      {
-        ...formData,
-        admin_role_id: levelUser.id,
+    const { name, username, password, level } = formData;
+
+    const requestBody = {
+      body: {
+        name,
+        username,
+        password,
+        user_id: id,
+        admin_role_id: level,
       },
-      {
-        onSuccess: () => {
-          showToastMessage('Berhasil membuat akun');
-          navigate('/admin/login-akses-user');
-        },
-        onError: (error) => {
-          showToastMessage(error.message, 'error');
-        },
-      }
-    );
+      token: authHeader(),
+    };
+
+    updateMutation.mutate(requestBody, {
+      onSuccess: () => {
+        showToastMessage('Berhasil mengubah akun');
+        navigate('/admin/login-akses-user');
+      },
+      onError: (error) => {
+        showToastMessage(error.message, 'error');
+      },
+    });
   };
 
   const handleSelectOpd = (item) => {
-    setOpd(item);
+    setSelectedOpd(item);
+    setValue('opd', item.id);
   };
 
   const handleSelectLevel = (item) => {
-    setLevelUser(item);
+    setSelectedLevel(item);
+    setValue('level', item.id);
   };
 
-  const addOpdComponent = () => {
-    const id = uuid();
-    setOpdData([...opdData, { id }]);
-  };
+  if (userQuery.isError) {
+    return <ErrorPage errorMessage={userQuery.error.message} />;
+  }
 
-  if (isLoading) {
+  if (userQuery.isLoading) {
     return <ReactLoading />;
   }
 
@@ -170,7 +127,7 @@ function LoginAksesCreate() {
         <Link to="../" className="flex space-x-3 items-center mb-8">
           <ArrowLeftIcon className="w-6 h-6" />
           <h1 className="font-semibold text-lg text-dark-gray leading-7">
-            Tambah User
+            Edit User
           </h1>
         </Link>
 
@@ -179,30 +136,27 @@ function LoginAksesCreate() {
             <Label className="mb-2">OPD</Label>
             <DropdownDialog
               label="Pilih OPD"
-              data={data}
-              value={opd}
+              data={opdQuery.data}
+              value={selectedOpd}
               onChange={handleSelectOpd}
+              register={register('opd', {
+                required: 'OPD wajib diisi!',
+              })}
+              error={errors.opd?.message}
             />
           </div>
-          {levelUser != null && levelUser.id === 3 && (
-            <div className="mb-6">
-              <Button
-                className="px-0"
-                onClick={addOpdComponent}
-                textColor="text-[#2F80ED]"
-                icon={<PlusCircleIcon className="w-8 h-8" />}
-              >
-                Tambah OPD Lain
-              </Button>
-            </div>
-          )}
+
           <div className="mb-6">
             <Label className="mb-2">Level</Label>
             <DropdownDialog
               label="Pilih Level User"
               data={rolesQuery.data}
-              value={levelUser}
+              value={selectedLevel}
               onChange={handleSelectLevel}
+              register={register('level', {
+                required: 'Level wajib diisi!',
+              })}
+              error={errors.level?.message}
             />
           </div>
           <div className="mb-6">
@@ -237,12 +191,13 @@ function LoginAksesCreate() {
               name="password"
               placeholder="Masukan Password"
               register={register('password', {
-                required: 'Password wajib diisi!',
+                required:
+                  'Password wajib diisi! Masukan password lama jika tidak ingin mengubah',
               })}
               error={errors.password?.message}
             />
           </div>
-          {createMutation.isLoading ? (
+          {updateMutation.isLoading ? (
             <ReactLoading />
           ) : (
             <div className="flex space-x-3">
@@ -270,6 +225,6 @@ function LoginAksesCreate() {
       </div>
     </>
   );
-}
+};
 
-export default LoginAksesCreate;
+export default UserAccessEdit;

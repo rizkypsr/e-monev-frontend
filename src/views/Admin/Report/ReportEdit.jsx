@@ -1,61 +1,46 @@
-import {
-  ArrowLeftIcon,
-  CheckCircleIcon,
-  MagnifyingGlassIcon,
-} from '@heroicons/react/24/solid';
-import React, { useCallback, useEffect, useState } from 'react';
+import { ArrowLeftIcon, CheckCircleIcon } from '@heroicons/react/24/solid';
+import React, { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuthHeader } from 'react-auth-kit';
-import InfiniteScroll from 'react-infinite-scroll-component';
-import { animated, useTransition } from '@react-spring/web';
+import { useInfiniteQuery, useMutation, useQuery } from 'react-query';
+import { useForm } from 'react-hook-form';
 import Label from '../../../components/Label';
 import Button from '../../../components/Button';
 import { useToastContext } from '../../../context/ToastContext';
 import ErrorPage from '../../ErrorPage';
 import ReactLoading from '../../../components/Loading';
-import Dropdown from '../../../components/Dropdown';
 import { getReport } from '../../../api/admin/report';
-import {
-  Dialog,
-  DialogContent,
-  DialogTrigger,
-} from '../../../components/DialogContent';
-import List from '../../../components/List';
-import SelectInputModal from '../../../components/SelectInputModal';
-import { createOccasion, getOccasions } from '../../../api/admin/occasion';
-import {
-  createOrganization,
-  getOrganizations,
-} from '../../../api/admin/organization';
-import { createProgram, getPrograms } from '../../../api/admin/program';
+import { getOccasions } from '../../../api/admin/occasion';
+import { getOrganizations } from '../../../api/admin/organization';
+import { getPrograms } from '../../../api/admin/program';
 import updateReport from '../../../api/admin/report/updateReport';
-import TextInput from '../../../components/TextInput';
 import getTriwulan from '../../../api/static/getTriwulan';
 import DropdownDialog from '../../../components/DropdownDialog';
-import { useInfiniteQuery, useMutation, useQuery } from 'react-query';
-import { setProgram } from '../../../redux/master/masterSlice';
 
-let initialParams = {
+const initialParams = {
   limit: 10,
   page: 1,
   search: '',
   sort: 'terbaru',
 };
 
-export default function ReportEdit() {
+const ReportEdit = () => {
   const { id } = useParams();
+  const authHeader = useAuthHeader();
+  const navigate = useNavigate();
+  const { showToastMessage } = useToastContext();
 
   const [selectedTriwulan, setSelectedTriwulan] = useState(null);
   const [selectedOpd, setSelectedOpd] = useState(null);
   const [selectedOccassion, setSelectedOccassion] = useState(null);
   const [selectedProgram, setSelectedProgram] = useState(null);
-  const [openCreateOpd, setOpenCreateOpd] = useState(false);
-  const [openCreateOccasion, setOpenCreateOccasion] = useState(false);
-  const [openCreateProgram, setOpenCreateProgram] = useState(false);
 
-  const authHeader = useAuthHeader();
-  const navigate = useNavigate();
-  const { showToastMessage } = useToastContext();
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm();
 
   const { isLoading, isError, error } = useQuery({
     queryKey: ['get_report'],
@@ -65,6 +50,11 @@ export default function ReportEdit() {
       setSelectedOpd(result.data.result.organization);
       setSelectedOccassion(result.data.result.occassion);
       setSelectedProgram(result.data.result.program);
+
+      setValue('triwulan_id', result.data.result.triwulan.id);
+      setValue('organization_id', result.data.result.organization.id);
+      setValue('occassion_id', result.data.result.occassion.id);
+      setValue('program_id', result.data.result.program.id);
     },
   });
 
@@ -99,59 +89,31 @@ export default function ReportEdit() {
 
   const updateMutation = useMutation(updateReport);
 
-  const transationConfig = {
-    config: {
-      duration: 120,
-    },
-    from: {
-      scale: 0,
-      opacity: 0,
-    },
-    enter: {
-      scale: 1,
-      opacity: 1,
-    },
-    leave: {
-      scale: 0,
-      opacity: 0,
-    },
-  };
-  const transitionCreateOpd = useTransition(openCreateOpd, transationConfig);
-  const transitionCreateOccasion = useTransition(
-    openCreateOccasion,
-    transationConfig
-  );
-  const transitionCreateProgram = useTransition(
-    openCreateProgram,
-    transationConfig
-  );
-
   const handleSelectTriwulan = (item) => {
     setSelectedTriwulan(item);
+    setValue('triwulan_id', item.id);
   };
 
   const handleSelectOccassion = (item) => {
     setSelectedOccassion(item);
+    setValue('occassion_id', item.id);
   };
 
   const handleSelectOpd = (item) => {
     setSelectedOpd(item);
+    setValue('organization_id', item.id);
   };
 
   const handleSelectProgram = (item) => {
     setSelectedProgram(item);
+    setValue('program_id', item.id);
   };
 
-  const onSubmit = (e) => {
-    e.preventDefault();
-
+  const onSubmit = (formData) => {
     updateMutation.mutate(
       {
         body: {
-          triwulan_id: selectedTriwulan.id,
-          organization_id: selectedOpd.id,
-          occassion_id: selectedOccassion.id,
-          program_id: selectedProgram.id,
+          ...formData,
           data_report_id: id,
         },
         token: authHeader(),
@@ -189,7 +151,10 @@ export default function ReportEdit() {
           </h1>
         </Link>
 
-        <form className="mt-4 lg:w-2/3 xl:w-1/3" onSubmit={onSubmit}>
+        <form
+          className="mt-4 lg:w-2/3 xl:w-1/3"
+          onSubmit={handleSubmit(onSubmit)}
+        >
           <div className="mb-6">
             <Label className="mb-2">Triwulan</Label>
             <DropdownDialog
@@ -197,6 +162,11 @@ export default function ReportEdit() {
               data={triwulanQuery.data}
               value={selectedTriwulan}
               onChange={handleSelectTriwulan}
+              register={register('triwulan_id', {
+                required: 'Triwulan wajib dipilih!',
+                valueAsNumber: true,
+              })}
+              error={errors.triwulan_id?.message}
             />
           </div>
           <div className="mb-6">
@@ -206,6 +176,11 @@ export default function ReportEdit() {
               data={occassionQuery.data}
               value={selectedOccassion}
               onChange={handleSelectOccassion}
+              register={register('occassion_id', {
+                required: 'Urusan wajib dipilih!',
+                valueAsNumber: true,
+              })}
+              error={errors.occassion_id?.message}
             />
           </div>
           <div className="mb-6">
@@ -215,6 +190,11 @@ export default function ReportEdit() {
               data={opdQuery.data}
               value={selectedOpd}
               onChange={handleSelectOpd}
+              register={register('organization_id', {
+                required: 'Organisasi wajib dipilih!',
+                valueAsNumber: true,
+              })}
+              error={errors.organization_id?.message}
             />
           </div>
           <div className="mb-6">
@@ -224,10 +204,15 @@ export default function ReportEdit() {
               data={programQuery.data}
               value={selectedProgram}
               onChange={handleSelectProgram}
+              register={register('program_id', {
+                required: 'Program wajib dipilih!',
+                valueAsNumber: true,
+              })}
+              error={errors.program_id?.message}
             />
           </div>
 
-          {isLoading ? (
+          {updateMutation.isLoading ? (
             <ReactLoading />
           ) : (
             <div className="flex space-x-3">
@@ -255,4 +240,6 @@ export default function ReportEdit() {
       </div>
     </>
   );
-}
+};
+
+export default ReportEdit;

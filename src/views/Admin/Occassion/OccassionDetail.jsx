@@ -5,29 +5,26 @@ import { Link, useParams } from 'react-router-dom';
 import { useQuery } from 'react-query';
 import ReactLoading from '../../../components/Loading';
 import ErrorPage from '../../ErrorPage';
-import { getUser } from '../../../api/admin/user';
+import getOccassion from '../../../api/admin/occasion/getOccasionDetail';
 
-const initialUser = {
-  name: '',
-  username: '',
-  levelUser: '',
+const initialData = {
+  code: '',
+  title: '',
 };
 
-function LoginAksesDetail() {
+const OccassionDetail = () => {
+  const [occassion, setOccassion] = useState(initialData);
+
   const { id } = useParams();
-
-  const [user, setUser] = useState(initialUser);
-
   const authHeader = useAuthHeader();
 
   const { isLoading, isError, error } = useQuery({
-    queryKey: ['get_user'],
-    queryFn: () => getUser(id, authHeader()),
+    queryKey: ['get_occassion'],
+    queryFn: () => getOccassion(id, authHeader()),
     onSuccess: (result) => {
-      setUser({
-        name: result.data.name,
-        username: result.data.username,
-        levelUser: result.data.role.name,
+      setOccassion({
+        code: result.data.code,
+        title: result.data.title,
       });
     },
   });
@@ -45,7 +42,7 @@ function LoginAksesDetail() {
       <Link to="../" className="flex space-x-3 items-center mb-8">
         <ArrowLeftIcon className="w-6 h-6" />
         <h1 className="font-semibold text-lg text-dark-gray leading-7">
-          Detail User
+          Detail Urusan
         </h1>
       </Link>
 
@@ -57,7 +54,7 @@ function LoginAksesDetail() {
                 scope="row"
                 className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
               >
-                ID
+                No.
               </th>
               <td className="px-6 py-4">{id}</td>
             </tr>
@@ -66,33 +63,24 @@ function LoginAksesDetail() {
                 scope="row"
                 className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
               >
-                Nama
+                Kode
               </th>
-              <td className="px-6 py-4">{user.name}</td>
+              <td className="px-6 py-4">{occassion.code}</td>
             </tr>
             <tr className="bg-light-blue">
               <th
                 scope="row"
                 className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
               >
-                Username
+                Urusan
               </th>
-              <td className="px-6 py-4">{user.username}</td>
-            </tr>
-            <tr className="bg-white">
-              <th
-                scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-              >
-                Level User
-              </th>
-              <td className="px-6 py-4">{user.levelUser}</td>
+              <td className="px-6 py-4">{occassion.title}</td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
   );
-}
+};
 
-export default LoginAksesDetail;
+export default OccassionDetail;

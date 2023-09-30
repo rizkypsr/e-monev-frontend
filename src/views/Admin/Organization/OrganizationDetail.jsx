@@ -12,11 +12,11 @@ const initialData = {
   title: '',
 };
 
-function OrganizationDetail() {
-  const [organization, setOrganization] = useState(initialData);
-
+const OrganizationDetail = () => {
   const { id } = useParams();
   const authHeader = useAuthHeader();
+
+  const [organization, setOrganization] = useState(initialData);
 
   const { isLoading, isError, error } = useQuery({
     queryKey: ['get_organization'],
@@ -81,6 +81,6 @@ function OrganizationDetail() {
       </div>
     </div>
   );
-}
+};
 
 export default OrganizationDetail;

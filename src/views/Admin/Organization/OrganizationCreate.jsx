@@ -1,5 +1,4 @@
 import { ArrowLeftIcon, CheckCircleIcon } from '@heroicons/react/24/solid';
-import { Label } from 'flowbite-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthHeader } from 'react-auth-kit';
 import { useMutation } from 'react-query';
@@ -9,8 +8,9 @@ import Button from '../../../components/Button';
 import { useToastContext } from '../../../context/ToastContext';
 import ReactLoading from '../../../components/Loading';
 import { createOrganization } from '../../../api/admin/organization';
+import Label from '../../../components/Label';
 
-function OrganizationCreate() {
+const OrganizationCreate = () => {
   const authHeader = useAuthHeader();
   const navigate = useNavigate();
   const { showToastMessage } = useToastContext();
@@ -58,7 +58,7 @@ function OrganizationCreate() {
 
         <form className="mt-4" onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-6">
-            <Label>Organisasi</Label>
+            <Label className="mb-2">Organisasi</Label>
             <TextInput
               id="title"
               name="title"
@@ -97,6 +97,6 @@ function OrganizationCreate() {
       </div>
     </>
   );
-}
+};
 
 export default OrganizationCreate;

@@ -1,35 +1,46 @@
-import React from 'react';
 import { ArrowLeftIcon, CheckCircleIcon } from '@heroicons/react/24/solid';
 import { Label } from 'flowbite-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuthHeader } from 'react-auth-kit';
-import { useMutation } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 import { useForm } from 'react-hook-form';
 import TextInput from '../../../components/TextInput';
 import Button from '../../../components/Button';
-import 'react-toastify/dist/ReactToastify.css';
 import { useToastContext } from '../../../context/ToastContext';
-import { createOccasion } from '../../../api/admin/occasion';
+import { updateOccasion } from '../../../api/admin/occasion';
+import ErrorPage from '../../ErrorPage';
 import ReactLoading from '../../../components/Loading';
+import getOccassion from '../../../api/admin/occasion/getOccasionDetail';
 
-export default function OccasionCreate() {
+const OccassionEdit = () => {
   const authHeader = useAuthHeader();
-  const navigate = useNavigate();
   const { showToastMessage } = useToastContext();
-
-  const createMutation = useMutation(createOccasion);
+  const { id } = useParams();
+  const navigate = useNavigate();
 
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm();
 
+  const { isLoading, isError, error } = useQuery({
+    queryKey: ['get_occassion'],
+    queryFn: () => getOccassion(id, authHeader()),
+    onSuccess: (result) => {
+      setValue('title', result.data.title);
+    },
+  });
+
+  const updateMutation = useMutation(updateOccasion);
+
   const onSubmit = (formData) => {
-    createMutation.mutate(
+    updateMutation.mutate(
       {
         body: {
           ...formData,
+          occassion_id: id,
         },
         token: authHeader(),
       },
@@ -38,24 +49,28 @@ export default function OccasionCreate() {
           showToastMessage('Berhasil membuat Urusan');
           navigate('/admin/urusan');
         },
-        onError: (error) => {
-          showToastMessage(error.message, 'error');
-        },
       }
     );
   };
+
+  if (isError) {
+    return <ErrorPage errorMessage={error.message} />;
+  }
+
+  if (isLoading) {
+    return <ReactLoading />;
+  }
 
   return (
     <>
       <div className="flex justify-between">
         <h1 className="text-2xl font-semibold">Urusan</h1>
       </div>
-
       <div className="w-full h-full mt-6 bg-white rounded-lg p-9">
         <Link to="../" className="flex space-x-3 items-center mb-8">
           <ArrowLeftIcon className="w-6 h-6" />
           <h1 className="font-semibold text-lg text-dark-gray leading-7">
-            Tambah Urusan
+            Edit Urusan
           </h1>
         </Link>
 
@@ -72,7 +87,7 @@ export default function OccasionCreate() {
               error={errors.title?.message}
             />
           </div>
-          {createMutation.isLoading ? (
+          {updateMutation.isLoading ? (
             <ReactLoading />
           ) : (
             <div className="flex space-x-3">
@@ -100,4 +115,6 @@ export default function OccasionCreate() {
       </div>
     </>
   );
-}
+};
+
+export default OccassionEdit;

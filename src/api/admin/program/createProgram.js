@@ -1,17 +1,23 @@
-import { baseUrl } from '../../../utils/constants';
-import makeRequest from '../../../utils/makeRequest';
+import axiosClient from '../../../config/axios';
 
-export default async function createProgram(authHeader, body) {
-  const url = `${baseUrl}/program/create`;
-  const headers = {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      authorization: authHeader(),
-    },
-    body: JSON.stringify(body),
-  };
+async function createProgram({ body, token }) {
+  try {
+    const response = await axiosClient.post('/program/create', body, {
+      headers: {
+        Authorization: token,
+      },
+    });
 
-  const programResponse = await makeRequest(url, headers);
-  return programResponse;
+    const responseData = response.data;
+
+    if (responseData.statusCode !== 200) {
+      throw new Error(responseData.message);
+    }
+
+    return responseData;
+  } catch (err) {
+    throw new Error(err);
+  }
 }
+
+export default createProgram;

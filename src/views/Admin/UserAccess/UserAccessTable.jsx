@@ -169,14 +169,14 @@ const initialParams = {
   sort: 'terbaru',
 };
 
-function UserAccessTable() {
-  const [filterParams, setFilterParams] = useState(initialParams);
-  const [selectedSorting, setSelectedSorting] = useState(sorting[0]);
-  const [selectedPageSize, setSelectedPageSize] = useState(pageSizes[0]);
-
+const UserAccessTable = () => {
   const authHeader = useAuthHeader();
   const { showToastMessage } = useToastContext();
   const queryClient = useQueryClient();
+
+  const [filterParams, setFilterParams] = useState(initialParams);
+  const [selectedSorting, setSelectedSorting] = useState(sorting[0]);
+  const [selectedPageSize, setSelectedPageSize] = useState(pageSizes[0]);
 
   const { isLoading, isError, data, error } = useQuery({
     queryKey: ['get_users', filterParams],
@@ -229,8 +229,15 @@ function UserAccessTable() {
     }, 500);
   };
 
+  const onPaginationChange = (currentPage) => {
+    setFilterParams({
+      ...filterParams,
+      page: currentPage,
+    });
+  };
+
   if (isError) {
-    return <ErrorPage errorMessage={error} />;
+    return <ErrorPage errorMessage={error.message} />;
   }
 
   return (
@@ -298,14 +305,13 @@ function UserAccessTable() {
         />
 
         <Pagination
-          totalRows={data?.data.pages || 0}
-          pageChangeHandler={() => {}}
-          rowsPerPage={data?.data.pages || 0}
-          resetPage={() => {}}
+          totalRows={data?.data.total || 0}
+          pageChangeHandler={onPaginationChange}
+          rowsPerPage={filterParams.limit}
         />
       </div>
     </>
   );
-}
+};
 
 export default UserAccessTable;
