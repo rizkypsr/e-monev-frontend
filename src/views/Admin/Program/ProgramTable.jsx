@@ -42,6 +42,11 @@ const columns = [
     cell: (info) => <i>{info.getValue()}</i>,
     header: () => <span>Program</span>,
   }),
+  columnHelper.accessor((row) => row.occassion?.title, {
+    id: 'occassion',
+    cell: (info) => <i>{info.getValue()}</i>,
+    header: () => <span>Urusan</span>,
+  }),
   columnHelper.accessor((row) => row.aksi, {
     id: 'aksi',
     size: 10,

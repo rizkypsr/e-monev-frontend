@@ -29,112 +29,114 @@ const columns = [
   columnHelper.accessor((row) => row.activity_name, {
     id: 'activity_name',
     cell: (info) => <i>{info.getValue()}</i>,
-    header: () => <span>activity_name</span>,
+    header: () => <span>Nama Kegiatan</span>,
   }),
   columnHelper.accessor((row) => row.activity_location, {
     id: 'activity_location',
     cell: (info) => <i>{info.getValue()}</i>,
-    header: () => <span>activity_location</span>,
+    header: () => <span>Lokasi Kegiatan</span>,
   }),
   columnHelper.accessor((row) => row.fund_source_id, {
     id: 'fund_source_id',
     cell: (info) => <i>{info.getValue()}</i>,
-    header: () => <span>fund_source_id</span>,
+    header: () => <span>Sumber Dana</span>,
   }),
   columnHelper.accessor((row) => row.fund_ceiling, {
     id: 'fund_ceiling',
     cell: (info) => <i>{info.getValue()}</i>,
-    header: () => <span>fund_ceiling</span>,
+    header: () => <span>Pagu Dana</span>,
   }),
   columnHelper.accessor((row) => row.management_organization, {
     id: 'management_organization',
     cell: (info) => <i>{info.getValue()}</i>,
-    header: () => <span>management_organization</span>,
+    header: () => <span>OPD Organisasi</span>,
   }),
   columnHelper.accessor((row) => row.pptk_name, {
     id: 'pptk_name',
     cell: (info) => <i>{info.getValue()}</i>,
-    header: () => <span>pptk_name</span>,
+    header: () => <span>Nama PPTK</span>,
   }),
   columnHelper.accessor((row) => row.contract_number_date, {
     id: 'contract_number_date',
     cell: (info) => <i>{info.getValue()}</i>,
-    header: () => <span>contract_number_date</span>,
+    header: () => <span>Nomor dan Tgl Kontrak</span>,
   }),
   columnHelper.accessor((row) => row.contractor_name, {
     id: 'contractor_name',
     cell: (info) => <i>{info.getValue()}</i>,
-    header: () => <span>contractor_name</span>,
+    header: () => <span>Nama Kontraktor</span>,
   }),
   columnHelper.accessor((row) => row.implementation_period, {
     id: 'implementation_period',
     cell: (info) => <i>{info.getValue()}</i>,
-    header: () => <span>implementation_period</span>,
+    header: () => <span>Jangka Waktu</span>,
   }),
   columnHelper.accessor((row) => row.contract_value, {
     id: 'contract_value',
     cell: (info) => <i>{info.getValue()}</i>,
-    header: () => <span>contract_value</span>,
+    header: () => <span>Nilai Kontrak</span>,
   }),
   columnHelper.accessor((row) => row.physical_realization, {
     id: 'physical_realization',
     cell: (info) => <i>{info.getValue()}</i>,
-    header: () => <span>physical_realization</span>,
+    header: () => <span>Realisasi Fisik</span>,
   }),
   columnHelper.accessor((row) => row.fund_realization, {
     id: 'fund_realization',
     cell: (info) => <i>{info.getValue()}</i>,
-    header: () => <span>fund_realization</span>,
+    header: () => <span>Realisasi Keuangan</span>,
   }),
   columnHelper.accessor((row) => row.activity_volume, {
     id: 'activity_volume',
     cell: (info) => <i>{info.getValue()}</i>,
-    header: () => <span>activity_volume</span>,
+    header: () => <span>Volume Kegiatan</span>,
   }),
   columnHelper.accessor((row) => row.activity_output, {
     id: 'activity_output',
     cell: (info) => <i>{info.getValue()}</i>,
-    header: () => <span>activity_output</span>,
+    header: () => <span>Output Kegiatan</span>,
   }),
   columnHelper.accessor((row) => row.direct_target_group, {
     id: 'direct_target_group',
     cell: (info) => <i>{info.getValue()}</i>,
-    header: () => <span>direct_target_group</span>,
+    header: () => <span>Manfaat Kegiatan (Kelompok Sasaran Langsung)</span>,
   }),
   columnHelper.accessor((row) => row.indirect_target_group, {
     id: 'indirect_target_group',
     cell: (info) => <i>{info.getValue()}</i>,
-    header: () => <span>indirect_target_group</span>,
+    header: () => (
+      <span>Manfaat Kegiatan (Kelompok Sasaran Tidak Langsung)</span>
+    ),
   }),
   columnHelper.accessor((row) => row.local_workforce, {
     id: 'local_workforce',
     cell: (info) => <i>{info.getValue()}</i>,
-    header: () => <span>local_workforce</span>,
+    header: () => <span>Jumlah Tenaga Kerja (Lokal)</span>,
   }),
   columnHelper.accessor((row) => row.non_local_workforce, {
     id: 'non_local_workforce',
     cell: (info) => <i>{info.getValue()}</i>,
-    header: () => <span>non_local_workforce</span>,
+    header: () => <span>Jumlah Tenaga Kerja (Non Lokal)</span>,
   }),
   columnHelper.accessor((row) => row.problems, {
     id: 'problems',
     cell: (info) => <i>{info.getValue()}</i>,
-    header: () => <span>problems</span>,
+    header: () => <span>Hambatan dan Permasalahan</span>,
   }),
   columnHelper.accessor((row) => row.solution, {
     id: 'solution',
     cell: (info) => <i>{info.getValue()}</i>,
-    header: () => <span>solution</span>,
+    header: () => <span>Solusi Permasalahan</span>,
   }),
   columnHelper.accessor((row) => row.procurement_type_id, {
     id: 'procurement_type_id',
     cell: (info) => <i>{info.getValue()}</i>,
-    header: () => <span>procurement_type_id</span>,
+    header: () => <span>Jenis Pengadaan</span>,
   }),
   columnHelper.accessor((row) => row.procurement_method_id, {
     id: 'procurement_method_id',
     cell: (info) => <i>{info.getValue()}</i>,
-    header: () => <span>procurement_method_id</span>,
+    header: () => <span>Cara Pengadaan</span>,
   }),
 
   columnHelper.accessor((row) => row.aksi, {
