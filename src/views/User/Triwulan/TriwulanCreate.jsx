@@ -22,7 +22,46 @@ const initialParams = {
   sort: 'terbaru',
 };
 
-function TriwulanCreate() {
+const jenisPengadaan = {
+  pageParams: [undefined],
+  pages: [
+    {
+      data: {
+        page: 1,
+        pages: 1,
+        result: [
+          { id: 1, name: 'Barang' },
+          { id: 2, name: 'Pekerjaan Konstruksi' },
+          { id: 3, name: 'Jasa Konsultasi' },
+          { id: 4, name: 'Jasa Lainnya' },
+        ],
+        total: 4,
+      },
+    },
+  ],
+};
+
+const caraPengadaan = {
+  pageParams: [undefined],
+  pages: [
+    {
+      data: {
+        page: 1,
+        pages: 1,
+        result: [
+          { id: 1, name: 'Swakelola' },
+          { id: 2, name: 'Pengadaan Langsung' },
+          { id: 3, name: 'Seleksi' },
+          { id: 4, name: 'Tender' },
+          { id: 5, name: 'Penunjukan Langsung' },
+        ],
+        total: 4,
+      },
+    },
+  ],
+};
+
+const TriwulanCreate = () => {
   const authHeader = useAuthHeader();
   const navigate = useNavigate();
   const { showToastMessage } = useToastContext();
@@ -358,7 +397,7 @@ function TriwulanCreate() {
               <Label className="mb-2">Jenis Pengadaan</Label>
               <DropdownDialog
                 label="Pilih Jenis Pengadaan"
-                data={procurementTypeQuery.data}
+                data={jenisPengadaan}
                 value={selectedProcurementType}
                 onChange={handleSelectProcurementType}
               />
@@ -368,7 +407,7 @@ function TriwulanCreate() {
               <Label className="mb-2">Cara Pengadaan</Label>
               <DropdownDialog
                 label="Pilih Cara Pengadaan"
-                data={procurementMethodQuery.data}
+                data={caraPengadaan}
                 value={selectedProcurementMethod}
                 onChange={handleSelectProcurementMethod}
               />
@@ -414,6 +453,6 @@ function TriwulanCreate() {
       </div>
     </div>
   );
-}
+};
 
 export default TriwulanCreate;
