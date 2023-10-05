@@ -1,9 +1,20 @@
+import {
+  EyeIcon,
+  MagnifyingGlassIcon,
+  PencilIcon,
+  PlusIcon,
+  TrashIcon,
+} from '@heroicons/react/24/solid';
 import { createColumnHelper } from '@tanstack/react-table';
-import { Link, useSearchParams } from 'react-router-dom';
-import { EyeIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/solid';
+import React, { useState } from 'react';
 import { useAuthHeader } from 'react-auth-kit';
-import { useMutation, useQuery, useQueryClient } from 'react-query';
-import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from 'react-query';
 import Button from '../../../components/Button';
 import {
   Dialog,
@@ -11,13 +22,18 @@ import {
   DialogContent,
   DialogTrigger,
 } from '../../../components/DialogContent';
-import TrashImg from '../../../assets/images/trash.png';
-import ErrorPage from '../../ErrorPage';
-import { deleteReport } from '../../../api/admin/report';
 import Table from '../../../components/Table';
-import Pagination from '../../../components/Pagination';
 import { useToastContext } from '../../../context/ToastContext';
+import TrashImg from '../../../assets/images/trash.png';
+import { deleteOccasion, getOccasions } from '../../../api/admin/occasion';
+import Pagination from '../../../components/Pagination';
+import ErrorPage from '../../ErrorPage';
+import DropdownSelect from '../../../components/DropdownSelect';
 import getTriwulanReport from '../../../api/admin/report/getTriwulanReport';
+import { deleteReport } from '../../../api/admin/report';
+import DropdownDialog from '../../../components/DropdownDialog';
+import { getOrganizations } from '../../../api/admin/organization';
+import Label from '../../../components/Label';
 import deleteTriwulanReport from '../../../api/admin/report/deleteTriwulanReport';
 
 const columnHelper = createColumnHelper();
@@ -147,14 +163,14 @@ const columns = [
       const rowId = props.row.original.id;
       return (
         <div className="flex justify-end">
-          <Link to={`/data-triwulan/edit/${rowId}`}>
+          {/* <Link to={`/data-triwulan/edit/${rowId}`}>
             <Button
               className="text-sm font-normal"
               textColor="text-blue-500"
               icon={<PencilIcon className="w-4 h-4" />}
             />
-          </Link>
-          <Link to={`/data-triwulan/detail/${rowId}`}>
+          </Link> */}
+          <Link to={`/admin/data-triwulan/detail/${rowId}`}>
             <Button
               className="text-sm font-normal"
               textColor="text-blue-500"
@@ -221,28 +237,36 @@ const initialParams = {
   page: 1,
   search: '',
   sort: 'terbaru',
-  month: null,
-  year: null,
-  fund_source_id: null,
 };
 
-const ReportTriwulanTable = () => {
-  const [searchParams] = useSearchParams();
+const initialOpdParams = {
+  limit: 10,
+  page: 1,
+  search: '',
+  sort: 'terbaru',
+};
 
-  const [filterParams, setFilterParams] = useState(initialParams);
-
-  useEffect(() => {
-    setFilterParams(Object.fromEntries(searchParams.entries()));
-  }, [searchParams]);
-
-  const queryClient = useQueryClient();
+const HistoryTable = () => {
   const authHeader = useAuthHeader();
   const { showToastMessage } = useToastContext();
+  const queryClient = useQueryClient();
+
+  const [filterParams, setFilterParams] = useState(initialParams);
+  const [filterOpdParams, setFilterOpdParams] = useState(initialOpdParams);
+  const [selectedOpd, setSelectedOpd] = useState(null);
 
   const { isLoading, isError, error, data } = useQuery({
     queryKey: ['get_triwulan_reports', filterParams],
     queryFn: () => getTriwulanReport(filterParams, authHeader()),
     keepPreviousData: true,
+  });
+
+  const opdQuery = useInfiniteQuery({
+    queryKey: ['get_organizations'],
+    queryFn: async ({ pageParam = 1 }) =>
+      getOrganizations(filterOpdParams, authHeader()),
+    getNextPageParam: (lastPage) => lastPage.nextId ?? undefined,
+    getPreviousPageParam: (firstPage) => firstPage.previousId ?? undefined,
   });
 
   const deleteMutation = useMutation(deleteTriwulanReport);
@@ -265,6 +289,10 @@ const ReportTriwulanTable = () => {
     );
   };
 
+  const handleSelectOpd = (opd) => {
+    setSelectedOpd(opd);
+  };
+
   const onPaginationChange = (currentPage) => {
     setFilterParams({
       ...filterParams,
@@ -277,27 +305,46 @@ const ReportTriwulanTable = () => {
   }
 
   return (
-    <div className="w-full h-full mt-6 bg-white rounded-lg">
-      <Table
-        columns={columns.map((column) =>
-          column.cell
-            ? {
-                ...column,
-                cell: (props) => column.cell(props, deleteReportData),
-              }
-            : column
-        )}
-        rows={data?.data.result || []}
-        isLoading={isLoading}
-      />
+    <>
+      <div className="flex justify-between">
+        <h1 className="text-2xl font-semibold">Riwayat</h1>
+      </div>
 
-      <Pagination
-        totalRows={data?.data.total || 0}
-        pageChangeHandler={onPaginationChange}
-        rowsPerPage={filterParams.limit}
-      />
-    </div>
+      <div className="flex justify-between mt-6">
+        <div className="flex-1">
+          <Label className="mb-2">OPD</Label>
+          <DropdownDialog
+            label="Pilih OPD"
+            data={opdQuery.data}
+            value={selectedOpd}
+            onChange={handleSelectOpd}
+            maxWidth="max-w-sm"
+          />
+        </div>
+      </div>
+
+      <div className="w-full h-full mt-6 bg-white rounded-lg">
+        <Table
+          columns={columns.map((column) =>
+            column.cell
+              ? {
+                  ...column,
+                  cell: (props) => column.cell(props, deleteReportData),
+                }
+              : column
+          )}
+          rows={data?.data.result || []}
+          isLoading={isLoading}
+        />
+
+        <Pagination
+          totalRows={data?.data.total || 0}
+          pageChangeHandler={onPaginationChange}
+          rowsPerPage={filterParams.limit}
+        />
+      </div>
+    </>
   );
 };
 
-export default ReportTriwulanTable;
+export default HistoryTable;

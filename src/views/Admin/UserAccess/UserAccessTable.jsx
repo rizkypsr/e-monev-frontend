@@ -39,6 +39,11 @@ const columns = [
     cell: (info) => <i>{info.getValue()}</i>,
     header: () => <span>Username</span>,
   }),
+  columnHelper.accessor((row) => row.email, {
+    id: 'email',
+    cell: (info) => <i>{info.getValue()}</i>,
+    header: () => <span>Email</span>,
+  }),
   columnHelper.accessor((row) => row.organization?.title, {
     id: 'organization',
     cell: (info) => <i>{info.getValue()}</i>,
@@ -186,16 +191,16 @@ const UserAccessTable = () => {
 
   const deleteMutation = useMutation(deleteUser);
 
-  const deleteUserData = async (userId) => {
+  const deleteUserData = (userId) => {
     deleteMutation.mutate(
       {
-        user_id: userId,
+        id: userId,
         token: authHeader(),
       },
       {
         onSuccess: (result) => {
+          showToastMessage(result.message);
           queryClient.invalidateQueries('get_users');
-          showToastMessage(result);
         },
         onError: (err) => {
           showToastMessage(err.message, 'error');

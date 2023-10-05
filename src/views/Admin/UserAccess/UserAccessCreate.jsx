@@ -1,4 +1,8 @@
-import { ArrowLeftIcon, CheckCircleIcon } from '@heroicons/react/24/solid';
+import {
+  ArrowLeftIcon,
+  CheckCircleIcon,
+  PlusCircleIcon,
+} from '@heroicons/react/24/solid';
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthHeader } from 'react-auth-kit';
@@ -13,7 +17,7 @@ import ReactLoading from '../../../components/Loading';
 import DropdownDialog from '../../../components/DropdownDialog';
 import getRoles from '../../../api/static/getRoles';
 import TextInput from '../../../components/TextInput';
-import doRegister from '../../../api/auth/register';
+import createUser from '../../../api/admin/user/createUser';
 
 const initialParams = {
   limit: 10,
@@ -22,14 +26,21 @@ const initialParams = {
   sort: 'terbaru',
 };
 
+const initialOrganizations = [
+  {
+    selected: null,
+  },
+];
+
 const UserAccessCreate = () => {
   const authHeader = useAuthHeader();
   const navigate = useNavigate();
   const { showToastMessage } = useToastContext();
 
-  const [selectedOpd, setSelectedOpd] = useState(null);
+  const [organizations, setOrganizations] = useState(initialOrganizations);
   const [selectedLevel, setSelectedLevel] = useState(null);
   const [filterParams, setFilterParams] = useState(initialParams);
+  const [opdError, setOpdError] = useState(null);
 
   const {
     register,
@@ -51,17 +62,30 @@ const UserAccessCreate = () => {
     queryFn: () => getRoles(authHeader()),
   });
 
-  const createMutation = useMutation(doRegister);
+  const createMutation = useMutation(createUser);
 
   const onSubmit = (formData) => {
-    const { name, username, password, level } = formData;
+    const { name, username, email, password, level } = formData;
+
+    const emptyOpd = organizations.filter((opd) => opd.selected === null);
+
+    // If organizations is not selected
+    if (emptyOpd.length > 0) {
+      setOpdError('Semua OPD wajib dipilih');
+      return;
+    }
 
     createMutation.mutate(
       {
-        name,
-        username,
-        password,
-        admin_role_id: level,
+        body: {
+          name,
+          username,
+          email,
+          password,
+          organization_id: organizations.map((opd) => opd.selected.id),
+          admin_role_id: level,
+        },
+        token: authHeader(),
       },
       {
         onSuccess: () => {
@@ -75,12 +99,35 @@ const UserAccessCreate = () => {
     );
   };
 
-  const handleSelectOpd = (item) => {
-    setSelectedOpd(item);
-    setValue('opd', item.id);
+  const addOrganizationsComponent = () => {
+    setOrganizations([
+      ...organizations,
+      {
+        selected: null,
+      },
+    ]);
+  };
+
+  const removeOrganizationsComponent = (indexToRemove) => {
+    const newOrganizations = organizations.filter(
+      (_, index) => index !== indexToRemove
+    );
+    setOrganizations(newOrganizations);
+  };
+
+  const handleSelectOpd = (item, index) => {
+    setOrganizations((prev) => {
+      const updatedOpd = [...prev];
+      updatedOpd[index] = { selected: item };
+      return updatedOpd;
+    });
   };
 
   const handleSelectLevel = (item) => {
+    if (item.name !== 'Admin Bidang') {
+      setOrganizations(initialOrganizations);
+    }
+
     setSelectedLevel(item);
     setValue('level', item.id);
   };
@@ -101,29 +148,37 @@ const UserAccessCreate = () => {
         <form className="mt-4" onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-6">
             <Label className="mb-2">OPD</Label>
-            <DropdownDialog
-              label="Pilih OPD"
-              data={opdQuery.data}
-              value={selectedOpd}
-              onChange={handleSelectOpd}
-              register={register('opd', {
-                required: 'OPD wajib diisi!',
-              })}
-              error={errors.opd?.message}
-            />
+            <div className="space-y-3">
+              {organizations.map((opd, index) => (
+                <DropdownDialog
+                  label="Pilih OPD"
+                  data={opdQuery.data}
+                  value={opd.selected}
+                  onChange={(value) => handleSelectOpd(value, index)}
+                  onDelete={
+                    index > 0 && (() => removeOrganizationsComponent(index))
+                  }
+                />
+              ))}
+            </div>
+            {opdError && (
+              <p className="mt-2 text-xs text-red-600">{opdError}</p>
+            )}
           </div>
-          {/* {levelUser != null && levelUser.id === 3 && (
+          {errors.organization && (
+            <p className="mt-2 text-xs text-red-600">{errors.organization}</p>
+          )}
+          {selectedLevel?.name === 'Admin Bidang' && (
             <div className="mb-6">
               <Button
-                className="px-0"
-                onClick={addOpdComponent}
+                onClick={addOrganizationsComponent}
                 textColor="text-[#2F80ED]"
                 icon={<PlusCircleIcon className="w-8 h-8" />}
               >
-                Tambah OPD Lain
+                Tambah Urusan Lain
               </Button>
             </div>
-          )} */}
+          )}
           <div className="mb-6">
             <Label className="mb-2">Level</Label>
             <DropdownDialog
@@ -152,13 +207,25 @@ const UserAccessCreate = () => {
           <div className="mb-6">
             <Label htmlFor="username">Username</Label>
             <TextInput
-              id="name"
-              name="name"
-              placeholder="Masukan Nama"
+              id="username"
+              name="username"
+              placeholder="Masukan Username"
               register={register('username', {
                 required: 'Nama wajib diisi!',
               })}
               error={errors.username?.message}
+            />
+          </div>
+          <div className="mb-6">
+            <Label htmlFor="email">Email</Label>
+            <TextInput
+              id="email"
+              name="email"
+              placeholder="Masukan Email"
+              register={register('email', {
+                required: 'Email wajib diisi!',
+              })}
+              error={errors.email?.message}
             />
           </div>
           <div className="mb-6">

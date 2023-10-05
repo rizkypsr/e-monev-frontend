@@ -1,4 +1,8 @@
-import { ArrowLeftIcon, CheckCircleIcon } from '@heroicons/react/24/solid';
+import {
+  ArrowLeftIcon,
+  CheckCircleIcon,
+  PlusCircleIcon,
+} from '@heroicons/react/24/solid';
 import React, { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuthHeader } from 'react-auth-kit';
@@ -23,15 +27,21 @@ let initialParams = {
   sort: 'terbaru',
 };
 
+const initialOrganizations = [
+  {
+    selected: null,
+  },
+];
+
 const UserAccessEdit = () => {
   const { id } = useParams();
-
-  const [selectedOpd, setSelectedOpd] = useState(null);
-  const [selectedLevel, setSelectedLevel] = useState(null);
-
-  const authHeader = useAuthHeader();
   const { showToastMessage } = useToastContext();
+  const authHeader = useAuthHeader();
   const navigate = useNavigate();
+
+  const [organizations, setOrganizations] = useState(initialOrganizations);
+  const [selectedLevel, setSelectedLevel] = useState(null);
+  const [opdError, setOpdError] = useState(null);
 
   const {
     register,
@@ -46,11 +56,15 @@ const UserAccessEdit = () => {
     onSuccess: (data) => {
       setValue('name', data.data.name);
       setValue('username', data.data.username);
-      setValue('opd', data.data.organization_id);
+      setValue('email', data.data.email);
       setValue('level', data.data.role_id);
 
+      const opds = data.data.userOrganization.map((opd) => ({
+        selected: opd.organization,
+      }));
+
       setSelectedLevel(data.data.role);
-      setSelectedOpd(data.data.organization);
+      setOrganizations(opds.length > 0 ? opds : initialOrganizations);
     },
   });
 
@@ -76,15 +90,25 @@ const UserAccessEdit = () => {
   const updateMutation = useMutation(updateUser);
 
   const onSubmit = (formData) => {
-    const { name, username, password, level } = formData;
+    const { name, username, email, password, level } = formData;
+
+    const emptyOpd = organizations.filter((opd) => opd.selected === null);
+
+    // If organizations is not selected
+    if (emptyOpd.length > 0) {
+      setOpdError('Semua OPD wajib dipilih');
+      return;
+    }
 
     const requestBody = {
       body: {
         name,
         username,
+        email,
         password,
-        user_id: id,
+        organization_id: organizations.map((opd) => Number(opd.selected.id)),
         admin_role_id: level,
+        user_id: id,
       },
       token: authHeader(),
     };
@@ -100,12 +124,35 @@ const UserAccessEdit = () => {
     });
   };
 
-  const handleSelectOpd = (item) => {
-    setSelectedOpd(item);
-    setValue('opd', item.id);
+  const addOrganizationsComponent = () => {
+    setOrganizations([
+      ...organizations,
+      {
+        selected: null,
+      },
+    ]);
+  };
+
+  const removeOrganizationsComponent = (indexToRemove) => {
+    const newOrganizations = organizations.filter(
+      (_, index) => index !== indexToRemove
+    );
+    setOrganizations(newOrganizations);
+  };
+
+  const handleSelectOpd = (item, index) => {
+    setOrganizations((prev) => {
+      const updatedOpd = [...prev];
+      updatedOpd[index] = { selected: item };
+      return updatedOpd;
+    });
   };
 
   const handleSelectLevel = (item) => {
+    if (item.name !== 'Admin Bidang') {
+      setOrganizations(initialOrganizations);
+    }
+
     setSelectedLevel(item);
     setValue('level', item.id);
   };
@@ -134,17 +181,38 @@ const UserAccessEdit = () => {
         <form className="mt-4" onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-6">
             <Label className="mb-2">OPD</Label>
-            <DropdownDialog
-              label="Pilih OPD"
-              data={opdQuery.data}
-              value={selectedOpd}
-              onChange={handleSelectOpd}
-              register={register('opd', {
-                required: 'OPD wajib diisi!',
-              })}
-              error={errors.opd?.message}
-            />
+            <div className="space-y-3">
+              {organizations.map((opd, index) => (
+                <DropdownDialog
+                  label="Pilih OPD"
+                  data={opdQuery.data}
+                  value={opd.selected}
+                  onChange={(value) => handleSelectOpd(value, index)}
+                  onDelete={
+                    index > 0 && (() => removeOrganizationsComponent(index))
+                  }
+                />
+              ))}
+            </div>
+            {opdError && (
+              <p className="mt-2 text-xs text-red-600">{opdError}</p>
+            )}
           </div>
+
+          {errors.organization && (
+            <p className="mt-2 text-xs text-red-600">{errors.organization}</p>
+          )}
+          {selectedLevel?.name === 'Admin Bidang' && (
+            <div className="mb-6">
+              <Button
+                onClick={addOrganizationsComponent}
+                textColor="text-[#2F80ED]"
+                icon={<PlusCircleIcon className="w-8 h-8" />}
+              >
+                Tambah Urusan Lain
+              </Button>
+            </div>
+          )}
 
           <div className="mb-6">
             <Label className="mb-2">Level</Label>
@@ -181,6 +249,18 @@ const UserAccessEdit = () => {
                 required: 'Nama wajib diisi!',
               })}
               error={errors.username?.message}
+            />
+          </div>
+          <div className="mb-6">
+            <Label htmlFor="email">Email</Label>
+            <TextInput
+              id="email"
+              name="email"
+              placeholder="Masukan Email"
+              register={register('email', {
+                required: 'Email wajib diisi!',
+              })}
+              error={errors.email?.message}
             />
           </div>
           <div className="mb-6">

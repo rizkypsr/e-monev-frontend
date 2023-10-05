@@ -1,6 +1,6 @@
 import axiosClient from '../../../config/axios';
 
-export default async function getActivities(params, token) {
+async function getActivities(params, token) {
   try {
     const response = await axiosClient.get('/activity/list', {
       params,
@@ -20,3 +20,5 @@ export default async function getActivities(params, token) {
     throw new Error(err);
   }
 }
+
+export default getActivities;

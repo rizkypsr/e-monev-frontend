@@ -26,18 +26,29 @@ const Sidebar = ({ isOpen }) => {
   const signOut = useSignOut();
   const authUser = useAuthUser();
 
+  const getPath = (path = '') => {
+    switch (authUser().role.name) {
+      case 'Superadmin':
+        return `/admin${path}`;
+      case 'Admin Bidang':
+        return `/admin-bidang${path}`;
+      default:
+        return path;
+    }
+  };
+
   const sidebarList = [
     {
-      path: authUser().role.id === 1 ? '/admin' : '/',
+      path: getPath(),
       label: 'Dashboard',
       icon: <DashboardIcon />,
-      roles: ['superadmin', 'opd'],
+      roles: ['superadmin', 'opd', 'admin bidang'],
     },
     {
-      path: authUser().role.id === 1 ? '/admin/akun-saya' : '/akun-saya',
+      path: getPath('/akun-saya'),
       label: 'Akun Saya',
       icon: <ProfileIcon />,
-      roles: ['superadmin', 'opd'],
+      roles: ['superadmin', 'opd', 'admin bidang'],
     },
     {
       path: '/admin/login-akses-user',
@@ -46,10 +57,10 @@ const Sidebar = ({ isOpen }) => {
       roles: ['superadmin'],
     },
     {
-      path: '/admin/urusan',
+      path: getPath('/urusan'),
       label: 'Urusan',
       icon: <CheckIcon />,
-      roles: ['superadmin'],
+      roles: ['superadmin', 'admin bidang'],
     },
     {
       path: '/admin/organisasi',
@@ -58,22 +69,22 @@ const Sidebar = ({ isOpen }) => {
       roles: ['superadmin'],
     },
     {
-      path: '/admin/program',
+      path: getPath('/program'),
       label: 'Program',
       icon: <BookIcon />,
-      roles: ['superadmin'],
+      roles: ['superadmin', 'admin bidang'],
     },
     {
-      path: '/admin/kegiatan',
+      path: getPath('/kegiatan'),
       label: 'Kegiatan',
       icon: <StarIcon />,
-      roles: ['superadmin'],
+      roles: ['superadmin', 'admin bidang'],
     },
     {
-      path: '/admin/sasaran',
+      path: getPath('/sasaran'),
       label: 'Sasaran',
       icon: <TargetIcon />,
-      roles: ['superadmin'],
+      roles: ['superadmin', 'admin bidang'],
     },
     {
       path: '/data-triwulan',
@@ -88,10 +99,16 @@ const Sidebar = ({ isOpen }) => {
       roles: ['opd'],
     },
     {
-      path: authUser().role.id === 1 ? '/admin/laporan' : '/laporan',
+      path: getPath('/laporan'),
       label: 'Laporan',
       icon: <ReportIcon />,
-      roles: ['superadmin', 'opd'],
+      roles: ['superadmin', 'opd', 'admin bidang'],
+    },
+    {
+      path: '/admin/riwayat',
+      label: 'Riwayat',
+      icon: <ProfileIcon />,
+      roles: ['superadmin'],
     },
     {
       path: '/admin/konfigurasi',

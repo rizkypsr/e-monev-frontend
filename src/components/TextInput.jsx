@@ -11,6 +11,7 @@ const TextInput = ({
   error,
   register,
   width = 'max-w-md',
+  onKeyDown,
 }) => {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -36,6 +37,7 @@ const TextInput = ({
             disabled={disabled}
             className={` p-0 text-gray-900 bg-transparent text-sm focus:ring-0 border-0 w-full focus:outline-none`}
             {...register}
+            onKeyDown={onKeyDown}
           />
         </div>
         {type === 'password' && !trailingIcon && (

@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-function Button({
+const Button = ({
   children,
   className,
   type,
@@ -9,8 +9,8 @@ function Button({
   onClick,
   background,
   textColor,
-}) {
-  return type === 'modal' ? (
+}) =>
+  type === 'modal' ? (
     <div
       onClick={onClick}
       aria-hidden="true"
@@ -34,7 +34,6 @@ function Button({
       {children && <span>{children}</span>}
     </button>
   );
-}
 
 Button.propTypes = {
   background: PropTypes.string,

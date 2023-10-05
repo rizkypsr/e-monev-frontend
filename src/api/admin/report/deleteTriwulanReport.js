@@ -1,8 +1,8 @@
 import axiosClient from '../../../config/axios';
 
-async function createActivity({ body, token }) {
+async function deleteTriwulanReport({ id, token }) {
   try {
-    const response = await axiosClient.post('/activity/create', body, {
+    const response = await axiosClient.delete(`/data-triwulan/${id}`, {
       headers: {
         Authorization: token,
       },
@@ -20,4 +20,4 @@ async function createActivity({ body, token }) {
   }
 }
 
-export default createActivity;
+export default deleteTriwulanReport;

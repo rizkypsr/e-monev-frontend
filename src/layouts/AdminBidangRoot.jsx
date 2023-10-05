@@ -5,7 +5,7 @@ import { useMediaQuery } from 'react-responsive';
 import Breadcrumb from '../components/Breadcrumb';
 import Sidebar from './Sidebar';
 
-const AdminLayout = () => {
+const AdminBidangLayout = () => {
   const auth = useAuthUser();
 
   const isDesktopOrLaptop = useMediaQuery({
@@ -57,12 +57,12 @@ const AdminLayout = () => {
     }
   };
 
-  if (auth().role.name === 'OPD') {
-    return <Navigate to="/" replace />;
+  if (auth().role.name === 'Superadmin') {
+    return <Navigate to="/admin" replace />;
   }
 
-  if (auth().role.name === 'Admin Bidang') {
-    return <Navigate to="/admin-bidang" replace />;
+  if (auth().role.name === 'OPD') {
+    return <Navigate to="/" replace />;
   }
 
   return (
@@ -105,4 +105,4 @@ const AdminLayout = () => {
   );
 };
 
-export default AdminLayout;
+export default AdminBidangLayout;

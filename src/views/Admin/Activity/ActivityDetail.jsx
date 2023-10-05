@@ -1,39 +1,40 @@
 import { ArrowLeftIcon } from '@heroicons/react/24/solid';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useAuthHeader } from 'react-auth-kit';
 import { Link, useParams } from 'react-router-dom';
+import { useQuery } from 'react-query';
 import { getActivity } from '../../../api/admin/activity';
 import ReactLoading from '../../../components/Loading';
 import ErrorPage from '../../ErrorPage';
 
-export default function ActivityDetail() {
-  const [activity, setActivity] = useState('');
-  const [error, setError] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+const initialData = {
+  code: '',
+  title: '',
+  subActivity: '',
+  program: '',
+};
+
+const ActivityDetail = () => {
+  const [activity, setActivity] = useState(initialData);
 
   const { id } = useParams();
   const authHeader = useAuthHeader();
 
-  const fetchActivity = async () => {
-    setIsLoading(true);
+  const { isError, isLoading, error } = useQuery({
+    queryKey: ['get_user'],
+    queryFn: () => getActivity(id, authHeader()),
+    onSuccess: (result) => {
+      setActivity({
+        code: result.data.code,
+        title: result.data.title,
+        subActivity: result.data.sub_activity,
+        program: result.data.program?.title,
+      });
+    },
+  });
 
-    try {
-      const occasionResponse = await getActivity(authHeader, id);
-
-      setActivity(occasionResponse);
-      setIsLoading(false);
-    } catch (err) {
-      setIsLoading(false);
-      setError(err.message);
-    }
-  };
-
-  useEffect(() => {
-    fetchActivity();
-  }, []);
-
-  if (error) {
-    return <ErrorPage errorMessage={error} showBackButton />;
+  if (isError) {
+    return <ErrorPage errorMessage={error.message} showBackButton />;
   }
 
   if (isLoading) {
@@ -66,22 +67,33 @@ export default function ActivityDetail() {
                 scope="row"
                 className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
               >
-                Program
+                Kegiatan
               </th>
-              <td className="px-6 py-4">{activity.program.title}</td>
+              <td className="px-6 py-4">{activity.title}</td>
             </tr>
             <tr className="bg-light-blue">
               <th
                 scope="row"
                 className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
               >
-                Kegiatan
+                Sub Kegiatan
               </th>
-              <td className="px-6 py-4">{activity.title}</td>
+              <td className="px-6 py-4">{activity.subActivity}</td>
+            </tr>
+            <tr className="bg-white">
+              <th
+                scope="row"
+                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+              >
+                Program
+              </th>
+              <td className="px-6 py-4">{activity.program}</td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
   );
-}
+};
+
+export default ActivityDetail;

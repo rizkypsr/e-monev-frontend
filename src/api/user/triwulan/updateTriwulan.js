@@ -1,10 +1,11 @@
 import axiosClient from '../../../config/axios';
 
-async function createActivity({ body, token }) {
+async function updateTriwulan({ id, body, token }) {
   try {
-    const response = await axiosClient.post('/activity/create', body, {
+    const response = await axiosClient.patch(`/data-triwulan/${id}`, body, {
       headers: {
         Authorization: token,
+        'Content-Type': 'multipart/form-data',
       },
     });
 
@@ -20,4 +21,4 @@ async function createActivity({ body, token }) {
   }
 }
 
-export default createActivity;
+export default updateTriwulan;

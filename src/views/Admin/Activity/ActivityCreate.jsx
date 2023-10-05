@@ -1,79 +1,72 @@
 import {
   ArrowLeftIcon,
   CheckCircleIcon,
-  MagnifyingGlassIcon,
+  PlusIcon,
 } from '@heroicons/react/24/solid';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthHeader } from 'react-auth-kit';
-import InfiniteScroll from 'react-infinite-scroll-component';
 import { animated, useTransition } from '@react-spring/web';
+import { useInfiniteQuery, useMutation, useQueryClient } from 'react-query';
+import { useForm } from 'react-hook-form';
 import Label from '../../../components/Label';
 import TextInput from '../../../components/TextInput';
 import Button from '../../../components/Button';
-import {
-  Dialog,
-  DialogContent,
-  DialogTrigger,
-} from '../../../components/DialogContent';
-import List from '../../../components/List';
-import SelectInputModal from '../../../components/SelectInputModal';
-import { createProgram, getPrograms } from '../../../api/admin/program';
-import { createActivity } from '../../../api/admin/activity';
+
+import { getPrograms } from '../../../api/admin/program';
+import { createActivity, getActivities } from '../../../api/admin/activity';
 import { useToastContext } from '../../../context/ToastContext';
 import ReactLoading from '../../../components/Loading';
+import DropdownDialog from '../../../components/DropdownDialog';
 
-function ActivityCreate() {
-  const [selectedActivity, setSelectedActivity] = useState(null);
-  const [selectedProgram, setSelectedProgram] = useState(null);
-  const [openActivityDialog, setOpenActivityDialog] = useState(false);
-  const [openProgramDialog, setOpenProgramDialog] = useState(false);
-  const [title, setTitle] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [openCreateActivity, setOpenCreateActivity] = useState(false);
-  const [openCreateOpd, setOpenCreateOpd] = useState(false);
-  const [pageData, setPageData] = useState({
-    items: [],
-    hasMore: true,
-    isLoading: false,
-    totalPages: 0,
-    currentPage: 1,
-  });
-  const [activityData, setActivityData] = useState({
-    items: [
-      {
-        title: 'Kegiatan 1',
-        name: 'Kegiatan 1',
-      },
-      {
-        title: 'Kegiatan 2',
-        name: 'Kegiatan 2',
-      },
-      {
-        title: 'Kegiatan 3',
-        name: 'Kegiatan 3',
-      },
-      {
-        title: 'Kegiatan 4',
-        name: 'Kegiatan 4',
-      },
-      {
-        title: 'Kegiatan 5',
-        name: 'Kegiatan 5',
-      },
-    ],
-    hasMore: true,
-    isLoading: false,
-    totalPages: 0,
-    currentPage: 1,
-  });
-  const [titleError, setTitleError] = useState('');
-  const [programError, setProgramError] = useState('');
+const initialParams = {
+  limit: 10,
+  page: 1,
+  search: '',
+  sort: 'terbaru',
+};
 
+const ActivityCreate = () => {
   const navigate = useNavigate();
   const authHeader = useAuthHeader();
   const { showToastMessage } = useToastContext();
-  const transition = useTransition(openCreateOpd, {
+  const queryClient = useQueryClient();
+
+  const [filterParams, setFilterParams] = useState(initialParams);
+  const [selectedActivity, setSelectedActivity] = useState(null);
+  const [selectedProgram, setSelectedProgram] = useState(null);
+  const [openCreateActivity, setOpenCreateActivity] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm();
+
+  const {
+    register: register2,
+    handleSubmit: handleSubmit2,
+    formState: { errors: errors2 },
+  } = useForm();
+
+  const activityQuery = useInfiniteQuery({
+    queryKey: ['get_activities'],
+    queryFn: async ({ pageParam = 1 }) =>
+      getActivities(filterParams, authHeader()),
+    getNextPageParam: (lastPage) => lastPage.nextId ?? undefined,
+    getPreviousPageParam: (firstPage) => firstPage.previousId ?? undefined,
+  });
+
+  const programsQuery = useInfiniteQuery({
+    queryKey: ['get_programs'],
+    queryFn: async ({ pageParam = 1 }) =>
+      getPrograms(filterParams, authHeader()),
+    getNextPageParam: (lastPage) => lastPage.nextId ?? undefined,
+    getPreviousPageParam: (firstPage) => firstPage.previousId ?? undefined,
+  });
+
+  const transition = useTransition(openCreateActivity, {
     config: {
       duration: 120,
     },
@@ -91,135 +84,67 @@ function ActivityCreate() {
     },
   });
 
-  const transitionCreateActivity = useTransition(openCreateActivity, {
-    config: {
-      duration: 120,
-    },
-    from: {
-      scale: 0,
-      opacity: 0,
-    },
-    enter: {
-      scale: 1,
-      opacity: 1,
-    },
-    leave: {
-      scale: 0,
-      opacity: 0,
-    },
-  });
-
-  const handleSelectActivity = (activity) => {
-    setSelectedActivity(activity);
-    setOpenActivityDialog(false);
+  const openCreateActivityClick = () => {
+    setOpenCreateActivity(!openCreateActivity);
   };
 
-  const handleSelectProgram = (opd) => {
-    setSelectedProgram(opd);
-    setOpenProgramDialog(false);
+  const handleSelectActivity = (item) => {
+    setSelectedActivity(item);
+    setValue('activity', item.title);
   };
 
-  const fetchPrograms = async (page) => {
-    const programResponse = await getPrograms(authHeader, {
-      limit: 15,
-      pageNumber: page,
-    });
-
-    if (page === pageData.totalPages) {
-      setPageData((prevData) => ({ ...prevData, hasMore: false }));
-    }
-
-    setPageData((prevData) => ({
-      ...prevData,
-      items: [...prevData.items, ...programResponse.result],
-      totalPages: programResponse.pages,
-    }));
+  const handleSelectProgram = (item) => {
+    setSelectedProgram(item);
+    setValue('program', item.id);
   };
 
-  useEffect(() => {
-    fetchPrograms(pageData.currentPage);
-  }, [pageData.currentPage]);
+  const createMutation = useMutation(createActivity);
 
-  const onSubmit = async (e) => {
-    e.preventDefault();
+  const onSubmit = (formData) => {
+    const { activity, subActivity, program } = formData;
 
-    const errors = {};
-
-    if (!title) {
-      errors.title = 'Kegiatan harus diisi';
-    }
-
-    if (!selectedProgram) {
-      errors.program = 'Program belum dipilih';
-    }
-
-    if (Object.keys(errors).length > 0) {
-      setTitleError(errors.title || '');
-      setProgramError(errors.program || '');
-      return;
-    }
-
-    setIsLoading(true);
-
-    try {
-      const activityBody = {
-        title,
-        program_id: selectedProgram.id,
-      };
-      const activityResponse = await createActivity(authHeader, activityBody);
-
-      setIsLoading(false);
-      showToastMessage(activityResponse);
-      navigate('../');
-    } catch (error) {
-      setIsLoading(false);
-      showToastMessage(error.message, 'error');
-    }
-  };
-
-  const handleKeyDown = async (e) => {
-    if (e.key === 'Enter') {
-      setPageData((prev) => ({ ...prev, isLoading: true }));
-      setOpenCreateOpd(false);
-
-      try {
-        const programBody = { title: e.target.value };
-        const programResponse = await createProgram(authHeader, programBody);
-
-        setPageData((prev) => ({
-          ...prev,
-          isLoading: false,
-          items: [
-            {
-              id: programResponse.data.id,
-              title: programResponse.data.title,
-            },
-            ...prev.items,
-          ],
-        }));
-
-        setOpenCreateOpd(false);
-        showToastMessage(programResponse);
-      } catch (err) {
-        setOpenCreateOpd(false);
-        setPageData((prev) => ({ ...prev, isLoading: false }));
-        showToastMessage(err.message, 'error');
+    createMutation.mutate(
+      {
+        body: {
+          title: activity,
+          sub_activity: subActivity,
+          program_id: program,
+        },
+        token: authHeader(),
+      },
+      {
+        onSuccess: () => {
+          showToastMessage('Berhasil membuat kegiatan');
+          navigate('/admin/kegiatan');
+        },
+        onError: (error) => {
+          showToastMessage(error.message, 'error');
+        },
       }
-    }
+    );
   };
 
-  const loadMoreData = async () => {
-    setPageData((prevData) => ({
-      ...prevData,
-      currentPage: prevData.currentPage + 1,
-    }));
-  };
+  const onSubmit2 = (formData) => {
+    const { activity2 } = formData;
 
-  const loadMoreActivityData = async () => {
-    setActivityData((prevData) => ({
-      ...prevData,
-      currentPage: prevData.currentPage + 1,
-    }));
+    createMutation.mutate(
+      {
+        body: {
+          title: activity2,
+        },
+        token: authHeader(),
+      },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries('get_activities');
+          showToastMessage('Berhasil membuat kegiatan');
+          setOpenCreateActivity(false);
+        },
+        onError: (error) => {
+          showToastMessage(error.message, 'error');
+        },
+      }
+    );
   };
 
   return (
@@ -235,159 +160,80 @@ function ActivityCreate() {
           </h1>
         </Link>
 
-        <form className="mt-4" onSubmit={onSubmit}>
+        <form className="mt-4" onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-6">
-            <Label>Nama Kegiatan</Label>
-            <Dialog
-              open={openActivityDialog}
-              onOpenChange={setOpenActivityDialog}
+            <Label className="mb-2">Nama Kegiatan</Label>
+            <DropdownDialog
+              label="Pilih Kegiatan"
+              data={activityQuery.data}
+              value={selectedActivity}
+              onChange={handleSelectActivity}
+              register={register('activity', {
+                required: 'Kegiatan wajib dipilih!',
+              })}
+              error={errors.activity?.message}
             >
-              <DialogTrigger className="w-full lg:w-2/3 xl:w-1/3">
-                <SelectInputModal
-                  className="mt-2"
-                  selectedValue={selectedActivity && selectedActivity.title}
-                  label="--- Pilih Nama Kegiatan ---"
-                />
-              </DialogTrigger>
+              <Button
+                type="button"
+                background="bg-primary"
+                textColor="text-white"
+                icon={<PlusIcon className="w-4 h-4" />}
+                onClick={() => openCreateActivityClick()}
+              />
 
-              <DialogContent
-                addButton
-                title="Pilih Nama Kegiatan"
-                onCreateClick={() => setOpenCreateActivity((prev) => !prev)}
-              >
-                {transitionCreateActivity((style, isOpen) => (
-                  <div>
-                    {isOpen && (
-                      <animated.div
-                        style={style}
-                        className="w-72 bg-white rounded-md absolute z-10 -right-80 top-0 p-4"
-                      >
+              {transition((style, isOpen) => (
+                <div>
+                  {isOpen && (
+                    <animated.div
+                      style={style}
+                      className="w-72 bg-white absolute z-auto rounded-md p-4 -right-80 top-0"
+                    >
+                      <form onSubmit={handleSubmit2(onSubmit2)}>
                         <TextInput
                           required
                           placeholder="Masukan Nama Kegiatan"
-                          onKeyDown={handleKeyDown}
+                          register={register2('activity2', {
+                            required: 'Nama Kegiatan wajib diisi!',
+                          })}
+                          error={errors2.activity2?.message}
                         />
                         <p className="text-xs text-light-gray mt-2 text-left">
                           Tekan{' '}
                           <span className="itelic text-dark-gray">Enter</span>{' '}
                           untuk menyimpan
                         </p>
-                      </animated.div>
-                    )}
-                  </div>
-                ))}
-
-                <div className="relative my-6">
-                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                    <MagnifyingGlassIcon className="w-4 h-4" />
-                  </div>
-                  <input
-                    type="search"
-                    id="search"
-                    className="bg-gray-50 text-light-gray border-none text-sm rounded-lg focus:ring-0 block w-full pl-10 p-2.5 shadow"
-                    placeholder="Pencarian"
-                  />
+                      </form>
+                    </animated.div>
+                  )}
                 </div>
-                {activityData.isLoading ? (
-                  <ReactLoading />
-                ) : (
-                  <InfiniteScroll
-                    dataLength={activityData.items.length}
-                    next={loadMoreActivityData}
-                    hasMore={activityData.hasMore}
-                    height={500}
-                  >
-                    <List
-                      data={activityData.items}
-                      onSelectValue={handleSelectActivity}
-                    />
-                  </InfiniteScroll>
-                )}
-              </DialogContent>
-            </Dialog>
+              ))}
+            </DropdownDialog>
           </div>
           <div className="mb-6">
-            <Label>Nama Sub Bagian</Label>
+            <Label className="mb-2">Nama Sub Bagian</Label>
             <TextInput
-              className="mt-2 lg:w-2/3 xl:w-1/3"
               placeholder="Masukan Nama Sub Kegiatan"
-              value={title}
-              error={titleError}
-              onChange={(e) => setTitle(e.target.value)}
+              register={register('subActivity', {
+                required: 'Sub Kegiatan wajib diisi!',
+              })}
+              error={errors.subActivity?.message}
             />
           </div>
           <div className="mb-6">
-            <Label>Program</Label>
-            <Dialog
-              open={openProgramDialog}
-              onOpenChange={setOpenProgramDialog}
-            >
-              <DialogTrigger className="w-full lg:w-2/3 xl:w-1/3">
-                <SelectInputModal
-                  className="mt-2"
-                  selectedValue={selectedProgram && selectedProgram.title}
-                  label="--- Pilih Program ---"
-                  error={programError}
-                />
-              </DialogTrigger>
-
-              <DialogContent
-                addButton
-                title="Pilih Nama OPD"
-                onCreateClick={() => setOpenCreateOpd((prev) => !prev)}
-              >
-                {transition((style, isOpen) => (
-                  <div>
-                    {isOpen && (
-                      <animated.div
-                        style={style}
-                        className="w-72 bg-white rounded-md absolute z-10 -right-80 top-0 p-4"
-                      >
-                        <TextInput
-                          required
-                          placeholder="Masukan Nama Program"
-                          onKeyDown={handleKeyDown}
-                        />
-                        <p className="text-xs text-light-gray mt-2 text-left">
-                          Tekan{' '}
-                          <span className="itelic text-dark-gray">Enter</span>{' '}
-                          untuk menyimpan
-                        </p>
-                      </animated.div>
-                    )}
-                  </div>
-                ))}
-
-                <div className="relative my-6">
-                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                    <MagnifyingGlassIcon className="w-4 h-4" />
-                  </div>
-                  <input
-                    type="search"
-                    id="search"
-                    className="bg-gray-50 text-light-gray border-none text-sm rounded-lg focus:ring-0 block w-full pl-10 p-2.5 shadow"
-                    placeholder="Pencarian"
-                  />
-                </div>
-                {pageData.isLoading ? (
-                  <ReactLoading />
-                ) : (
-                  <InfiniteScroll
-                    dataLength={pageData.items.length}
-                    next={loadMoreData}
-                    hasMore={false}
-                    height={500}
-                  >
-                    <List
-                      data={pageData.items}
-                      onSelectValue={handleSelectProgram}
-                    />
-                  </InfiniteScroll>
-                )}
-              </DialogContent>
-            </Dialog>
+            <Label className="mb-2">Program</Label>
+            <DropdownDialog
+              label="Pilih Program"
+              data={programsQuery.data}
+              value={selectedProgram}
+              onChange={handleSelectProgram}
+              register={register('program', {
+                required: 'Program wajib dipilih!',
+              })}
+              error={errors.program?.message}
+            />
           </div>
-          {isLoading ? (
+
+          {createMutation.isLoading ? (
             <ReactLoading />
           ) : (
             <div className="flex space-x-3">
@@ -415,6 +261,6 @@ function ActivityCreate() {
       </div>
     </>
   );
-}
+};
 
 export default ActivityCreate;

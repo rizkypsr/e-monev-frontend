@@ -182,7 +182,7 @@ const OrganizationTable = () => {
       {
         onSuccess: (result) => {
           queryClient.invalidateQueries('get_organizations');
-          showToastMessage(result);
+          showToastMessage(result.message);
         },
         onError: (err) => {
           showToastMessage(err.message, 'error');

@@ -1,8 +1,8 @@
 import axiosClient from '../../../config/axios';
 
-async function createActivity({ body, token }) {
+async function setTriwulanSetting({ body, token }) {
   try {
-    const response = await axiosClient.post('/activity/create', body, {
+    const response = await axiosClient.patch('/setting/triwulan', body, {
       headers: {
         Authorization: token,
       },
@@ -20,4 +20,4 @@ async function createActivity({ body, token }) {
   }
 }
 
-export default createActivity;
+export default setTriwulanSetting;

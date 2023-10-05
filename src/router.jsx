@@ -57,6 +57,11 @@ import ReportMasterTable from './views/Admin/Report/ReportMasterTable';
 import ReportTriwulanTable from './views/Admin/Report/ReportTriwulanTable';
 import ReportTableWrapper from './views/Admin/Report/ReportTableWrapper';
 import ForgotPassword from './views/Auth/ForgotPassword';
+import History from './views/Admin/History/History';
+import HistoryTable from './views/Admin/History/HistoryTable';
+import ReportTriwulanDetail from './views/Admin/Report/ReportTriwulanDetail';
+import TriwulanEdit from './views/User/Triwulan/TriwulanEdit';
+import AdminBidangLayout from './layouts/AdminBidangRoot';
 
 const router = createBrowserRouter(
   createRoutesFromElements([
@@ -168,7 +173,13 @@ const router = createBrowserRouter(
         element={<Master />}
       >
         <Route index key="triwulanCreate" element={<TriwulanCreate />} />
+        <Route key="triwulanEdit" path="edit/:id" element={<TriwulanEdit />} />
       </Route>
+      <Route
+        key="triwulanDetail"
+        path="data-triwulan/detail/:id"
+        element={<ReportTriwulanDetail />}
+      />
     </Route>,
     <Route
       path="/admin"
@@ -386,6 +397,7 @@ const router = createBrowserRouter(
           path="detail/:id"
           element={<ReportDetail />}
         />
+
         <Route
           key="userReportPreviewAdmin"
           path="preview"
@@ -397,6 +409,198 @@ const router = createBrowserRouter(
         path="konfigurasi"
         element={<Configuration />}
       />
+      <Route
+        key="history"
+        path="riwayat"
+        loader={() => 'Riwayat'}
+        handle={{
+          crumb: (data) => (
+            <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
+          ),
+        }}
+        element={<History />}
+      >
+        <Route index key="purpose" element={<HistoryTable />} />
+        {/* <Route key="purposeCreate" path="create" element={<PurposeCreate />} />
+        <Route key="purposeEdit" path="edit/:id" element={<PurposeEdit />} />
+        <Route
+          key="purposeDetail"
+          path="detail/:id"
+          element={<PurposeDetail />}
+        /> */}
+      </Route>
+      <Route
+        key="triwulanDetailAdmin"
+        path="data-triwulan/detail/:id"
+        element={<ReportTriwulanDetail />}
+      />
+    </Route>,
+    <Route
+      path="/admin-bidang"
+      loader={() => 'Dashboard'}
+      handle={{
+        crumb: () => (
+          <Link
+            to="/admin-bidang"
+            className="ml-1 text-sm text-dark-gray hover:text-primary md:ml-2"
+          >
+            e-Montir
+          </Link>
+        ),
+      }}
+      element={
+        <PrivateRoute>
+          <AdminBidangLayout />
+        </PrivateRoute>
+      }
+    >
+      <Route
+        index
+        key="adminBidangDashboard"
+        loader={() => 'Dashboard'}
+        handle={{
+          crumb: (data) => (
+            <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
+          ),
+        }}
+        element={<Dashboard />}
+      />
+      <Route
+        key="adminBidangmyAccount"
+        path="akun-saya"
+        loader={() => 'Akun Saya'}
+        handle={{
+          crumb: (data) => (
+            <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
+          ),
+        }}
+        element={<MyAccount />}
+      >
+        <Route index key="akunSayaForm" element={<MyAccountForm />} />
+      </Route>
+      <Route
+        key="aminBidangurusan"
+        path="urusan"
+        loader={() => 'Urusan'}
+        handle={{
+          crumb: (data) => (
+            <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
+          ),
+        }}
+        element={<Occassion />}
+      >
+        <Route index key="urusan" element={<OccassionTable />} />
+        <Route key="urusanCreate" path="create" element={<OccasionCreate />} />
+        <Route key="urusanEdit" path="edit/:id" element={<OccassionEdit />} />
+        <Route
+          key="urusanDetail"
+          path="detail/:id"
+          element={<OccassionDetail />}
+        />
+      </Route>
+      <Route
+        key="adminBidangprogram"
+        path="program"
+        loader={() => 'Program'}
+        handle={{
+          crumb: (data) => (
+            <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
+          ),
+        }}
+        element={<Program />}
+      >
+        <Route index key="program" element={<ProgramTable />} />
+        <Route key="programCreate" path="create" element={<ProgramCreate />} />
+        <Route key="programEdit" path="edit/:id" element={<ProgramEdit />} />
+        <Route
+          key="programDetail"
+          path="detail/:id"
+          element={<ProgramDetail />}
+        />
+      </Route>
+      ,
+      <Route
+        key="adminBidangkegiatan"
+        path="kegiatan"
+        loader={() => 'Kegiatan'}
+        handle={{
+          crumb: (data) => (
+            <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
+          ),
+        }}
+        element={<Activity />}
+      >
+        <Route index key="kegiatan" element={<ActivityTable />} />
+        <Route
+          key="kegiatanCreate"
+          path="create"
+          element={<ActivityCreate />}
+        />
+        <Route key="kegiatanEdit" path="edit/:id" element={<ActivityEdit />} />
+        <Route
+          key="kegiatanDetail"
+          path="detail/:id"
+          element={<ActivityDetail />}
+        />
+      </Route>
+      <Route
+        key="adminBidangpurpose"
+        path="sasaran"
+        loader={() => 'Sasaran'}
+        handle={{
+          crumb: (data) => (
+            <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
+          ),
+        }}
+        element={<Purpose />}
+      >
+        <Route index key="purpose" element={<PurposeTable />} />
+        <Route key="purposeCreate" path="create" element={<PurposeCreate />} />
+        <Route key="purposeEdit" path="edit/:id" element={<PurposeEdit />} />
+        <Route
+          key="purposeDetail"
+          path="detail/:id"
+          element={<PurposeDetail />}
+        />
+      </Route>
+      <Route
+        key="adminBidangReport"
+        path="laporan"
+        loader={() => 'Data Laporan'}
+        handle={{
+          crumb: (data) => (
+            <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
+          ),
+        }}
+        element={<Report />}
+      >
+        <Route path="" key="reportTableAdmin" element={<ReportTableWrapper />}>
+          <Route key="reportTableAdmin" path="" element={<ReportTable />} />
+          <Route
+            key="reportMasterTableAdmin"
+            path="data-master"
+            element={<ReportMasterTable />}
+          />
+          <Route
+            key="reportTriwulanTableAdmin"
+            path="data-triwulan"
+            element={<ReportTriwulanTable />}
+          />
+        </Route>
+
+        <Route key="reportEditAdmin" path="edit/:id" element={<ReportEdit />} />
+        <Route
+          key="reportDetailAdmin"
+          path="detail/:id"
+          element={<ReportDetail />}
+        />
+
+        <Route
+          key="userReportPreviewAdmin"
+          path="preview"
+          element={<ReportPreview />}
+        />
+      </Route>
     </Route>,
   ]),
   {

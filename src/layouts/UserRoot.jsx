@@ -5,7 +5,7 @@ import { useMediaQuery } from 'react-responsive';
 import Sidebar from './Sidebar';
 import Breadcrumb from '../components/Breadcrumb';
 
-function UserLayout() {
+const UserLayout = () => {
   const auth = useAuthUser();
 
   const isDesktopOrLaptop = useMediaQuery({
@@ -57,8 +57,12 @@ function UserLayout() {
     }
   };
 
-  if (auth().role.id !== 2) {
+  if (auth().role.name === 'Superadmin') {
     return <Navigate to="/admin" replace />;
+  }
+
+  if (auth().role.name === 'Admin Bidang') {
+    return <Navigate to="/admin-bidang" replace />;
   }
 
   return (
@@ -99,6 +103,6 @@ function UserLayout() {
       </div>
     </div>
   );
-}
+};
 
 export default UserLayout;

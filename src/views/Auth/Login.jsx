@@ -18,7 +18,7 @@ import Loading from '../../components/Loading';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
-function Login() {
+const Login = () => {
   const isAuthenticated = useIsAuthenticated();
   const signIn = useSignIn();
   const auth = useAuthUser();
@@ -62,8 +62,12 @@ function Login() {
   };
 
   if (isAuthenticated()) {
-    if (auth().role.id === 1) {
+    if (auth().role.id === 'Superadmin') {
       return <Navigate to="/admin" />;
+    }
+
+    if (auth().role.id === 'Admin Bidang') {
+      return <Navigate to="/admin-bidang" />;
     }
 
     return <Navigate to="/" />;
@@ -182,6 +186,6 @@ function Login() {
       </div>
     </div>
   );
-}
+};
 
 export default Login;

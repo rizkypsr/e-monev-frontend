@@ -1,17 +1,23 @@
-import { baseUrl } from '../../../utils/constants';
-import makeRequest from '../../../utils/makeRequest';
+import axiosClient from '../../../config/axios';
 
-export default async function updateActivity(authHeader, activityBody) {
-  const url = `${baseUrl}/activity/update`;
-  const headers = {
-    method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-      authorization: authHeader(),
-    },
-    body: JSON.stringify(activityBody),
-  };
+async function updateActivity({ body, token }) {
+  try {
+    const response = await axiosClient.patch('/activity/update', body, {
+      headers: {
+        Authorization: token,
+      },
+    });
 
-  const activityResponse = await makeRequest(url, headers);
-  return activityResponse.message;
+    const responseData = response.data;
+
+    if (responseData.statusCode !== 200) {
+      throw new Error(responseData.message);
+    }
+
+    return responseData;
+  } catch (err) {
+    throw new Error(err);
+  }
 }
+
+export default updateActivity;

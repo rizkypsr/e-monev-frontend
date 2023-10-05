@@ -1,34 +1,21 @@
 import { CheckCircleIcon, PlusCircleIcon } from '@heroicons/react/24/solid';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthHeader } from 'react-auth-kit';
-import uuid from 'react-uuid';
-import { useDispatch, useSelector } from 'react-redux';
+import { useForm } from 'react-hook-form';
+import { useInfiniteQuery, useMutation } from 'react-query';
 import Label from '../../../components/Label';
 import TextInput from '../../../components/TextInput';
 import ReactLoading from '../../../components/Loading';
 import Button from '../../../components/Button';
 import { getOrganizations } from '../../../api/admin/organization';
-import DialogInputWrapper from '../../../components/DialogInputWrapper';
 import { getOccasions } from '../../../api/admin/occasion';
 import { getPurposes } from '../../../api/admin/purpose';
-import DropdownWrapper from '../../../components/DropdownWrapper';
 import { useToastContext } from '../../../context/ToastContext';
 import { createMaster } from '../../../api/user/master';
 import formattedDate from '../../../utils/formattedDate';
-import {
-  resetAll,
-  setIndicator,
-  setOccasions,
-  setOrganization,
-  setProgram,
-  setPurpose,
-  setTriwulan,
-} from '../../../redux/master/masterSlice';
-import { getPrograms } from '../../../api/admin/program';
+
 import getTriwulan from '../../../api/static/getTriwulan';
-import { useForm } from 'react-hook-form';
-import { useInfiniteQuery, useMutation } from 'react-query';
 import DropdownDialog from '../../../components/DropdownDialog';
 
 const initalParams = {
@@ -43,7 +30,7 @@ const initialOccassions = [
   },
 ];
 
-export default function MasterCreate() {
+const MasterCreate = () => {
   const authHeader = useAuthHeader();
   const navigate = useNavigate();
   const { showToastMessage } = useToastContext();
@@ -94,13 +81,6 @@ export default function MasterCreate() {
     setValue('created_at', formattedDate(Date.now()));
   }, []);
 
-  const removeOccasionComponent = (indexToRemove) => {
-    const newOccasions = occassions.filter(
-      (_, index) => index !== indexToRemove
-    );
-    setOccassions(newOccasions);
-  };
-
   const handleSelectTriwulan = (item) => {
     setSelectedTriwulan(item);
   };
@@ -128,6 +108,13 @@ export default function MasterCreate() {
         selected: null,
       },
     ]);
+  };
+
+  const removeOccasionComponent = (indexToRemove) => {
+    const newOccasions = occassions.filter(
+      (_, index) => index !== indexToRemove
+    );
+    setOccassions(newOccasions);
   };
 
   const createMutation = useMutation(createMaster);
@@ -246,7 +233,7 @@ export default function MasterCreate() {
             />
           </div>
 
-          {false ? (
+          {createMutation.isLoading ? (
             <ReactLoading />
           ) : (
             <div className="flex space-x-3 !mt-10">
@@ -274,4 +261,6 @@ export default function MasterCreate() {
       </div>
     </div>
   );
-}
+};
+
+export default MasterCreate;

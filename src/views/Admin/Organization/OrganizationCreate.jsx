@@ -65,6 +65,10 @@ const OrganizationCreate = () => {
               placeholder="Organisasi"
               register={register('title', {
                 required: 'Organisasi wajib diisi!',
+                maxLength: {
+                  message: 'Nama Organisasi maksimal 150 karater',
+                  value: 150,
+                },
               })}
               error={errors.title?.message}
             />

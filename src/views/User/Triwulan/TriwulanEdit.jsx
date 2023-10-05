@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { CheckCircleIcon } from '@heroicons/react/24/solid';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { useInfiniteQuery, useMutation } from 'react-query';
+import { useInfiniteQuery, useMutation, useQuery } from 'react-query';
 import { useAuthHeader } from 'react-auth-kit';
 import Label from '../../../components/Label';
 import TextInput from '../../../components/TextInput';
@@ -16,6 +16,8 @@ import getProcurementType from '../../../api/user/triwulan/getProcurementType';
 import getProcurementMethod from '../../../api/user/triwulan/getProcurementMethod';
 import { useToastContext } from '../../../context/ToastContext';
 import FileInput from '../../../components/FileInput';
+import getTriwulanDetail from '../../../api/user/triwulan/getTriwulanDetail';
+import updateTriwulan from '../../../api/user/triwulan/updateTriwulan';
 
 const initialParams = {
   page: 1,
@@ -61,7 +63,8 @@ const caraPengadaan = {
   ],
 };
 
-const TriwulanCreate = () => {
+const TriwulanEdit = () => {
+  const { id } = useParams();
   const authHeader = useAuthHeader();
   const navigate = useNavigate();
   const { showToastMessage } = useToastContext();
@@ -78,6 +81,42 @@ const TriwulanCreate = () => {
     formState: { errors },
   } = useForm();
 
+  const { isLoading, isError, error } = useQuery({
+    queryKey: ['get_triwulan'],
+    queryFn: () => getTriwulanDetail(id, authHeader()),
+    onSuccess: (result) => {
+      const triwulanData = result.data;
+
+      setSelectedFundSource(triwulanData.fundSource);
+
+      setValue('activity_name', triwulanData.activity_name);
+      setValue('activity_location', triwulanData.activity_location);
+      setValue('fund_source_id', triwulanData.fund_source_id);
+      setValue('fund_ceiling', triwulanData.fund_ceiling || '');
+      setValue('management_organization', triwulanData.management_organization);
+      setValue('pptk_name', triwulanData.pptk_name);
+      setValue('contract_number_date', triwulanData.contract_number_date);
+      setValue('contractor_name', triwulanData.contractor_name);
+      setValue('implementation_period', triwulanData.implementation_period);
+      setValue('physical_realization', triwulanData.physical_realization);
+      setValue('fund_realization', triwulanData.fund_realization);
+      setValue('activity_volume', triwulanData.activity_volume);
+      setValue('activity_output', triwulanData.activity_output);
+      setValue('direct_target_group', triwulanData.direct_target_group);
+      setValue('indirect_target_group', triwulanData.indirect_target_group);
+      setValue('local_workforce', triwulanData.local_workforce);
+      setValue('non_local_workforce', triwulanData.non_local_workforce);
+      setValue('problems', triwulanData.problems);
+      setValue('solution', triwulanData.solution);
+      setValue('procurement_type', triwulanData.procurement_type);
+      setValue('procurement_method', triwulanData.procurement_method);
+      setValue('user_id', triwulanData.user_id);
+      setValue('activity_name', triwulanData.activity_name);
+      setValue('activity_name', triwulanData.activity_name);
+      setValue('activity_name', triwulanData.activity_name);
+    },
+  });
+
   const fundSourceQuery = useInfiniteQuery({
     queryKey: ['get_fund_source'],
     queryFn: ({ pageParam = 1 }) => getFundSource(initialParams, authHeader()),
@@ -89,14 +128,14 @@ const TriwulanCreate = () => {
     setValue('created_at', formattedDate(Date.now()));
   }, []);
 
-  const createMutation = useMutation(createTriwulan);
+  const updateMutation = useMutation(updateTriwulan);
 
   const onSubmit = (data) => {
     const formData = new FormData();
 
     const formDataObject = {
       ...data,
-      fund_source_id: selectedFundSource?.id,
+      fund_source_id: Number(selectedFundSource?.id),
       procurement_type_id: selectedProcurementType?.id,
       procurement_method_id: selectedProcurementMethod?.id,
     };
@@ -111,18 +150,19 @@ const TriwulanCreate = () => {
       }
     }
 
-    createMutation.mutate(
+    updateMutation.mutate(
       {
+        id,
         body: formData,
         token: authHeader(),
       },
       {
         onSuccess: () => {
-          showToastMessage('Berhasil membuat Data Triwulan');
+          showToastMessage('Berhasil mengubah Data Triwulan');
           navigate('/laporan/data-triwulan?limit=10&page=1&sort=terbaru');
         },
-        onError: (error) => {
-          showToastMessage(error.message, 'error');
+        onError: (err) => {
+          showToastMessage(err.message, 'error');
         },
       }
     );
@@ -421,7 +461,7 @@ const TriwulanCreate = () => {
             </div>
           </div>
 
-          {createMutation.isLoading ? (
+          {updateMutation.isLoading ? (
             <ReactLoading />
           ) : (
             <div className="flex space-x-3">
@@ -451,4 +491,4 @@ const TriwulanCreate = () => {
   );
 };
 
-export default TriwulanCreate;
+export default TriwulanEdit;
