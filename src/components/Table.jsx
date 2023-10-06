@@ -7,7 +7,7 @@ import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import ReactLoading from './Loading';
 
-function Table({ className, columns, rows, isLoading }) {
+const Table = ({ className, columns, rows, isLoading }) => {
   const columnData = useMemo(() => columns, [columns]);
   const rowData = useMemo(() => rows, [rows]);
 
@@ -59,7 +59,7 @@ function Table({ className, columns, rows, isLoading }) {
       </table>
     </div>
   );
-}
+};
 
 Table.propTypes = {
   className: PropTypes.string,

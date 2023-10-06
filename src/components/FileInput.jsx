@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-function FileInput({ className, label, icon, handleFile, error, register }) {
+const FileInput = ({ className, label, icon, handleFile, error, register }) => {
   const [fileName, setFileName] = useState('');
 
   const handleChange = (e) => {
@@ -34,6 +34,6 @@ function FileInput({ className, label, icon, handleFile, error, register }) {
       <p className="mt-2 text-xs text-red-600">{error}</p>
     </div>
   );
-}
+};
 
 export default FileInput;

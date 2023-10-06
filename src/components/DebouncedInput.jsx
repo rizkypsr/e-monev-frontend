@@ -1,12 +1,16 @@
 import { MagnifyingGlassIcon } from '@heroicons/react/24/solid';
 import React, { useEffect, useState } from 'react';
 
-function DebouncedInput({ initialValue, onChange, debounce = 500, ...props }) {
+const DebouncedInput = ({
+  initialValue,
+  onChange,
+  debounce = 500,
+  ...props
+}) => {
   const [value, setValue] = useState(initialValue);
 
   useEffect(() => {
     setValue(initialValue);
-    console.log(initialValue);
   }, [initialValue]);
 
   useEffect(() => {
@@ -32,6 +36,6 @@ function DebouncedInput({ initialValue, onChange, debounce = 500, ...props }) {
       />
     </>
   );
-}
+};
 
 export default DebouncedInput;

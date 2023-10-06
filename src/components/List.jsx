@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-function List({ data, onSelectValue }) {
+const List = ({ data, onSelectValue }) => {
   const handleSelectValue = (value) => {
     onSelectValue(value);
   };
@@ -28,7 +28,7 @@ function List({ data, onSelectValue }) {
       )}
     </div>
   );
-}
+};
 
 List.propTypes = {
   data: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.any)).isRequired,

@@ -1,12 +1,12 @@
 import PropTypes from 'prop-types';
 import React, { useEffect, useMemo, useState } from 'react';
 
-export default function Pagination({
+const Pagination = ({
   pageChangeHandler,
   totalRows,
   rowsPerPage,
   // resetPage,
-}) {
+}) => {
   const [currentPage, setCurrentPage] = useState(0);
   const [canGoBack, setCanGoBack] = useState(false);
   const [canGoNext, setCanGoNext] = useState(true);
@@ -201,10 +201,12 @@ export default function Pagination({
   }
 
   return null;
-}
+};
 
 Pagination.propTypes = {
   pageChangeHandler: PropTypes.func.isRequired,
   rowsPerPage: PropTypes.number.isRequired,
   totalRows: PropTypes.number.isRequired,
 };
+
+export default Pagination;

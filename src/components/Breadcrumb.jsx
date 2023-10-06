@@ -1,10 +1,10 @@
 import React from 'react';
 import { useMatches } from 'react-router-dom';
 
-function Breadcrumb() {
-  let matches = useMatches();
+const Breadcrumb = () => {
+  const matches = useMatches();
 
-  let crumbs = matches
+  const crumbs = matches
     .filter((match) => Boolean(match.handle?.crumb))
     .map((match) => match.handle.crumb(match.data));
 
@@ -31,6 +31,6 @@ function Breadcrumb() {
       </ol>
     </nav>
   );
-}
+};
 
 export default Breadcrumb;

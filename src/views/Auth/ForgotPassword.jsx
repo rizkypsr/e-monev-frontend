@@ -19,7 +19,7 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import forgotPassword from '../../api/auth/forgotPassword';
 
-function ForgotPassword() {
+const ForgotPassword = () => {
   const auth = useAuthUser();
   const { showToastMessage } = useToastContext();
 
@@ -136,6 +136,6 @@ function ForgotPassword() {
       </div>
     </div>
   );
-}
+};
 
 export default ForgotPassword;

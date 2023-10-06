@@ -14,7 +14,7 @@ const options = {
   standardFontDataUrl: 'standard_fonts/',
 };
 
-export default function ReportPreview() {
+const ReportPreview = () => {
   const [numPages, setNumPages] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
 
@@ -53,4 +53,6 @@ export default function ReportPreview() {
       </div>
     </>
   );
-}
+};
+
+export default ReportPreview;

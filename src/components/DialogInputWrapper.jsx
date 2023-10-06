@@ -8,7 +8,7 @@ import SelectInputModal from './SelectInputModal';
 import List from './List';
 import ErrorPage from '../views/ErrorPage';
 
-export default function DialogInputWrapper({
+const DialogInputWrapper = ({
   label,
   selectedItem,
   trailingIcon,
@@ -16,7 +16,7 @@ export default function DialogInputWrapper({
   onSelect,
   onDelete,
   error,
-}) {
+}) => {
   const [openDialog, setOpenDialog] = useState(false);
   const [data, setData] = useState({
     items: [],
@@ -108,7 +108,7 @@ export default function DialogInputWrapper({
       </DialogContent>
     </Dialog>
   );
-}
+};
 
 DialogInputWrapper.propTypes = {
   label: PropTypes.string.isRequired,
@@ -127,3 +127,5 @@ DialogInputWrapper.defaultProps = {
   onSelect: null,
   onDelete: null,
 };
+
+export default DialogInputWrapper;

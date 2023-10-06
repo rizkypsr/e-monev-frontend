@@ -1,8 +1,6 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 
-function Activity() {
-  return <Outlet />;
-}
+const Activity = () => <Outlet />;
 
 export default Activity;

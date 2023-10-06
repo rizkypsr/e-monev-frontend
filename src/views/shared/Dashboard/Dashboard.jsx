@@ -84,11 +84,13 @@ const Dashboard = () => {
     return <ErrorPage errorMessage={usersQuery.error} />;
   }
 
+  const showCountBox = (roles) => roles.includes(authUser().role.name);
+
   return (
     <>
       <h1 className="font-semibold text-2xl mb-8">
-        Halo {authUser().role.id === 1 ? 'Admin' : 'User OPD'}, Selamat Datang
-        di halaman elektronik aplikasi&nbsp;
+        Halo {authUser().role.name}, Selamat Datang di halaman elektronik
+        aplikasi&nbsp;
         <span className="italic">e-Montir Pemda</span>
       </h1>
 
@@ -129,58 +131,58 @@ const Dashboard = () => {
       </div>
 
       <div className="bg-white rounded-lg grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-y-7 p-8 shadow-2xl shadow-[#F3F6FF]">
-        {authUser().role.name.toLowerCase() === 'superadmin' ? (
-          <>
-            <CountBox
-              linkTo="urusan"
-              title="urusan"
-              count={occassionsQuery.data?.data.total || 0}
-              color="#56CCF2"
-              className="hover:solid-shadow-blue"
-            />
-            <CountBox
-              linkTo="organisasi"
-              title="organisasi"
-              count={organizationsQuery.data?.data.total || 0}
-              color="#BB6BD9"
-              className="hover:solid-shadow-purple"
-            />
-            <CountBox
-              linkTo="program"
-              title="program"
-              count={programsQuery.data?.data.total || 0}
-              color="#6FCF97"
-              className="hover:solid-shadow-green"
-            />
-            <CountBox
-              linkTo="kegiatan"
-              title="kegiatan"
-              count={activitiesQuery.data?.data.total || 0}
-              color="#F2C94C"
-              className="hover:solid-shadow-yellow"
-            />
-            <CountBox
-              linkTo="sasaran"
-              title="sasaran"
-              count={purposesQuery.data?.data.total || 0}
-              color="#F2994A"
-              className="hover:solid-shadow-orange"
-            />
-            <CountBox
-              linkTo="login-akses-user"
-              title="user"
-              count={usersQuery.data?.data.total || 0}
-              color="#BDBDBD"
-              className="hover:solid-shadow-gray"
-            />
-          </>
-        ) : (
+        {showCountBox(['Superadmin', 'Admin Bidang']) && (
           <CountBox
-            linkTo="/"
+            linkTo="urusan"
+            title="urusan"
+            count={occassionsQuery.data?.data.total || 0}
+            color="#56CCF2"
+            className="hover:solid-shadow-blue"
+          />
+        )}
+        {showCountBox(['Superadmin']) && (
+          <CountBox
+            linkTo="organisasi"
+            title="organisasi"
+            count={organizationsQuery.data?.data.total || 0}
+            color="#BB6BD9"
+            className="hover:solid-shadow-purple"
+          />
+        )}
+        {showCountBox(['Superadmin', 'Admin Bidang']) && (
+          <CountBox
+            linkTo="program"
             title="program"
             count={programsQuery.data?.data.total || 0}
             color="#6FCF97"
             className="hover:solid-shadow-green"
+          />
+        )}
+        {showCountBox(['Superadmin', 'Admin Bidang']) && (
+          <CountBox
+            linkTo="kegiatan"
+            title="kegiatan"
+            count={activitiesQuery.data?.data.total || 0}
+            color="#F2C94C"
+            className="hover:solid-shadow-yellow"
+          />
+        )}
+        {showCountBox(['Superadmin', 'Admin Bidang']) && (
+          <CountBox
+            linkTo="sasaran"
+            title="sasaran"
+            count={purposesQuery.data?.data.total || 0}
+            color="#F2994A"
+            className="hover:solid-shadow-orange"
+          />
+        )}
+        {showCountBox(['Superadmin']) && (
+          <CountBox
+            linkTo="login-akses-user"
+            title="user"
+            count={usersQuery.data?.data.total || 0}
+            color="#BDBDBD"
+            className="hover:solid-shadow-gray"
           />
         )}
       </div>

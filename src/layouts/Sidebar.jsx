@@ -145,7 +145,7 @@ const Sidebar = ({ isOpen }) => {
           />
           <div className="flex flex-col">
             <span className="font-semibold whitespace-nowrap">
-              {authUser()?.role?.id === 1 ? 'Super Admin' : 'User OPD'}
+              {authUser()?.role?.name}
             </span>
             <span className="text-xs">{authUser()?.username}</span>
           </div>
