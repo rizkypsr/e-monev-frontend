@@ -10,7 +10,6 @@ import {
 } from '../components/DialogContent';
 import LogoutImg from '../assets/images/logout.png';
 import Button from '../components/Button';
-import { AddIcon, BookIcon } from '../components/icons';
 import DashboardIcon from '../components/icons/DashboardIcon';
 import ProfileIcon from '../components/icons/ProfileIcon';
 import LockIcon from '../components/icons/LockIcon';
@@ -21,6 +20,8 @@ import TargetIcon from '../components/icons/TargetIcon';
 import ReportIcon from '../components/icons/ReportIcon';
 import LogoutIcon from '../components/icons/LogoutIcon';
 import ConfigurationIcon from '../components/icons/ConfigurationIcon';
+import BookIcon from '../components/icons/BookIcon';
+import AddIcon from '../components/icons/AddIcon';
 
 const Sidebar = ({ isOpen }) => {
   const signOut = useSignOut();

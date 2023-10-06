@@ -23,10 +23,15 @@ const Configuration = () => {
     queryKey: ['get_configuration'],
     queryFn: () => getTriwulanSetting(authHeader()),
     onSuccess: (result) => {
-      setDatePicker([
-        result.data[0].TRIWULAN_STARTED,
-        result.data[1].TRIWULAN_ENDED,
-      ]);
+      let triwulanEnded;
+      let triwulanStarted;
+
+      result.data.forEach(({ TRIWULAN_ENDED, TRIWULAN_STARTED }) => {
+        if (TRIWULAN_ENDED) triwulanEnded = TRIWULAN_ENDED;
+        if (TRIWULAN_STARTED) triwulanStarted = TRIWULAN_STARTED;
+      });
+
+      setDatePicker([new Date(triwulanStarted), new Date(triwulanEnded)]);
     },
   });
 
@@ -41,10 +46,12 @@ const Configuration = () => {
       {
         body: [
           {
-            TRIWULAN_STARTED: newData[0],
+            key: 'TRIWULAN_STARTED',
+            value: newData[0],
           },
           {
-            TRIWULAN_ENDED: newData[1],
+            key: 'TRIWULAN_ENDED',
+            value: newData[1],
           },
         ],
         token: authHeader(),
