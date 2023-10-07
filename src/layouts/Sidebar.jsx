@@ -27,62 +27,51 @@ const Sidebar = ({ isOpen }) => {
   const signOut = useSignOut();
   const authUser = useAuthUser();
 
-  const getPath = (path = '') => {
-    switch (authUser().role.name) {
-      case 'Superadmin':
-        return `/admin${path}`;
-      case 'Admin Bidang':
-        return `/admin-bidang${path}`;
-      default:
-        return path;
-    }
-  };
-
   const sidebarList = [
     {
-      path: getPath(),
+      path: '/',
       label: 'Dashboard',
       icon: <DashboardIcon />,
       roles: ['superadmin', 'opd', 'admin bidang'],
     },
     {
-      path: getPath('/akun-saya'),
+      path: '/akun-saya',
       label: 'Akun Saya',
       icon: <ProfileIcon />,
       roles: ['superadmin', 'opd', 'admin bidang'],
     },
     {
-      path: '/admin/login-akses-user',
+      path: '/login-akses-user',
       label: 'Login Akses User',
       icon: <LockIcon />,
       roles: ['superadmin'],
     },
     {
-      path: getPath('/urusan'),
+      path: '/urusan',
       label: 'Urusan',
       icon: <CheckIcon />,
       roles: ['superadmin', 'admin bidang'],
     },
     {
-      path: '/admin/organisasi',
+      path: '/organisasi',
       label: 'Organisasi',
       icon: <MedalIcon />,
       roles: ['superadmin'],
     },
     {
-      path: getPath('/program'),
+      path: '/program',
       label: 'Program',
       icon: <BookIcon />,
       roles: ['superadmin', 'admin bidang'],
     },
     {
-      path: getPath('/kegiatan'),
+      path: '/kegiatan',
       label: 'Kegiatan',
       icon: <StarIcon />,
       roles: ['superadmin', 'admin bidang'],
     },
     {
-      path: getPath('/sasaran'),
+      path: '/sasaran',
       label: 'Sasaran',
       icon: <TargetIcon />,
       roles: ['superadmin', 'admin bidang'],
@@ -100,19 +89,19 @@ const Sidebar = ({ isOpen }) => {
       roles: ['opd'],
     },
     {
-      path: getPath('/laporan'),
+      path: '/laporan',
       label: 'Laporan',
       icon: <ReportIcon />,
       roles: ['superadmin', 'opd', 'admin bidang'],
     },
     {
-      path: '/admin/riwayat',
+      path: '/riwayat',
       label: 'Riwayat',
       icon: <ProfileIcon />,
       roles: ['superadmin'],
     },
     {
-      path: '/admin/konfigurasi',
+      path: '/konfigurasi',
       label: 'Konfigurasi',
       icon: <ConfigurationIcon />,
       roles: ['superadmin'],
@@ -153,7 +142,7 @@ const Sidebar = ({ isOpen }) => {
         </div>
         <ul className="space-y-2 px-6 font-medium leading-5">
           {sidebarList.map((sidebar) => {
-            if (sidebar.roles.includes(authUser().role.name.toLowerCase())) {
+            if (sidebar.roles.includes(authUser()?.role?.name.toLowerCase())) {
               return (
                 <NavLink
                   end={sidebar.label === 'Dashboard'}

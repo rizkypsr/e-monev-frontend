@@ -7,8 +7,6 @@ import {
   Route,
 } from 'react-router-dom';
 import Login from './views/Auth/Login';
-import PrivateRoute from './layouts/PrivateRoute';
-import AdminLayout from './layouts/AdminRoot';
 import MyAccount from './views/Admin/MyAccount/MyAccount';
 import LoginAksesUser from './views/Admin/UserAccess/UserAccess';
 import Report from './views/Admin/Report/Report';
@@ -61,7 +59,9 @@ import History from './views/Admin/History/History';
 import HistoryTable from './views/Admin/History/HistoryTable';
 import ReportTriwulanDetail from './views/Admin/Report/ReportTriwulanDetail';
 import TriwulanEdit from './views/User/Triwulan/TriwulanEdit';
-import AdminBidangLayout from './layouts/AdminBidangRoot';
+import ReportMasterDetail from './views/Admin/Report/ReportMasterDetail';
+import Authorization from './components/Authorization';
+import PrivateLayout from './layouts/PrivateLayout';
 
 const router = createBrowserRouter(
   createRoutesFromElements([
@@ -69,6 +69,7 @@ const router = createBrowserRouter(
     <Route path="/forgot-password" element={<ForgotPassword />} />,
     <Route
       path="/"
+      element={<PrivateLayout />}
       loader={() => 'Dashboard'}
       handle={{
         crumb: () => (
@@ -80,23 +81,21 @@ const router = createBrowserRouter(
           </Link>
         ),
       }}
-      element={
-        <PrivateRoute>
-          <UserLayout />
-        </PrivateRoute>
-      }
-      errorElement={<ErrorPage404 />}
     >
       <Route
         index
-        key="userDashboard"
+        key="dashboard"
         loader={() => 'Dashboard'}
         handle={{
           crumb: (data) => (
             <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
           ),
         }}
-        element={<Dashboard />}
+        element={
+          <Authorization roles={['Superadmin', 'OPD', 'Admin Bidang']}>
+            <Dashboard />
+          </Authorization>
+        }
       />
       <Route
         key="myAccount"
@@ -107,120 +106,11 @@ const router = createBrowserRouter(
             <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
           ),
         }}
-        element={<MyAccount />}
-      >
-        <Route index key="akunSayaForm" element={<MyAccountForm />} />
-      </Route>
-      <Route
-        key="report"
-        path="laporan"
-        loader={() => 'Data Laporan'}
-        handle={{
-          crumb: (data) => (
-            <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
-          ),
-        }}
-        element={<Report />}
-      >
-        <Route path="" key="reportTable" element={<ReportTableWrapper />}>
-          <Route key="reportTable" path="" element={<ReportTable />} />
-          <Route
-            key="reportMasterTable"
-            path="data-master"
-            element={<ReportMasterTable />}
-          />
-          <Route
-            key="reportTriwulanTable"
-            path="data-triwulan"
-            element={<ReportTriwulanTable />}
-          />
-        </Route>
-
-        <Route key="reportEdit" path="edit/:id" element={<ReportEdit />} />
-        <Route
-          key="reportDetail"
-          path="detail/:id"
-          element={<ReportDetail />}
-        />
-        <Route
-          key="userReportPreview"
-          path="preview"
-          element={<ReportPreview />}
-        />
-      </Route>
-      <Route
-        key="master"
-        path="data-master"
-        loader={() => 'Tambah Data Master'}
-        handle={{
-          crumb: (data) => (
-            <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
-          ),
-        }}
-        element={<Master />}
-      >
-        <Route index key="masterCreate" element={<MasterCreate />} />
-      </Route>
-      <Route
-        key="triwulan"
-        path="data-triwulan"
-        loader={() => 'Tambah Data Triwulan'}
-        handle={{
-          crumb: (data) => (
-            <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
-          ),
-        }}
-        element={<Master />}
-      >
-        <Route index key="triwulanCreate" element={<TriwulanCreate />} />
-        <Route key="triwulanEdit" path="edit/:id" element={<TriwulanEdit />} />
-      </Route>
-      <Route
-        key="triwulanDetail"
-        path="data-triwulan/detail/:id"
-        element={<ReportTriwulanDetail />}
-      />
-    </Route>,
-    <Route
-      path="/admin"
-      loader={() => 'Dashboard'}
-      handle={{
-        crumb: () => (
-          <Link
-            to="/admin"
-            className="ml-1 text-sm text-dark-gray hover:text-primary md:ml-2"
-          >
-            e-Montir
-          </Link>
-        ),
-      }}
-      element={
-        <PrivateRoute>
-          <AdminLayout />
-        </PrivateRoute>
-      }
-    >
-      <Route
-        index
-        key="adminDashboard"
-        loader={() => 'Dashboard'}
-        handle={{
-          crumb: (data) => (
-            <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
-          ),
-        }}
-        element={<Dashboard />}
-      />
-      <Route
-        key="myAccount"
-        path="akun-saya"
-        loader={() => 'Akun Saya'}
-        handle={{
-          crumb: (data) => (
-            <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
-          ),
-        }}
-        element={<MyAccount />}
+        element={
+          <Authorization roles={['Superadmin', 'OPD', 'Admin Bidang']}>
+            <MyAccount />
+          </Authorization>
+        }
       >
         <Route index key="akunSayaForm" element={<MyAccountForm />} />
       </Route>
@@ -233,7 +123,11 @@ const router = createBrowserRouter(
             <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
           ),
         }}
-        element={<LoginAksesUser />}
+        element={
+          <Authorization roles={['Superadmin']}>
+            <LoginAksesUser />
+          </Authorization>
+        }
       >
         <Route index key="loginAksesTable" element={<UserAccessTable />} />
         <Route
@@ -261,7 +155,11 @@ const router = createBrowserRouter(
             <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
           ),
         }}
-        element={<Occassion />}
+        element={
+          <Authorization roles={['Superadmin', 'Admin Bidang']}>
+            <Occassion />
+          </Authorization>
+        }
       >
         <Route index key="urusan" element={<OccassionTable />} />
         <Route key="urusanCreate" path="create" element={<OccasionCreate />} />
@@ -281,7 +179,11 @@ const router = createBrowserRouter(
             <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
           ),
         }}
-        element={<Organization />}
+        element={
+          <Authorization roles={['Superadmin']}>
+            <Organization />
+          </Authorization>
+        }
       >
         <Route index key="organisasi" element={<OrganizationTable />} />
         <Route
@@ -300,7 +202,6 @@ const router = createBrowserRouter(
           element={<OrganizationDetail />}
         />
       </Route>
-      ,
       <Route
         key="program"
         path="program"
@@ -310,7 +211,11 @@ const router = createBrowserRouter(
             <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
           ),
         }}
-        element={<Program />}
+        element={
+          <Authorization roles={['Superadmin', 'Admin Bidang']}>
+            <Program />
+          </Authorization>
+        }
       >
         <Route index key="program" element={<ProgramTable />} />
         <Route key="programCreate" path="create" element={<ProgramCreate />} />
@@ -321,7 +226,6 @@ const router = createBrowserRouter(
           element={<ProgramDetail />}
         />
       </Route>
-      ,
       <Route
         key="kegiatan"
         path="kegiatan"
@@ -331,7 +235,11 @@ const router = createBrowserRouter(
             <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
           ),
         }}
-        element={<Activity />}
+        element={
+          <Authorization roles={['Superadmin', 'Admin Bidang']}>
+            <Activity />
+          </Authorization>
+        }
       >
         <Route index key="kegiatan" element={<ActivityTable />} />
         <Route
@@ -355,7 +263,11 @@ const router = createBrowserRouter(
             <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
           ),
         }}
-        element={<Purpose />}
+        element={
+          <Authorization roles={['Superadmin', 'Admin Bidang']}>
+            <Purpose />
+          </Authorization>
+        }
       >
         <Route index key="purpose" element={<PurposeTable />} />
         <Route key="purposeCreate" path="create" element={<PurposeCreate />} />
@@ -367,7 +279,7 @@ const router = createBrowserRouter(
         />
       </Route>
       <Route
-        key="adminReport"
+        key="report"
         path="laporan"
         loader={() => 'Data Laporan'}
         handle={{
@@ -375,39 +287,55 @@ const router = createBrowserRouter(
             <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
           ),
         }}
-        element={<Report />}
+        element={
+          <Authorization roles={['Superadmin', 'OPD', 'Admin Bidang']}>
+            <Report />
+          </Authorization>
+        }
       >
-        <Route path="" key="reportTableAdmin" element={<ReportTableWrapper />}>
-          <Route key="reportTableAdmin" path="" element={<ReportTable />} />
+        <Route path="" key="report" element={<ReportTableWrapper />}>
+          <Route key="reportTable" path="" element={<ReportTable />} />
           <Route
-            key="reportMasterTableAdmin"
+            key="reportMasterTable"
             path="data-master"
             element={<ReportMasterTable />}
           />
           <Route
-            key="reportTriwulanTableAdmin"
+            key="reportTriwulanTable"
             path="data-triwulan"
             element={<ReportTriwulanTable />}
           />
         </Route>
-
-        <Route key="reportEditAdmin" path="edit/:id" element={<ReportEdit />} />
+        <Route key="reportEdit" path="edit/:id" element={<ReportEdit />} />
         <Route
-          key="reportDetailAdmin"
+          key="reportTriwulanEdit"
+          path="data-triwulan/edit/:id"
+          element={<TriwulanEdit />}
+        />
+        <Route
+          key="reportTriwulanDetail"
+          path="data-triwulan/detail/:id"
+          element={<ReportTriwulanDetail />}
+        />
+        <Route
+          key="reportMasterDetail"
+          path="data-master/detail/:id"
+          element={<ReportMasterDetail />}
+        />
+        <Route
+          key="reportDetail"
           path="detail/:id"
           element={<ReportDetail />}
-        />
-
-        <Route
-          key="userReportPreviewAdmin"
-          path="preview"
-          element={<ReportPreview />}
         />
       </Route>
       <Route
         key="configuration"
         path="konfigurasi"
-        element={<Configuration />}
+        element={
+          <Authorization roles={['Superadmin']}>
+            <Configuration />
+          </Authorization>
+        }
       />
       <Route
         key="history"
@@ -418,188 +346,49 @@ const router = createBrowserRouter(
             <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
           ),
         }}
-        element={<History />}
+        element={
+          <Authorization roles={['Superadmin']}>
+            <History />
+          </Authorization>
+        }
       >
-        <Route index key="purpose" element={<HistoryTable />} />
-        {/* <Route key="purposeCreate" path="create" element={<PurposeCreate />} />
-        <Route key="purposeEdit" path="edit/:id" element={<PurposeEdit />} />
-        <Route
-          key="purposeDetail"
-          path="detail/:id"
-          element={<PurposeDetail />}
-        /> */}
+        <Route index key="history" element={<HistoryTable />} />
       </Route>
       <Route
-        key="triwulanDetailAdmin"
-        path="data-triwulan/detail/:id"
-        element={<ReportTriwulanDetail />}
-      />
-    </Route>,
-    <Route
-      path="/admin-bidang"
-      loader={() => 'Dashboard'}
-      handle={{
-        crumb: () => (
-          <Link
-            to="/admin-bidang"
-            className="ml-1 text-sm text-dark-gray hover:text-primary md:ml-2"
-          >
-            e-Montir
-          </Link>
-        ),
-      }}
-      element={
-        <PrivateRoute>
-          <AdminBidangLayout />
-        </PrivateRoute>
-      }
-    >
-      <Route
-        index
-        key="adminBidangDashboard"
-        loader={() => 'Dashboard'}
+        key="master"
+        path="data-master"
+        loader={() => 'Tambah Data Master'}
         handle={{
           crumb: (data) => (
             <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
           ),
         }}
-        element={<Dashboard />}
-      />
-      <Route
-        key="adminBidangmyAccount"
-        path="akun-saya"
-        loader={() => 'Akun Saya'}
-        handle={{
-          crumb: (data) => (
-            <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
-          ),
-        }}
-        element={<MyAccount />}
+        element={
+          <Authorization roles={['OPD']}>
+            <Master />
+          </Authorization>
+        }
       >
-        <Route index key="akunSayaForm" element={<MyAccountForm />} />
-      </Route>
-      <Route
-        key="aminBidangurusan"
-        path="urusan"
-        loader={() => 'Urusan'}
-        handle={{
-          crumb: (data) => (
-            <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
-          ),
-        }}
-        element={<Occassion />}
-      >
-        <Route index key="urusan" element={<OccassionTable />} />
-        <Route key="urusanCreate" path="create" element={<OccasionCreate />} />
-        <Route key="urusanEdit" path="edit/:id" element={<OccassionEdit />} />
-        <Route
-          key="urusanDetail"
-          path="detail/:id"
-          element={<OccassionDetail />}
-        />
-      </Route>
-      <Route
-        key="adminBidangprogram"
-        path="program"
-        loader={() => 'Program'}
-        handle={{
-          crumb: (data) => (
-            <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
-          ),
-        }}
-        element={<Program />}
-      >
-        <Route index key="program" element={<ProgramTable />} />
-        <Route key="programCreate" path="create" element={<ProgramCreate />} />
-        <Route key="programEdit" path="edit/:id" element={<ProgramEdit />} />
-        <Route
-          key="programDetail"
-          path="detail/:id"
-          element={<ProgramDetail />}
-        />
+        <Route index key="masterCreate" element={<MasterCreate />} />
       </Route>
       ,
       <Route
-        key="adminBidangkegiatan"
-        path="kegiatan"
-        loader={() => 'Kegiatan'}
+        key="triwulan"
+        path="data-triwulan"
+        loader={() => 'Tambah Data Triwulan'}
         handle={{
           crumb: (data) => (
             <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
           ),
         }}
-        element={<Activity />}
+        element={
+          <Authorization roles={['OPD']}>
+            <Master />
+          </Authorization>
+        }
       >
-        <Route index key="kegiatan" element={<ActivityTable />} />
-        <Route
-          key="kegiatanCreate"
-          path="create"
-          element={<ActivityCreate />}
-        />
-        <Route key="kegiatanEdit" path="edit/:id" element={<ActivityEdit />} />
-        <Route
-          key="kegiatanDetail"
-          path="detail/:id"
-          element={<ActivityDetail />}
-        />
-      </Route>
-      <Route
-        key="adminBidangpurpose"
-        path="sasaran"
-        loader={() => 'Sasaran'}
-        handle={{
-          crumb: (data) => (
-            <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
-          ),
-        }}
-        element={<Purpose />}
-      >
-        <Route index key="purpose" element={<PurposeTable />} />
-        <Route key="purposeCreate" path="create" element={<PurposeCreate />} />
-        <Route key="purposeEdit" path="edit/:id" element={<PurposeEdit />} />
-        <Route
-          key="purposeDetail"
-          path="detail/:id"
-          element={<PurposeDetail />}
-        />
-      </Route>
-      <Route
-        key="adminBidangReport"
-        path="laporan"
-        loader={() => 'Data Laporan'}
-        handle={{
-          crumb: (data) => (
-            <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
-          ),
-        }}
-        element={<Report />}
-      >
-        <Route path="" key="reportTableAdmin" element={<ReportTableWrapper />}>
-          <Route key="reportTableAdmin" path="" element={<ReportTable />} />
-          <Route
-            key="reportMasterTableAdmin"
-            path="data-master"
-            element={<ReportMasterTable />}
-          />
-          <Route
-            key="reportTriwulanTableAdmin"
-            path="data-triwulan"
-            element={<ReportTriwulanTable />}
-          />
-        </Route>
-
-        <Route key="reportEditAdmin" path="edit/:id" element={<ReportEdit />} />
-        <Route
-          key="reportDetailAdmin"
-          path="detail/:id"
-          element={<ReportDetail />}
-        />
-
-        <Route
-          key="userReportPreviewAdmin"
-          path="preview"
-          element={<ReportPreview />}
-        />
+        <Route index key="triwulanCreate" element={<TriwulanCreate />} />
+        <Route key="triwulanEdit" path="edit/:id" element={<TriwulanEdit />} />
       </Route>
     </Route>,
   ]),

@@ -143,9 +143,7 @@ const ReportTableWrapper = () => {
 
     const queryString = objectToQueryString(initialFilterParams);
 
-    const path = authUser().role.name === 'Superadmin' ? '/admin' : '';
-
-    navigate(`${path}/laporan?${queryString}`);
+    navigate(`/laporan?${queryString}`);
   };
 
   useEffect(() => {

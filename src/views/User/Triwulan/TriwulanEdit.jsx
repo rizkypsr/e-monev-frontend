@@ -187,7 +187,7 @@ const TriwulanEdit = () => {
   return (
     <div className="mb-6">
       <div className="flex justify-between">
-        <h1 className="text-2xl font-semibold">Tambah Data Triwulan</h1>
+        <h1 className="text-2xl font-semibold">Ubah Data Triwulan</h1>
       </div>
 
       <div className="w-full h-full mt-6 bg-white rounded-lg p-9">

@@ -209,7 +209,7 @@ const UserAccessEdit = () => {
                 textColor="text-[#2F80ED]"
                 icon={<PlusCircleIcon className="w-8 h-8" />}
               >
-                Tambah Urusan Lain
+                Tambah OPD Lain
               </Button>
             </div>
           )}

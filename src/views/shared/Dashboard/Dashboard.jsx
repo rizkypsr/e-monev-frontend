@@ -149,7 +149,7 @@ const Dashboard = () => {
             className="hover:solid-shadow-purple"
           />
         )}
-        {showCountBox(['Superadmin', 'Admin Bidang']) && (
+        {showCountBox(['Superadmin', 'Admin Bidang', 'OPD']) && (
           <CountBox
             linkTo="program"
             title="program"

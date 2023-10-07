@@ -147,14 +147,14 @@ const columns = [
       const rowId = props.row.original.id;
       return (
         <div className="flex justify-end">
-          <Link to={`/data-triwulan/edit/${rowId}`}>
+          <Link to={`edit/${rowId}`}>
             <Button
               className="text-sm font-normal"
               textColor="text-blue-500"
               icon={<PencilIcon className="w-4 h-4" />}
             />
           </Link>
-          <Link to={`/data-triwulan/detail/${rowId}`}>
+          <Link to={`detail/${rowId}`}>
             <Button
               className="text-sm font-normal"
               textColor="text-blue-500"
