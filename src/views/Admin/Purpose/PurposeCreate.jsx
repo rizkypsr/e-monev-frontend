@@ -34,7 +34,7 @@ const PurposeCreate = () => {
       {
         onSuccess: () => {
           showToastMessage('Berhasil membuat Sasaran');
-          navigate('/admin/sasaran');
+          navigate('/sasaran');
         },
         onError: (error) => {
           showToastMessage(error.message, 'error');

@@ -34,7 +34,7 @@ const OrganizationCreate = () => {
       {
         onSuccess: () => {
           showToastMessage('Berhasil membuat Organisasi');
-          navigate('/admin/organisasi');
+          navigate('/organisasi');
         },
         onError: (error) => {
           showToastMessage(error.message, 'error');

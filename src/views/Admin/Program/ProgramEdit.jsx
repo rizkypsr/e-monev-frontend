@@ -46,7 +46,7 @@ const ProgramEdit = () => {
       {
         onSuccess: () => {
           showToastMessage('Berhasil mengubah Program');
-          navigate('/admin/program');
+          navigate('/program');
         },
       }
     );

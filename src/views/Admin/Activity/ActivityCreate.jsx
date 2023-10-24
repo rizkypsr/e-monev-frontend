@@ -115,7 +115,7 @@ const ActivityCreate = () => {
       {
         onSuccess: () => {
           showToastMessage('Berhasil membuat kegiatan');
-          navigate('/admin/kegiatan');
+          navigate('/kegiatan');
         },
         onError: (error) => {
           showToastMessage(error.message, 'error');
@@ -160,7 +160,7 @@ const ActivityCreate = () => {
           </h1>
         </Link>
 
-        <form className="mt-4" onSubmit={handleSubmit(onSubmit)}>
+        <form id="mainForm" className="mt-4" onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-6">
             <Label className="mb-2">Nama Kegiatan</Label>
             <DropdownDialog
@@ -188,7 +188,10 @@ const ActivityCreate = () => {
                       style={style}
                       className="w-72 bg-white absolute z-auto rounded-md p-4 -right-80 top-0"
                     >
-                      <form onSubmit={handleSubmit2(onSubmit2)}>
+                      <form
+                        id="createFundSource"
+                        onSubmit={handleSubmit2(onSubmit2)}
+                      >
                         <TextInput
                           required
                           placeholder="Masukan Nama Kegiatan"

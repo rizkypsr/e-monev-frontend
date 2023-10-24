@@ -13,6 +13,8 @@ import { getPrograms } from '../../../api/admin/program';
 import { getActivities } from '../../../api/admin/activity';
 import { getPurposes } from '../../../api/admin/purpose';
 import DropdownDialog from '../../../components/DropdownDialog';
+import getExcel from '../../../api/admin/dashboard/getExcel';
+import ReactLoading from '../../../components/Loading';
 
 const initialParams = {
   limit: 0,
@@ -68,6 +70,12 @@ const Dashboard = () => {
     enabled: token !== null,
   });
 
+  const excelQuery = useQuery({
+    queryKey: ['get_excel'],
+    queryFn: () => getExcel(authHeader()),
+    enabled: false,
+  });
+
   const opdQuery = useInfiniteQuery({
     queryKey: ['get_organizations'],
     queryFn: async ({ pageParam = 1 }) =>
@@ -75,6 +83,10 @@ const Dashboard = () => {
     getNextPageParam: (lastPage) => lastPage.nextId ?? undefined,
     getPreviousPageParam: (firstPage) => firstPage.previousId ?? undefined,
   });
+
+  const handleDownloadExcel = async () => {
+    await excelQuery.refetch();
+  };
 
   const handleSelectOpd = (opd) => {
     setSelectedOpd(opd);
@@ -119,11 +131,13 @@ const Dashboard = () => {
             Unduh Data (PDF)
           </Button>
           <Button
+            onClick={handleDownloadExcel}
             className="w-28 lg:w-auto"
             type="submit"
             background="bg-primary"
             textColor="text-white"
             icon={<ArrowDownTrayIcon className="w-6 h-6" />}
+            loading={excelQuery.isLoading}
           >
             Unduh Data (XLS)
           </Button>

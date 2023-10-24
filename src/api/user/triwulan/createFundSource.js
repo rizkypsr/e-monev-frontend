@@ -1,8 +1,8 @@
 import axiosClient from '../../../config/axios';
 
-async function createMaster({ body, token }) {
+async function createFundSource({ body, token }) {
   try {
-    const response = await axiosClient.post('/data-master/create', body, {
+    const response = await axiosClient.post('/fund-source/create', body, {
       headers: {
         Authorization: token,
       },
@@ -20,4 +20,4 @@ async function createMaster({ body, token }) {
   }
 }
 
-export default createMaster;
+export default createFundSource;

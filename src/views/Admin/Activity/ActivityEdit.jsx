@@ -139,7 +139,7 @@ const ActivityEdit = () => {
       {
         onSuccess: () => {
           showToastMessage('Berhasil membuat kegiatan');
-          navigate('/admin/kegiatan');
+          navigate('/kegiatan');
         },
         onError: (error) => {
           showToastMessage(error.message, 'error');

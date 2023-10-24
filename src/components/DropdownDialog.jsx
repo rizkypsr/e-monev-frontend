@@ -1,6 +1,8 @@
 import { Dialog, Transition } from '@headlessui/react';
 import { ChevronDownIcon, TrashIcon } from '@heroicons/react/24/solid';
-import { Fragment, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
+import { useInView } from 'react-intersection-observer';
+import ThreeDot from './ThreeDot';
 
 const DropdownDialog = ({
   label,
@@ -11,8 +13,18 @@ const DropdownDialog = ({
   onDelete,
   error,
   children,
+  onBottom,
+  hasNextPage,
+  isFetchingNextPage,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const { ref, inView } = useInView();
+
+  useEffect(() => {
+    if (inView && hasNextPage) {
+      onBottom();
+    }
+  }, [inView]);
 
   const closeModal = () => {
     setIsOpen(false);
@@ -73,7 +85,7 @@ const DropdownDialog = ({
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="w-full max-w-md transform rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                <Dialog.Panel className="[&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] w-full max-w-md h-[40rem] transform rounded-2xl bg-white overflow-y-auto p-6 shadow-xl transition-all">
                   <Dialog.Title
                     as="h3"
                     className="text-lg font-medium leading-6 text-gray-900 mb-6 flex items-center justify-between"
@@ -106,6 +118,15 @@ const DropdownDialog = ({
                           ))}
                     </div>
                   ))}
+                  <div ref={ref} className="mt-6 flex justify-center">
+                    {isFetchingNextPage ? (
+                      'Loading...'
+                    ) : hasNextPage ? (
+                      'Loading...'
+                    ) : (
+                      <ThreeDot />
+                    )}
+                  </div>
                 </Dialog.Panel>
               </Transition.Child>
             </div>

@@ -47,7 +47,7 @@ const OccassionEdit = () => {
       {
         onSuccess: () => {
           showToastMessage('Berhasil membuat Urusan');
-          navigate('/admin/urusan');
+          navigate('/urusan');
         },
       }
     );

@@ -36,7 +36,7 @@ const OccassionCreate = () => {
       {
         onSuccess: () => {
           showToastMessage('Berhasil membuat Urusan');
-          navigate('/admin/urusan');
+          navigate('/urusan');
         },
         onError: (error) => {
           showToastMessage(error.message, 'error');

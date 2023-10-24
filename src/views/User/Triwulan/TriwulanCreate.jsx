@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { CheckCircleIcon } from '@heroicons/react/24/solid';
+import { CheckCircleIcon, PlusIcon } from '@heroicons/react/24/solid';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { useInfiniteQuery, useMutation } from 'react-query';
+import { useInfiniteQuery, useMutation, useQueryClient } from 'react-query';
 import { useAuthHeader } from 'react-auth-kit';
+import { animated, useTransition } from '@react-spring/web';
 import Label from '../../../components/Label';
 import TextInput from '../../../components/TextInput';
 import formattedDate from '../../../utils/formattedDate';
@@ -12,10 +13,9 @@ import Button from '../../../components/Button';
 import getFundSource from '../../../api/user/triwulan/getFundSource';
 import createTriwulan from '../../../api/user/triwulan/createTriwulan';
 import DropdownDialog from '../../../components/DropdownDialog';
-import getProcurementType from '../../../api/user/triwulan/getProcurementType';
-import getProcurementMethod from '../../../api/user/triwulan/getProcurementMethod';
 import { useToastContext } from '../../../context/ToastContext';
 import FileInput from '../../../components/FileInput';
+import createFundSource from '../../../api/user/triwulan/createFundSource';
 
 const initialParams = {
   page: 1,
@@ -65,18 +65,54 @@ const TriwulanCreate = () => {
   const authHeader = useAuthHeader();
   const navigate = useNavigate();
   const { showToastMessage } = useToastContext();
+  const queryClient = useQueryClient();
 
   const [selectedFundSource, setSelectedFundSource] = useState(null);
   const [selectedProcurementType, setSelectedProcurementType] = useState(null);
   const [selectedProcurementMethod, setSelectedProcurementMethod] =
     useState(null);
+  const [openCreateFundSource, setOpenCreateFundSource] = useState(false);
 
   const {
     register,
     handleSubmit,
     setValue,
     formState: { errors },
+  } = useForm({
+    // defaultValues: {
+    //   fund_ceiling: 0,
+    //   contract_number_date: 0,
+    //   contract_value: 0,
+    //   physical_realization: 0,
+    //   fund_realization: 0,
+    //   local_workforce: 0,
+    //   non_local_workforce: 0,
+    // },
+  });
+
+  const {
+    register: register2,
+    handleSubmit: handleSubmit2,
+    formState: { errors: errors2 },
   } = useForm();
+
+  const transition = useTransition(openCreateFundSource, {
+    config: {
+      duration: 120,
+    },
+    from: {
+      scale: 0,
+      opacity: 0,
+    },
+    enter: {
+      scale: 1,
+      opacity: 1,
+    },
+    leave: {
+      scale: 0,
+      opacity: 0,
+    },
+  });
 
   const fundSourceQuery = useInfiniteQuery({
     queryKey: ['get_fund_source'],
@@ -90,6 +126,7 @@ const TriwulanCreate = () => {
   }, []);
 
   const createMutation = useMutation(createTriwulan);
+  const createFundSourceMutation = useMutation(createFundSource);
 
   const onSubmit = (data) => {
     const formData = new FormData();
@@ -128,6 +165,34 @@ const TriwulanCreate = () => {
     );
   };
 
+  const onSubmit2 = (formData) => {
+    const { fundSource2 } = formData;
+
+    createFundSourceMutation.mutate(
+      {
+        body: {
+          name: fundSource2,
+        },
+        token: authHeader(),
+      },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries('get_fund_source');
+
+          showToastMessage('Berhasil membuat Sumber Dana');
+          setOpenCreateFundSource(false);
+        },
+        onError: (error) => {
+          showToastMessage(error.message, 'error');
+        },
+      }
+    );
+  };
+
+  const openCreateFundSourceClick = () => {
+    setOpenCreateFundSource(!openCreateFundSource);
+  };
+
   const handleSelectFundSource = (item) => {
     setSelectedFundSource(item);
   };
@@ -151,7 +216,7 @@ const TriwulanCreate = () => {
       </div>
 
       <div className="w-full h-full mt-6 bg-white rounded-lg p-9">
-        <form className="w-4/5" onSubmit={handleSubmit(onSubmit)}>
+        <form id="main" className="w-4/5" onSubmit={handleSubmit(onSubmit)}>
           <div className="grid grid-cols-2 gap-4 mb-8">
             <div className="col-span-2">
               <Label>Tanggal Input Data</Label>
@@ -199,15 +264,55 @@ const TriwulanCreate = () => {
                 data={fundSourceQuery.data}
                 value={selectedFundSource}
                 onChange={handleSelectFundSource}
-              />
+              >
+                <Button
+                  type="button"
+                  background="bg-primary"
+                  textColor="text-white"
+                  icon={<PlusIcon className="w-4 h-4" />}
+                  onClick={() => openCreateFundSourceClick()}
+                />
+
+                {transition((style, isOpen) => (
+                  <div>
+                    {isOpen && (
+                      <animated.div
+                        style={style}
+                        className="w-72 bg-white absolute z-auto rounded-md p-4 -right-80 top-0"
+                      >
+                        <form
+                          id="fundSource"
+                          onSubmit={handleSubmit2(onSubmit2)}
+                        >
+                          <TextInput
+                            required
+                            placeholder="Masukan Sumber Dana"
+                            register={register2('fundSource2', {
+                              required: 'Sumber Dana wajib diisi!',
+                            })}
+                            error={errors2.fundSource2?.message}
+                          />
+                          <p className="text-xs text-light-gray mt-2 text-left">
+                            Tekan{' '}
+                            <span className="itelic text-dark-gray">Enter</span>{' '}
+                            untuk menyimpan
+                          </p>
+                        </form>
+                      </animated.div>
+                    )}
+                  </div>
+                ))}
+              </DropdownDialog>
             </div>
             <div>
-              <Label className="mb-2">Pagu Dana (Rp)</Label>
+              <Label className="mb-2">Pagu Dana (Dalam bentuk angka)</Label>
               <TextInput
                 id="fund_ceiling"
+                type="number"
                 name="fund_ceiling"
                 placeholder="Tulis Disini..."
                 register={register('fund_ceiling', {
+                  required: 'Pagu Dana wajib diisi!',
                   valueAsNumber: true,
                 })}
                 error={errors.fund_ceiling?.message}
@@ -236,12 +341,18 @@ const TriwulanCreate = () => {
             </div>
 
             <div>
-              <Label className="mb-2">Nomor dan Tanggal Kontrak</Label>
+              <Label className="mb-2">
+                Nomor dan Tanggal Kontrak (Dalam bentuk angka)
+              </Label>
               <TextInput
                 id="contract_number_date"
+                type="number"
                 name="contract_number_date"
                 placeholder="Tulis Disini..."
-                register={register('contract_number_date')}
+                register={register('contract_number_date', {
+                  required: 'Nomor dan Tanggal Kontrak wajib diisi!',
+                  valueAsNumber: true,
+                })}
                 error={errors.contract_number_date?.message}
               />
             </div>
@@ -266,36 +377,46 @@ const TriwulanCreate = () => {
               />
             </div>
             <div>
-              <Label className="mb-2">Nilai Kontrak</Label>
+              <Label className="mb-2">Nilai Kontrak (Dalam bentuk angka)</Label>
               <TextInput
                 id="contract_value"
+                type="number"
                 name="contract_value"
                 placeholder="Tulis Disini..."
                 register={register('contract_value', {
+                  required: 'Nilai Kontrak wajib diisi!',
                   valueAsNumber: true,
                 })}
                 error={errors.contract_value?.message}
               />
             </div>
             <div>
-              <Label className="mb-2">Realisasi Fisik</Label>
+              <Label className="mb-2">
+                Realisasi Fisik (Dalam bentuk angka)
+              </Label>
               <TextInput
                 id="physical_realization"
+                type="number"
                 name="physical_realization"
                 placeholder="Tulis Disini..."
                 register={register('physical_realization', {
+                  required: 'Realisasi Fisik wajib diisi!',
                   valueAsNumber: true,
                 })}
                 error={errors.physical_realization?.message}
               />
             </div>
             <div>
-              <Label className="mb-2">Realisasi Keuangan</Label>
+              <Label className="mb-2">
+                Realisasi Keuangan (Dalam bentuk angka)
+              </Label>
               <TextInput
                 id="fund_realization"
+                type="number"
                 name="fund_realization"
                 placeholder="Tulis Disini..."
                 register={register('fund_realization', {
+                  required: 'Realisasi Keuangan wajib diisi!',
                   valueAsNumber: true,
                 })}
                 error={errors.fund_realization?.message}
@@ -346,24 +467,31 @@ const TriwulanCreate = () => {
               />
             </div>
             <div>
-              <Label className="mb-2">Jumlah Tenaga Kerja (Lokal)</Label>
+              <Label className="mb-2">
+                Jumlah Tenaga Kerja Lokal (Dalam bentuk angka)
+              </Label>
               <TextInput
                 id="local_workforce"
+                type="number"
                 name="local_workforce"
                 placeholder="Tulis Disini..."
                 register={register('local_workforce', {
+                  required: 'Jumlah Tenaga Kerja Lokal wajib diisi!',
                   valueAsNumber: true,
                 })}
                 error={errors.local_workforce?.message}
               />
             </div>
             <div>
-              <Label className="mb-2">Jumlah Tenaga Kerja (Non Lokal)</Label>
+              <Label className="mb-2">
+                Jumlah Tenaga Kerja Non Lokal (Dalam bentuk angka)
+              </Label>
               <TextInput
                 id="non_local_workforce"
                 name="non_local_workforce"
                 placeholder="Tulis Disini..."
                 register={register('non_local_workforce', {
+                  required: 'Jumlah Tenaga Kerja Non Lokal wajib diisi!',
                   valueAsNumber: true,
                 })}
                 error={errors.non_local_workforce?.message}

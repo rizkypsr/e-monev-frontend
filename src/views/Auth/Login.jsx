@@ -62,14 +62,6 @@ const Login = () => {
   };
 
   if (isAuthenticated()) {
-    if (auth().role.id === 'Superadmin') {
-      return <Navigate to="/admin" />;
-    }
-
-    if (auth().role.id === 'Admin Bidang') {
-      return <Navigate to="/admin-bidang" />;
-    }
-
     return <Navigate to="/" />;
   }
 

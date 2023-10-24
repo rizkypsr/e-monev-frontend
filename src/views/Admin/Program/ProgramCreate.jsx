@@ -58,7 +58,7 @@ const ProgramCreate = () => {
       {
         onSuccess: () => {
           showToastMessage('Berhasil membuat Program');
-          navigate('/admin/program');
+          navigate('/program');
         },
         onError: (error) => {
           showToastMessage(error.message, 'error');

@@ -47,7 +47,7 @@ const PurposeEdit = () => {
       {
         onSuccess: () => {
           showToastMessage('Berhasil mengubah Sasaran');
-          navigate('/admin/sasaran');
+          navigate('/sasaran');
         },
       }
     );

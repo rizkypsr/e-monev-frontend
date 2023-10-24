@@ -3,10 +3,11 @@ import {
   CheckCircleIcon,
   PlusCircleIcon,
 } from '@heroicons/react/24/solid';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthHeader } from 'react-auth-kit';
 import { useInfiniteQuery, useMutation } from 'react-query';
+import { useInView } from 'react-intersection-observer';
 import { useForm } from 'react-hook-form';
 import Label from '../../../components/Label';
 import Button from '../../../components/Button';
@@ -20,7 +21,7 @@ import TextInput from '../../../components/TextInput';
 import createUser from '../../../api/admin/user/createUser';
 
 const initialParams = {
-  limit: 10,
+  limit: 20,
   page: 1,
   search: '',
   sort: 'terbaru',
@@ -51,16 +52,33 @@ const UserAccessCreate = () => {
 
   const opdQuery = useInfiniteQuery({
     queryKey: ['get_organizations'],
-    queryFn: async ({ pageParam = 1 }) =>
-      getOrganizations(filterParams, authHeader()),
-    getNextPageParam: (lastPage) => lastPage.nextId ?? undefined,
-    getPreviousPageParam: (firstPage) => firstPage.previousId ?? undefined,
+    queryFn: async ({ pageParam = 1 }) => {
+      const params = filterParams;
+
+      params.page = pageParam;
+
+      const res = await getOrganizations(params, authHeader());
+
+      return res;
+    },
+    getNextPageParam: (lastPage) => {
+      if (lastPage.data.page < lastPage.data.pages) {
+        return lastPage.data.page + 1;
+      }
+
+      return undefined;
+    },
   });
 
   const rolesQuery = useInfiniteQuery({
     queryKey: ['get_roles'],
     queryFn: () => getRoles(authHeader()),
   });
+
+  const handleOpdOnBottom = () => {
+    console.log('fetchingnext');
+    opdQuery.fetchNextPage();
+  };
 
   const createMutation = useMutation(createUser);
 
@@ -90,7 +108,7 @@ const UserAccessCreate = () => {
       {
         onSuccess: () => {
           showToastMessage('Berhasil membuat akun');
-          navigate('/admin/login-akses-user');
+          navigate('/login-akses-user');
         },
         onError: (error) => {
           showToastMessage(error.message, 'error');
@@ -158,6 +176,10 @@ const UserAccessCreate = () => {
                   onDelete={
                     index > 0 && (() => removeOrganizationsComponent(index))
                   }
+                  fetchNextPage={opdQuery.fetchNextPage}
+                  hasNextPage={opdQuery.hasNextPage}
+                  isFetchingNextPage={opdQuery.isFetchingNextPage}
+                  onBottom={() => handleOpdOnBottom()}
                 />
               ))}
             </div>

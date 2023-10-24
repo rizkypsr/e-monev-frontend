@@ -1,10 +1,11 @@
 import axiosClient from '../../../config/axios';
 
-async function createMaster({ body, token }) {
+async function getExcel(token) {
   try {
-    const response = await axiosClient.post('/data-master/create', body, {
+    const response = await axiosClient.get('/dashboard/excel', {
       headers: {
         Authorization: token,
+        'Content-Type': 'blob',
       },
     });
 
@@ -20,4 +21,4 @@ async function createMaster({ body, token }) {
   }
 }
 
-export default createMaster;
+export default getExcel;

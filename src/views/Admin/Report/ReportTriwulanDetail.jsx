@@ -1,11 +1,10 @@
 import { ArrowLeftIcon } from '@heroicons/react/24/solid';
 import React, { useState } from 'react';
 import { useAuthHeader } from 'react-auth-kit';
-import { Link, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from 'react-query';
 import ReactLoading from '../../../components/Loading';
 import ErrorPage from '../../ErrorPage';
-import getReport from '../../../api/admin/report/getReport';
 import formattedDate from '../../../utils/formattedDate';
 import getTriwulanDetail from '../../../api/user/triwulan/getTriwulanDetail';
 
@@ -40,6 +39,7 @@ const initialData = {
 const ReportTriwulanDetail = () => {
   const { id } = useParams();
   const authHeader = useAuthHeader();
+  const navigate = useNavigate();
 
   const [report, setReport] = useState(initialData);
 
@@ -89,15 +89,15 @@ const ReportTriwulanDetail = () => {
 
   return (
     <div className="w-full h-full mt-6 bg-white rounded-lg p-9">
-      <Link
-        to="/laporan/data-triwulan?limit=10&page=1&sort=terbaru&search="
-        className="flex space-x-3 items-center mb-8"
+      <div
+        className="flex space-x-3 items-center mb-8 cursor-pointer"
+        onClick={() => navigate(-1)}
       >
         <ArrowLeftIcon className="w-6 h-6" />
         <h1 className="font-semibold text-lg text-dark-gray leading-7">
           Detail Triwulan
         </h1>
-      </Link>
+      </div>
 
       <div className="relative overflow-x-auto">
         <table className="w-full text-sm text-left text-dark-gray">

@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import ReactLoading from './Loading';
 
 const Button = ({
   children,
@@ -9,6 +10,7 @@ const Button = ({
   onClick,
   background,
   textColor,
+  loading,
 }) =>
   type === 'modal' ? (
     <div
@@ -30,8 +32,12 @@ const Button = ({
         icon ? 'flex items-center justify-center space-x-2' : ''
       } ${background || 'bg-transparent'} ${className} ${textColor}`}
     >
-      {icon}
-      {children && <span>{children}</span>}
+      {!loading && icon}
+      {loading ? (
+        <ReactLoading color="#ffffff" />
+      ) : (
+        children && <span>{children}</span>
+      )}
     </button>
   );
 

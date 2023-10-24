@@ -116,7 +116,7 @@ const UserAccessEdit = () => {
     updateMutation.mutate(requestBody, {
       onSuccess: () => {
         showToastMessage('Berhasil mengubah akun');
-        navigate('/admin/login-akses-user');
+        navigate('/login-akses-user');
       },
       onError: (error) => {
         showToastMessage(error.message, 'error');

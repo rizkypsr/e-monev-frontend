@@ -121,7 +121,7 @@ const ReportEdit = () => {
       {
         onSuccess: () => {
           showToastMessage('Berhasil mengubah Laporan');
-          navigate('/admin/laporan');
+          navigate('/laporan');
         },
         onError: (err) => {
           showToastMessage(err.message, 'error');

@@ -1,7 +1,7 @@
 import { createColumnHelper } from '@tanstack/react-table';
 import { Link, useSearchParams } from 'react-router-dom';
 import { EyeIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/solid';
-import { useAuthHeader } from 'react-auth-kit';
+import { useAuthHeader, useAuthUser } from 'react-auth-kit';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useEffect, useState } from 'react';
 import Button from '../../../components/Button';
@@ -13,7 +13,6 @@ import {
 } from '../../../components/DialogContent';
 import TrashImg from '../../../assets/images/trash.png';
 import ErrorPage from '../../ErrorPage';
-import { deleteReport } from '../../../api/admin/report';
 import Table from '../../../components/Table';
 import Pagination from '../../../components/Pagination';
 import { useToastContext } from '../../../context/ToastContext';
@@ -143,17 +142,19 @@ const columns = [
   columnHelper.accessor((row) => row.aksi, {
     id: 'aksi',
     size: 10,
-    cell: (props, deleteUserData) => {
+    cell: (props, deleteUserData, role) => {
       const rowId = props.row.original.id;
       return (
         <div className="flex justify-end">
-          <Link to={`edit/${rowId}`}>
-            <Button
-              className="text-sm font-normal"
-              textColor="text-blue-500"
-              icon={<PencilIcon className="w-4 h-4" />}
-            />
-          </Link>
+          {role === 'Superadmin' && (
+            <Link to={`edit/${rowId}`}>
+              <Button
+                className="text-sm font-normal"
+                textColor="text-blue-500"
+                icon={<PencilIcon className="w-4 h-4" />}
+              />
+            </Link>
+          )}
           <Link to={`detail/${rowId}`}>
             <Button
               className="text-sm font-normal"
@@ -162,53 +163,55 @@ const columns = [
             />
           </Link>
 
-          <Dialog>
-            <DialogTrigger>
-              <Button
-                className="text-sm font-normal"
-                type="modal"
-                textColor="text-red-500"
-                icon={<TrashIcon className="w-4 h-4" />}
-              />
-            </DialogTrigger>
+          {role === 'Superadmin' && (
+            <Dialog>
+              <DialogTrigger>
+                <Button
+                  className="text-sm font-normal"
+                  type="modal"
+                  textColor="text-red-500"
+                  icon={<TrashIcon className="w-4 h-4" />}
+                />
+              </DialogTrigger>
 
-            <DialogContent className="w-1/3 py-12">
-              <div className="flex flex-col items-center justify-center h-full">
-                <div className="p-6 bg-[#FFDADA] w-fit rounded-lg">
-                  <img src={TrashImg} alt="Hapus" />
-                </div>
+              <DialogContent className="w-1/3 py-12">
+                <div className="flex flex-col items-center justify-center h-full">
+                  <div className="p-6 bg-[#FFDADA] w-fit rounded-lg">
+                    <img src={TrashImg} alt="Hapus" />
+                  </div>
 
-                <div>
-                  <h1 className="mt-6 text-lg font-semibold leading-7 text-dark-gray">
-                    Apakah Anda yakin menghapus ini?
-                  </h1>
-                  <div className="flex justify-center space-x-3">
-                    <DialogClose>
-                      <Button
-                        onClick={() => deleteUserData(rowId)}
-                        className="w-full md:w-28 mt-8 border border-[#EB5757]"
-                        type="modal"
-                        background="bg-white"
-                        textColor="text-[#EB5757]"
-                      >
-                        Ya, hapus
-                      </Button>
-                    </DialogClose>
-                    <DialogClose>
-                      <Button
-                        className="w-full mt-8 md:w-28"
-                        type="modal"
-                        background="bg-primary"
-                        textColor="text-white"
-                      >
-                        Batal
-                      </Button>
-                    </DialogClose>
+                  <div>
+                    <h1 className="mt-6 text-lg font-semibold leading-7 text-dark-gray">
+                      Apakah Anda yakin menghapus ini?
+                    </h1>
+                    <div className="flex justify-center space-x-3">
+                      <DialogClose>
+                        <Button
+                          onClick={() => deleteUserData(rowId)}
+                          className="w-full md:w-28 mt-8 border border-[#EB5757]"
+                          type="modal"
+                          background="bg-white"
+                          textColor="text-[#EB5757]"
+                        >
+                          Ya, hapus
+                        </Button>
+                      </DialogClose>
+                      <DialogClose>
+                        <Button
+                          className="w-full mt-8 md:w-28"
+                          type="modal"
+                          background="bg-primary"
+                          textColor="text-white"
+                        >
+                          Batal
+                        </Button>
+                      </DialogClose>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </DialogContent>
-          </Dialog>
+              </DialogContent>
+            </Dialog>
+          )}
         </div>
       );
     },
@@ -237,6 +240,7 @@ const ReportTriwulanTable = () => {
 
   const queryClient = useQueryClient();
   const authHeader = useAuthHeader();
+  const authUser = useAuthUser();
   const { showToastMessage } = useToastContext();
 
   const { isLoading, isError, error, data } = useQuery({
@@ -255,8 +259,8 @@ const ReportTriwulanTable = () => {
       },
       {
         onSuccess: (result) => {
-          queryClient.invalidateQueries('get_reports');
-          showToastMessage(result);
+          queryClient.invalidateQueries('get_triwulan_reports');
+          showToastMessage(result.message);
         },
         onError: (err) => {
           showToastMessage(err.message, 'error');
@@ -283,7 +287,8 @@ const ReportTriwulanTable = () => {
           column.cell
             ? {
                 ...column,
-                cell: (props) => column.cell(props, deleteReportData),
+                cell: (props) =>
+                  column.cell(props, deleteReportData, authUser().role?.name),
               }
             : column
         )}

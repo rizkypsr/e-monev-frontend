@@ -62,6 +62,7 @@ import TriwulanEdit from './views/User/Triwulan/TriwulanEdit';
 import ReportMasterDetail from './views/Admin/Report/ReportMasterDetail';
 import Authorization from './components/Authorization';
 import PrivateLayout from './layouts/PrivateLayout';
+import MasterEdit from './views/User/Master/MasterEdit';
 
 const router = createBrowserRouter(
   createRoutesFromElements([
@@ -306,7 +307,24 @@ const router = createBrowserRouter(
             element={<ReportTriwulanTable />}
           />
         </Route>
-        <Route key="reportEdit" path="edit/:id" element={<ReportEdit />} />
+        <Route
+          key="reportEdit"
+          path="edit/:id"
+          element={
+            <Authorization roles={['Superadmin']}>
+              <ReportEdit />
+            </Authorization>
+          }
+        />
+        <Route
+          key="reportMasterEdit"
+          path="data-master/edit/:id"
+          element={
+            <Authorization roles={['Superadmin']}>
+              <MasterEdit />
+            </Authorization>
+          }
+        />
         <Route
           key="reportTriwulanEdit"
           path="data-triwulan/edit/:id"

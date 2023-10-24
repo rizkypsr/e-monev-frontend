@@ -49,7 +49,7 @@ const OrganizationEdit = () => {
       {
         onSuccess: () => {
           showToastMessage('Berhasil membuat Organisasi');
-          navigate('/admin/organisasi');
+          navigate('/organisasi');
         },
       }
     );
