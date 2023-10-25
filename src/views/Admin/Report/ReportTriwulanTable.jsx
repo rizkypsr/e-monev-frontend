@@ -1,6 +1,11 @@
 import { createColumnHelper } from '@tanstack/react-table';
 import { Link, useSearchParams } from 'react-router-dom';
-import { EyeIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/solid';
+import {
+  ArrowDownTrayIcon,
+  EyeIcon,
+  PencilIcon,
+  TrashIcon,
+} from '@heroicons/react/24/solid';
 import { useAuthHeader, useAuthUser } from 'react-auth-kit';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useEffect, useState } from 'react';
@@ -36,7 +41,7 @@ const columns = [
     cell: (info) => <i>{info.getValue()}</i>,
     header: () => <span>Lokasi Kegiatan</span>,
   }),
-  columnHelper.accessor((row) => row.fund_source_id, {
+  columnHelper.accessor((row) => row.fundSource?.name, {
     id: 'fund_source_id',
     cell: (info) => <i>{info.getValue()}</i>,
     header: () => <span>Sumber Dana</span>,
@@ -162,6 +167,11 @@ const columns = [
               icon={<EyeIcon className="w-4 h-4" />}
             />
           </Link>
+          <Button
+            className="text-sm font-normal"
+            textColor="text-blue-500"
+            icon={<ArrowDownTrayIcon className="w-4 h-4" />}
+          />
 
           {role === 'Superadmin' && (
             <Dialog>

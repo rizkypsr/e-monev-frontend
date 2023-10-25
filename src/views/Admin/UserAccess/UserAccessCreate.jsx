@@ -76,7 +76,6 @@ const UserAccessCreate = () => {
   });
 
   const handleOpdOnBottom = () => {
-    console.log('fetchingnext');
     opdQuery.fetchNextPage();
   };
 

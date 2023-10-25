@@ -7,6 +7,7 @@ import {
   useQuery,
   useQueryClient,
 } from 'react-query';
+import { ArrowDownTrayIcon, EyeIcon } from '@heroicons/react/24/solid';
 import Table from '../../../components/Table';
 import { useToastContext } from '../../../context/ToastContext';
 import Pagination from '../../../components/Pagination';
@@ -16,6 +17,7 @@ import DropdownDialog from '../../../components/DropdownDialog';
 import { getOrganizations } from '../../../api/admin/organization';
 import Label from '../../../components/Label';
 import deleteTriwulanReport from '../../../api/admin/report/deleteTriwulanReport';
+import Button from '../../../components/Button';
 
 const columnHelper = createColumnHelper();
 const columns = [
@@ -34,7 +36,7 @@ const columns = [
     cell: (info) => <i>{info.getValue()}</i>,
     header: () => <span>Lokasi Kegiatan</span>,
   }),
-  columnHelper.accessor((row) => row.fund_source_id, {
+  columnHelper.accessor((row) => row.fundSource?.name, {
     id: 'fund_source_id',
     cell: (info) => <i>{info.getValue()}</i>,
     header: () => <span>Sumber Dana</span>,
@@ -136,6 +138,20 @@ const columns = [
     cell: (info) => <i>{info.getValue()}</i>,
     header: () => <span>Cara Pengadaan</span>,
   }),
+  columnHelper.accessor((row) => row.aksi, {
+    id: 'aksi',
+    size: 10,
+    cell: () => (
+      <div className="flex justify-end">
+        <Button
+          className="text-sm font-normal"
+          textColor="text-blue-500"
+          icon={<ArrowDownTrayIcon className="w-4 h-4" />}
+        />
+      </div>
+    ),
+    header: () => <div className="text-right">Aksi</div>,
+  }),
 ];
 
 const initialParams = {
@@ -169,11 +185,27 @@ const HistoryTable = () => {
 
   const opdQuery = useInfiniteQuery({
     queryKey: ['get_organizations'],
-    queryFn: async ({ pageParam = 1 }) =>
-      getOrganizations(filterOpdParams, authHeader()),
-    getNextPageParam: (lastPage) => lastPage.nextId ?? undefined,
-    getPreviousPageParam: (firstPage) => firstPage.previousId ?? undefined,
+    queryFn: async ({ pageParam = 1 }) => {
+      const params = filterOpdParams;
+
+      params.page = pageParam;
+
+      const res = await getOrganizations(params, authHeader());
+
+      return res;
+    },
+    getNextPageParam: (lastPage) => {
+      if (lastPage.data.page < lastPage.data.pages) {
+        return lastPage.data.page + 1;
+      }
+
+      return undefined;
+    },
   });
+
+  const handleOpdOnBottom = () => {
+    opdQuery.fetchNextPage();
+  };
 
   const deleteMutation = useMutation(deleteTriwulanReport);
 
@@ -223,8 +255,12 @@ const HistoryTable = () => {
             label="Pilih OPD"
             data={opdQuery.data}
             value={selectedOpd}
-            onChange={handleSelectOpd}
             maxWidth="max-w-sm"
+            onChange={handleSelectOpd}
+            fetchNextPage={opdQuery.fetchNextPage}
+            hasNextPage={opdQuery.hasNextPage}
+            isFetchingNextPage={opdQuery.isFetchingNextPage}
+            onBottom={() => handleOpdOnBottom()}
           />
         </div>
       </div>

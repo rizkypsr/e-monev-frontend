@@ -42,7 +42,7 @@ const UserAccessEdit = () => {
   const [organizations, setOrganizations] = useState(initialOrganizations);
   const [selectedLevel, setSelectedLevel] = useState(null);
   const [opdError, setOpdError] = useState(null);
-
+  const [filterParams, setFilterParams] = useState(initialParams);
   const {
     register,
     handleSubmit,
@@ -71,21 +71,31 @@ const UserAccessEdit = () => {
   const opdQuery = useInfiniteQuery({
     queryKey: ['get_organizations'],
     queryFn: async ({ pageParam = 1 }) => {
-      initialParams = {
-        ...initialParams,
-        page: pageParam,
-      };
+      const params = filterParams;
 
-      return getOrganizations(initialParams, authHeader());
+      params.page = pageParam;
+
+      const res = await getOrganizations(params, authHeader());
+
+      return res;
     },
-    getNextPageParam: (lastPage) => lastPage.nextId ?? undefined,
-    getPreviousPageParam: (firstPage) => firstPage.previousId ?? undefined,
+    getNextPageParam: (lastPage) => {
+      if (lastPage.data.page < lastPage.data.pages) {
+        return lastPage.data.page + 1;
+      }
+
+      return undefined;
+    },
   });
 
   const rolesQuery = useInfiniteQuery({
     queryKey: ['get_roles'],
     queryFn: () => getRoles(authHeader()),
   });
+
+  const handleOpdOnBottom = () => {
+    opdQuery.fetchNextPage();
+  };
 
   const updateMutation = useMutation(updateUser);
 
@@ -191,6 +201,10 @@ const UserAccessEdit = () => {
                   onDelete={
                     index > 0 && (() => removeOrganizationsComponent(index))
                   }
+                  fetchNextPage={opdQuery.fetchNextPage}
+                  hasNextPage={opdQuery.hasNextPage}
+                  isFetchingNextPage={opdQuery.isFetchingNextPage}
+                  onBottom={() => handleOpdOnBottom()}
                 />
               ))}
             </div>

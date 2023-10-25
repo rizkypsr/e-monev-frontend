@@ -34,7 +34,9 @@ const ReportMasterDetail = () => {
       setReport({
         id: data.id,
         description: data.description,
-        occassion: data.occassion?.title,
+        occassion: data.masterOccassions?.map(
+          (value) => value.occassion?.title
+        ),
         organization: data.organization?.title,
         program: data.program?.title,
         program_description: data.program_description,
@@ -81,7 +83,7 @@ const ReportMasterDetail = () => {
                 scope="row"
                 className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
               >
-                Deskripsi
+                Sasaran RPJMD
               </th>
               <td className="px-6 py-4">{report.description}</td>
             </tr>
@@ -103,6 +105,15 @@ const ReportMasterDetail = () => {
               </th>
               <td className="px-6 py-4">{report.organization}</td>
             </tr>
+            <tr className="bg-light-blue">
+              <th
+                scope="row"
+                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+              >
+                Indikator Kegiatan
+              </th>
+              <td className="px-6 py-4">{report.program}</td>
+            </tr>
             <tr className="bg-white">
               <th
                 scope="row"
@@ -110,7 +121,7 @@ const ReportMasterDetail = () => {
               >
                 Urusan
               </th>
-              <td className="px-6 py-4">{report.occassion}</td>
+              <td className="px-6 py-4">{report.occassion.join(', ')}</td>
             </tr>
           </tbody>
         </table>

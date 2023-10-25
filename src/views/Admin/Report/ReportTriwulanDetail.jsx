@@ -1,4 +1,4 @@
-import { ArrowLeftIcon } from '@heroicons/react/24/solid';
+import { ArrowDownTrayIcon, ArrowLeftIcon } from '@heroicons/react/24/solid';
 import React, { useState } from 'react';
 import { useAuthHeader } from 'react-auth-kit';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -7,6 +7,7 @@ import ReactLoading from '../../../components/Loading';
 import ErrorPage from '../../ErrorPage';
 import formattedDate from '../../../utils/formattedDate';
 import getTriwulanDetail from '../../../api/user/triwulan/getTriwulanDetail';
+import Button from '../../../components/Button';
 
 const initialData = {
   id: 0,
@@ -53,7 +54,7 @@ const ReportTriwulanDetail = () => {
         id: triwulanData.id,
         activity_name: triwulanData.activity_name,
         activity_location: triwulanData.activity_location,
-        fund_source_id: triwulanData.fund_source_id,
+        fund_source_id: triwulanData.fundSource.name,
         fund_ceiling: triwulanData.fund_ceiling,
         management_organization: triwulanData.management_organization,
         pptk_name: triwulanData.pptk_name,
@@ -89,14 +90,28 @@ const ReportTriwulanDetail = () => {
 
   return (
     <div className="w-full h-full mt-6 bg-white rounded-lg p-9">
-      <div
-        className="flex space-x-3 items-center mb-8 cursor-pointer"
-        onClick={() => navigate(-1)}
-      >
-        <ArrowLeftIcon className="w-6 h-6" />
-        <h1 className="font-semibold text-lg text-dark-gray leading-7">
-          Detail Triwulan
-        </h1>
+      <div>
+        <div className="mb-8 cursor-pointer  flex justify-between">
+          <div
+            className="flex space-x-3 items-center"
+            onClick={() => navigate(-1)}
+          >
+            <ArrowLeftIcon className="w-6 h-6" />
+            <h1 className="font-semibold text-lg text-dark-gray leading-7">
+              Detail Triwulan
+            </h1>
+          </div>
+          <div>
+            <Button
+              className="w-28 lg:w-auto"
+              background="bg-primary"
+              textColor="text-white"
+              icon={<ArrowDownTrayIcon className="w-6 h-6" />}
+            >
+              Unduh Data
+            </Button>
+          </div>
+        </div>
       </div>
 
       <div className="relative overflow-x-auto">
