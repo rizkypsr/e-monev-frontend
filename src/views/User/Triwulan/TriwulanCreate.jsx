@@ -4,7 +4,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { useInfiniteQuery, useMutation, useQueryClient } from 'react-query';
 import { useAuthHeader } from 'react-auth-kit';
-import { animated, useTransition } from '@react-spring/web';
 import Label from '../../../components/Label';
 import TextInput from '../../../components/TextInput';
 import formattedDate from '../../../utils/formattedDate';
@@ -15,10 +14,12 @@ import createTriwulan from '../../../api/user/triwulan/createTriwulan';
 import DropdownDialog from '../../../components/DropdownDialog';
 import { useToastContext } from '../../../context/ToastContext';
 import FileInput from '../../../components/FileInput';
-import createFundSource from '../../../api/user/triwulan/createFundSource';
+import { getActivities } from '../../../api/admin/activity';
 
 const initialParams = {
+  limit: 20,
   page: 1,
+  search: '',
   sort: 'terbaru',
 };
 
@@ -34,6 +35,7 @@ const jenisPengadaan = {
           { id: 2, name: 'Pekerjaan Konstruksi' },
           { id: 3, name: 'Jasa Konsultasi' },
           { id: 4, name: 'Jasa Lainnya' },
+          { id: 5, name: 'Jasa Kelola' },
         ],
         total: 4,
       },
@@ -61,17 +63,34 @@ const caraPengadaan = {
   ],
 };
 
+const bentukKegiatan = {
+  pageParams: [undefined],
+  pages: [
+    {
+      data: {
+        page: 1,
+        pages: 1,
+        result: [
+          { id: 1, name: 'fisik' },
+          { id: 2, name: 'nonfisik' },
+        ],
+        total: 4,
+      },
+    },
+  ],
+};
+
 const TriwulanCreate = () => {
   const authHeader = useAuthHeader();
   const navigate = useNavigate();
   const { showToastMessage } = useToastContext();
-  const queryClient = useQueryClient();
 
   const [selectedFundSource, setSelectedFundSource] = useState(null);
   const [selectedProcurementType, setSelectedProcurementType] = useState(null);
   const [selectedProcurementMethod, setSelectedProcurementMethod] =
     useState(null);
-  const [openCreateFundSource, setOpenCreateFundSource] = useState(false);
+  const [selectedActivityForm, setSelectedActivityForm] = useState(null);
+  const [selectedActivity, setSelectedActivity] = useState(null);
 
   const {
     register,
@@ -90,27 +109,23 @@ const TriwulanCreate = () => {
     // },
   });
 
-  const {
-    register: register2,
-    handleSubmit: handleSubmit2,
-    formState: { errors: errors2 },
-  } = useForm();
+  const activityQuery = useInfiniteQuery({
+    queryKey: ['get_activities'],
+    queryFn: async ({ pageParam = 1 }) => {
+      const params = initialParams;
 
-  const transition = useTransition(openCreateFundSource, {
-    config: {
-      duration: 120,
+      params.page = pageParam;
+
+      const res = await getActivities(params, authHeader());
+
+      return res;
     },
-    from: {
-      scale: 0,
-      opacity: 0,
-    },
-    enter: {
-      scale: 1,
-      opacity: 1,
-    },
-    leave: {
-      scale: 0,
-      opacity: 0,
+    getNextPageParam: (lastPage) => {
+      if (lastPage.data.page < lastPage.data.pages) {
+        return lastPage.data.page + 1;
+      }
+
+      return undefined;
     },
   });
 
@@ -126,7 +141,6 @@ const TriwulanCreate = () => {
   }, []);
 
   const createMutation = useMutation(createTriwulan);
-  const createFundSourceMutation = useMutation(createFundSource);
 
   const onSubmit = (data) => {
     const formData = new FormData();
@@ -136,6 +150,8 @@ const TriwulanCreate = () => {
       fund_source_id: selectedFundSource?.id,
       procurement_type_id: selectedProcurementType?.id,
       procurement_method_id: selectedProcurementMethod?.id,
+      activity_id: selectedActivity?.id,
+      activity_form: selectedActivityForm?.id,
     };
 
     // eslint-disable-next-line no-restricted-syntax
@@ -165,40 +181,20 @@ const TriwulanCreate = () => {
     );
   };
 
-  const onSubmit2 = (formData) => {
-    const { fundSource2 } = formData;
-
-    createFundSourceMutation.mutate(
-      {
-        body: {
-          name: fundSource2,
-        },
-        token: authHeader(),
-      },
-      {
-        onSuccess: () => {
-          queryClient.invalidateQueries('get_fund_source');
-
-          showToastMessage('Berhasil membuat Sumber Dana');
-          setOpenCreateFundSource(false);
-        },
-        onError: (error) => {
-          showToastMessage(error.message, 'error');
-        },
-      }
-    );
-  };
-
-  const openCreateFundSourceClick = () => {
-    setOpenCreateFundSource(!openCreateFundSource);
-  };
-
   const handleSelectFundSource = (item) => {
     setSelectedFundSource(item);
   };
 
   const handleSelectProcurementType = (item) => {
     setSelectedProcurementType(item);
+  };
+
+  const handleSelectActivityForm = (item) => {
+    setSelectedActivityForm(item);
+  };
+
+  const handleSelectActivity = (item) => {
+    setSelectedActivity(item);
   };
 
   const handleSelectProcurementMethod = (item) => {
@@ -232,7 +228,7 @@ const TriwulanCreate = () => {
             </div>
 
             <div>
-              <Label className="mb-2">Nama Kegiatan</Label>
+              <Label className="mb-2">Output Sub Kegiatan</Label>
               <TextInput
                 id="activity_name"
                 name="activity_name"
@@ -264,45 +260,7 @@ const TriwulanCreate = () => {
                 data={fundSourceQuery.data}
                 value={selectedFundSource}
                 onChange={handleSelectFundSource}
-              >
-                <Button
-                  type="button"
-                  background="bg-primary"
-                  textColor="text-white"
-                  icon={<PlusIcon className="w-4 h-4" />}
-                  onClick={() => openCreateFundSourceClick()}
-                />
-
-                {transition((style, isOpen) => (
-                  <div>
-                    {isOpen && (
-                      <animated.div
-                        style={style}
-                        className="w-72 bg-white absolute z-auto rounded-md p-4 -right-80 top-0"
-                      >
-                        <form
-                          id="fundSource"
-                          onSubmit={handleSubmit2(onSubmit2)}
-                        >
-                          <TextInput
-                            required
-                            placeholder="Masukan Sumber Dana"
-                            register={register2('fundSource2', {
-                              required: 'Sumber Dana wajib diisi!',
-                            })}
-                            error={errors2.fundSource2?.message}
-                          />
-                          <p className="text-xs text-light-gray mt-2 text-left">
-                            Tekan{' '}
-                            <span className="itelic text-dark-gray">Enter</span>{' '}
-                            untuk menyimpan
-                          </p>
-                        </form>
-                      </animated.div>
-                    )}
-                  </div>
-                ))}
-              </DropdownDialog>
+              />
             </div>
             <div>
               <Label className="mb-2">Pagu Dana (Dalam bentuk angka)</Label>
@@ -314,6 +272,10 @@ const TriwulanCreate = () => {
                 register={register('fund_ceiling', {
                   required: 'Pagu Dana wajib diisi!',
                   valueAsNumber: true,
+                  max: {
+                    message: 'Maksimal Rp.200.000.000.000.000',
+                    value: 200000000000000000,
+                  },
                 })}
                 error={errors.fund_ceiling?.message}
               />
@@ -350,8 +312,12 @@ const TriwulanCreate = () => {
                 name="contract_number_date"
                 placeholder="Tulis Disini..."
                 register={register('contract_number_date', {
-                  required: 'Nomor dan Tanggal Kontrak wajib diisi!',
+                  required: false,
                   valueAsNumber: true,
+                  max: {
+                    message: 'Maksimal Rp.200.000.000.000.000',
+                    value: 200000000000000000,
+                  },
                 })}
                 error={errors.contract_number_date?.message}
               />
@@ -362,7 +328,9 @@ const TriwulanCreate = () => {
                 id="contractor_name"
                 name="contractor_name"
                 placeholder="Tulis Disini..."
-                register={register('contractor_name')}
+                register={register('contractor_name', {
+                  required: false,
+                })}
                 error={errors.contractor_name?.message}
               />
             </div>
@@ -372,7 +340,9 @@ const TriwulanCreate = () => {
                 id="implementation_period"
                 name="implementation_period"
                 placeholder="Tulis Disini..."
-                register={register('implementation_period')}
+                register={register('implementation_period', {
+                  required: false,
+                })}
                 error={errors.implementation_period?.message}
               />
             </div>
@@ -384,8 +354,12 @@ const TriwulanCreate = () => {
                 name="contract_value"
                 placeholder="Tulis Disini..."
                 register={register('contract_value', {
-                  required: 'Nilai Kontrak wajib diisi!',
+                  required: false,
                   valueAsNumber: true,
+                  max: {
+                    message: 'Maksimal Rp.200.000.000.000.000',
+                    value: 200000000000000000,
+                  },
                 })}
                 error={errors.contract_value?.message}
               />
@@ -402,6 +376,10 @@ const TriwulanCreate = () => {
                 register={register('physical_realization', {
                   required: 'Realisasi Fisik wajib diisi!',
                   valueAsNumber: true,
+                  max: {
+                    message: 'Maksimal Rp.200.000.000.000.000',
+                    value: 200000000000000000,
+                  },
                 })}
                 error={errors.physical_realization?.message}
               />
@@ -418,6 +396,10 @@ const TriwulanCreate = () => {
                 register={register('fund_realization', {
                   required: 'Realisasi Keuangan wajib diisi!',
                   valueAsNumber: true,
+                  max: {
+                    message: 'Maksimal Rp.200.000.000.000.000',
+                    value: 200000000000000000,
+                  },
                 })}
                 error={errors.fund_realization?.message}
               />
@@ -534,6 +516,26 @@ const TriwulanCreate = () => {
                 data={caraPengadaan}
                 value={selectedProcurementMethod}
                 onChange={handleSelectProcurementMethod}
+              />
+            </div>
+
+            <div className="mb-4">
+              <Label className="mb-2">Sub Kegiatan</Label>
+              <DropdownDialog
+                label="Pilih Sub Kegiatan"
+                data={activityQuery.data}
+                value={selectedActivity}
+                onChange={handleSelectActivity}
+              />
+            </div>
+
+            <div className="mb-4">
+              <Label className="mb-2">Bentuk Kegiatan</Label>
+              <DropdownDialog
+                label="Pilih Bentuk Kegiatan"
+                data={bentukKegiatan}
+                value={selectedActivityForm}
+                onChange={handleSelectActivityForm}
               />
             </div>
 

@@ -24,6 +24,8 @@ import { useToastContext } from '../../../context/ToastContext';
 import TrashImg from '../../../assets/images/trash.png';
 import ErrorPage from '../../ErrorPage';
 import DropdownSelect from '../../../components/DropdownSelect';
+import getFundSource from '../../../api/user/triwulan/getFundSource';
+import deleteFundSource from '../../../api/admin/fundSource/deleteFundSource';
 
 const columnHelper = createColumnHelper();
 const columns = [
@@ -32,30 +34,27 @@ const columns = [
     cell: (info) => <i>{info.getValue()}</i>,
     header: () => <span>No</span>,
   }),
-  columnHelper.accessor((row) => row.code, {
-    id: 'code',
+  columnHelper.accessor((row) => row.name, {
+    id: 'name',
     cell: (info) => <i>{info.getValue()}</i>,
-    header: () => <span>Kode</span>,
+    header: () => <span>Nama</span>,
   }),
-  columnHelper.accessor((row) => row.sub_activity, {
-    id: 'sub_activity',
-    cell: (info) => <i>{info.getValue()}</i>,
-    header: () => <span>Sub Kegiatan</span>,
-  }),
-  columnHelper.accessor((row) => row.title, {
-    id: 'title',
-    cell: (info) => <i>{info.getValue()}</i>,
-    header: () => <span>Kegiatan</span>,
-  }),
-  columnHelper.accessor((row) => row.program?.title, {
-    id: 'program',
-    cell: (info) => <i>{info.getValue()}</i>,
-    header: () => <span>Program</span>,
+  columnHelper.accessor((row) => row.fund_source_total, {
+    id: 'fund_source_total',
+    cell: (info) => (
+      <i>
+        {parseFloat(info.getValue()).toLocaleString('id-ID', {
+          style: 'currency',
+          currency: 'IDR',
+        })}
+      </i>
+    ),
+    header: () => <span>Total Sumber Dana</span>,
   }),
   columnHelper.accessor((row) => row.aksi, {
     id: 'aksi',
     size: 10,
-    cell: (props, deleteActivityData) => {
+    cell: (props, deleteFundSourceData) => {
       const rowId = props.row.original.id;
       return (
         <div className="flex justify-end">
@@ -102,7 +101,7 @@ const columns = [
                   <div className="flex space-x-3 justify-center">
                     <DialogClose>
                       <Button
-                        onClick={() => deleteActivityData(rowId)}
+                        onClick={() => deleteFundSourceData(rowId)}
                         className="w-full md:w-28 mt-8 border border-[#EB5757]"
                         type="modal"
                         background="bg-white"
@@ -166,7 +165,7 @@ const initialParams = {
   sort: 'terbaru',
 };
 
-const ActivityTable = () => {
+const FundSourceTable = () => {
   const authHeader = useAuthHeader();
   const { showToastMessage } = useToastContext();
   const queryClient = useQueryClient();
@@ -176,14 +175,14 @@ const ActivityTable = () => {
   const [selectedPageSize, setSelectedPageSize] = useState(pageSizes[0]);
 
   const { isLoading, isError, data, error } = useQuery({
-    queryKey: ['get_activities', filterParams],
-    queryFn: () => getActivities(filterParams, authHeader()),
+    queryKey: ['get_fund_sources', filterParams],
+    queryFn: () => getFundSource(filterParams, authHeader()),
     enabled: authHeader() !== null,
   });
 
-  const deleteMutation = useMutation(deleteActivity);
+  const deleteMutation = useMutation(deleteFundSource);
 
-  const deleteActivityData = async (id) => {
+  const deleteFundSourceData = async (id) => {
     deleteMutation.mutate(
       {
         id,
@@ -191,8 +190,8 @@ const ActivityTable = () => {
       },
       {
         onSuccess: (result) => {
-          queryClient.invalidateQueries('get_activities');
-          showToastMessage(result);
+          queryClient.invalidateQueries('get_fund_sources');
+          showToastMessage(result.message);
         },
         onError: (err) => {
           showToastMessage(err.message, 'error');
@@ -240,14 +239,14 @@ const ActivityTable = () => {
   return (
     <>
       <div className="flex justify-between">
-        <h1 className="text-2xl font-semibold">Kegiatan</h1>
+        <h1 className="text-2xl font-semibold">Sumber Dana</h1>
         <Link to="create">
           <Button
             background="bg-primary"
             textColor="text-white"
             icon={<PlusIcon className="w-4 h-4" />}
           >
-            Tambah Kegiatan
+            Tambah Sumber Dana
           </Button>
         </Link>
       </div>
@@ -293,7 +292,7 @@ const ActivityTable = () => {
             column.cell
               ? {
                   ...column,
-                  cell: (props) => column.cell(props, deleteActivityData),
+                  cell: (props) => column.cell(props, deleteFundSourceData),
                 }
               : column
           )}
@@ -311,4 +310,4 @@ const ActivityTable = () => {
   );
 };
 
-export default ActivityTable;
+export default FundSourceTable;

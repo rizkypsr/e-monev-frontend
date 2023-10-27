@@ -11,11 +11,10 @@ import getMasterDetail from '../../../api/user/master/getMasterDetail';
 const initialData = {
   id: 0,
   description: '',
-  program_description: '',
   triwulan: '',
   organization: '',
   occassion: '',
-  program: '',
+  purpose: '',
   created_at: '',
 };
 
@@ -38,8 +37,7 @@ const ReportMasterDetail = () => {
           (value) => value.occassion?.title
         ),
         organization: data.organization?.title,
-        program: data.program?.title,
-        program_description: data.program_description,
+        purpose: data.purpose?.title,
         triwulan: data.triwulan?.name,
         created_at: data.created_at,
       });
@@ -85,7 +83,7 @@ const ReportMasterDetail = () => {
               >
                 Sasaran RPJMD
               </th>
-              <td className="px-6 py-4">{report.description}</td>
+              <td className="px-6 py-4">{report.purpose}</td>
             </tr>
             <tr className="bg-white">
               <th
@@ -112,7 +110,7 @@ const ReportMasterDetail = () => {
               >
                 Indikator Kegiatan
               </th>
-              <td className="px-6 py-4">{report.program}</td>
+              <td className="px-6 py-4">{report.description}</td>
             </tr>
             <tr className="bg-white">
               <th
@@ -121,7 +119,11 @@ const ReportMasterDetail = () => {
               >
                 Urusan
               </th>
-              <td className="px-6 py-4">{report.occassion.join(', ')}</td>
+              <td className="px-6 py-4">
+                {Array.isArray(report?.occassion)
+                  ? report?.occassion?.join(', ')
+                  : 'N/A'}
+              </td>
             </tr>
           </tbody>
         </table>

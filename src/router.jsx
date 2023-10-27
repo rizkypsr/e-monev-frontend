@@ -63,6 +63,11 @@ import ReportMasterDetail from './views/Admin/Report/ReportMasterDetail';
 import Authorization from './components/Authorization';
 import PrivateLayout from './layouts/PrivateLayout';
 import MasterEdit from './views/User/Master/MasterEdit';
+import FundSourceTable from './views/Admin/FundSource/FundSourceTable';
+import FundSource from './views/Admin/FundSource/FundSource';
+import FundSourceCreate from './views/Admin/FundSource/FundSourceCreate';
+import FundSourceEdit from './views/Admin/FundSource/FundSourceEdit';
+import FundSourceDetail from './views/Admin/FundSource/FundSourceDetail';
 
 const router = createBrowserRouter(
   createRoutesFromElements([
@@ -169,6 +174,38 @@ const router = createBrowserRouter(
           key="urusanDetail"
           path="detail/:id"
           element={<OccassionDetail />}
+        />
+      </Route>
+      <Route
+        key="sumberDana"
+        path="sumber-dana"
+        loader={() => 'Sumber Dana'}
+        handle={{
+          crumb: (data) => (
+            <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
+          ),
+        }}
+        element={
+          <Authorization roles={['Superadmin']}>
+            <FundSource />
+          </Authorization>
+        }
+      >
+        <Route index key="sumberDanaTable" element={<FundSourceTable />} />
+        <Route
+          key="sumberDanaCreate"
+          path="create"
+          element={<FundSourceCreate />}
+        />
+        <Route
+          key="sumberDanaEdit"
+          path="edit/:id"
+          element={<FundSourceEdit />}
+        />
+        <Route
+          key="sumberDanaDetail"
+          path="detail/:id"
+          element={<FundSourceDetail />}
         />
       </Route>
       <Route
@@ -289,7 +326,9 @@ const router = createBrowserRouter(
           ),
         }}
         element={
-          <Authorization roles={['Superadmin', 'OPD', 'Admin Bidang']}>
+          <Authorization
+            roles={['Superadmin', 'OPD', 'Admin Bidang', 'Atasan Daerah']}
+          >
             <Report />
           </Authorization>
         }
@@ -320,7 +359,7 @@ const router = createBrowserRouter(
           key="reportMasterEdit"
           path="data-master/edit/:id"
           element={
-            <Authorization roles={['Superadmin']}>
+            <Authorization roles={['Superadmin', 'OPD']}>
               <MasterEdit />
             </Authorization>
           }

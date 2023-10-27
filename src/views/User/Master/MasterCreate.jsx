@@ -119,8 +119,10 @@ const MasterCreate = () => {
 
   const createMutation = useMutation(createMaster);
 
-  const onSubmit = () => {
-    if (!selectedTriwulan || !selectedOpd || !selectedPurpose) {
+  const onSubmit = (formData) => {
+    const { description } = formData;
+
+    if (!selectedTriwulan || !selectedOpd) {
       showToastMessage('Pastikan semua data terisi', 'error');
       return;
     }
@@ -135,9 +137,10 @@ const MasterCreate = () => {
     createMutation.mutate(
       {
         body: {
+          description,
           triwulan_id: selectedTriwulan.id,
           organization_id: selectedOpd.id,
-          purpose_id: selectedPurpose.id,
+          purpose_id: selectedPurpose?.id,
           occassions: occassions.map((ocs) => Number(ocs.selected.id)),
         },
         token: authHeader(),
@@ -183,6 +186,20 @@ const MasterCreate = () => {
                 onChange={handleSelectTriwulan}
               />
             </div>
+          </div>
+
+          <div>
+            <Label className="mb-2">Indikator Kegiatan</Label>
+            <TextInput
+              id="description"
+              name="description"
+              width="w-full"
+              placeholder="Tulis Disini..."
+              register={register('description', {
+                required: 'Indikator Kegiatan wajib diisi!',
+              })}
+              error={errors.description?.message}
+            />
           </div>
 
           <div>

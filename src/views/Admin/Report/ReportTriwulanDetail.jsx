@@ -55,15 +55,37 @@ const ReportTriwulanDetail = () => {
         activity_name: triwulanData.activity_name,
         activity_location: triwulanData.activity_location,
         fund_source_id: triwulanData.fundSource.name,
-        fund_ceiling: triwulanData.fund_ceiling,
+        fund_ceiling: parseFloat(triwulanData.fund_ceiling).toLocaleString(
+          'id-ID',
+          {
+            style: 'currency',
+            currency: 'IDR',
+          }
+        ),
         management_organization: triwulanData.management_organization,
         pptk_name: triwulanData.pptk_name,
         contract_number_date: triwulanData.contract_number_date,
         contractor_name: triwulanData.contractor_name,
         implementation_period: triwulanData.implementation_period,
-        contract_value: triwulanData.contract_value,
-        physical_realization: triwulanData.physical_realization,
-        fund_realization: triwulanData.fund_realization,
+        contract_value: parseFloat(triwulanData.contract_value).toLocaleString(
+          'id-ID',
+          {
+            style: 'currency',
+            currency: 'IDR',
+          }
+        ),
+        physical_realization: parseFloat(
+          triwulanData.physical_realization
+        ).toLocaleString('id-ID', {
+          style: 'currency',
+          currency: 'IDR',
+        }),
+        fund_realization: parseFloat(
+          triwulanData.fund_realization
+        ).toLocaleString('id-ID', {
+          style: 'currency',
+          currency: 'IDR',
+        }),
         activity_volume: triwulanData.activity_volume,
         activity_output: triwulanData.activity_output,
         direct_target_group: triwulanData.direct_target_group,

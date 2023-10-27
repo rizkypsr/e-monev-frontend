@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useAuthHeader, useAuthUser } from 'react-auth-kit';
 import { ArrowDownTrayIcon } from '@heroicons/react/24/solid';
 import { useInfiniteQuery, useQuery } from 'react-query';
@@ -15,6 +15,7 @@ import { getPurposes } from '../../../api/admin/purpose';
 import DropdownDialog from '../../../components/DropdownDialog';
 import getExcel from '../../../api/admin/dashboard/getExcel';
 import ReactLoading from '../../../components/Loading';
+import { useNavigate } from 'react-router-dom';
 
 const initialParams = {
   limit: 0,
@@ -120,86 +121,90 @@ const Dashboard = () => {
           </div>
         )}
 
-        <div className="flex space-x-2 flex-3">
-          <Button
-            className="w-28 lg:w-auto"
-            type="submit"
-            background="bg-primary"
-            textColor="text-white"
-            icon={<ArrowDownTrayIcon className="w-6 h-6" />}
-          >
-            Unduh Data (PDF)
-          </Button>
-          <Button
-            onClick={handleDownloadExcel}
-            className="w-28 lg:w-auto"
-            type="submit"
-            background="bg-primary"
-            textColor="text-white"
-            icon={<ArrowDownTrayIcon className="w-6 h-6" />}
-            loading={excelQuery.isLoading}
-          >
-            Unduh Data (XLS)
-          </Button>
-        </div>
+        {authUser().role.name !== 'OPD' && (
+          <div className="flex space-x-2 flex-3">
+            <Button
+              className="w-28 lg:w-auto"
+              type="submit"
+              background="bg-primary"
+              textColor="text-white"
+              icon={<ArrowDownTrayIcon className="w-6 h-6" />}
+            >
+              Unduh Data (PDF)
+            </Button>
+            <Button
+              onClick={handleDownloadExcel}
+              className="w-28 lg:w-auto"
+              type="submit"
+              background="bg-primary"
+              textColor="text-white"
+              icon={<ArrowDownTrayIcon className="w-6 h-6" />}
+              loading={excelQuery.isLoading}
+            >
+              Unduh Data (XLS)
+            </Button>
+          </div>
+        )}
       </div>
 
-      <div className="bg-white rounded-lg grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-y-7 p-8 shadow-2xl shadow-[#F3F6FF]">
-        {showCountBox(['Superadmin', 'Admin Bidang']) && (
-          <CountBox
-            linkTo="urusan"
-            title="urusan"
-            count={occassionsQuery.data?.data.total || 0}
-            color="#56CCF2"
-            className="hover:solid-shadow-blue"
-          />
-        )}
-        {showCountBox(['Superadmin']) && (
-          <CountBox
-            linkTo="organisasi"
-            title="organisasi"
-            count={organizationsQuery.data?.data.total || 0}
-            color="#BB6BD9"
-            className="hover:solid-shadow-purple"
-          />
-        )}
-        {showCountBox(['Superadmin', 'Admin Bidang', 'OPD']) && (
-          <CountBox
-            linkTo="program"
-            title="program"
-            count={programsQuery.data?.data.total || 0}
-            color="#6FCF97"
-            className="hover:solid-shadow-green"
-          />
-        )}
-        {showCountBox(['Superadmin', 'Admin Bidang']) && (
-          <CountBox
-            linkTo="kegiatan"
-            title="kegiatan"
-            count={activitiesQuery.data?.data.total || 0}
-            color="#F2C94C"
-            className="hover:solid-shadow-yellow"
-          />
-        )}
-        {showCountBox(['Superadmin', 'Admin Bidang']) && (
-          <CountBox
-            linkTo="sasaran"
-            title="sasaran"
-            count={purposesQuery.data?.data.total || 0}
-            color="#F2994A"
-            className="hover:solid-shadow-orange"
-          />
-        )}
-        {showCountBox(['Superadmin']) && (
-          <CountBox
-            linkTo="login-akses-user"
-            title="user"
-            count={usersQuery.data?.data.total || 0}
-            color="#BDBDBD"
-            className="hover:solid-shadow-gray"
-          />
-        )}
-      </div>
+      {authUser().role.name !== 'OPD' && (
+        <div className="bg-white rounded-lg grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-y-7 p-8 shadow-2xl shadow-[#F3F6FF]">
+          {showCountBox(['Superadmin', 'Admin Bidang']) && (
+            <CountBox
+              linkTo="urusan"
+              title="urusan"
+              count={occassionsQuery.data?.data.total || 0}
+              color="#56CCF2"
+              className="hover:solid-shadow-blue"
+            />
+          )}
+          {showCountBox(['Superadmin']) && (
+            <CountBox
+              linkTo="organisasi"
+              title="organisasi"
+              count={organizationsQuery.data?.data.total || 0}
+              color="#BB6BD9"
+              className="hover:solid-shadow-purple"
+            />
+          )}
+          {showCountBox(['Superadmin', 'Admin Bidang']) && (
+            <CountBox
+              linkTo="program"
+              title="program"
+              count={programsQuery.data?.data.total || 0}
+              color="#6FCF97"
+              className="hover:solid-shadow-green"
+            />
+          )}
+          {showCountBox(['Superadmin', 'Admin Bidang']) && (
+            <CountBox
+              linkTo="kegiatan"
+              title="kegiatan"
+              count={activitiesQuery.data?.data.total || 0}
+              color="#F2C94C"
+              className="hover:solid-shadow-yellow"
+            />
+          )}
+          {showCountBox(['Superadmin', 'Admin Bidang']) && (
+            <CountBox
+              linkTo="sasaran"
+              title="sasaran"
+              count={purposesQuery.data?.data.total || 0}
+              color="#F2994A"
+              className="hover:solid-shadow-orange"
+            />
+          )}
+          {showCountBox(['Superadmin']) && (
+            <CountBox
+              linkTo="login-akses-user"
+              title="user"
+              count={usersQuery.data?.data.total || 0}
+              color="#BDBDBD"
+              className="hover:solid-shadow-gray"
+            />
+          )}
+        </div>
+      )}
     </>
   );
 };

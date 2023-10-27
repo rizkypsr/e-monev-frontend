@@ -53,6 +53,12 @@ const Sidebar = ({ isOpen }) => {
       roles: ['superadmin', 'admin bidang'],
     },
     {
+      path: '/sumber-dana',
+      label: 'Sumber Dana',
+      icon: <ReportIcon />,
+      roles: ['superadmin'],
+    },
+    {
       path: '/organisasi',
       label: 'Organisasi',
       icon: <MedalIcon />,
@@ -92,7 +98,7 @@ const Sidebar = ({ isOpen }) => {
       path: '/laporan',
       label: 'Laporan',
       icon: <ReportIcon />,
-      roles: ['superadmin', 'opd', 'admin bidang'],
+      roles: ['superadmin', 'opd', 'admin bidang', 'atasan daerah'],
     },
     {
       path: '/riwayat',
