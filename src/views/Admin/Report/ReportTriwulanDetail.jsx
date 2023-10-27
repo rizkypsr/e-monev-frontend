@@ -8,12 +8,17 @@ import ErrorPage from '../../ErrorPage';
 import formattedDate from '../../../utils/formattedDate';
 import getTriwulanDetail from '../../../api/user/triwulan/getTriwulanDetail';
 import Button from '../../../components/Button';
+import { baseUrlAPI } from '../../../utils/constants';
 
 const initialData = {
   id: 0,
+  activity_output_sub: '',
   activity_name: '',
+  sub_activity: '',
+  program: '',
   activity_location: '',
   fund_source_id: 0,
+  fund_source_total: 0,
   fund_ceiling: 0,
   management_organization: '',
   pptk_name: '',
@@ -34,6 +39,7 @@ const initialData = {
   procurement_type: '',
   procurement_method: '',
   user_id: 0,
+  file: null,
   created_at: '2023-10-05T05:38:27.413Z',
 };
 
@@ -52,9 +58,18 @@ const ReportTriwulanDetail = () => {
 
       setReport({
         id: triwulanData.id,
-        activity_name: triwulanData.activity_name,
-        activity_location: triwulanData.activity_location,
-        fund_source_id: triwulanData.fundSource.name,
+        activity_name: triwulanData?.activity?.title,
+        activity_output_sub: triwulanData?.activity_name,
+        sub_activity: triwulanData?.activity?.sub_activity,
+        activity_location: triwulanData?.activity_location,
+        program: triwulanData?.activity?.program?.title,
+        fund_source_id: triwulanData?.fundSource?.name,
+        fund_source_total: parseFloat(
+          triwulanData.fund_source_total ?? 0
+        ).toLocaleString('id-ID', {
+          style: 'currency',
+          currency: 'IDR',
+        }),
         fund_ceiling: parseFloat(triwulanData.fund_ceiling).toLocaleString(
           'id-ID',
           {
@@ -97,6 +112,7 @@ const ReportTriwulanDetail = () => {
         procurement_type: triwulanData.procurement_type,
         procurement_method: triwulanData.procurement_method,
         user_id: triwulanData.user_id,
+        file: triwulanData.file,
         created_at: triwulanData.created_at,
       });
     },
@@ -123,7 +139,7 @@ const ReportTriwulanDetail = () => {
               Detail Triwulan
             </h1>
           </div>
-          <div>
+          <a href={baseUrlAPI + report.file} target="__blank">
             <Button
               className="w-28 lg:w-auto"
               background="bg-primary"
@@ -132,7 +148,7 @@ const ReportTriwulanDetail = () => {
             >
               Unduh Data
             </Button>
-          </div>
+          </a>
         </div>
       </div>
 
@@ -162,6 +178,24 @@ const ReportTriwulanDetail = () => {
                 scope="row"
                 className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
               >
+                Nama Output Sub Kegiatan
+              </th>
+              <td className="px-6 py-4">{report.activity_output_sub}</td>
+            </tr>
+            <tr className="bg-light-blue">
+              <th
+                scope="row"
+                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+              >
+                Sub Kegiatan
+              </th>
+              <td className="px-6 py-4">{report.sub_activity}</td>
+            </tr>
+            <tr className="bg-white">
+              <th
+                scope="row"
+                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+              >
                 Lokasi Kegiatan
               </th>
               <td className="px-6 py-4">{report.activity_location}</td>
@@ -171,9 +205,27 @@ const ReportTriwulanDetail = () => {
                 scope="row"
                 className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
               >
+                Nama Program
+              </th>
+              <td className="px-6 py-4">{report.program}</td>
+            </tr>
+            <tr className="bg-white">
+              <th
+                scope="row"
+                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+              >
                 Sumber Dana
               </th>
               <td className="px-6 py-4">{report.fund_source_id}</td>
+            </tr>
+            <tr className="bg-light-blue">
+              <th
+                scope="row"
+                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+              >
+                Total Sumber Dana
+              </th>
+              <td className="px-6 py-4">{report.fund_source_total}</td>
             </tr>
             <tr className="bg-white">
               <th

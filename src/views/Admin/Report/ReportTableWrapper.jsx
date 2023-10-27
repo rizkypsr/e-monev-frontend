@@ -13,6 +13,7 @@ import getFundSource from '../../../api/user/triwulan/getFundSource';
 import Button from '../../../components/Button';
 import useDebounce from '../../../hooks/useDebounce';
 import objectToQueryString from '../../../utils/objectToQueryString';
+import downloadTriwulanExcel from '../../../api/admin/report/downloadTriwulanExcel';
 
 const type = [
   {
@@ -90,6 +91,16 @@ const ReportTableWrapper = () => {
     queryKey: ['get_fund_source'],
     queryFn: () => getFundSource(initialFundSourceParams, authHeader()),
   });
+
+  const downloadExcel = useQuery({
+    queryKey: ['download_excel'],
+    queryFn: () => downloadTriwulanExcel(searchParamsState, authHeader()),
+    enabled: false,
+  });
+
+  const handleDownloadExcel = async () => {
+    await downloadExcel.refetch();
+  };
 
   const onSelectType = (item) => {
     setSelectedType(item);
@@ -256,6 +267,7 @@ const ReportTableWrapper = () => {
             background="bg-primary"
             textColor="text-white"
             icon={<ArrowDownTrayIcon className="w-6 h-6" />}
+            onClick={handleDownloadExcel}
           >
             Unduh Data (XLS)
           </Button>

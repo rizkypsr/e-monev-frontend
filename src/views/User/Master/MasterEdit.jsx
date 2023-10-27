@@ -61,9 +61,15 @@ const MasterEdit = () => {
       setValue('created_at', formattedDate(new Date(data.created_at)));
       setValue('triwulan', data.triwulan?.id);
       setValue('opd', data.organization?.id);
+      setValue('description', data.description);
 
-      setSelectedOpd(data.organization);
-      setSelectedTriwulan(data.triwulan);
+      setSelectedOpd(data?.organization);
+      setSelectedTriwulan(data?.triwulan);
+      setOccassions(
+        data?.masterOccassions?.map((ocs) => ({
+          selected: ocs.occassion,
+        }))
+      );
 
       // setReport({
       //   id: data.id,

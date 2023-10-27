@@ -23,6 +23,7 @@ import Pagination from '../../../components/Pagination';
 import { useToastContext } from '../../../context/ToastContext';
 import getTriwulanReport from '../../../api/admin/report/getTriwulanReport';
 import deleteTriwulanReport from '../../../api/admin/report/deleteTriwulanReport';
+import { baseUrlAPI } from '../../../utils/constants';
 
 const columnHelper = createColumnHelper();
 const columns = [
@@ -161,12 +162,12 @@ const columns = [
     cell: (info) => <i>{info.getValue()}</i>,
     header: () => <span>Solusi Permasalahan</span>,
   }),
-  columnHelper.accessor((row) => row.procurement_type_id, {
+  columnHelper.accessor((row) => row.procurement_type, {
     id: 'procurement_type_id',
     cell: (info) => <i>{info.getValue()}</i>,
     header: () => <span>Jenis Pengadaan</span>,
   }),
-  columnHelper.accessor((row) => row.procurement_method_id, {
+  columnHelper.accessor((row) => row.procurement_method, {
     id: 'procurement_method_id',
     cell: (info) => <i>{info.getValue()}</i>,
     header: () => <span>Cara Pengadaan</span>,
@@ -176,7 +177,10 @@ const columns = [
     id: 'aksi',
     size: 10,
     cell: (props, deleteUserData, role) => {
-      const rowId = props.row.original.id;
+      const data = props.row.original;
+      const rowId = data.id;
+      const file = data.file;
+
       return (
         <div className="flex justify-end">
           {role === 'Superadmin' && (
@@ -195,11 +199,13 @@ const columns = [
               icon={<EyeIcon className="w-4 h-4" />}
             />
           </Link>
-          <Button
-            className="text-sm font-normal"
-            textColor="text-blue-500"
-            icon={<ArrowDownTrayIcon className="w-4 h-4" />}
-          />
+          <Link to={file ? baseUrlAPI + file : '#'} target="__blank">
+            <Button
+              className="text-sm font-normal"
+              textColor="text-blue-500"
+              icon={<ArrowDownTrayIcon className="w-4 h-4" />}
+            />
+          </Link>
 
           {role === 'Superadmin' ||
             (role === 'OPD' && (

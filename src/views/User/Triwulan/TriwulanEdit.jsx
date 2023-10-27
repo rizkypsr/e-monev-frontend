@@ -136,8 +136,8 @@ const TriwulanEdit = () => {
     const formDataObject = {
       ...data,
       fund_source_id: Number(selectedFundSource?.id),
-      procurement_type_id: selectedProcurementType?.id,
-      procurement_method_id: selectedProcurementMethod?.id,
+      procurement_type: selectedProcurementType?.name,
+      procurement_method: selectedProcurementMethod?.name,
     };
 
     // eslint-disable-next-line no-restricted-syntax

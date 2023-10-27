@@ -148,8 +148,8 @@ const TriwulanCreate = () => {
     const formDataObject = {
       ...data,
       fund_source_id: selectedFundSource?.id,
-      procurement_type_id: selectedProcurementType?.id,
-      procurement_method_id: selectedProcurementMethod?.id,
+      procurement_type: selectedProcurementType?.name,
+      procurement_method: selectedProcurementMethod?.name,
       activity_id: selectedActivity?.id,
       activity_form: selectedActivityForm?.id,
     };
