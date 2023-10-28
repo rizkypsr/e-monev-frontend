@@ -14,6 +14,8 @@ import Button from '../../../components/Button';
 import useDebounce from '../../../hooks/useDebounce';
 import objectToQueryString from '../../../utils/objectToQueryString';
 import downloadTriwulanExcel from '../../../api/admin/report/downloadTriwulanExcel';
+import { useToastContext } from '../../../context/ToastContext';
+import downloadMasterExcel from '../../../api/admin/report/downloadMasterExcel';
 
 const type = [
   {
@@ -60,9 +62,9 @@ const initialFilterParams = {
 
 const ReportTableWrapper = () => {
   const authHeader = useAuthHeader();
-  const authUser = useAuthUser();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { showToastMessage } = useToastContext();
 
   const [selectedType, setSelectedType] = useState(null);
   const [selectedMonth, setSelectedMonth] = useState(null);
@@ -92,14 +94,39 @@ const ReportTableWrapper = () => {
     queryFn: () => getFundSource(initialFundSourceParams, authHeader()),
   });
 
-  const downloadExcel = useQuery({
-    queryKey: ['download_excel'],
-    queryFn: () => downloadTriwulanExcel(searchParamsState, authHeader()),
-    enabled: false,
-  });
-
   const handleDownloadExcel = async () => {
-    await downloadExcel.refetch();
+    let res;
+    let fileName;
+
+    if (selectedType && selectedType.value === 'data-master') {
+      fileName = 'Data Master.xlsx';
+      res = await downloadMasterExcel(searchParamsState, authHeader());
+    } else if (selectedType && selectedType.value === 'data-triwulan') {
+      fileName = 'Data Triwulan.xlsx';
+      res = await downloadTriwulanExcel(searchParamsState, authHeader());
+    }
+
+    if (res) {
+      // Create a URL for the blob
+      const blobUrl = URL.createObjectURL(res);
+
+      // Create a link element
+      const link = document.createElement('a');
+
+      // Set the href and download attributes to trigger the download
+      link.href = blobUrl;
+      link.download = fileName;
+
+      // Programmatically click the link to trigger the download
+      document.body.appendChild(link);
+      link.click();
+
+      // Clean up the URL and remove the link from the DOM
+      URL.revokeObjectURL(blobUrl);
+      document.body.removeChild(link);
+    } else {
+      showToastMessage('Terjadi kesalahan saat mengunduh file', 'error');
+    }
   };
 
   const onSelectType = (item) => {
@@ -144,16 +171,13 @@ const ReportTableWrapper = () => {
 
   const resetFilter = () => {
     setSearchParamsState(initialFilterParams);
-
     setSelectedType(null);
     setSelectedMonth(null);
     setSelectedYear(null);
     setSelectedTriwulan(null);
     setSelectedFundSource(null);
     setSearch('');
-
     const queryString = objectToQueryString(initialFilterParams);
-
     navigate(`/laporan?${queryString}`);
   };
 
