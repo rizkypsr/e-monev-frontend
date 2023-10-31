@@ -24,6 +24,7 @@ import { useToastContext } from '../../../context/ToastContext';
 import getTriwulanReport from '../../../api/admin/report/getTriwulanReport';
 import deleteTriwulanReport from '../../../api/admin/report/deleteTriwulanReport';
 import { baseUrlAPI } from '../../../utils/constants';
+import useFileDownloader from '../../../hooks/useFileDownloader';
 
 const columnHelper = createColumnHelper();
 const columns = [
@@ -176,7 +177,7 @@ const columns = [
   columnHelper.accessor((row) => row.aksi, {
     id: 'aksi',
     size: 10,
-    cell: (props, deleteUserData, role) => {
+    cell: (props, deleteUserData, role, downloadFile) => {
       const data = props.row.original;
       const rowId = data.id;
       const file = data.file;
@@ -199,13 +200,16 @@ const columns = [
               icon={<EyeIcon className="w-4 h-4" />}
             />
           </Link>
-          <Link to={file ? baseUrlAPI + file : '#'} target="__blank">
-            <Button
-              className="text-sm font-normal"
-              textColor="text-blue-500"
-              icon={<ArrowDownTrayIcon className="w-4 h-4" />}
-            />
-          </Link>
+          <Button
+            className="text-sm font-normal"
+            textColor="text-blue-500"
+            icon={<ArrowDownTrayIcon className="w-4 h-4" />}
+            onClick={() => {
+              if (file) {
+                downloadFile(baseUrlAPI + file);
+              }
+            }}
+          />
 
           {role === 'Superadmin' ||
             (role === 'OPD' && (
@@ -276,6 +280,7 @@ const initialParams = {
 
 const ReportTriwulanTable = () => {
   const [searchParams] = useSearchParams();
+  const { downloadFile } = useFileDownloader();
 
   const [filterParams, setFilterParams] = useState(initialParams);
 
@@ -321,6 +326,10 @@ const ReportTriwulanTable = () => {
     });
   };
 
+  const handleDownloadFile = (url) => {
+    downloadFile(url);
+  };
+
   if (isError) {
     return <ErrorPage errorMessage={error.message} />;
   }
@@ -333,7 +342,12 @@ const ReportTriwulanTable = () => {
             ? {
                 ...column,
                 cell: (props) =>
-                  column.cell(props, deleteReportData, authUser().role?.name),
+                  column.cell(
+                    props,
+                    deleteReportData,
+                    authUser().role?.name,
+                    handleDownloadFile
+                  ),
               }
             : column
         )}

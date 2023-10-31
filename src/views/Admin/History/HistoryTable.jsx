@@ -7,7 +7,7 @@ import {
   useQuery,
   useQueryClient,
 } from 'react-query';
-import { ArrowDownTrayIcon, EyeIcon } from '@heroicons/react/24/solid';
+import { ArrowDownTrayIcon } from '@heroicons/react/24/solid';
 import Table from '../../../components/Table';
 import { useToastContext } from '../../../context/ToastContext';
 import Pagination from '../../../components/Pagination';
@@ -18,6 +18,8 @@ import { getOrganizations } from '../../../api/admin/organization';
 import Label from '../../../components/Label';
 import deleteTriwulanReport from '../../../api/admin/report/deleteTriwulanReport';
 import Button from '../../../components/Button';
+import useFileDownloader from '../../../hooks/useFileDownloader';
+import { baseUrlAPI } from '../../../utils/constants';
 
 const columnHelper = createColumnHelper();
 const columns = [
@@ -141,15 +143,25 @@ const columns = [
   columnHelper.accessor((row) => row.aksi, {
     id: 'aksi',
     size: 10,
-    cell: () => (
-      <div className="flex justify-end">
-        <Button
-          className="text-sm font-normal"
-          textColor="text-blue-500"
-          icon={<ArrowDownTrayIcon className="w-4 h-4" />}
-        />
-      </div>
-    ),
+    cell: (props, downloadFile) => {
+      const data = props.row.original;
+      const file = data.file;
+
+      return (
+        <div className="flex justify-end">
+          <Button
+            className="text-sm font-normal"
+            textColor="text-blue-500"
+            icon={<ArrowDownTrayIcon className="w-4 h-4" />}
+            onClick={() => {
+              if (file) {
+                downloadFile(baseUrlAPI + file);
+              }
+            }}
+          />
+        </div>
+      );
+    },
     header: () => <div className="text-right">Aksi</div>,
   }),
 ];
@@ -172,6 +184,7 @@ const HistoryTable = () => {
   const authHeader = useAuthHeader();
   const { showToastMessage } = useToastContext();
   const queryClient = useQueryClient();
+  const { downloadFile } = useFileDownloader();
 
   const [filterParams, setFilterParams] = useState(initialParams);
   const [filterOpdParams, setFilterOpdParams] = useState(initialOpdParams);
@@ -207,26 +220,6 @@ const HistoryTable = () => {
     opdQuery.fetchNextPage();
   };
 
-  const deleteMutation = useMutation(deleteTriwulanReport);
-
-  const deleteReportData = (id) => {
-    deleteMutation.mutate(
-      {
-        id,
-        token: authHeader(),
-      },
-      {
-        onSuccess: (result) => {
-          queryClient.invalidateQueries('get_reports');
-          showToastMessage(result);
-        },
-        onError: (err) => {
-          showToastMessage(err.message, 'error');
-        },
-      }
-    );
-  };
-
   const handleSelectOpd = (opd) => {
     setSelectedOpd(opd);
   };
@@ -236,6 +229,10 @@ const HistoryTable = () => {
       ...filterParams,
       page: currentPage,
     });
+  };
+
+  const handleDownloadFile = (url) => {
+    downloadFile(url);
   };
 
   if (isError) {
@@ -271,7 +268,7 @@ const HistoryTable = () => {
             column.cell
               ? {
                   ...column,
-                  cell: (props) => column.cell(props, deleteReportData),
+                  cell: (props) => column.cell(props, handleDownloadFile),
                 }
               : column
           )}
