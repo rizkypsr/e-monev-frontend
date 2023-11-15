@@ -6,7 +6,7 @@ import {
   TrashIcon,
 } from '@heroicons/react/24/solid';
 import { createColumnHelper } from '@tanstack/react-table';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuthHeader } from 'react-auth-kit';
 import { Link } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
@@ -26,6 +26,7 @@ import ErrorPage from '../../ErrorPage';
 import DropdownSelect from '../../../components/DropdownSelect';
 import getFundSource from '../../../api/user/triwulan/getFundSource';
 import deleteFundSource from '../../../api/admin/fundSource/deleteFundSource';
+import { useDebounce } from '@uidotdev/usehooks';
 
 const columnHelper = createColumnHelper();
 const columns = [
@@ -171,6 +172,8 @@ const FundSourceTable = () => {
   const queryClient = useQueryClient();
 
   const [filterParams, setFilterParams] = useState(initialParams);
+  const [searchTerm, setSearchTerm] = useState('');
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
   const [selectedSorting, setSelectedSorting] = useState(sorting[0]);
   const [selectedPageSize, setSelectedPageSize] = useState(pageSizes[0]);
 
@@ -179,6 +182,13 @@ const FundSourceTable = () => {
     queryFn: () => getFundSource(filterParams, authHeader()),
     enabled: authHeader() !== null,
   });
+
+  useEffect(() => {
+    setFilterParams({
+      ...filterParams,
+      search: debouncedSearchTerm,
+    });
+  }, [debouncedSearchTerm]);
 
   const deleteMutation = useMutation(deleteFundSource);
 
@@ -217,12 +227,7 @@ const FundSourceTable = () => {
   };
 
   const onSearchChange = (e) => {
-    setTimeout(() => {
-      setFilterParams({
-        ...filterParams,
-        search: e.target.value,
-      });
-    }, 500);
+    setSearchTerm(e.target.value);
   };
 
   const onPaginationChange = (currentPage) => {
@@ -278,7 +283,7 @@ const FundSourceTable = () => {
           </div>
           <input
             type="search"
-            value={filterParams.search}
+            value={searchTerm}
             onChange={onSearchChange}
             className="bg-gray-50 text-light-gray border-none text-sm rounded-lg focus:ring-0 block w-full pl-10 p-2.5 shadow"
             placeholder="Pencarian"

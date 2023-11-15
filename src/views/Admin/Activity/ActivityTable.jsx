@@ -218,12 +218,10 @@ const ActivityTable = () => {
   };
 
   const onSearchChange = (e) => {
-    setTimeout(() => {
-      setFilterParams({
-        ...filterParams,
-        search: e.target.value,
-      });
-    }, 500);
+    setFilterParams({
+      ...filterParams,
+      search: e.target.value,
+    });
   };
 
   const onPaginationChange = (currentPage) => {
