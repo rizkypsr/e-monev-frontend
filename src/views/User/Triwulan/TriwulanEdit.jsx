@@ -10,14 +10,14 @@ import formattedDate from '../../../utils/formattedDate';
 import ReactLoading from '../../../components/Loading';
 import Button from '../../../components/Button';
 import getFundSource from '../../../api/user/triwulan/getFundSource';
-import createTriwulan from '../../../api/user/triwulan/createTriwulan';
 import DropdownDialog from '../../../components/DropdownDialog';
-import getProcurementType from '../../../api/user/triwulan/getProcurementType';
-import getProcurementMethod from '../../../api/user/triwulan/getProcurementMethod';
 import { useToastContext } from '../../../context/ToastContext';
 import FileInput from '../../../components/FileInput';
 import getTriwulanDetail from '../../../api/user/triwulan/getTriwulanDetail';
 import updateTriwulan from '../../../api/user/triwulan/updateTriwulan';
+import CurrencyInput from '../../../components/CurrencyInput';
+import PercentageInput from '../../../components/PercentageInput';
+import { getActivities } from '../../../api/admin/activity';
 
 const initialParams = {
   page: 1,
@@ -43,6 +43,24 @@ const jenisPengadaan = {
   ],
 };
 
+const optionals = {
+  pageParams: [undefined],
+  pages: [
+    {
+      data: {
+        page: 1,
+        pages: 1,
+        result: [
+          { id: 1, name: 'Forst Major' },
+          { id: 2, name: 'Keterlambatan Lelang' },
+          { id: 3, name: 'Perubahan Kebijakan Adendum' },
+        ],
+        total: 3,
+      },
+    },
+  ],
+};
+
 const caraPengadaan = {
   pageParams: [undefined],
   pages: [
@@ -63,6 +81,23 @@ const caraPengadaan = {
   ],
 };
 
+const bentukKegiatan = {
+  pageParams: [undefined],
+  pages: [
+    {
+      data: {
+        page: 1,
+        pages: 1,
+        result: [
+          { id: 1, name: 'fisik' },
+          { id: 2, name: 'nonfisik' },
+        ],
+        total: 4,
+      },
+    },
+  ],
+};
+
 const TriwulanEdit = () => {
   const { id } = useParams();
   const authHeader = useAuthHeader();
@@ -73,11 +108,15 @@ const TriwulanEdit = () => {
   const [selectedProcurementType, setSelectedProcurementType] = useState(null);
   const [selectedProcurementMethod, setSelectedProcurementMethod] =
     useState(null);
+  const [selectedActivityForm, setSelectedActivityForm] = useState(null);
+  const [selectedActivity, setSelectedActivity] = useState(null);
+  const [selectedOptional, setSelectedOptional] = useState(null);
 
   const {
     register,
     handleSubmit,
     setValue,
+    control,
     formState: { errors },
   } = useForm();
 
@@ -88,6 +127,7 @@ const TriwulanEdit = () => {
       const triwulanData = result.data;
 
       setSelectedFundSource(triwulanData.fundSource);
+      setSelectedOptional(triwulanData.optional);
 
       setValue('activity_name', triwulanData.activity_name);
       setValue('activity_location', triwulanData.activity_location);
@@ -113,7 +153,10 @@ const TriwulanEdit = () => {
       setValue('user_id', triwulanData.user_id);
       setValue('activity_name', triwulanData.activity_name);
       setValue('activity_name', triwulanData.activity_name);
-      setValue('activity_name', triwulanData.activity_name);
+      setValue('contract_date', triwulanData.contract_date);
+      setValue('pic_name', triwulanData.pic_name);
+      setValue('leader_name', triwulanData.leader_name);
+      setValue('reason', triwulanData.reason);
     },
   });
 
@@ -122,6 +165,26 @@ const TriwulanEdit = () => {
     queryFn: ({ pageParam = 1 }) => getFundSource(initialParams, authHeader()),
     getNextPageParam: (lastPage) => lastPage.nextId ?? undefined,
     getPreviousPageParam: (firstPage) => firstPage.previousId ?? undefined,
+  });
+
+  const activityQuery = useInfiniteQuery({
+    queryKey: ['get_activities'],
+    queryFn: async ({ pageParam = 1 }) => {
+      const params = initialParams;
+
+      params.page = pageParam;
+
+      const res = await getActivities(params, authHeader());
+
+      return res;
+    },
+    getNextPageParam: (lastPage) => {
+      if (lastPage.data.page < lastPage.data.pages) {
+        return lastPage.data.page + 1;
+      }
+
+      return undefined;
+    },
   });
 
   useEffect(() => {
@@ -135,9 +198,13 @@ const TriwulanEdit = () => {
 
     const formDataObject = {
       ...data,
-      fund_source_id: Number(selectedFundSource?.id),
+      fund_source_id: selectedFundSource?.id,
       procurement_type: selectedProcurementType?.name,
       procurement_method: selectedProcurementMethod?.name,
+      activity_id: selectedActivity?.id,
+      activity_form: selectedActivityForm?.id,
+      optional: selectedOptional?.name,
+      contract_date: formattedDate(data?.contract_date),
     };
 
     // eslint-disable-next-line no-restricted-syntax
@@ -172,6 +239,10 @@ const TriwulanEdit = () => {
     setSelectedFundSource(item);
   };
 
+  const handleSelectOptional = (item) => {
+    setSelectedOptional(item);
+  };
+
   const handleSelectProcurementType = (item) => {
     setSelectedProcurementType(item);
   };
@@ -180,9 +251,19 @@ const TriwulanEdit = () => {
     setSelectedProcurementMethod(item);
   };
 
+  const handleSelectActivityForm = (item) => {
+    setSelectedActivityForm(item);
+  };
+
+  const handleSelectActivity = (item) => {
+    setSelectedActivity(item);
+  };
+
   const handleFileInput = (file) => {
     setValue('file', file);
   };
+
+  if (isLoading) return <ReactLoading />;
 
   return (
     <div className="mb-6">
@@ -193,21 +274,8 @@ const TriwulanEdit = () => {
       <div className="w-full h-full mt-6 bg-white rounded-lg p-9">
         <form className="w-4/5" onSubmit={handleSubmit(onSubmit)}>
           <div className="grid grid-cols-2 gap-4 mb-8">
-            <div className="col-span-2">
-              <Label>Tanggal Input Data</Label>
-              <TextInput
-                id="created_at"
-                name="created_at"
-                width="w-full"
-                register={register('created_at', {
-                  disabled: true,
-                })}
-                error={errors.created_at?.message}
-              />
-            </div>
-
             <div>
-              <Label className="mb-2">Nama Kegiatan</Label>
+              <Label className="mb-2">Output Sub Kegiatan</Label>
               <TextInput
                 id="activity_name"
                 name="activity_name"
@@ -242,18 +310,21 @@ const TriwulanEdit = () => {
               />
             </div>
             <div>
-              <Label className="mb-2">Pagu Dana (Rp)</Label>
-              <TextInput
-                id="fund_ceiling"
+              <CurrencyInput
                 name="fund_ceiling"
+                label="Pagu Dana (Dalam bentuk angka)"
+                control={control}
                 placeholder="Tulis Disini..."
-                register={register('fund_ceiling', {
+                {...register('fund_ceiling', {
+                  required: 'Pagu Dana wajib diisi!',
                   valueAsNumber: true,
+                  max: {
+                    message: 'Maksimal Rp.200.000.000.000.000',
+                    value: 200000000000000000,
+                  },
                 })}
-                error={errors.fund_ceiling?.message}
               />
             </div>
-
             <div>
               <Label className="mb-2">OPD Pengelola</Label>
               <TextInput
@@ -274,24 +345,40 @@ const TriwulanEdit = () => {
                 error={errors.pptk_name?.message}
               />
             </div>
-
             <div>
-              <Label className="mb-2">Nomor dan Tanggal Kontrak</Label>
+              <Label className="mb-2">Nomor Kontrak</Label>
               <TextInput
                 id="contract_number_date"
                 name="contract_number_date"
                 placeholder="Tulis Disini..."
-                register={register('contract_number_date')}
-                error={errors.contract_number_date?.message}
+                register={register('contract_number_date', {
+                  required: false,
+                })}
+                error={errors.pptk_name?.message}
               />
             </div>
             <div>
-              <Label className="mb-2">Nama Kontraktor</Label>
+              <Label>Tanggal Kontrak</Label>
+              <TextInput
+                id="contract_date"
+                name="contract_date"
+                type="date"
+                width="w-full"
+                register={register('contract_date', {
+                  valueAsDate: true,
+                })}
+                error={errors.contract_date?.message}
+              />
+            </div>
+            <div>
+              <Label className="mb-2">Nama Penyedia</Label>
               <TextInput
                 id="contractor_name"
                 name="contractor_name"
                 placeholder="Tulis Disini..."
-                register={register('contractor_name')}
+                register={register('contractor_name', {
+                  required: false,
+                })}
                 error={errors.contractor_name?.message}
               />
             </div>
@@ -301,44 +388,68 @@ const TriwulanEdit = () => {
                 id="implementation_period"
                 name="implementation_period"
                 placeholder="Tulis Disini..."
-                register={register('implementation_period')}
+                register={register('implementation_period', {
+                  required: false,
+                })}
                 error={errors.implementation_period?.message}
               />
             </div>
             <div>
-              <Label className="mb-2">Nilai Kontrak</Label>
+              <Label className="mb-2">Nama Penanggung Jawab</Label>
               <TextInput
-                id="contract_value"
+                id="pic_name"
+                name="pic_name"
+                placeholder="Tulis Disini..."
+                register={register('pic_name')}
+                error={errors.pic_name?.message}
+              />
+            </div>
+            <div>
+              <CurrencyInput
                 name="contract_value"
+                label="Nilai Kontrak (Dalam bentuk angka)"
+                control={control}
                 placeholder="Tulis Disini..."
-                register={register('contract_value', {
+                {...register('contract_value', {
+                  required: false,
                   valueAsNumber: true,
+                  max: {
+                    message: 'Maksimal Rp.200.000.000.000.000',
+                    value: 200000000000000000,
+                  },
                 })}
-                error={errors.contract_value?.message}
               />
             </div>
             <div>
-              <Label className="mb-2">Realisasi Fisik</Label>
-              <TextInput
-                id="physical_realization"
+              <PercentageInput
                 name="physical_realization"
+                label="Realisasi Fisik (Dalam bentuk angka)"
+                control={control}
                 placeholder="Tulis Disini..."
-                register={register('physical_realization', {
+                {...register('physical_realization', {
+                  required: 'Realisasi Fisik wajib diisi!',
                   valueAsNumber: true,
+                  max: {
+                    message: 'Maksimal Rp.200.000.000.000.000',
+                    value: 200000000000000000,
+                  },
                 })}
-                error={errors.physical_realization?.message}
               />
             </div>
             <div>
-              <Label className="mb-2">Realisasi Keuangan</Label>
-              <TextInput
-                id="fund_realization"
+              <CurrencyInput
                 name="fund_realization"
+                label="Realisasi Keuangan (Dalam bentuk angka)"
+                control={control}
                 placeholder="Tulis Disini..."
-                register={register('fund_realization', {
+                {...register('fund_realization', {
+                  required: 'Realisasi Keuangan wajib diisi!',
                   valueAsNumber: true,
+                  max: {
+                    message: 'Maksimal Rp.200.000.000.000.000',
+                    value: 200000000000000000,
+                  },
                 })}
-                error={errors.fund_realization?.message}
               />
             </div>
             <div>
@@ -386,27 +497,27 @@ const TriwulanEdit = () => {
               />
             </div>
             <div>
-              <Label className="mb-2">Jumlah Tenaga Kerja (Lokal)</Label>
-              <TextInput
-                id="local_workforce"
+              <CurrencyInput
                 name="local_workforce"
+                label="Jumlah Tenaga Kerja Lokal (Dalam bentuk angka)"
+                control={control}
                 placeholder="Tulis Disini..."
-                register={register('local_workforce', {
+                {...register('local_workforce', {
+                  required: 'Jumlah Tenaga Kerja Lokal wajib diisi!',
                   valueAsNumber: true,
                 })}
-                error={errors.local_workforce?.message}
               />
             </div>
             <div>
-              <Label className="mb-2">Jumlah Tenaga Kerja (Non Lokal)</Label>
-              <TextInput
-                id="non_local_workforce"
+              <CurrencyInput
                 name="non_local_workforce"
+                label="Jumlah Tenaga Kerja Non Lokal (Dalam bentuk angka)"
+                control={control}
                 placeholder="Tulis Disini..."
-                register={register('non_local_workforce', {
+                {...register('non_local_workforce', {
+                  required: 'Jumlah Tenaga Kerja Non Lokal wajib diisi!',
                   valueAsNumber: true,
                 })}
-                error={errors.non_local_workforce?.message}
               />
             </div>
             <div>
@@ -438,7 +549,6 @@ const TriwulanEdit = () => {
                 onChange={handleSelectProcurementType}
               />
             </div>
-
             <div className="mb-4">
               <Label className="mb-2">Cara Pengadaan</Label>
               <DropdownDialog
@@ -446,6 +556,55 @@ const TriwulanEdit = () => {
                 data={caraPengadaan}
                 value={selectedProcurementMethod}
                 onChange={handleSelectProcurementMethod}
+              />
+            </div>
+            <div className="mb-4">
+              <Label className="mb-2">Sub Kegiatan</Label>
+              <DropdownDialog
+                label="Pilih Sub Kegiatan"
+                data={activityQuery.data}
+                value={selectedActivity}
+                onChange={handleSelectActivity}
+              />
+            </div>
+            <div className="mb-4">
+              <Label className="mb-2">Bentuk Kegiatan</Label>
+              <DropdownDialog
+                label="Pilih Bentuk Kegiatan"
+                data={bentukKegiatan}
+                value={selectedActivityForm}
+                onChange={handleSelectActivityForm}
+              />
+            </div>
+            <div>
+              <Label className="mb-2">Opsi</Label>
+              <DropdownDialog
+                label="Pilih Opsi"
+                data={optionals}
+                value={selectedOptional}
+                onChange={handleSelectOptional}
+              />
+            </div>
+            <div>
+              <Label className="mb-2">Nama Pimpinan</Label>
+              <TextInput
+                id="leader_name"
+                name="leader_name"
+                width="w-full"
+                placeholder="Tulis Disini..."
+                register={register('leader_name')}
+                error={errors.leader_name?.message}
+              />
+            </div>
+            <div className="col-span-2">
+              <Label className="mb-2">Alasan Terkait</Label>
+              <TextInput
+                id="reason"
+                name="reason"
+                width="w-full"
+                placeholder="Tulis Disini..."
+                register={register('reason')}
+                error={errors.reason?.message}
               />
             </div>
 

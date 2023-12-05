@@ -1,6 +1,5 @@
 import { BanknotesIcon } from '@heroicons/react/24/solid';
 import React from 'react';
-import formatRupiah from '../../../../utils/formatRupiah';
 
 const FundTotal = ({ title, color, total }) => (
   <div className="flex items-center space-x-3">
@@ -11,7 +10,7 @@ const FundTotal = ({ title, color, total }) => (
     </div>
     <div>
       <h1 className="font-medium">{title}</h1>
-      <div className="text-2xl font-semibold">Rp. {formatRupiah(total)}</div>
+      <div className="text-2xl font-semibold">{total}</div>
     </div>
   </div>
 );

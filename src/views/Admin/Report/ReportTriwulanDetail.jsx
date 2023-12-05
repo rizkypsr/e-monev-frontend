@@ -9,6 +9,7 @@ import formattedDate from '../../../utils/formattedDate';
 import getTriwulanDetail from '../../../api/user/triwulan/getTriwulanDetail';
 import Button from '../../../components/Button';
 import { baseUrlAPI } from '../../../utils/constants';
+import formatToRupiah from '../../../utils/formatRupiah';
 
 const initialData = {
   id: 0,
@@ -40,8 +41,92 @@ const initialData = {
   procurement_method: '',
   user_id: 0,
   file: null,
-  created_at: '2023-10-05T05:38:27.413Z',
+  created_at: '',
+  contract_date: '',
+  pic_name: '',
+  optional: '',
+  reason: '',
+  leader_name: '',
+  updated_at: '',
 };
+
+const fieldMappings = [
+  {
+    key: 'created_at',
+    label: 'Tanggal Dibuat',
+    isFormatted: true,
+    formatter: formattedDate,
+  },
+  {
+    key: 'updated_at',
+    label: 'Terakhir Update',
+    isFormatted: true,
+    formatter: formattedDate,
+  },
+  { key: 'activity_name', label: 'Nama Kegiatan' },
+  { key: 'activity_output_sub', label: 'Nama Output Sub Kegiatan' },
+  { key: 'sub_activity', label: 'Sub Kegiatan' },
+  { key: 'program', label: 'Nama Program' },
+  { key: 'activity_location', label: 'Lokasi Kegiatan' },
+  {
+    key: 'fund_source_id',
+    label: 'Sumber Dana',
+  },
+  {
+    key: 'fund_source_total',
+    label: 'Total Sumber Dana',
+    isFormatted: true,
+    formatter: formatToRupiah,
+  },
+  {
+    key: 'fund_ceiling',
+    label: 'Pagu Dana',
+    isFormatted: true,
+    formatter: formatToRupiah,
+  },
+  { key: 'management_organization', label: 'OPD Organisasi' },
+  { key: 'pptk_name', label: 'Nama PPTK' },
+  { key: 'contract_number_date', label: 'Nomor Kontrak' },
+  { key: 'contract_date', label: 'Tanggal Kontrak' },
+  { key: 'contractor_name', label: 'Nama Penyedia' },
+  { key: 'pic_name', label: 'Nama Penanggung Jawab' },
+  { key: 'implementation_period', label: 'Jangka Waktu Pelaksanaan' },
+  {
+    key: 'contract_value',
+    label: 'Nilai Kontrak',
+    isFormatted: true,
+    formatter: formatToRupiah,
+  },
+  {
+    key: 'physical_realization',
+    label: 'Realisasi Fisik',
+    isFormatted: true,
+    formatter: formatToRupiah,
+  },
+  {
+    key: 'fund_realization',
+    label: 'Realisasi Keuangan',
+    isFormatted: true,
+    formatter: formatToRupiah,
+  },
+  { key: 'activity_volume', label: 'Volume Kegiatan' },
+  { key: 'activity_output', label: 'Output Kegiatan' },
+  {
+    key: 'direct_target_group',
+    label: 'Manfaat Kegiatan (Kelompok sasaran Langsung)',
+  },
+  {
+    key: 'indirect_target_group',
+    label: 'Manfaat Kegiatan (Kelompok sasaran Langsung)',
+  },
+  { key: 'local_workforce', label: 'Jumlah Tenaga Kerja (Lokal)' },
+  { key: 'non_local_workforce', label: 'Jumlah Tenaga Kerja (Non Lokal)' },
+  { key: 'problems', label: 'Hambatan dan Permasalahan' },
+  { key: 'procurement_type', label: 'Jenis Pengadaan' },
+  { key: 'procurement_method', label: 'Cara Pengadaan' },
+  { key: 'optional', label: 'Opsi' },
+  { key: 'reason', label: 'Alasan Terkait' },
+];
 
 const ReportTriwulanDetail = () => {
   const { id } = useParams();
@@ -64,43 +149,16 @@ const ReportTriwulanDetail = () => {
         activity_location: triwulanData?.activity_location,
         program: triwulanData?.activity?.program?.title,
         fund_source_id: triwulanData?.fundSource?.name,
-        fund_source_total: parseFloat(
-          triwulanData.fund_source_total ?? 0
-        ).toLocaleString('id-ID', {
-          style: 'currency',
-          currency: 'IDR',
-        }),
-        fund_ceiling: parseFloat(triwulanData.fund_ceiling).toLocaleString(
-          'id-ID',
-          {
-            style: 'currency',
-            currency: 'IDR',
-          }
-        ),
+        fund_source_total: triwulanData.fund_source_total ?? 0,
+        fund_ceiling: triwulanData.fund_ceiling ?? 0,
         management_organization: triwulanData.management_organization,
         pptk_name: triwulanData.pptk_name,
         contract_number_date: triwulanData.contract_number_date,
         contractor_name: triwulanData.contractor_name,
         implementation_period: triwulanData.implementation_period,
-        contract_value: parseFloat(triwulanData.contract_value).toLocaleString(
-          'id-ID',
-          {
-            style: 'currency',
-            currency: 'IDR',
-          }
-        ),
-        physical_realization: parseFloat(
-          triwulanData.physical_realization
-        ).toLocaleString('id-ID', {
-          style: 'currency',
-          currency: 'IDR',
-        }),
-        fund_realization: parseFloat(
-          triwulanData.fund_realization
-        ).toLocaleString('id-ID', {
-          style: 'currency',
-          currency: 'IDR',
-        }),
+        contract_value: triwulanData.contract_value ?? 0,
+        physical_realization: triwulanData.physical_realization ?? 0,
+        fund_realization: triwulanData.fund_realization ?? 0,
         activity_volume: triwulanData.activity_volume,
         activity_output: triwulanData.activity_output,
         direct_target_group: triwulanData.direct_target_group,
@@ -114,6 +172,12 @@ const ReportTriwulanDetail = () => {
         user_id: triwulanData.user_id,
         file: triwulanData.file,
         created_at: triwulanData.created_at,
+        contract_date: triwulanData.contract_date,
+        pic_name: triwulanData.pic_name,
+        optional: triwulanData.optional,
+        reason: triwulanData.reason,
+        leader_name: triwulanData.leader_name,
+        updated_at: triwulanData.updated_at,
       });
     },
   });
@@ -126,14 +190,36 @@ const ReportTriwulanDetail = () => {
     return <ReactLoading />;
   }
 
+  const renderTableRows = () =>
+    fieldMappings.map((field) => (
+      <tr
+        key={field.key}
+        className={
+          fieldMappings.indexOf(field) % 2 === 0 ? 'bg-white' : 'bg-light-blue'
+        }
+      >
+        <th
+          scope="row"
+          className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+        >
+          {field.label}
+        </th>
+        <td className="px-6 py-4">
+          {field.isFormatted
+            ? field.formatter(report[field.key])
+            : report[field.key]}
+        </td>
+      </tr>
+    ));
+
   return (
     <div className="w-full h-full mt-6 bg-white rounded-lg p-9">
       <div>
-        <div className="mb-8 cursor-pointer  flex justify-between">
-          <div
-            className="flex space-x-3 items-center"
-            onClick={() => navigate(-1)}
-          >
+        <div
+          className="mb-8 cursor-pointer flex justify-between"
+          onClick={() => navigate(-1)}
+        >
+          <div className="flex space-x-3 items-center">
             <ArrowLeftIcon className="w-6 h-6" />
             <h1 className="font-semibold text-lg text-dark-gray leading-7">
               Detail Triwulan
@@ -154,243 +240,7 @@ const ReportTriwulanDetail = () => {
 
       <div className="relative overflow-x-auto">
         <table className="w-full text-sm text-left text-dark-gray">
-          <tbody>
-            <tr className="bg-white">
-              <th
-                scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-              >
-                Tanggal
-              </th>
-              <td className="px-6 py-4">{formattedDate(report.created_at)}</td>
-            </tr>
-            <tr className="bg-light-blue">
-              <th
-                scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-              >
-                Nama Kegiatan
-              </th>
-              <td className="px-6 py-4">{report.activity_name}</td>
-            </tr>
-            <tr className="bg-white">
-              <th
-                scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-              >
-                Nama Output Sub Kegiatan
-              </th>
-              <td className="px-6 py-4">{report.activity_output_sub}</td>
-            </tr>
-            <tr className="bg-light-blue">
-              <th
-                scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-              >
-                Sub Kegiatan
-              </th>
-              <td className="px-6 py-4">{report.sub_activity}</td>
-            </tr>
-            <tr className="bg-white">
-              <th
-                scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-              >
-                Lokasi Kegiatan
-              </th>
-              <td className="px-6 py-4">{report.activity_location}</td>
-            </tr>
-            <tr className="bg-light-blue">
-              <th
-                scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-              >
-                Nama Program
-              </th>
-              <td className="px-6 py-4">{report.program}</td>
-            </tr>
-            <tr className="bg-white">
-              <th
-                scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-              >
-                Sumber Dana
-              </th>
-              <td className="px-6 py-4">{report.fund_source_id}</td>
-            </tr>
-            <tr className="bg-light-blue">
-              <th
-                scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-              >
-                Total Sumber Dana
-              </th>
-              <td className="px-6 py-4">{report.fund_source_total}</td>
-            </tr>
-            <tr className="bg-white">
-              <th
-                scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-              >
-                Pagu Dana
-              </th>
-              <td className="px-6 py-4">{report.fund_ceiling}</td>
-            </tr>
-            <tr className="bg-light-blue">
-              <th
-                scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-              >
-                OPD Organisasi
-              </th>
-              <td className="px-6 py-4">{report.management_organization}</td>
-            </tr>
-            <tr className="bg-white">
-              <th
-                scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-              >
-                Nama PPTK
-              </th>
-              <td className="px-6 py-4">{report.pptk_name}</td>
-            </tr>
-            <tr className="bg-light-blue">
-              <th
-                scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-              >
-                Nomor dan Tanggal Kontrak
-              </th>
-              <td className="px-6 py-4">{report.contract_number_date}</td>
-            </tr>
-            <tr className="bg-white">
-              <th
-                scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-              >
-                Nama Kontraktor
-              </th>
-              <td className="px-6 py-4">{report.contractor_name}</td>
-            </tr>
-            <tr className="bg-light-blue">
-              <th
-                scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-              >
-                Jangka Waktu Pelaksanaan
-              </th>
-              <td className="px-6 py-4">{report.implementation_period}</td>
-            </tr>
-            <tr className="bg-white">
-              <th
-                scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-              >
-                Nilai Kontrak
-              </th>
-              <td className="px-6 py-4">{report.contract_value}</td>
-            </tr>
-            <tr className="bg-light-blue">
-              <th
-                scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-              >
-                Realisasi Fisik
-              </th>
-              <td className="px-6 py-4">{report.physical_realization}</td>
-            </tr>
-            <tr className="bg-white">
-              <th
-                scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-              >
-                Realisasi Keuangan
-              </th>
-              <td className="px-6 py-4">{report.fund_realization}</td>
-            </tr>
-            <tr className="bg-light-blue">
-              <th
-                scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-              >
-                Volume Kegiatan
-              </th>
-              <td className="px-6 py-4">{report.activity_volume}</td>
-            </tr>
-            <tr className="bg-white">
-              <th
-                scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-              >
-                Output Kegiatan
-              </th>
-              <td className="px-6 py-4">{report.activity_output}</td>
-            </tr>
-            <tr className="bg-light-blue">
-              <th
-                scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-              >
-                Manfaat Kegiatan (Kelompok sasaran Langsung)
-              </th>
-              <td className="px-6 py-4">{report.direct_target_group}</td>
-            </tr>
-            <tr className="bg-white">
-              <th
-                scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-              >
-                Manfaat Kegiatan (Kelompok sasaran Langsung)
-              </th>
-              <td className="px-6 py-4">{report.indirect_target_group}</td>
-            </tr>
-            <tr className="bg-light-blue">
-              <th
-                scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-              >
-                Jumlah Tenaga Kerja (Lokal)
-              </th>
-              <td className="px-6 py-4">{report.local_workforce}</td>
-            </tr>
-
-            <tr className="bg-white">
-              <th
-                scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-              >
-                Jumlah Tenaga Kerja (Non Lokal)
-              </th>
-              <td className="px-6 py-4">{report.non_local_workforce}</td>
-            </tr>
-            <tr className="bg-light-blue">
-              <th
-                scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-              >
-                Hambatan dan Permasalahan
-              </th>
-              <td className="px-6 py-4">{report.problems}</td>
-            </tr>
-            <tr className="bg-white">
-              <th
-                scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-              >
-                Jenis Pengadaan
-              </th>
-              <td className="px-6 py-4">{report.procurement_type}</td>
-            </tr>
-            <tr className="bg-light-blue">
-              <th
-                scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-              >
-                Cara Pengadaan
-              </th>
-              <td className="px-6 py-4">{report.procurement_method}</td>
-            </tr>
-          </tbody>
+          <tbody>{renderTableRows()}</tbody>
         </table>
       </div>
     </div>

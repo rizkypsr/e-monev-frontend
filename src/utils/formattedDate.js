@@ -1,9 +1,18 @@
 export default function formattedDate(date) {
-  const rawDate = new Date(date);
+  // check if date is invalid date
+  if (Number.isNaN(Date.parse(date))) {
+    return null;
+  }
 
-  const year = rawDate.getFullYear();
-  const month = (rawDate.getMonth() + 1).toString().padStart(2, '0');
-  const day = rawDate.getDate().toString().padStart(2, '0');
+  try {
+    const rawDate = new Date(date);
 
-  return `${year}-${month}-${day}`;
+    const year = rawDate.getFullYear();
+    const month = (rawDate.getMonth() + 1).toString().padStart(2, '0');
+    const day = rawDate.getDate().toString().padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+  } catch (error) {
+    return null;
+  }
 }

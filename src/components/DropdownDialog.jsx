@@ -16,6 +16,9 @@ const DropdownDialog = ({
   onBottom,
   hasNextPage,
   isFetchingNextPage,
+  enableSearch = false,
+  searchValue,
+  onSearch,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const { ref, inView } = useInView();
@@ -93,6 +96,18 @@ const DropdownDialog = ({
                     <div>{label}</div>
                     <div>{children}</div>
                   </Dialog.Title>
+
+                  {enableSearch && (
+                    <div className="mb-6">
+                      <input
+                        type="text"
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                        placeholder="Cari..."
+                        value={searchValue}
+                        onChange={(e) => onSearch(e.target.value)}
+                      />
+                    </div>
+                  )}
 
                   {data?.pages?.map((page, index) => (
                     // eslint-disable-next-line react/no-array-index-key

@@ -44,6 +44,7 @@ const Dashboard = () => {
 
   const token = useMemo(() => authHeader(), [authHeader]);
 
+  const [search, setSearch] = useState('');
   const [selectedFundSource, setSelectedFundSource] = useState(null);
   const [filterParams, setFilterParams] = useState(initialFundSourceparams);
   const [filterFundSourceChart, setFilterFundSourceChart] = useState(
@@ -93,7 +94,7 @@ const Dashboard = () => {
   });
 
   const fundSourceQuery = useInfiniteQuery({
-    queryKey: ['get_fund_source'],
+    queryKey: ['get_fund_source', filterParams],
     queryFn: async ({ pageParam = 1 }) => {
       const params = filterParams;
 
@@ -134,10 +135,25 @@ const Dashboard = () => {
     setSelectedFundSource(opd);
   };
 
+  const handleOnSearch = (e) => {
+    setFilterParams({
+      ...filterParams,
+      search: e,
+    });
+  };
+
   if (usersQuery.isError) {
     return <ErrorPage errorMessage={usersQuery.error} />;
   }
 
+  const totalPaguDana = useMemo(
+    () => fundSourceChartQuery?.data?.data?.pagu_dana.total_pagu_dana,
+    [fundSourceChartQuery?.data?.data?.pagu_dana.total_pagu_dana]
+  );
+  const totalPaguDanaDigunakan = useMemo(
+    () => fundSourceChartQuery?.data?.data?.pagu_dana.total_pagu_dana_digunakan,
+    [fundSourceChartQuery?.data?.data?.pagu_dana.total_pagu_dana_digunakan]
+  );
   const showCountBox = (roles) => roles.includes(authUser().role.name);
 
   return (
@@ -158,6 +174,9 @@ const Dashboard = () => {
               value={selectedFundSource}
               onChange={handleSelectFundSource}
               maxWidth="max-w-sm"
+              enableSearch
+              searchValue={filterParams.search}
+              onSearch={handleOnSearch}
             />
           </div>
         )}
@@ -200,18 +219,12 @@ const Dashboard = () => {
             <FundTotal
               title="Total Sumber Dana"
               color="bg-[#56CCF2]"
-              total={formatRupiah(
-                fundSourceChartQuery?.data?.data?.pagu_dana.total_pagu_dana.toString() ??
-                  '0'
-              )}
+              total={formatRupiah(totalPaguDana)}
             />
             <FundTotal
               title="Total Pagu Dana"
               color="bg-[#BB6BD9]"
-              total={formatRupiah(
-                fundSourceChartQuery?.data?.data?.pagu_dana.total_pagu_dana_digunakan.toString() ??
-                  '0'
-              )}
+              total={formatRupiah(totalPaguDanaDigunakan)}
             />
           </div>
 

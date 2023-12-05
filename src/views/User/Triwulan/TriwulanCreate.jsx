@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { CheckCircleIcon, PlusIcon } from '@heroicons/react/24/solid';
+import { CheckCircleIcon } from '@heroicons/react/24/solid';
 import { Link, useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-import { useInfiniteQuery, useMutation, useQueryClient } from 'react-query';
+import { useForm, Controller } from 'react-hook-form';
+import { useInfiniteQuery, useMutation } from 'react-query';
 import { useAuthHeader } from 'react-auth-kit';
+import { NumericFormat } from 'react-number-format';
+
 import Label from '../../../components/Label';
 import TextInput from '../../../components/TextInput';
 import formattedDate from '../../../utils/formattedDate';
@@ -15,6 +17,8 @@ import DropdownDialog from '../../../components/DropdownDialog';
 import { useToastContext } from '../../../context/ToastContext';
 import FileInput from '../../../components/FileInput';
 import { getActivities } from '../../../api/admin/activity';
+import CurrencyInput from '../../../components/CurrencyInput';
+import PercentageInput from '../../../components/PercentageInput';
 
 const initialParams = {
   limit: 20,
@@ -38,6 +42,24 @@ const jenisPengadaan = {
           { id: 5, name: 'Jasa Kelola' },
         ],
         total: 4,
+      },
+    },
+  ],
+};
+
+const optionals = {
+  pageParams: [undefined],
+  pages: [
+    {
+      data: {
+        page: 1,
+        pages: 1,
+        result: [
+          { id: 1, name: 'Forst Major' },
+          { id: 2, name: 'Keterlambatan Lelang' },
+          { id: 3, name: 'Perubahan Kebijakan Adendum' },
+        ],
+        total: 3,
       },
     },
   ],
@@ -91,11 +113,13 @@ const TriwulanCreate = () => {
     useState(null);
   const [selectedActivityForm, setSelectedActivityForm] = useState(null);
   const [selectedActivity, setSelectedActivity] = useState(null);
+  const [selectedOptional, setSelectedOptional] = useState(null);
 
   const {
     register,
     handleSubmit,
     setValue,
+    control,
     formState: { errors },
   } = useForm({
     // defaultValues: {
@@ -152,6 +176,8 @@ const TriwulanCreate = () => {
       procurement_method: selectedProcurementMethod?.name,
       activity_id: selectedActivity?.id,
       activity_form: selectedActivityForm?.id,
+      optional: selectedOptional?.name,
+      contract_date: formattedDate(data?.contract_date),
     };
 
     // eslint-disable-next-line no-restricted-syntax
@@ -187,6 +213,10 @@ const TriwulanCreate = () => {
 
   const handleSelectProcurementType = (item) => {
     setSelectedProcurementType(item);
+  };
+
+  const handleSelectOptional = (item) => {
+    setSelectedOptional(item);
   };
 
   const handleSelectActivityForm = (item) => {
@@ -263,13 +293,12 @@ const TriwulanCreate = () => {
               />
             </div>
             <div>
-              <Label className="mb-2">Pagu Dana (Dalam bentuk angka)</Label>
-              <TextInput
-                id="fund_ceiling"
-                type="number"
+              <CurrencyInput
                 name="fund_ceiling"
+                label="Pagu Dana (Dalam bentuk angka)"
+                control={control}
                 placeholder="Tulis Disini..."
-                register={register('fund_ceiling', {
+                {...register('fund_ceiling', {
                   required: 'Pagu Dana wajib diisi!',
                   valueAsNumber: true,
                   max: {
@@ -277,10 +306,8 @@ const TriwulanCreate = () => {
                     value: 200000000000000000,
                   },
                 })}
-                error={errors.fund_ceiling?.message}
               />
             </div>
-
             <div>
               <Label className="mb-2">OPD Pengelola</Label>
               <TextInput
@@ -301,29 +328,33 @@ const TriwulanCreate = () => {
                 error={errors.pptk_name?.message}
               />
             </div>
-
             <div>
-              <Label className="mb-2">
-                Nomor dan Tanggal Kontrak (Dalam bentuk angka)
-              </Label>
+              <Label className="mb-2">Nomor Kontrak</Label>
               <TextInput
                 id="contract_number_date"
-                type="number"
                 name="contract_number_date"
                 placeholder="Tulis Disini..."
                 register={register('contract_number_date', {
                   required: false,
-                  valueAsNumber: true,
-                  max: {
-                    message: 'Maksimal Rp.200.000.000.000.000',
-                    value: 200000000000000000,
-                  },
                 })}
-                error={errors.contract_number_date?.message}
+                error={errors.pptk_name?.message}
               />
             </div>
             <div>
-              <Label className="mb-2">Nama Kontraktor</Label>
+              <Label>Tanggal Kontrak</Label>
+              <TextInput
+                id="contract_date"
+                name="contract_date"
+                type="date"
+                width="w-full"
+                register={register('contract_date', {
+                  valueAsDate: true,
+                })}
+                error={errors.contract_date?.message}
+              />
+            </div>
+            <div>
+              <Label className="mb-2">Nama Penyedia</Label>
               <TextInput
                 id="contractor_name"
                 name="contractor_name"
@@ -347,13 +378,22 @@ const TriwulanCreate = () => {
               />
             </div>
             <div>
-              <Label className="mb-2">Nilai Kontrak (Dalam bentuk angka)</Label>
+              <Label className="mb-2">Nama Penanggung Jawab</Label>
               <TextInput
-                id="contract_value"
-                type="number"
-                name="contract_value"
+                id="pic_name"
+                name="pic_name"
                 placeholder="Tulis Disini..."
-                register={register('contract_value', {
+                register={register('pic_name')}
+                error={errors.pic_name?.message}
+              />
+            </div>
+            <div>
+              <CurrencyInput
+                name="contract_value"
+                label="Nilai Kontrak (Dalam bentuk angka)"
+                control={control}
+                placeholder="Tulis Disini..."
+                {...register('contract_value', {
                   required: false,
                   valueAsNumber: true,
                   max: {
@@ -361,19 +401,15 @@ const TriwulanCreate = () => {
                     value: 200000000000000000,
                   },
                 })}
-                error={errors.contract_value?.message}
               />
             </div>
             <div>
-              <Label className="mb-2">
-                Realisasi Fisik (Dalam bentuk angka)
-              </Label>
-              <TextInput
-                id="physical_realization"
-                type="number"
+              <PercentageInput
                 name="physical_realization"
+                label="Realisasi Fisik (Dalam bentuk angka)"
+                control={control}
                 placeholder="Tulis Disini..."
-                register={register('physical_realization', {
+                {...register('physical_realization', {
                   required: 'Realisasi Fisik wajib diisi!',
                   valueAsNumber: true,
                   max: {
@@ -381,19 +417,15 @@ const TriwulanCreate = () => {
                     value: 200000000000000000,
                   },
                 })}
-                error={errors.physical_realization?.message}
               />
             </div>
             <div>
-              <Label className="mb-2">
-                Realisasi Keuangan (Dalam bentuk angka)
-              </Label>
-              <TextInput
-                id="fund_realization"
-                type="number"
+              <CurrencyInput
                 name="fund_realization"
+                label="Realisasi Keuangan (Dalam bentuk angka)"
+                control={control}
                 placeholder="Tulis Disini..."
-                register={register('fund_realization', {
+                {...register('fund_realization', {
                   required: 'Realisasi Keuangan wajib diisi!',
                   valueAsNumber: true,
                   max: {
@@ -401,7 +433,6 @@ const TriwulanCreate = () => {
                     value: 200000000000000000,
                   },
                 })}
-                error={errors.fund_realization?.message}
               />
             </div>
             <div>
@@ -449,34 +480,27 @@ const TriwulanCreate = () => {
               />
             </div>
             <div>
-              <Label className="mb-2">
-                Jumlah Tenaga Kerja Lokal (Dalam bentuk angka)
-              </Label>
-              <TextInput
-                id="local_workforce"
-                type="number"
+              <CurrencyInput
                 name="local_workforce"
+                label="Jumlah Tenaga Kerja Lokal (Dalam bentuk angka)"
+                control={control}
                 placeholder="Tulis Disini..."
-                register={register('local_workforce', {
+                {...register('local_workforce', {
                   required: 'Jumlah Tenaga Kerja Lokal wajib diisi!',
                   valueAsNumber: true,
                 })}
-                error={errors.local_workforce?.message}
               />
             </div>
             <div>
-              <Label className="mb-2">
-                Jumlah Tenaga Kerja Non Lokal (Dalam bentuk angka)
-              </Label>
-              <TextInput
-                id="non_local_workforce"
+              <CurrencyInput
                 name="non_local_workforce"
+                label="Jumlah Tenaga Kerja Non Lokal (Dalam bentuk angka)"
+                control={control}
                 placeholder="Tulis Disini..."
-                register={register('non_local_workforce', {
+                {...register('non_local_workforce', {
                   required: 'Jumlah Tenaga Kerja Non Lokal wajib diisi!',
                   valueAsNumber: true,
                 })}
-                error={errors.non_local_workforce?.message}
               />
             </div>
             <div>
@@ -508,7 +532,6 @@ const TriwulanCreate = () => {
                 onChange={handleSelectProcurementType}
               />
             </div>
-
             <div className="mb-4">
               <Label className="mb-2">Cara Pengadaan</Label>
               <DropdownDialog
@@ -518,7 +541,6 @@ const TriwulanCreate = () => {
                 onChange={handleSelectProcurementMethod}
               />
             </div>
-
             <div className="mb-4">
               <Label className="mb-2">Sub Kegiatan</Label>
               <DropdownDialog
@@ -528,7 +550,6 @@ const TriwulanCreate = () => {
                 onChange={handleSelectActivity}
               />
             </div>
-
             <div className="mb-4">
               <Label className="mb-2">Bentuk Kegiatan</Label>
               <DropdownDialog
@@ -536,6 +557,37 @@ const TriwulanCreate = () => {
                 data={bentukKegiatan}
                 value={selectedActivityForm}
                 onChange={handleSelectActivityForm}
+              />
+            </div>
+            <div>
+              <Label className="mb-2">Opsi</Label>
+              <DropdownDialog
+                label="Pilih Opsi"
+                data={optionals}
+                value={selectedOptional}
+                onChange={handleSelectOptional}
+              />
+            </div>
+            <div>
+              <Label className="mb-2">Nama Pimpinan</Label>
+              <TextInput
+                id="leader_name"
+                name="leader_name"
+                width="w-full"
+                placeholder="Tulis Disini..."
+                register={register('leader_name')}
+                error={errors.leader_name?.message}
+              />
+            </div>
+            <div className="col-span-2">
+              <Label className="mb-2">Alasan Terkait</Label>
+              <TextInput
+                id="reason"
+                name="reason"
+                width="w-full"
+                placeholder="Tulis Disini..."
+                register={register('reason')}
+                error={errors.reason?.message}
               />
             </div>
 

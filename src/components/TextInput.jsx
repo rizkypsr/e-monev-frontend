@@ -1,5 +1,6 @@
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/solid';
 import React, { useState } from 'react';
+import { twMerge } from 'tailwind-merge';
 
 const TextInput = ({
   className,
@@ -15,10 +16,12 @@ const TextInput = ({
 }) => {
   const [showPassword, setShowPassword] = useState(false);
 
-  const disabledClass = disabled
-    ? 'bg-[#F2F2F2] border border-[#BDBDBD]'
-    : 'bg-white border border-dark-gray';
-  const errorClass = error ? 'border-red-600' : '';
+  const disabledClass = twMerge(
+    disabled
+      ? 'bg-[#F2F2F2] border border-[#BDBDBD]'
+      : 'bg-white border border-dark-gray'
+  );
+  const errorClass = twMerge(error ? 'border-red-600' : '');
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -27,15 +30,23 @@ const TextInput = ({
   return (
     <>
       <div
-        className={`flex items-center justify-between rounded-lg px-4 py-2.5 my-2 ${width} ${disabledClass} ${errorClass} ${className}`}
+        className={twMerge(
+          'flex items-center justify-between rounded-lg px-4 py-2.5 my-2',
+          width,
+          disabledClass,
+          errorClass,
+          className
+        )}
       >
         <div className="flex items-center w-full">
-          {leadingIcon && <p className="text-sm ml-3">Rp</p>}
+          {leadingIcon && <div className="mr-2">{leadingIcon}</div>}
           <input
             type={showPassword ? 'text' : type}
             placeholder={placeholder}
             disabled={disabled}
-            className={` p-0 text-gray-900 bg-transparent text-sm focus:ring-0 border-0 w-full focus:outline-none`}
+            className={twMerge(
+              'p-0 text-gray-900 bg-transparent text-sm focus:ring-0 border-0 w-full focus:outline-none'
+            )}
             {...register}
             onKeyDown={onKeyDown}
           />

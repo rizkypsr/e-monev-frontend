@@ -1,15 +1,16 @@
 import { createColumnHelper } from '@tanstack/react-table';
 import { Link, useSearchParams } from 'react-router-dom';
 import {
-  ArrowDownTrayIcon,
   EyeIcon,
   PencilIcon,
   TrashIcon,
+  ArrowDownOnSquareIcon,
+  ArrowDownOnSquareStackIcon,
 } from '@heroicons/react/24/solid';
 import { useAuthHeader, useAuthUser } from 'react-auth-kit';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useEffect, useState } from 'react';
-import Button from '../../../components/Button';
+
 import {
   Dialog,
   DialogClose,
@@ -25,6 +26,8 @@ import getTriwulanReport from '../../../api/admin/report/getTriwulanReport';
 import deleteTriwulanReport from '../../../api/admin/report/deleteTriwulanReport';
 import { baseUrlAPI } from '../../../utils/constants';
 import useFileDownloader from '../../../hooks/useFileDownloader';
+import formattedDate from '../../../utils/formattedDate';
+import Button from '../../../components/Button';
 
 const columnHelper = createColumnHelper();
 const columns = [
@@ -73,12 +76,27 @@ const columns = [
   columnHelper.accessor((row) => row.contract_number_date, {
     id: 'contract_number_date',
     cell: (info) => <i>{info.getValue()}</i>,
-    header: () => <span>Nomor dan Tgl Kontrak</span>,
+    header: () => <span>Nomor Kontrak</span>,
+  }),
+  columnHelper.accessor((row) => row.contract_date, {
+    id: 'contract_date',
+    cell: (info) => <i>{info.getValue()}</i>,
+    header: () => <span>Tanggal Kontrak</span>,
   }),
   columnHelper.accessor((row) => row.contractor_name, {
     id: 'contractor_name',
     cell: (info) => <i>{info.getValue()}</i>,
-    header: () => <span>Nama Kontraktor</span>,
+    header: () => <span>Nama Penyedia</span>,
+  }),
+  columnHelper.accessor((row) => row.pic_name, {
+    id: 'pic_name',
+    cell: (info) => <i>{info.getValue()}</i>,
+    header: () => <span>Nama Penanggung Jawab</span>,
+  }),
+  columnHelper.accessor((row) => row.leader_name, {
+    id: 'leader_name',
+    cell: (info) => <i>{info.getValue()}</i>,
+    header: () => <span>Nama Pimpinan</span>,
   }),
   columnHelper.accessor((row) => row.implementation_period, {
     id: 'implementation_period',
@@ -173,6 +191,21 @@ const columns = [
     cell: (info) => <i>{info.getValue()}</i>,
     header: () => <span>Cara Pengadaan</span>,
   }),
+  columnHelper.accessor((row) => row.optional, {
+    id: 'optional',
+    cell: (info) => <i>{info.getValue()}</i>,
+    header: () => <span>Opsi</span>,
+  }),
+  columnHelper.accessor((row) => row.reason, {
+    id: 'reason',
+    cell: (info) => <i>{info.getValue()}</i>,
+    header: () => <span>Alasan Terkait</span>,
+  }),
+  columnHelper.accessor((row) => row.updated_at, {
+    id: 'updated_at',
+    cell: (info) => <i>{formattedDate(info.getValue())}</i>,
+    header: () => <span>Update Terakhir</span>,
+  }),
 
   columnHelper.accessor((row) => row.aksi, {
     id: 'aksi',
@@ -203,10 +236,25 @@ const columns = [
           <Button
             className="text-sm font-normal"
             textColor="text-blue-500"
-            icon={<ArrowDownTrayIcon className="w-4 h-4" />}
+            icon={<ArrowDownOnSquareStackIcon className="w-4 h-4" />}
             onClick={() => {
               if (file) {
-                downloadFile(baseUrlAPI + file);
+                downloadFile({
+                  fileUrl: baseUrlAPI + file,
+                });
+              }
+            }}
+          />
+          <Button
+            className="text-sm font-normal"
+            textColor="text-blue-500"
+            icon={<ArrowDownOnSquareIcon className="w-4 h-4" />}
+            onClick={() => {
+              if (file) {
+                downloadFile({
+                  fileUrl: `${baseUrlAPI}/data-report/user/data-triwulan/excel/${rowId}`,
+                  isFetch: true,
+                });
               }
             }}
           />
@@ -326,8 +374,12 @@ const ReportTriwulanTable = () => {
     });
   };
 
-  const handleDownloadFile = (url) => {
-    downloadFile(url);
+  const handleDownloadFile = ({ fileUrl, isFetch }) => {
+    downloadFile({
+      fileUrl,
+      authToken: authHeader(),
+      isFetch,
+    });
   };
 
   if (isError) {
