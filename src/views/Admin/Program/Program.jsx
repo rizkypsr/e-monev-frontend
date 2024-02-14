@@ -1,8 +1,6 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 
-function Program() {
-  return <Outlet />;
-}
+const Program = () => <Outlet />;
 
 export default Program;

@@ -5,7 +5,7 @@ import { useMediaQuery } from 'react-responsive';
 import Breadcrumb from '../components/Breadcrumb';
 import Sidebar from './Sidebar';
 
-function AdminLayout() {
+const AdminLayout = () => {
   const auth = useAuthUser();
 
   const isDesktopOrLaptop = useMediaQuery({
@@ -57,8 +57,12 @@ function AdminLayout() {
     }
   };
 
-  if (auth().admin_role_id !== 1) {
+  if (auth().role.name === 'OPD') {
     return <Navigate to="/" replace />;
+  }
+
+  if (auth().role.name === 'Admin Bidang') {
+    return <Navigate to="/admin-bidang" replace />;
   }
 
   return (
@@ -90,7 +94,7 @@ function AdminLayout() {
         <Sidebar isOpen={sidebarVisible} onHide={handleMenuClick} />
       </div>
       <div className="bg-[#F3F6FF] md:ml-64 min-h-screen">
-        <header className="px-8 py-4 bg-white">
+        <header className="px-8 py-4 bg-gray-300">
           <Breadcrumb />
         </header>
         <main className="p-9">
@@ -99,6 +103,6 @@ function AdminLayout() {
       </div>
     </div>
   );
-}
+};
 
 export default AdminLayout;

@@ -1,41 +1,36 @@
 import { ArrowLeftIcon } from '@heroicons/react/24/solid';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useAuthHeader } from 'react-auth-kit';
 import { Link, useParams } from 'react-router-dom';
+import { useQuery } from 'react-query';
 import { getProgram } from '../../../api/admin/program';
 import ReactLoading from '../../../components/Loading';
 import ErrorPage from '../../ErrorPage';
 
-function ProgramDetail() {
-  const [code, setCode] = useState('');
-  const [program, setProgram] = useState('');
-  const [error, setError] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+const initialProgram = {
+  code: '',
+  title: '',
+};
 
+const ProgramDetail = () => {
   const { id } = useParams();
   const authHeader = useAuthHeader();
 
-  const fetchProgram = async () => {
-    setIsLoading(true);
+  const [program, setProgram] = useState(initialProgram);
 
-    try {
-      const programResponse = await getProgram(authHeader, id);
+  const { isLoading, isError, error } = useQuery({
+    queryKey: ['get_program'],
+    queryFn: () => getProgram(id, authHeader()),
+    onSuccess: (result) => {
+      setProgram({
+        code: result.data.code,
+        title: result.data.title,
+      });
+    },
+  });
 
-      setCode(programResponse.code);
-      setProgram(programResponse.title);
-      setIsLoading(false);
-    } catch (err) {
-      setIsLoading(false);
-      setError(err.message);
-    }
-  };
-
-  useEffect(() => {
-    fetchProgram();
-  }, []);
-
-  if (error) {
-    return <ErrorPage />;
+  if (isError) {
+    return <ErrorPage errorMessage={error.message} />;
   }
 
   if (isLoading) {
@@ -70,7 +65,7 @@ function ProgramDetail() {
               >
                 Kode
               </th>
-              <td className="px-6 py-4">{code}</td>
+              <td className="px-6 py-4">{program.code}</td>
             </tr>
             <tr className="bg-light-blue">
               <th
@@ -79,13 +74,13 @@ function ProgramDetail() {
               >
                 Urusan
               </th>
-              <td className="px-6 py-4">{program}</td>
+              <td className="px-6 py-4">{program.title}</td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
   );
-}
+};
 
 export default ProgramDetail;

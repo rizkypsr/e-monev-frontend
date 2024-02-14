@@ -1,16 +1,23 @@
-import { baseUrl } from '../../../utils/constants';
-import makeRequest from '../../../utils/makeRequest';
+import axiosClient from '../../../config/axios';
 
-export default async function getActivity(authHeader, activityId) {
-  const url = `${baseUrl}/activity/detail/${activityId}`;
-  const headers = {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      authorization: authHeader(),
-    },
-  };
+async function getActivity(id, token) {
+  try {
+    const response = await axiosClient.get(`/activity/detail/${id}`, {
+      headers: {
+        Authorization: token,
+      },
+    });
 
-  const activityResponse = await makeRequest(url, headers);
-  return activityResponse.data.result;
+    const responseData = response.data;
+
+    if (responseData.statusCode !== 200) {
+      throw new Error(responseData.message);
+    }
+
+    return responseData;
+  } catch (err) {
+    throw new Error(err);
+  }
 }
+
+export default getActivity;

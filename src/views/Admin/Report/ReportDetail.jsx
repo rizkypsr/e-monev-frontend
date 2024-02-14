@@ -1,53 +1,46 @@
 import { ArrowLeftIcon } from '@heroicons/react/24/solid';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useAuthHeader } from 'react-auth-kit';
 import { Link, useParams } from 'react-router-dom';
+import { useQuery } from 'react-query';
 import ReactLoading from '../../../components/Loading';
 import ErrorPage from '../../ErrorPage';
 import getReport from '../../../api/admin/report/getReport';
 import formattedDate from '../../../utils/formattedDate';
 
-export default function ReportDetail() {
-  const [report, setReport] = useState({
-    createdAt: '',
-    triwulan: '',
-    occasion: '',
-    organization: '',
-    program: '',
-    activity: '',
-    indicator: '',
-  });
-  const [error, setError] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-
+const initialData = {
+  createdAt: '',
+  triwulan: '',
+  occasion: '',
+  organization: '',
+  program: '',
+  activity: '',
+  indicator: '',
+};
+const ReportDetail = () => {
   const { id } = useParams();
   const authHeader = useAuthHeader();
 
-  const fetchReport = async () => {
-    setIsLoading(true);
+  const [report, setReport] = useState(initialData);
 
-    try {
-      const reportResponse = await getReport(authHeader, id);
+  const { isLoading, isError, error } = useQuery({
+    queryKey: ['get_report'],
+    queryFn: () => getReport(id, authHeader()),
+    onSuccess: (result) => {
       setReport({
-        createdAt: reportResponse.created_at,
-        triwulan: reportResponse.triwulan.name,
-        occasion: reportResponse.occassion.title,
-        organization: reportResponse.organization.title,
-        program: reportResponse.program.title,
+        createdAt: result.data.result.created_at,
+        triwulan: result.data.result.triwulan.name,
+        occasion: result.data.result.occassion.title,
+        organization: result.data.result.organization.title,
+        program: result.data.result.program.title,
+        activity: '',
+        indicator: '',
       });
-      setIsLoading(false);
-    } catch (err) {
-      setIsLoading(false);
-      setError(err.message);
-    }
-  };
+    },
+  });
 
-  useEffect(() => {
-    fetchReport();
-  }, []);
-
-  if (error) {
-    return <ErrorPage errorMessage={error} />;
+  if (isError) {
+    return <ErrorPage errorMessage={error.message} />;
   }
 
   if (isLoading) {
@@ -116,4 +109,6 @@ export default function ReportDetail() {
       </div>
     </div>
   );
-}
+};
+
+export default ReportDetail;

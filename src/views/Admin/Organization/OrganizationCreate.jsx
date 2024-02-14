@@ -1,49 +1,46 @@
 import { ArrowLeftIcon, CheckCircleIcon } from '@heroicons/react/24/solid';
-import { Label } from 'flowbite-react';
-import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthHeader } from 'react-auth-kit';
+import { useMutation } from 'react-query';
+import { useForm } from 'react-hook-form';
 import TextInput from '../../../components/TextInput';
 import Button from '../../../components/Button';
 import { useToastContext } from '../../../context/ToastContext';
-import createOrganization from '../../../api/admin/organization/createOrganization';
 import ReactLoading from '../../../components/Loading';
+import { createOrganization } from '../../../api/admin/organization';
+import Label from '../../../components/Label';
 
-function OrganizationCreate() {
-  const [title, setTitle] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [titleError, setTitleError] = useState('');
-
-  const { showToastMessage } = useToastContext();
-  const navigate = useNavigate();
+const OrganizationCreate = () => {
   const authHeader = useAuthHeader();
+  const navigate = useNavigate();
+  const { showToastMessage } = useToastContext();
 
-  const onSubmit = async (e) => {
-    e.preventDefault();
+  const createMutation = useMutation(createOrganization);
 
-    setTitleError('');
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
 
-    if (!title) {
-      setTitleError('Organisasi harus diisi');
-      return;
-    }
-
-    setIsLoading(true);
-
-    try {
-      const organizationBody = { title };
-      const organizationResponse = await createOrganization(
-        authHeader,
-        organizationBody
-      );
-
-      setIsLoading(false);
-      showToastMessage(organizationResponse.message);
-      navigate('../');
-    } catch (err) {
-      setIsLoading(false);
-      showToastMessage(err.message, 'error');
-    }
+  const onSubmit = (formData) => {
+    createMutation.mutate(
+      {
+        body: {
+          ...formData,
+        },
+        token: authHeader(),
+      },
+      {
+        onSuccess: () => {
+          showToastMessage('Berhasil membuat Organisasi');
+          navigate('/organisasi');
+        },
+        onError: (error) => {
+          showToastMessage(error.message, 'error');
+        },
+      }
+    );
   };
 
   return (
@@ -59,18 +56,24 @@ function OrganizationCreate() {
           </h1>
         </Link>
 
-        <form className="mt-4" onSubmit={onSubmit}>
+        <form className="mt-4" onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-6">
-            <Label>Organisasi</Label>
+            <Label className="mb-2">Organisasi</Label>
             <TextInput
-              className="mt-2 lg:w-2/3 xl:w-1/3"
-              placeholder="Masukan Organisasi"
-              value={title}
-              error={titleError}
-              onChange={(e) => setTitle(e.target.value)}
+              id="title"
+              name="title"
+              placeholder="Organisasi"
+              register={register('title', {
+                required: 'Organisasi wajib diisi!',
+                maxLength: {
+                  message: 'Nama Organisasi maksimal 150 karater',
+                  value: 150,
+                },
+              })}
+              error={errors.title?.message}
             />
           </div>
-          {isLoading ? (
+          {createMutation.isLoading ? (
             <ReactLoading />
           ) : (
             <div className="flex space-x-3">
@@ -98,6 +101,6 @@ function OrganizationCreate() {
       </div>
     </>
   );
-}
+};
 
 export default OrganizationCreate;

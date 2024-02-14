@@ -1,69 +1,75 @@
-import {
-  ArrowLeftIcon,
-  CheckCircleIcon,
-  MagnifyingGlassIcon,
-} from '@heroicons/react/24/solid';
+import { ArrowLeftIcon, CheckCircleIcon } from '@heroicons/react/24/solid';
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthHeader } from 'react-auth-kit';
+import { useInfiniteQuery, useMutation } from 'react-query';
+import { useForm } from 'react-hook-form';
 import TextInput from '../../../components/TextInput';
 import Button from '../../../components/Button';
 import { useToastContext } from '../../../context/ToastContext';
 import { createProgram } from '../../../api/admin/program';
 import ReactLoading from '../../../components/Loading';
-import {
-  Dialog,
-  DialogContent,
-  DialogTrigger,
-} from '../../../components/DialogContent';
-import SelectInputModal from '../../../components/SelectInputModal';
-import List from '../../../components/List';
 import Label from '../../../components/Label';
+import DropdownDialog from '../../../components/DropdownDialog';
+import { getOccasions } from '../../../api/admin/occasion';
 
-const purposes = [
-  { id: 1, name: 'Urusan 1' },
-  { id: 2, name: 'Urusan 2' },
-];
+const initialParams = {
+  limit: 10,
+  page: 1,
+  search: '',
+  sort: 'terbaru',
+};
 
-function ProgramCreate() {
-  const [title, setTitle] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [titleError, setTitleError] = useState('');
-  const [selectedPurpose, setSelectedPurpose] = useState(null);
-  const [openPurpose, setOpenPurpose] = useState(false);
-
+const ProgramCreate = () => {
   const authHeader = useAuthHeader();
   const navigate = useNavigate();
   const { showToastMessage } = useToastContext();
 
-  const handleSelectPurpose = (opd) => {
-    setSelectedPurpose(opd);
-    setOpenPurpose(false);
+  const [selectedOccassion, setSelectedOccassion] = useState(null);
+
+  const occassionQuery = useInfiniteQuery({
+    queryKey: ['get_occassions'],
+    queryFn: async ({ pageParam = 1 }) =>
+      getOccasions(initialParams, authHeader()),
+    getNextPageParam: (lastPage) => lastPage.nextId ?? undefined,
+    getPreviousPageParam: (firstPage) => firstPage.previousId ?? undefined,
+  });
+
+  const createMutation = useMutation(createProgram);
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm();
+
+  const onSubmit = (formData) => {
+    const { title, occassion } = formData;
+
+    createMutation.mutate(
+      {
+        body: {
+          title,
+          occassion_id: occassion,
+        },
+        token: authHeader(),
+      },
+      {
+        onSuccess: () => {
+          showToastMessage('Berhasil membuat Program');
+          navigate('/program');
+        },
+        onError: (error) => {
+          showToastMessage(error.message, 'error');
+        },
+      }
+    );
   };
 
-  const onSubmit = async (e) => {
-    e.preventDefault();
-
-    setTitleError('');
-
-    if (!title) {
-      setTitleError('Program harus diisi');
-      return;
-    }
-
-    setIsLoading(true);
-
-    try {
-      const programBody = { title };
-      const programResponse = await createProgram(authHeader, programBody);
-
-      setIsLoading(false);
-      showToastMessage(programResponse.message);
-      navigate('../');
-    } catch (error) {
-      setIsLoading(false);
-      showToastMessage(error.message, 'error');
-    }
+  const handleSelectOccassion = (occassion) => {
+    setSelectedOccassion(occassion);
+    setValue('occassion', occassion.id);
   };
 
   return (
@@ -79,48 +85,33 @@ function ProgramCreate() {
           </h1>
         </Link>
 
-        <form className="mt-4" onSubmit={onSubmit}>
+        <form className="mt-4" onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-6">
-            <Label>Program</Label>
+            <Label className="mb-2">Program</Label>
             <TextInput
-              className="mt-2 lg:w-2/3 xl:w-1/3"
               placeholder="Masukan Program"
-              value={title}
-              error={titleError}
-              onChange={(e) => setTitle(e.target.value)}
+              register={register('title', {
+                required: 'Nama Program wajib diisi!',
+              })}
+              error={errors.title?.message}
             />
           </div>
 
           <div className="mb-6">
-            <Label>Urusan</Label>
-            <Dialog open={openPurpose} onOpenChange={setOpenPurpose}>
-              <DialogTrigger className="w-full lg:w-2/3 xl:w-1/3">
-                <SelectInputModal
-                  className="mt-2"
-                  selectedValue={selectedPurpose && selectedPurpose.name}
-                  label="--- Pilih Urusan ---"
-                />
-              </DialogTrigger>
-
-              <DialogContent title="Pilih Urusan">
-                <div className="relative my-6">
-                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                    <MagnifyingGlassIcon className="w-4 h-4" />
-                  </div>
-                  <input
-                    type="search"
-                    id="search"
-                    className="bg-gray-50 text-light-gray border-none text-sm rounded-lg focus:ring-0 block w-full pl-10 p-2.5 shadow"
-                    placeholder="Pencarian"
-                  />
-                </div>
-
-                <List data={purposes} onSelectValue={handleSelectPurpose} />
-              </DialogContent>
-            </Dialog>
+            <Label className="mb-2">Urusan</Label>
+            <DropdownDialog
+              label="Pilih Urusan"
+              data={occassionQuery.data}
+              value={selectedOccassion}
+              onChange={handleSelectOccassion}
+              register={register('occassion', {
+                required: 'Urusan wajib diisi!',
+              })}
+              error={errors.occassion?.message}
+            />
           </div>
 
-          {isLoading ? (
+          {createMutation.isLoading ? (
             <ReactLoading />
           ) : (
             <div className="flex space-x-3">
@@ -148,6 +139,6 @@ function ProgramCreate() {
       </div>
     </>
   );
-}
+};
 
 export default ProgramCreate;

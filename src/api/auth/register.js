@@ -1,26 +1,17 @@
-import { baseUrl, domainUrl } from '../../utils/constants';
+import axiosClient from '../../config/axios';
 
-const register = async (userBody) => {
+export default async function doRegister(body) {
   try {
-    const userResponse = await fetch(`${baseUrl}/user/register`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': domainUrl,
-      },
-      body: JSON.stringify(userBody),
-    });
+    const response = await axiosClient.post('/user/register', body);
 
-    const userData = await userResponse.json();
+    const responseData = response.data;
 
-    if (!userResponse.ok) {
-      throw new Error(userData.message);
+    if (responseData.statusCode !== 200) {
+      throw new Error(responseData.message);
     }
 
-    return userData;
-  } catch (error) {
-    throw new Error(error.message);
+    return responseData;
+  } catch (err) {
+    throw new Error(err);
   }
-};
-
-export default register;
+}

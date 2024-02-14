@@ -1,6 +1,6 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 
-export default function Triwulan() {
-  return <Outlet />;
-}
+const Triwulan = () => <Outlet />;
+
+export default Triwulan;

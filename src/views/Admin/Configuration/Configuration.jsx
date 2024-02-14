@@ -1,16 +1,76 @@
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 import React, { useState } from 'react';
 import DateRangePicker from '@wojtekmaj/react-daterange-picker';
 import { CheckCircleIcon } from '@heroicons/react/24/solid';
+import { useAuthHeader } from 'react-auth-kit';
 import Label from '../../../components/Label';
 import ReactLoading from '../../../components/Loading';
 import Button from '../../../components/Button';
 
 import './dateRangePicker.css';
+import setTriwulanSetting from '../../../api/admin/configuration/setTriwulanSetting';
+import formattedDate from '../../../utils/formattedDate';
+import { useToastContext } from '../../../context/ToastContext';
+import getTriwulanSetting from '../../../api/admin/configuration/getTriwulanSetting';
 
-function Configuration() {
-  const [datePicker, onChange] = useState([new Date(), new Date()]);
+const Configuration = () => {
+  const [datePicker, setDatePicker] = useState([new Date(), new Date()]);
+  const queryClient = useQueryClient();
+  const { showToastMessage } = useToastContext();
+  const authHeader = useAuthHeader();
 
-  const onSubmit = () => {};
+  const configurationQuery = useQuery({
+    queryKey: ['get_configuration'],
+    queryFn: () => getTriwulanSetting(authHeader()),
+    onSuccess: (result) => {
+      let triwulanEnded;
+      let triwulanStarted;
+
+      result.data.forEach(({ TRIWULAN_ENDED, TRIWULAN_STARTED }) => {
+        if (TRIWULAN_ENDED) triwulanEnded = TRIWULAN_ENDED;
+        if (TRIWULAN_STARTED) triwulanStarted = TRIWULAN_STARTED;
+      });
+
+      setDatePicker([new Date(triwulanStarted), new Date(triwulanEnded)]);
+    },
+  });
+
+  const updateMutation = useMutation(setTriwulanSetting);
+
+  const onSubmit = (e) => {
+    e.preventDefault();
+
+    const newData = datePicker.map((date) => formattedDate(date));
+
+    updateMutation.mutate(
+      {
+        body: [
+          {
+            key: 'TRIWULAN_STARTED',
+            value: newData[0],
+          },
+          {
+            key: 'TRIWULAN_ENDED',
+            value: newData[1],
+          },
+        ],
+        token: authHeader(),
+      },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries('get_configuration');
+          showToastMessage('Berhasil mengubah konfigurasi');
+        },
+        onError: (err) => {
+          showToastMessage(err.message, 'error');
+        },
+      }
+    );
+  };
+
+  if (configurationQuery.isLoading) {
+    return <ReactLoading />;
+  }
 
   return (
     <>
@@ -24,12 +84,12 @@ function Configuration() {
             <Label>Tanggal OPD (untuk Pengisian Tambah Data Triwulan)</Label>
             <DateRangePicker
               className="mt-2"
-              onChange={onChange}
+              onChange={setDatePicker}
               value={datePicker}
             />
           </div>
 
-          {false ? (
+          {updateMutation.isLoading ? (
             <ReactLoading />
           ) : (
             <Button
@@ -46,6 +106,6 @@ function Configuration() {
       </div>
     </>
   );
-}
+};
 
 export default Configuration;

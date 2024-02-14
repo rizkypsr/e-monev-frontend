@@ -1,18 +1,29 @@
-import { baseUrl } from '../../../utils/constants';
-import makeRequest from '../../../utils/makeRequest';
+import axiosClient from '../../../config/axios';
 
-export default async function deleteOrganization(authHeader, organizationId) {
-  const url = `${baseUrl}/org/delete`;
-  const headers = {
-    method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-      authorization: authHeader(),
-    },
-    body: JSON.stringify({
-      organization_id: organizationId,
-    }),
-  };
-  const organizationResponse = await makeRequest(url, headers);
-  return organizationResponse.message;
+async function deleteOrganization({ id, token }) {
+  try {
+    const response = await axiosClient.patch(
+      '/org/delete',
+      {
+        organization_id: id,
+      },
+      {
+        headers: {
+          Authorization: token,
+        },
+      }
+    );
+
+    const responseData = response.data;
+
+    if (responseData.statusCode !== 200) {
+      throw new Error(responseData.message);
+    }
+
+    return responseData;
+  } catch (err) {
+    throw new Error(err);
+  }
 }
+
+export default deleteOrganization;

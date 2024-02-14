@@ -1,40 +1,36 @@
 import { ArrowLeftIcon } from '@heroicons/react/24/solid';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useAuthHeader } from 'react-auth-kit';
 import { Link, useParams } from 'react-router-dom';
+import { useQuery } from 'react-query';
 import getPurpose from '../../../api/admin/purpose/getPurpose';
 import ReactLoading from '../../../components/Loading';
 import ErrorPage from '../../ErrorPage';
 
-function PurposeDetail() {
-  const [code, setCode] = useState('');
-  const [title, setTitle] = useState('');
-  const [error, setError] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+const initialPurpose = {
+  id: '',
+  title: '',
+};
 
+const PurposeDetail = () => {
   const { id } = useParams();
   const authHeader = useAuthHeader();
 
-  const fetchPurpose = async () => {
-    setIsLoading(true);
+  const [purpose, setPurpose] = useState(initialPurpose);
 
-    try {
-      const purposeResponse = await getPurpose(authHeader, id);
-      setCode(purposeResponse.id);
-      setTitle(purposeResponse.title);
-      setIsLoading(false);
-    } catch (err) {
-      setIsLoading(false);
-      setError(err.message);
-    }
-  };
+  const { isLoading, isError, error } = useQuery({
+    queryKey: ['get_purpose'],
+    queryFn: () => getPurpose(id, authHeader()),
+    onSuccess: (result) => {
+      setPurpose({
+        id: result.data.id,
+        title: result.data.title,
+      });
+    },
+  });
 
-  useEffect(() => {
-    fetchPurpose();
-  }, []);
-
-  if (error) {
-    return <ErrorPage errorMessage={error} />;
+  if (isError) {
+    return <ErrorPage errorMessage={error.message} />;
   }
 
   if (isLoading) {
@@ -60,7 +56,7 @@ function PurposeDetail() {
               >
                 ID
               </th>
-              <td className="px-6 py-4">{code}</td>
+              <td className="px-6 py-4">{purpose.id}</td>
             </tr>
             <tr className="bg-light-blue">
               <th
@@ -69,13 +65,13 @@ function PurposeDetail() {
               >
                 Indikator Program
               </th>
-              <td className="px-6 py-4">{title}</td>
+              <td className="px-6 py-4">{purpose.title}</td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
   );
-}
+};
 
 export default PurposeDetail;

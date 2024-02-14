@@ -7,7 +7,7 @@ import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import ReactLoading from './Loading';
 
-export default function Table({ className, columns, rows, isLoading }) {
+const Table = ({ className, columns, rows, isLoading }) => {
   const columnData = useMemo(() => columns, [columns]);
   const rowData = useMemo(() => rows, [rows]);
 
@@ -59,7 +59,7 @@ export default function Table({ className, columns, rows, isLoading }) {
       </table>
     </div>
   );
-}
+};
 
 Table.propTypes = {
   className: PropTypes.string,
@@ -72,3 +72,5 @@ Table.defaultProps = {
   className: null,
   isLoading: false,
 };
+
+export default Table;

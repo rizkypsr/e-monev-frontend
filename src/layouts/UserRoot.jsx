@@ -5,7 +5,7 @@ import { useMediaQuery } from 'react-responsive';
 import Sidebar from './Sidebar';
 import Breadcrumb from '../components/Breadcrumb';
 
-function UserLayout() {
+const UserLayout = () => {
   const auth = useAuthUser();
 
   const isDesktopOrLaptop = useMediaQuery({
@@ -57,8 +57,12 @@ function UserLayout() {
     }
   };
 
-  if (auth().admin_role_id !== 2) {
+  if (auth().role.name === 'Superadmin') {
     return <Navigate to="/admin" replace />;
+  }
+
+  if (auth().role.name === 'Admin Bidang') {
+    return <Navigate to="/admin-bidang" replace />;
   }
 
   return (
@@ -90,7 +94,7 @@ function UserLayout() {
         <Sidebar isOpen={sidebarVisible} onHide={handleMenuClick} />
       </div>
       <div className="bg-[#F3F6FF] md:ml-64 min-h-screen">
-        <header className="px-8 py-4 bg-white">
+        <header className="px-8 py-4 bg-gray-300">
           <Breadcrumb />
         </header>
         <main className="p-9">
@@ -99,6 +103,6 @@ function UserLayout() {
       </div>
     </div>
   );
-}
+};
 
 export default UserLayout;

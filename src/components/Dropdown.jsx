@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
 
-function Dropdown({
+const Dropdown = ({
   className,
   dropdownStyle,
   minWidth,
@@ -12,7 +12,7 @@ function Dropdown({
   onSelect,
   selectedItem,
   error,
-}) {
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedLabel, setSelectedLabel] = useState('');
 
@@ -96,19 +96,17 @@ function Dropdown({
       )}
     </div>
   );
-}
+};
 
-function Items({ children, onSelect }) {
-  return (
-    <div>
-      {React.Children.map(children, (child) =>
-        React.cloneElement(child, {
-          onClick: () => onSelect(child.props.value, child.props.children),
-        })
-      )}
-    </div>
-  );
-}
+const Items = ({ children, onSelect }) => (
+  <div>
+    {React.Children.map(children, (child) =>
+      React.cloneElement(child, {
+        onClick: () => onSelect(child.props.value, child.props.children),
+      })
+    )}
+  </div>
+);
 
 Dropdown.propTypes = {
   children: PropTypes.node.isRequired,

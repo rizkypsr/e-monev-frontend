@@ -1,15 +1,23 @@
-import { baseUrl } from '../../../utils/constants';
-import makeRequest from '../../../utils/makeRequest';
+import axiosClient from '../../../config/axios';
 
-export default async function getOrganization(authHeader, organizationId) {
-  const url = `${baseUrl}/org/detail/${organizationId}`;
-  const headers = {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      authorization: authHeader(),
-    },
-  };
-  const organizationResponse = await makeRequest(url, headers);
-  return organizationResponse.data.result;
+async function getOrganization(id, token) {
+  try {
+    const response = await axiosClient.get(`/org/detail/${id}`, {
+      headers: {
+        Authorization: token,
+      },
+    });
+
+    const responseData = response.data;
+
+    if (responseData.statusCode !== 200) {
+      throw new Error(responseData.message);
+    }
+
+    return responseData;
+  } catch (err) {
+    throw new Error(err);
+  }
 }
+
+export default getOrganization;

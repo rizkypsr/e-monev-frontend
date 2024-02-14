@@ -1,18 +1,29 @@
-import { baseUrl, domainUrl } from '../../../utils/constants';
-import makeRequest from '../../../utils/makeRequest';
+import axiosClient from '../../../config/axios';
 
-export default async function deleteActivity(authHeader, activityId) {
-  const url = `${baseUrl}/activity/delete`;
-  const headers = {
-    method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': domainUrl,
-      authorization: authHeader(),
-    },
-    body: JSON.stringify({ activity_id: activityId }),
-  };
+async function deleteActivity({ id, token }) {
+  try {
+    const response = await axiosClient.patch(
+      '/activity/delete',
+      {
+        activity_id: id,
+      },
+      {
+        headers: {
+          Authorization: token,
+        },
+      }
+    );
 
-  const activityResponse = await makeRequest(url, headers);
-  return activityResponse.message;
+    const responseData = response.data;
+
+    if (responseData.statusCode !== 200) {
+      throw new Error(responseData.message);
+    }
+
+    return responseData;
+  } catch (err) {
+    throw new Error(err);
+  }
 }
+
+export default deleteActivity;

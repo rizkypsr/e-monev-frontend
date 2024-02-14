@@ -1,16 +1,23 @@
-import { baseUrl, domainUrl } from '../../../utils/constants';
-import makeRequest from '../../../utils/makeRequest';
+import axiosClient from '../../../config/axios';
 
-export default async function getOccasionDetail(authHeader, occasionId) {
-  const url = `${baseUrl}/occassion/detail/${occasionId}`;
-  const headers = {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': domainUrl,
-      authorization: authHeader(),
-    },
-  };
-  const occasionResponse = await makeRequest(url, headers);
-  return occasionResponse.data.result;
+async function getOccassion(id, token) {
+  try {
+    const response = await axiosClient.get(`/occassion/detail/${id}`, {
+      headers: {
+        Authorization: token,
+      },
+    });
+
+    const responseData = response.data;
+
+    if (responseData.statusCode !== 200) {
+      throw new Error(responseData.message);
+    }
+
+    return responseData;
+  } catch (err) {
+    throw new Error(err);
+  }
 }
+
+export default getOccassion;

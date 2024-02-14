@@ -1,16 +1,23 @@
-import { baseUrl } from '../../../utils/constants';
-import makeRequest from '../../../utils/makeRequest';
+import axiosClient from '../../../config/axios';
 
-export default async function updateOccasion(authHeader, occasionBody) {
-  const url = `${baseUrl}/occassion/update`;
-  const headers = {
-    method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-      authorization: authHeader(),
-    },
-    body: JSON.stringify(occasionBody),
-  };
-  const occasionResponse = await makeRequest(url, headers);
-  return occasionResponse.message;
+async function createOccassion({ body, token }) {
+  try {
+    const response = await axiosClient.patch('/occassion/update', body, {
+      headers: {
+        Authorization: token,
+      },
+    });
+
+    const responseData = response.data;
+
+    if (responseData.statusCode !== 200) {
+      throw new Error(responseData.message);
+    }
+
+    return responseData;
+  } catch (err) {
+    throw new Error(err);
+  }
 }
+
+export default createOccassion;

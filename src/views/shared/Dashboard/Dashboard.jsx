@@ -1,229 +1,305 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useAuthHeader, useAuthUser } from 'react-auth-kit';
-import {
-  ArrowDownTrayIcon,
-  MagnifyingGlassIcon,
-} from '@heroicons/react/24/solid';
-import InfiniteScroll from 'react-infinite-scroll-component';
-import { getCounts } from '../../../api/admin/dashboard';
+import { ArrowDownTrayIcon } from '@heroicons/react/24/solid';
+import { useInfiniteQuery, useQuery } from 'react-query';
+import { useNavigate } from 'react-router-dom';
 import ErrorPage from '../../ErrorPage';
 import CountBox from './components/CountBox';
-import SelectInputModal from '../../../components/SelectInputModal';
 import { getOrganizations } from '../../../api/admin/organization';
-import ReactLoading from '../../../components/Loading';
-import List from '../../../components/List';
-import {
-  Dialog,
-  DialogContent,
-  DialogTrigger,
-} from '../../../components/DialogContent';
 import Button from '../../../components/Button';
 import Label from '../../../components/Label';
+import { getUsers } from '../../../api/admin/user';
+import { getOccasions } from '../../../api/admin/occasion';
+import { getPrograms } from '../../../api/admin/program';
+import { getActivities } from '../../../api/admin/activity';
+import { getPurposes } from '../../../api/admin/purpose';
+import DropdownDialog from '../../../components/DropdownDialog';
+import getExcel from '../../../api/admin/dashboard/getExcel';
+import ReactLoading from '../../../components/Loading';
+import FundTotal from './components/FundTotal';
+import ProgressBar from '../../../components/ProgressBar';
+import getFundSource from '../../../api/user/triwulan/getFundSource';
+import getFundSourceChart from '../../../api/admin/dashboard/getFundSourceChart';
+import formatRupiah from '../../../utils/formatRupiah';
 
-export default function Dashboard() {
-  const [counts, setCounts] = useState({
-    userCount: 0,
-    occasionCount: 0,
-    organizationCount: 0,
-    programCount: 0,
-    activityCount: 0,
-    purposeCount: 0,
+const initialParams = {
+  limit: 0,
+  page: 0,
+};
+
+const initialFundSourceparams = {
+  limit: 10,
+  page: 1,
+  search: '',
+  sort: 'terbaru',
+};
+
+const initialFundSourceChart = {
+  pagu_dana_id: null,
+};
+
+const Dashboard = () => {
+  const authHeader = useAuthHeader();
+  const authUser = useAuthUser();
+
+  const token = useMemo(() => authHeader(), [authHeader]);
+
+  const [search, setSearch] = useState('');
+  const [selectedFundSource, setSelectedFundSource] = useState(null);
+  const [filterParams, setFilterParams] = useState(initialFundSourceparams);
+  const [filterFundSourceChart, setFilterFundSourceChart] = useState(
+    initialFundSourceChart
+  );
+
+  const occassionsQuery = useQuery({
+    queryKey: ['get_occassions', initialParams],
+    queryFn: () => getOccasions(initialParams, authHeader()),
+    enabled: token !== null,
   });
-  const [error, setError] = useState(null);
-  const [openOpd, setOpenOpd] = useState(false);
-  const [selectedOpd, setSelectedOpd] = useState(null);
-  const [opdData, setOpdData] = useState({
-    items: [],
-    hasMore: true,
-    isLoading: false,
-    totalPages: 0,
-    currentPage: 1,
+
+  const organizationsQuery = useQuery({
+    queryKey: ['get_organizations', initialParams],
+    queryFn: () => getOrganizations(initialParams, authHeader()),
+    enabled: token !== null,
   });
 
-  const authUser = useRef(useAuthUser());
-  const authHeaderRef = useRef(useAuthHeader());
+  const programsQuery = useQuery({
+    queryKey: ['get_programs', initialParams],
+    queryFn: () => getPrograms(initialParams, authHeader()),
+    enabled: token !== null,
+  });
 
-  useEffect(() => {
-    async function fetchCounts() {
-      try {
-        const countsData = await getCounts(authHeaderRef.current);
-        setCounts(countsData);
-      } catch (err) {
-        setError(err.message);
+  const activitiesQuery = useQuery({
+    queryKey: ['get_activities', initialParams],
+    queryFn: () => getActivities(initialParams, authHeader()),
+    enabled: token !== null,
+  });
+
+  const purposesQuery = useQuery({
+    queryKey: ['get_purposes', initialParams],
+    queryFn: () => getPurposes(initialParams, authHeader()),
+    enabled: token !== null,
+  });
+
+  const usersQuery = useQuery({
+    queryKey: ['get_users', initialParams],
+    queryFn: () => getUsers(initialParams, authHeader()),
+    enabled: token !== null,
+  });
+
+  const excelQuery = useQuery({
+    queryKey: ['get_excel'],
+    queryFn: () => getExcel(authHeader()),
+    enabled: false,
+  });
+
+  const fundSourceQuery = useInfiniteQuery({
+    queryKey: ['get_fund_source', filterParams],
+    queryFn: async ({ pageParam = 1 }) => {
+      const params = filterParams;
+
+      params.page = pageParam;
+
+      const res = await getFundSource(filterParams, authHeader());
+
+      return res;
+    },
+    getNextPageParam: (lastPage) => {
+      if (lastPage.data.page < lastPage.data.pages) {
+        return lastPage.data.page + 1;
       }
-    }
 
-    fetchCounts();
-  }, []);
+      return undefined;
+    },
+  });
 
-  const fetchOrganizations = async (page) => {
-    const organizationResponse = await getOrganizations(authHeaderRef.current, {
-      limit: 20,
-      page,
-    });
-
-    if (page === opdData.totalPages) {
-      setOpdData((prevData) => ({ ...prevData, hasMore: false }));
-    }
-
-    setOpdData((prevData) => ({
-      ...prevData,
-      items: [...prevData.items, ...organizationResponse.result],
-      totalPages: organizationResponse.pages,
-    }));
-  };
+  const fundSourceChartQuery = useQuery({
+    queryKey: ['get_fund_source_chart', filterFundSourceChart],
+    queryFn: () => getFundSourceChart(filterFundSourceChart, authHeader()),
+    enabled: selectedFundSource !== null,
+  });
 
   useEffect(() => {
-    fetchOrganizations(opdData.currentPage);
-  }, [opdData.currentPage]);
+    if (selectedFundSource?.id) {
+      setFilterFundSourceChart({
+        pagu_dana_id: selectedFundSource.id,
+      });
+    }
+  }, [selectedFundSource]);
 
-  const loadMoreData = async () => {
-    setOpdData((prevData) => ({
-      ...prevData,
-      currentPage: prevData.currentPage + 1,
-    }));
+  const handleDownloadExcel = async () => {
+    await excelQuery.refetch();
   };
 
-  const handleSelectOpd = (opd) => {
-    setSelectedOpd(opd);
-    setOpenOpd(false);
+  const handleSelectFundSource = (opd) => {
+    setSelectedFundSource(opd);
   };
 
-  if (error) {
-    return <ErrorPage errorMessage={error} />;
+  const handleOnSearch = (e) => {
+    setFilterParams({
+      ...filterParams,
+      search: e,
+    });
+  };
+
+  if (usersQuery.isError) {
+    return <ErrorPage errorMessage={usersQuery.error} />;
   }
+
+  const totalPaguDana = useMemo(
+    () => fundSourceChartQuery?.data?.data?.pagu_dana.total_pagu_dana,
+    [fundSourceChartQuery?.data?.data?.pagu_dana.total_pagu_dana]
+  );
+  const totalPaguDanaDigunakan = useMemo(
+    () => fundSourceChartQuery?.data?.data?.pagu_dana.total_pagu_dana_digunakan,
+    [fundSourceChartQuery?.data?.data?.pagu_dana.total_pagu_dana_digunakan]
+  );
+  const showCountBox = (roles) => roles.includes(authUser().role.name);
 
   return (
     <>
       <h1 className="font-semibold text-2xl mb-8">
-        Halo {authUser.current().admin_role_id === 1 ? 'Admin' : 'User OPD'},
-        Selamat Datang di halaman elektronik aplikasi&nbsp;
+        Halo {authUser().role.name}, Selamat Datang di halaman elektronik
+        aplikasi&nbsp;
         <span className="italic">e-Montir Pemda</span>
       </h1>
 
-      <div className="flex flex-col space-y-4 lg:flex-row justify-center lg:justify-between mb-8 lg:items-center">
-        {authUser.current().admin_role_id === 1 && (
-          <div>
-            <Label>OPD</Label>
-            <Dialog open={openOpd} onOpenChange={setOpenOpd}>
-              <DialogTrigger className="w-full lg:w-72">
-                <SelectInputModal
-                  className="mt-2 bg-white"
-                  selectedValue={selectedOpd && selectedOpd.title}
-                  label="--- Pilih OPD ---"
-                />
-              </DialogTrigger>
-
-              <DialogContent title="Pilih Nama OPD">
-                <div className="relative my-6">
-                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                    <MagnifyingGlassIcon className="w-4 h-4" />
-                  </div>
-                  <input
-                    type="search"
-                    id="search"
-                    className="bg-gray-50 text-light-gray border-none text-sm rounded-lg focus:ring-0 block w-full pl-10 p-2.5 shadow"
-                    placeholder="Pencarian"
-                  />
-                </div>
-                {opdData.isLoading ? (
-                  <ReactLoading />
-                ) : (
-                  <InfiniteScroll
-                    dataLength={opdData.items.length}
-                    next={loadMoreData}
-                    hasMore={opdData.hasMore}
-                    height={500}
-                  >
-                    <List
-                      data={opdData.items}
-                      onSelectValue={handleSelectOpd}
-                    />
-                  </InfiniteScroll>
-                )}
-              </DialogContent>
-            </Dialog>
+      <div className="flex flex-col space-y-4 lg:space-y-0 lg:flex-row justify-center lg:justify-between mb-8 lg:items-end">
+        {authUser().role.id === 1 && (
+          <div className="flex-1">
+            <Label className="mb-2">Sumber Dana</Label>
+            <DropdownDialog
+              label="Pilih Sumber Dana"
+              data={fundSourceQuery.data}
+              value={selectedFundSource}
+              onChange={handleSelectFundSource}
+              maxWidth="max-w-sm"
+              enableSearch
+              searchValue={filterParams.search}
+              onSearch={handleOnSearch}
+            />
           </div>
         )}
 
-        <div className="flex space-x-2">
-          <Button
-            className="w-28 lg:w-auto"
-            type="submit"
-            background="bg-primary"
-            textColor="text-white"
-            icon={<ArrowDownTrayIcon className="w-6 h-6" />}
-          >
-            Unduh Data (PDF)
-          </Button>
-          <Button
-            className="w-28 lg:w-auto"
-            type="submit"
-            background="bg-primary"
-            textColor="text-white"
-            icon={<ArrowDownTrayIcon className="w-6 h-6" />}
-          >
-            Unduh Data (XLS)
-          </Button>
-        </div>
+        {authUser().role.name !== 'OPD' && (
+          <div className="flex space-x-2 flex-3">
+            <Button
+              className="w-28 lg:w-auto"
+              type="submit"
+              background="bg-primary"
+              textColor="text-white"
+              icon={<ArrowDownTrayIcon className="w-6 h-6" />}
+            >
+              Unduh Data (PDF)
+            </Button>
+            <Button
+              onClick={handleDownloadExcel}
+              className="w-28 lg:w-auto"
+              type="submit"
+              background="bg-primary"
+              textColor="text-white"
+              icon={<ArrowDownTrayIcon className="w-6 h-6" />}
+              loading={excelQuery.isLoading}
+            >
+              Unduh Data (XLS)
+            </Button>
+          </div>
+        )}
       </div>
 
-      <div className="bg-white rounded-lg grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-y-7 p-8 shadow-2xl shadow-[#F3F6FF]">
-        {authUser.current().admin_role_id === 1 ? (
-          <>
+      {authUser().role.name !== 'OPD' && (
+        <div className="mb-8 bg-white rounded-lg shadow-2xl shadow-[#F3F6FF] p-8">
+          <h1 className="text-2xl font-semibold text-center space-x-3">
+            <span>Sumber Dana:</span>
+            <span className="uppercase">
+              {fundSourceChartQuery?.data?.data?.pagu_dana.name}
+            </span>
+          </h1>
+          <div className="mt-6 flex justify-center space-x-16">
+            <FundTotal
+              title="Total Sumber Dana"
+              color="bg-[#56CCF2]"
+              total={formatRupiah(totalPaguDana)}
+            />
+            <FundTotal
+              title="Total Pagu Dana"
+              color="bg-[#BB6BD9]"
+              total={formatRupiah(totalPaguDanaDigunakan)}
+            />
+          </div>
+
+          <div className="space-y-6 mt-12">
+            {fundSourceChartQuery?.data?.data?.triwulan.map((triwulan) => (
+              <ProgressBar
+                label={triwulan.nama_aktifitas}
+                completed={triwulan.realisasi_fisik}
+                total={triwulan.pagu_dana}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {authUser().role.name !== 'OPD' && (
+        <div className="bg-white rounded-lg grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-y-7 p-8 shadow-2xl shadow-[#F3F6FF]">
+          {showCountBox(['Superadmin', 'Admin Bidang']) && (
             <CountBox
               linkTo="urusan"
               title="urusan"
-              count={counts.occasionCount}
+              count={occassionsQuery.data?.data.total || 0}
               color="#56CCF2"
               className="hover:solid-shadow-blue"
             />
+          )}
+          {showCountBox(['Superadmin']) && (
             <CountBox
               linkTo="organisasi"
               title="organisasi"
-              count={counts.organizationCount}
+              count={organizationsQuery.data?.data.total || 0}
               color="#BB6BD9"
               className="hover:solid-shadow-purple"
             />
+          )}
+          {showCountBox(['Superadmin', 'Admin Bidang']) && (
             <CountBox
-              linkTo="/"
+              linkTo="program"
               title="program"
-              count={counts.programCount}
+              count={programsQuery.data?.data.total || 0}
               color="#6FCF97"
               className="hover:solid-shadow-green"
             />
+          )}
+          {showCountBox(['Superadmin', 'Admin Bidang']) && (
             <CountBox
               linkTo="kegiatan"
               title="kegiatan"
-              count={counts.activityCount}
+              count={activitiesQuery.data?.data.total || 0}
               color="#F2C94C"
               className="hover:solid-shadow-yellow"
             />
+          )}
+          {showCountBox(['Superadmin', 'Admin Bidang']) && (
             <CountBox
               linkTo="sasaran"
               title="sasaran"
-              count={counts.purposeCount}
+              count={purposesQuery.data?.data.total || 0}
               color="#F2994A"
               className="hover:solid-shadow-orange"
             />
+          )}
+          {showCountBox(['Superadmin']) && (
             <CountBox
               linkTo="login-akses-user"
               title="user"
-              count={counts.userCount}
+              count={usersQuery.data?.data.total || 0}
               color="#BDBDBD"
               className="hover:solid-shadow-gray"
             />
-          </>
-        ) : (
-          <CountBox
-            linkTo="#"
-            title="program"
-            count={counts.programCount}
-            color="#6FCF97"
-            className="hover:solid-shadow-green"
-          />
-        )}
-      </div>
+          )}
+        </div>
+      )}
     </>
   );
-}
+};
+
+export default Dashboard;

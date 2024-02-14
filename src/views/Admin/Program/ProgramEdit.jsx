@@ -1,8 +1,9 @@
 import { ArrowLeftIcon, CheckCircleIcon } from '@heroicons/react/24/solid';
 import { Label } from 'flowbite-react';
-import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuthHeader } from 'react-auth-kit';
+import { useForm } from 'react-hook-form';
+import { useMutation, useQuery } from 'react-query';
 import TextInput from '../../../components/TextInput';
 import Button from '../../../components/Button';
 import { getProgram, updateProgram } from '../../../api/admin/program';
@@ -10,59 +11,53 @@ import ErrorPage from '../../ErrorPage';
 import { useToastContext } from '../../../context/ToastContext';
 import ReactLoading from '../../../components/Loading';
 
-function ProgramEdit() {
+const ProgramEdit = () => {
   const { id } = useParams();
-  const [code, setCode] = useState('');
-  const [program, setProgram] = useState('');
-  const [error, setError] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-
+  const { showToastMessage } = useToastContext();
   const authHeader = useAuthHeader();
   const navigate = useNavigate();
-  const { showToastMessage } = useToastContext();
 
-  const fetchProgram = async () => {
-    setIsLoading(true);
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm();
 
-    try {
-      const programResponse = await getProgram(authHeader, id);
-      setCode(programResponse.code);
-      setProgram(programResponse.title);
-      setIsLoading(false);
-    } catch (err) {
-      setIsLoading(false);
-      setError(err.message);
-    }
+  const { isLoading, isError, error } = useQuery({
+    queryKey: ['get_program'],
+    queryFn: () => getProgram(id, authHeader()),
+    onSuccess: (result) => {
+      setValue('title', result.data.title);
+    },
+  });
+
+  const updateMutation = useMutation(updateProgram);
+
+  const onSubmit = (formData) => {
+    updateMutation.mutate(
+      {
+        body: {
+          ...formData,
+          program_id: id,
+        },
+        token: authHeader(),
+      },
+      {
+        onSuccess: () => {
+          showToastMessage('Berhasil mengubah Program');
+          navigate('/program');
+        },
+      }
+    );
   };
 
-  useEffect(() => {
-    fetchProgram();
-  }, []);
-
-  async function onSubmit(e) {
-    e.preventDefault();
-
-    setIsLoading(true);
-
-    try {
-      const programBody = {
-        program_id: id,
-        title: program,
-        code,
-      };
-      const programResponse = await updateProgram(authHeader, programBody);
-
-      setIsLoading(false);
-      showToastMessage(programResponse, 'success');
-      navigate('../');
-    } catch (err) {
-      setIsLoading(false);
-      showToastMessage(err.message, 'error');
-    }
+  if (isError) {
+    return <ErrorPage errorMessage={error.message} />;
   }
 
-  if (error) {
-    return <ErrorPage errorMessage={error} />;
+  if (isLoading) {
+    return <ReactLoading />;
   }
 
   return (
@@ -78,27 +73,19 @@ function ProgramEdit() {
           </h1>
         </Link>
 
-        <form className="mt-4" onSubmit={onSubmit}>
+        <form className="mt-4" onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-6">
-            <Label>Kode</Label>
+            <Label className="mb-2">Program</Label>
             <TextInput
-              className="mt-2 lg:w-2/3 xl:w-1/3"
-              value={code}
-              required
-              disabled
-            />
-          </div>
-          <div className="mb-6">
-            <Label>Program</Label>
-            <TextInput
-              className="mt-2 lg:w-2/3 xl:w-1/3"
               placeholder="Masukan Program"
-              value={program}
-              onChange={(e) => setProgram(e.target.value)}
-              required
+              register={register('title', {
+                required: 'Nama Program wajib diisi!',
+              })}
+              error={errors.title?.message}
             />
           </div>
-          {isLoading ? (
+
+          {updateMutation.isLoading ? (
             <ReactLoading />
           ) : (
             <div className="flex space-x-3">
@@ -126,6 +113,6 @@ function ProgramEdit() {
       </div>
     </>
   );
-}
+};
 
 export default ProgramEdit;

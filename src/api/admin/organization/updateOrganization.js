@@ -1,16 +1,23 @@
-import { baseUrl } from '../../../utils/constants';
-import makeRequest from '../../../utils/makeRequest';
+import axiosClient from '../../../config/axios';
 
-export default async function updateOrganization(authHeader, organizationBody) {
-  const url = `${baseUrl}/org/update`;
-  const headers = {
-    method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-      authorization: authHeader(),
-    },
-    body: JSON.stringify(organizationBody),
-  };
-  const organizationResponse = await makeRequest(url, headers);
-  return organizationResponse.message;
+async function updateOrganization({ body, token }) {
+  try {
+    const response = await axiosClient.patch('/org/update', body, {
+      headers: {
+        Authorization: token,
+      },
+    });
+
+    const responseData = response.data;
+
+    if (responseData.statusCode !== 200) {
+      throw new Error(responseData.message);
+    }
+
+    return responseData;
+  } catch (err) {
+    throw new Error(err);
+  }
 }
+
+export default updateOrganization;

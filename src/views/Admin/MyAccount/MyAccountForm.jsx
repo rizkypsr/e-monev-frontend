@@ -1,6 +1,8 @@
 import { PencilIcon } from '@heroicons/react/24/solid';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuthUser } from 'react-auth-kit';
+import { useForm } from 'react-hook-form';
+import { useMutation } from 'react-query';
 import Button from '../../../components/Button';
 import Label from '../../../components/Label';
 import TextInput from '../../../components/TextInput';
@@ -9,61 +11,54 @@ import { useToastContext } from '../../../context/ToastContext';
 import ReactLoading from '../../../components/Loading';
 import MyAccountEdit from './MyAccountEdit';
 
-export default function MyAccountForm() {
+const MyAccountForm = () => {
   const auth = useAuthUser();
-  const [account, setAccount] = useState({
-    username: auth().username,
-    password: '',
-  });
-  const [loading, setLoading] = useState(false);
+
   const [authenticated, setAuthenticated] = useState(false);
-  const [passwordError, setPasswordError] = useState('');
 
   const { showToastMessage } = useToastContext();
 
-  const onSubmit = async (event) => {
-    event.preventDefault();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+  } = useForm();
 
-    setPasswordError('');
+  const loginMutation = useMutation(login);
 
-    if (!account.password) {
-      setPasswordError('Password harus diisi');
-      return;
-    }
+  useEffect(() => {
+    setValue('username', auth().username);
+  }, [auth, setValue]);
 
-    setLoading(true);
+  const onSubmit = (data) => {
+    const { username, password } = data;
 
-    try {
-      const loginBody = {
-        username: account.username,
-        password: account.password,
-      };
-      await login(loginBody);
-      setLoading(false);
-      setAuthenticated(true);
-    } catch (error) {
-      setPasswordError(error.message);
-      showToastMessage(error.message, 'error');
-    }
-
-    setLoading(false);
-  };
-
-  const handleOnChange = (event) => {
-    setAccount((prev) => ({
-      ...prev,
-      password: event.target.value,
-    }));
+    loginMutation.mutate(
+      {
+        username,
+        password,
+      },
+      {
+        onSuccess: (res) => {
+          if (res.statusCode === 200) {
+            setAuthenticated(true);
+          }
+        },
+        onError: (error) => {
+          showToastMessage(
+            `Terjadi kesalahan saat login: ${error.message}`,
+            'error'
+          );
+        },
+      }
+    );
   };
 
   if (authenticated) {
     return (
       <MyAccountEdit
         onBack={() => {
-          setAccount({
-            ...account,
-            password: '',
-          });
           setAuthenticated(false);
         }}
       />
@@ -71,28 +66,29 @@ export default function MyAccountForm() {
   }
 
   return (
-    <form className="mt-4" onSubmit={onSubmit}>
+    <form className="mt-4" onSubmit={handleSubmit(onSubmit)}>
       <div className="mb-6">
         <Label htmlFor="username">Username</Label>
         <TextInput
-          disabled
-          className="mt-2 lg:w-2/3 xl:w-1/3"
           placeholder="Masukan Username"
-          value={account.username}
+          register={register('username', {
+            disabled: true,
+          })}
+          disabled
         />
       </div>
       <div className="mb-6">
         <Label htmlFor="password">Password</Label>
         <TextInput
-          className="mt-2 lg:w-2/3 xl:w-1/3"
           type="password"
           placeholder="Masukan Password"
-          value={account.password}
-          error={passwordError}
-          onChange={handleOnChange}
+          register={register('password', {
+            required: 'Password wajib diisi!',
+          })}
+          error={errors.password?.message}
         />
       </div>
-      {loading ? (
+      {loginMutation.isLoading ? (
         <ReactLoading />
       ) : (
         <Button
@@ -107,4 +103,6 @@ export default function MyAccountForm() {
       )}
     </form>
   );
-}
+};
+
+export default MyAccountForm;

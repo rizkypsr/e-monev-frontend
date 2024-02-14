@@ -6,9 +6,12 @@ import {
   TrashIcon,
 } from '@heroicons/react/24/solid';
 import { createColumnHelper } from '@tanstack/react-table';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuthHeader } from 'react-auth-kit';
 import { Link } from 'react-router-dom';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { useDebounce } from '@uidotdev/usehooks';
+
 import { deleteProgram, getPrograms } from '../../../api/admin/program';
 import Button from '../../../components/Button';
 import {
@@ -17,18 +20,19 @@ import {
   DialogContent,
   DialogTrigger,
 } from '../../../components/DialogContent';
-import Dropdown from '../../../components/Dropdown';
 import Pagination from '../../../components/Pagination';
 import Table from '../../../components/Table';
 import { useToastContext } from '../../../context/ToastContext';
 import TrashImg from '../../../assets/images/trash.png';
 import ErrorPage from '../../ErrorPage';
+import DropdownSelect from '../../../components/DropdownSelect';
 
 const columnHelper = createColumnHelper();
 const columns = [
-  columnHelper.accessor('id', {
-    header: () => <span>ID</span>,
-    cell: (info) => info.getValue(),
+  columnHelper.accessor((row, index) => index + 1, {
+    id: 'no',
+    cell: (info) => <i>{info.getValue()}</i>,
+    header: () => <span>No</span>,
   }),
   columnHelper.accessor((row) => row.code, {
     id: 'code',
@@ -39,6 +43,11 @@ const columns = [
     id: 'program',
     cell: (info) => <i>{info.getValue()}</i>,
     header: () => <span>Program</span>,
+  }),
+  columnHelper.accessor((row) => row.occassion?.title, {
+    id: 'occassion',
+    cell: (info) => <i>{info.getValue()}</i>,
+    header: () => <span>Urusan</span>,
   }),
   columnHelper.accessor((row) => row.aksi, {
     id: 'aksi',
@@ -121,97 +130,112 @@ const columns = [
   }),
 ];
 
-function ProgramTable() {
-  const [error, setError] = useState(false);
-  const [pageSize, setPageSize] = useState(10);
-  const [search, setSearch] = useState('');
-  const [pageData, setCurrentPageData] = useState({
-    rowData: [],
-    isLoading: false,
-    totalPages: 0,
-    totalData: 0,
-  });
-  const [currentPage, setCurrentPage] = useState(1);
-  const [resetPage, setResetPage] = useState(false);
-  const [sorting, setSorting] = useState({
-    value: 'terbaru',
+const sorting = [
+  {
     label: 'Terbaru',
-  });
+    value: 'terbaru',
+  },
+  {
+    label: 'Terlama',
+    value: 'terlama',
+  },
+];
 
+const pageSizes = [
+  {
+    label: '10',
+    value: 10,
+  },
+  {
+    label: '50',
+    value: 50,
+  },
+  {
+    label: '100',
+    value: 100,
+  },
+];
+
+const initialParams = {
+  limit: 10,
+  page: 1,
+  search: '',
+  sort: 'terbaru',
+};
+
+const ProgramTable = () => {
   const authHeader = useAuthHeader();
   const { showToastMessage } = useToastContext();
+  const queryClient = useQueryClient();
 
-  const fetchProgram = async (offset, limit, pageNumber, sort) => {
-    try {
-      const programData = await getPrograms(authHeader, {
-        sort,
-        offset,
-        limit,
-        page: pageNumber,
-        search,
-      });
-      setCurrentPageData({
-        rowData: programData.result,
-        isLoading: false,
-        totalPages: programData.pages,
-        totalData: programData.total,
-      });
-    } catch (err) {
-      setError(err.message);
-    }
-  };
+  const [filterParams, setFilterParams] = useState(initialParams);
+  const [searchTerm, setSearchTerm] = useState('');
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+  const [selectedSorting, setSelectedSorting] = useState(sorting[0]);
+  const [selectedPageSize, setSelectedPageSize] = useState(pageSizes[0]);
+
+  const { isLoading, isError, error, data } = useQuery({
+    queryKey: ['get_programs', filterParams],
+    queryFn: () => getPrograms(filterParams, authHeader()),
+    keepPreviousData: true,
+  });
 
   useEffect(() => {
-    setCurrentPageData((prevState) => ({
-      ...prevState,
-      rowData: [],
-      isLoading: true,
-    }));
+    setFilterParams({
+      ...filterParams,
+      search: debouncedSearchTerm,
+    });
+  }, [debouncedSearchTerm]);
 
-    fetchProgram(0, pageSize, currentPage, sorting.value);
-  }, [currentPage, pageSize, sorting]);
-
-  useEffect(() => {
-    setCurrentPage(1);
-    setResetPage((prevState) => !prevState);
-    setCurrentPageData((prevState) => ({
-      ...prevState,
-      rowData: [],
-      isLoading: true,
-    }));
-
-    fetchProgram(0, pageSize, currentPage, sorting.value);
-  }, [search]);
+  const deleteMutation = useMutation(deleteProgram);
 
   const deleteProgramData = async (id) => {
-    try {
-      const deleteResponse = await deleteProgram(authHeader, id);
-      fetchProgram(0, pageSize, currentPage);
-
-      showToastMessage(deleteResponse);
-    } catch (err) {
-      showToastMessage(err.message, 'error');
-    }
+    deleteMutation.mutate(
+      {
+        id,
+        token: authHeader(),
+      },
+      {
+        onSuccess: () => {
+          showToastMessage('Berhasil menghapus program');
+          queryClient.invalidateQueries('get_programs');
+        },
+        onError: (err) => {
+          showToastMessage(err.message, 'error');
+        },
+      }
+    );
   };
 
-  const onPageSizeChanged = useCallback(
-    ({ newValue }) => {
-      setCurrentPage(1);
-      setResetPage((prevState) => !prevState);
-      setPageSize(Number(newValue));
-    },
-    [setCurrentPage, setResetPage, setPageSize]
-  );
+  const onPageSizeChanged = (selectedValue) => {
+    setSelectedPageSize(selectedValue);
+    setFilterParams({
+      ...filterParams,
+      limit: selectedValue.value,
+    });
+  };
 
-  const onSorting = useCallback(
-    ({ newValue, newLabel }) => {
-      setSorting({ value: newValue, label: newLabel });
-    },
-    [setSorting]
-  );
+  const onSorting = (selectedValue) => {
+    setSelectedSorting(selectedValue);
+    setFilterParams({
+      ...filterParams,
+      sort: selectedValue.value,
+    });
+  };
 
-  if (error) {
-    return <ErrorPage errorMessage={error} />;
+  const onSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const onPaginationChange = (currentPage) => {
+    setFilterParams({
+      ...filterParams,
+      page: currentPage,
+    });
+  };
+
+  if (isError) {
+    return <ErrorPage errorMessage={error.message} />;
   }
 
   return (
@@ -230,64 +254,24 @@ function ProgramTable() {
       </div>
 
       <div className="flex justify-between mt-6">
-        <div className="flex space-x-3">
+        <div className="flex space-x-3 w-full">
           {/* Sorting Dropdown */}
-          <div>
-            <Dropdown
-              onSelect={onSorting}
-              label="Urutkan:"
-              selectedItem={sorting}
-            >
-              <Dropdown.Items>
-                <li
-                  value="terbaru"
-                  className="block px-4 py-2 font-semibold cursor-pointer hover:bg-gray-100"
-                >
-                  Terbaru
-                </li>
-                <li
-                  value="terlama"
-                  className="block px-4 py-2 font-semibold cursor-pointer hover:bg-gray-100"
-                >
-                  Terlama
-                </li>
-              </Dropdown.Items>
-            </Dropdown>
-          </div>
+          <DropdownSelect
+            value={selectedSorting}
+            options={sorting}
+            onChange={onSorting}
+          >
+            <DropdownSelect.HeaderV1 label="Urutkan:" />
+          </DropdownSelect>
 
           {/* Page Size Dropdown */}
-          <div>
-            <Dropdown
-              onSelect={onPageSizeChanged}
-              label="Tampilkan:"
-              endLabel="Entri"
-              selectedItem={{
-                value: pageSize.toString(),
-                label: pageSize.toString(),
-              }}
-            >
-              <Dropdown.Items>
-                <li
-                  value="10"
-                  className="block px-4 py-2 font-semibold cursor-pointer hover:bg-gray-100"
-                >
-                  10
-                </li>
-                <li
-                  value="50"
-                  className="block px-4 py-2 font-semibold cursor-pointer hover:bg-gray-100"
-                >
-                  50
-                </li>
-                <li
-                  value="100"
-                  className="block px-4 py-2 font-semibold cursor-pointer hover:bg-gray-100"
-                >
-                  100
-                </li>
-              </Dropdown.Items>
-            </Dropdown>
-          </div>
+          <DropdownSelect
+            value={selectedPageSize}
+            options={pageSizes}
+            onChange={onPageSizeChanged}
+          >
+            <DropdownSelect.HeaderV1 label="Tampilkan:" endLabel="Entri" />
+          </DropdownSelect>
         </div>
 
         <div className="relative w-1/3">
@@ -296,8 +280,8 @@ function ProgramTable() {
           </div>
           <input
             type="search"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            value={searchTerm}
+            onChange={onSearchChange}
             className="bg-gray-50 text-light-gray border-none text-sm rounded-lg focus:ring-0 block w-full pl-10 p-2.5 shadow"
             placeholder="Pencarian"
           />
@@ -314,19 +298,18 @@ function ProgramTable() {
                 }
               : column
           )}
-          rows={pageData.rowData}
-          isLoading={pageData.isLoading}
+          rows={data?.data.result || []}
+          isLoading={isLoading}
         />
 
         <Pagination
-          totalRows={pageData.totalData}
-          pageChangeHandler={setCurrentPage}
-          rowsPerPage={pageSize}
-          resetPage={resetPage}
+          totalRows={data?.data.total || 0}
+          pageChangeHandler={onPaginationChange}
+          rowsPerPage={filterParams.limit}
         />
       </div>
     </>
   );
-}
+};
 
 export default ProgramTable;

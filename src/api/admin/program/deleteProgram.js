@@ -1,17 +1,29 @@
-import { baseUrl } from '../../../utils/constants';
-import makeRequest from '../../../utils/makeRequest';
+import axiosClient from '../../../config/axios';
 
-export default async function deleteProgram(authHeader, programId) {
-  const url = `${baseUrl}/program/delete`;
-  const headers = {
-    method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-      authorization: authHeader(),
-    },
-    body: JSON.stringify({ program_id: programId }),
-  };
+async function deleteProgram({ id, token }) {
+  try {
+    const response = await axiosClient.patch(
+      '/program/delete',
+      {
+        program_id: id,
+      },
+      {
+        headers: {
+          Authorization: token,
+        },
+      }
+    );
 
-  const programResponse = await makeRequest(url, headers);
-  return programResponse.message;
+    const responseData = response.data;
+
+    if (responseData.statusCode !== 200) {
+      throw new Error(responseData.message);
+    }
+
+    return responseData;
+  } catch (err) {
+    throw new Error(err);
+  }
 }
+
+export default deleteProgram;

@@ -1,15 +1,23 @@
-import { baseUrl } from '../../../utils/constants';
-import makeRequest from '../../../utils/makeRequest';
+import axiosClient from '../../../config/axios';
 
-export default async function getPurpose(authHeader, purposeId) {
-  const url = `${baseUrl}/purpose/detail/${purposeId}`;
-  const headers = {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      authorization: authHeader(),
-    },
-  };
-  const purposeResponse = await makeRequest(url, headers);
-  return purposeResponse.data.result;
+async function getPurpose(id, token) {
+  try {
+    const response = await axiosClient.get(`/purpose/detail/${id}`, {
+      headers: {
+        Authorization: token,
+      },
+    });
+
+    const responseData = response.data;
+
+    if (responseData.statusCode !== 200) {
+      throw new Error(responseData.message);
+    }
+
+    return responseData;
+  } catch (err) {
+    throw new Error(err);
+  }
 }
+
+export default getPurpose;

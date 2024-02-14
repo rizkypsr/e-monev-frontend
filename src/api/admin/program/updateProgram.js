@@ -1,17 +1,23 @@
-import { baseUrl } from '../../../utils/constants';
-import makeRequest from '../../../utils/makeRequest';
+import axiosClient from '../../../config/axios';
 
-export default async function updateProgram(authHeader, programBody) {
-  const url = `${baseUrl}/program/update`;
-  const headers = {
-    method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-      authorization: authHeader(),
-    },
-    body: JSON.stringify(programBody),
-  };
+async function updateProgram({ body, token }) {
+  try {
+    const response = await axiosClient.patch('/program/update', body, {
+      headers: {
+        Authorization: token,
+      },
+    });
 
-  const programResponse = await makeRequest(url, headers);
-  return programResponse.message;
+    const responseData = response.data;
+
+    if (responseData.statusCode !== 200) {
+      throw new Error(responseData.message);
+    }
+
+    return responseData;
+  } catch (err) {
+    throw new Error(err);
+  }
 }
+
+export default updateProgram;

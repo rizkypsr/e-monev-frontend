@@ -10,7 +10,6 @@ import {
 } from '../components/DialogContent';
 import LogoutImg from '../assets/images/logout.png';
 import Button from '../components/Button';
-import { AddIcon, BookIcon } from '../components/icons';
 import DashboardIcon from '../components/icons/DashboardIcon';
 import ProfileIcon from '../components/icons/ProfileIcon';
 import LockIcon from '../components/icons/LockIcon';
@@ -21,10 +20,99 @@ import TargetIcon from '../components/icons/TargetIcon';
 import ReportIcon from '../components/icons/ReportIcon';
 import LogoutIcon from '../components/icons/LogoutIcon';
 import ConfigurationIcon from '../components/icons/ConfigurationIcon';
+import BookIcon from '../components/icons/BookIcon';
+import AddIcon from '../components/icons/AddIcon';
 
-function Sidebar({ isOpen, onHide }) {
+const Sidebar = ({ isOpen }) => {
   const signOut = useSignOut();
   const authUser = useAuthUser();
+
+  const sidebarList = [
+    {
+      path: '/',
+      label: 'Dashboard',
+      icon: <DashboardIcon />,
+      roles: ['superadmin', 'opd', 'admin bidang'],
+    },
+    {
+      path: '/akun-saya',
+      label: 'Akun Saya',
+      icon: <ProfileIcon />,
+      roles: ['superadmin', 'opd', 'admin bidang'],
+    },
+    {
+      path: '/login-akses-user',
+      label: 'Login Akses User',
+      icon: <LockIcon />,
+      roles: ['superadmin'],
+    },
+    {
+      path: '/urusan',
+      label: 'Urusan',
+      icon: <CheckIcon />,
+      roles: ['superadmin', 'admin bidang'],
+    },
+    {
+      path: '/sumber-dana',
+      label: 'Sumber Dana',
+      icon: <ReportIcon />,
+      roles: ['superadmin'],
+    },
+    {
+      path: '/organisasi',
+      label: 'Organisasi',
+      icon: <MedalIcon />,
+      roles: ['superadmin'],
+    },
+    {
+      path: '/program',
+      label: 'Program',
+      icon: <BookIcon />,
+      roles: ['superadmin', 'admin bidang'],
+    },
+    {
+      path: '/kegiatan',
+      label: 'Kegiatan',
+      icon: <StarIcon />,
+      roles: ['superadmin', 'admin bidang'],
+    },
+    {
+      path: '/sasaran',
+      label: 'Sasaran',
+      icon: <TargetIcon />,
+      roles: ['superadmin', 'admin bidang'],
+    },
+    {
+      path: '/data-triwulan',
+      label: 'Data Triwulan',
+      icon: <AddIcon />,
+      roles: ['opd'],
+    },
+    {
+      path: '/data-master',
+      label: 'Data Master',
+      icon: <AddIcon />,
+      roles: ['opd'],
+    },
+    {
+      path: '/laporan',
+      label: 'Laporan',
+      icon: <ReportIcon />,
+      roles: ['superadmin', 'opd', 'admin bidang', 'atasan daerah'],
+    },
+    {
+      path: '/riwayat',
+      label: 'Riwayat',
+      icon: <ProfileIcon />,
+      roles: ['superadmin'],
+    },
+    {
+      path: '/konfigurasi',
+      label: 'Konfigurasi',
+      icon: <ConfigurationIcon />,
+      roles: ['superadmin'],
+    },
+  ];
 
   return (
     <aside
@@ -32,7 +120,7 @@ function Sidebar({ isOpen, onHide }) {
         isOpen ? 'translate-x-0' : '-translate-x-full'
       }`}
     >
-      <div className="h-full overflow-y-auto bg-white flex flex-col">
+      <div className="h-full overflow-y-auto bg-gray-300 flex flex-col">
         <a
           href="/"
           className="flex items-center pl-4 py-5 border-b border-gray-20"
@@ -53,205 +141,35 @@ function Sidebar({ isOpen, onHide }) {
           />
           <div className="flex flex-col">
             <span className="font-semibold whitespace-nowrap">
-              {authUser().admin_role_id === 1 ? 'Super Admin' : 'User OPD'}
+              {authUser()?.role?.name}
             </span>
-            <span className="text-xs">{authUser().name}</span>
+            <span className="text-xs">{authUser()?.username}</span>
           </div>
         </div>
-        <ul className="space-y-2 px-3 font-medium leading-5">
-          <NavLink
-            end
-            onClick={onHide}
-            to={authUser().admin_role_id === 1 ? '/admin' : '/'}
-            className={({ isActive }) =>
-              [
-                'flex items-center p-2',
-                isActive ? 'text-blue-600' : 'text-black',
-              ]
-                .filter(Boolean)
-                .join(' ')
+        <ul className="space-y-2 px-6 font-medium leading-5">
+          {sidebarList.map((sidebar) => {
+            if (sidebar.roles.includes(authUser()?.role?.name.toLowerCase())) {
+              return (
+                <NavLink
+                  end={sidebar.label === 'Dashboard'}
+                  key={sidebar.label}
+                  to={sidebar.path}
+                  className={({ isActive }) =>
+                    [
+                      'flex items-center p-2',
+                      isActive ? 'text-blue-600' : 'text-black',
+                    ]
+                      .filter(Boolean)
+                      .join(' ')
+                  }
+                >
+                  {sidebar.icon}
+                  <span className="ml-3">{sidebar.label}</span>
+                </NavLink>
+              );
             }
-          >
-            <DashboardIcon />
-            <span className="ml-3">Dashboard</span>
-          </NavLink>
-          <NavLink
-            to={
-              authUser().admin_role_id === 1 ? '/admin/akun-saya' : '/akun-saya'
-            }
-            onClick={onHide}
-            className={({ isActive }) =>
-              [
-                'flex items-center p-2',
-                isActive ? 'text-blue-600' : 'text-black',
-              ]
-                .filter(Boolean)
-                .join(' ')
-            }
-          >
-            <ProfileIcon />
-            <span className="ml-3"> Akun Saya</span>
-          </NavLink>
-          {authUser().admin_role_id === 1 && (
-            <>
-              <NavLink
-                to="/admin/login-akses-user"
-                onClick={onHide}
-                className={({ isActive }) =>
-                  [
-                    'flex items-center p-2',
-                    isActive ? 'text-blue-600' : 'text-black',
-                  ]
-                    .filter(Boolean)
-                    .join(' ')
-                }
-              >
-                <LockIcon />
-                <span className="ml-3">Login Akses User</span>
-              </NavLink>
-              <NavLink
-                to="/admin/urusan"
-                onClick={onHide}
-                className={({ isActive }) =>
-                  [
-                    'flex items-center p-2',
-                    isActive ? 'text-blue-600' : 'text-black',
-                  ]
-                    .filter(Boolean)
-                    .join(' ')
-                }
-              >
-                <CheckIcon />
-                <span className="ml-3">Urusan</span>
-              </NavLink>
-              <NavLink
-                to="/admin/organisasi"
-                onClick={onHide}
-                className={({ isActive }) =>
-                  [
-                    'flex items-center p-2',
-                    isActive ? 'text-blue-600' : 'text-black',
-                  ]
-                    .filter(Boolean)
-                    .join(' ')
-                }
-              >
-                <MedalIcon />
-                <span className="ml-3">Organisasi</span>
-              </NavLink>
-              <NavLink
-                to="/admin/program"
-                onClick={onHide}
-                className={({ isActive }) =>
-                  [
-                    'flex items-center p-2',
-                    isActive ? 'text-blue-600' : 'text-black',
-                  ]
-                    .filter(Boolean)
-                    .join(' ')
-                }
-              >
-                <BookIcon />
-                <span className="ml-3">Program</span>
-              </NavLink>
-              <NavLink
-                to="/admin/kegiatan"
-                onClick={onHide}
-                className={({ isActive }) =>
-                  [
-                    'flex items-center p-2',
-                    isActive ? 'text-blue-600' : 'text-black',
-                  ]
-                    .filter(Boolean)
-                    .join(' ')
-                }
-              >
-                <StarIcon />
-                <span className="ml-3">Kegiatan</span>
-              </NavLink>
-              <NavLink
-                to="/admin/sasaran"
-                onClick={onHide}
-                className={({ isActive }) =>
-                  [
-                    'flex items-center p-2',
-                    isActive ? 'text-blue-600' : 'text-black',
-                  ]
-                    .filter(Boolean)
-                    .join(' ')
-                }
-              >
-                <TargetIcon />
-                <span className="ml-3">Sasaran</span>
-              </NavLink>
-            </>
-          )}
-          {authUser().admin_role_id === 2 && (
-            <>
-              <NavLink
-                to="/data-triwulan"
-                onClick={onHide}
-                className={({ isActive }) =>
-                  [
-                    'flex items-center p-2',
-                    isActive ? 'text-blue-600' : 'text-black',
-                  ]
-                    .filter(Boolean)
-                    .join(' ')
-                }
-              >
-                <AddIcon />
-                <span className="ml-3">Tambah Data Triwulan</span>
-              </NavLink>
-              <NavLink
-                to="/data-master"
-                onClick={onHide}
-                className={({ isActive }) =>
-                  [
-                    'flex items-center p-2',
-                    isActive ? 'text-blue-600' : 'text-black',
-                  ]
-                    .filter(Boolean)
-                    .join(' ')
-                }
-              >
-                <AddIcon />
-                <span className="ml-3">Tambah Data Master</span>
-              </NavLink>
-            </>
-          )}
-          <NavLink
-            to={authUser().admin_role_id === 1 ? '/admin/laporan' : '/laporan'}
-            onClick={onHide}
-            className={({ isActive }) =>
-              [
-                'flex items-center p-2',
-                isActive ? 'text-blue-600' : 'text-black',
-              ]
-                .filter(Boolean)
-                .join(' ')
-            }
-          >
-            <ReportIcon />
-            <span className="ml-3">Data Laporan</span>
-          </NavLink>
-          {authUser().admin_role_id === 1 && (
-            <NavLink
-              to="/admin/konfigurasi"
-              onClick={onHide}
-              className={({ isActive }) =>
-                [
-                  'flex items-center p-2',
-                  isActive ? 'text-blue-600' : 'text-black',
-                ]
-                  .filter(Boolean)
-                  .join(' ')
-              }
-            >
-              <ConfigurationIcon />
-              <span className="ml-3">Konfigurasi</span>
-            </NavLink>
-          )}
+            return null;
+          })}
         </ul>
         <Dialog>
           <DialogContent className="py-12">
@@ -304,6 +222,6 @@ function Sidebar({ isOpen, onHide }) {
       </div>
     </aside>
   );
-}
+};
 
 export default Sidebar;

@@ -1,390 +1,137 @@
-import {
-  ArrowLeftIcon,
-  CheckCircleIcon,
-  MagnifyingGlassIcon,
-} from '@heroicons/react/24/solid';
-import React, { useCallback, useEffect, useState } from 'react';
+import { ArrowLeftIcon, CheckCircleIcon } from '@heroicons/react/24/solid';
+import React, { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuthHeader } from 'react-auth-kit';
-import InfiniteScroll from 'react-infinite-scroll-component';
-import { animated, useTransition } from '@react-spring/web';
+import { useInfiniteQuery, useMutation, useQuery } from 'react-query';
+import { useForm } from 'react-hook-form';
 import Label from '../../../components/Label';
 import Button from '../../../components/Button';
 import { useToastContext } from '../../../context/ToastContext';
 import ErrorPage from '../../ErrorPage';
 import ReactLoading from '../../../components/Loading';
-import Dropdown from '../../../components/Dropdown';
-import { getReport, getTriwulan } from '../../../api/admin/report';
-import {
-  Dialog,
-  DialogContent,
-  DialogTrigger,
-} from '../../../components/DialogContent';
-import List from '../../../components/List';
-import SelectInputModal from '../../../components/SelectInputModal';
-import { createOccasion, getOccasions } from '../../../api/admin/occasion';
-import {
-  createOrganization,
-  getOrganizations,
-} from '../../../api/admin/organization';
-import { createProgram, getPrograms } from '../../../api/admin/program';
+import { getReport } from '../../../api/admin/report';
+import { getOccasions } from '../../../api/admin/occasion';
+import { getOrganizations } from '../../../api/admin/organization';
+import { getPrograms } from '../../../api/admin/program';
 import updateReport from '../../../api/admin/report/updateReport';
-import TextInput from '../../../components/TextInput';
+import getTriwulan from '../../../api/static/getTriwulan';
+import DropdownDialog from '../../../components/DropdownDialog';
 
-export default function ReportEdit() {
+const initialParams = {
+  limit: 10,
+  page: 1,
+  search: '',
+  sort: 'terbaru',
+};
+
+const ReportEdit = () => {
   const { id } = useParams();
-  const [report, setReport] = useState({
-    createdAt: '',
-    triwulan: {
-      value: 0,
-      label: '',
-    },
-    occasion: '',
-    organization: '',
-    program: '',
-    activity: '',
-    indicator: '',
-  });
-  const [triwulan, setTriwulan] = useState([]);
-  const [occasions, setOccasions] = useState({
-    items: [],
-    hasMore: true,
-    isLoading: false,
-    totalPages: 0,
-    currentPage: 1,
-  });
-  const [openOccasionDialog, setOpenOccasionDialog] = useState(false);
-
-  const [organizations, setOrganizations] = useState({
-    items: [],
-    hasMore: true,
-    isLoading: false,
-    totalPages: 0,
-    currentPage: 1,
-  });
-  const [openOrganizationDialog, setOpenOrganizationDialog] = useState(false);
-
-  const [programs, setPrograms] = useState({
-    items: [],
-    hasMore: true,
-    isLoading: false,
-    totalPages: 0,
-    currentPage: 1,
-  });
-  const [openProgramDialog, setOpenProgramDialog] = useState(false);
-
-  const [error, setError] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [openCreateOpd, setOpenCreateOpd] = useState(false);
-  const [openCreateOccasion, setOpenCreateOccasion] = useState(false);
-  const [openCreateProgram, setOpenCreateProgram] = useState(false);
-
   const authHeader = useAuthHeader();
   const navigate = useNavigate();
   const { showToastMessage } = useToastContext();
-  const transationConfig = {
-    config: {
-      duration: 120,
+
+  const [selectedTriwulan, setSelectedTriwulan] = useState(null);
+  const [selectedOpd, setSelectedOpd] = useState(null);
+  const [selectedOccassion, setSelectedOccassion] = useState(null);
+  const [selectedProgram, setSelectedProgram] = useState(null);
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm();
+
+  const { isLoading, isError, error } = useQuery({
+    queryKey: ['get_report'],
+    queryFn: () => getReport(id, authHeader()),
+    onSuccess: (result) => {
+      setSelectedTriwulan(result.data.result.triwulan);
+      setSelectedOpd(result.data.result.organization);
+      setSelectedOccassion(result.data.result.occassion);
+      setSelectedProgram(result.data.result.program);
+
+      setValue('triwulan_id', result.data.result.triwulan.id);
+      setValue('organization_id', result.data.result.organization.id);
+      setValue('occassion_id', result.data.result.occassion.id);
+      setValue('program_id', result.data.result.program.id);
     },
-    from: {
-      scale: 0,
-      opacity: 0,
-    },
-    enter: {
-      scale: 1,
-      opacity: 1,
-    },
-    leave: {
-      scale: 0,
-      opacity: 0,
-    },
+  });
+
+  const triwulanQuery = useInfiniteQuery({
+    queryKey: ['get_triwulan'],
+    queryFn: ({ pageParam = 1 }) => getTriwulan(authHeader()),
+    getNextPageParam: (lastPage) => lastPage.nextId ?? undefined,
+    getPreviousPageParam: (firstPage) => firstPage.previousId ?? undefined,
+  });
+
+  const opdQuery = useInfiniteQuery({
+    queryKey: ['get_organizations'],
+    queryFn: ({ pageParam = 1 }) =>
+      getOrganizations(initialParams, authHeader()),
+    getNextPageParam: (lastPage) => lastPage.nextId ?? undefined,
+    getPreviousPageParam: (firstPage) => firstPage.previousId ?? undefined,
+  });
+
+  const occassionQuery = useInfiniteQuery({
+    queryKey: ['get_occassions'],
+    queryFn: ({ pageParam = 1 }) => getOccasions(initialParams, authHeader()),
+    getNextPageParam: (lastPage) => lastPage.nextId ?? undefined,
+    getPreviousPageParam: (firstPage) => firstPage.previousId ?? undefined,
+  });
+
+  const programQuery = useInfiniteQuery({
+    queryKey: ['get_programs'],
+    queryFn: ({ pageParam = 1 }) => getPrograms(initialParams, authHeader()),
+    getNextPageParam: (lastPage) => lastPage.nextId ?? undefined,
+    getPreviousPageParam: (firstPage) => firstPage.previousId ?? undefined,
+  });
+
+  const updateMutation = useMutation(updateReport);
+
+  const handleSelectTriwulan = (item) => {
+    setSelectedTriwulan(item);
+    setValue('triwulan_id', item.id);
   };
-  const transitionCreateOpd = useTransition(openCreateOpd, transationConfig);
-  const transitionCreateOccasion = useTransition(
-    openCreateOccasion,
-    transationConfig
-  );
-  const transitionCreateProgram = useTransition(
-    openCreateProgram,
-    transationConfig
-  );
 
-  useEffect(() => {
-    const fetchReport = async (reportId) => {
-      setIsLoading(true);
+  const handleSelectOccassion = (item) => {
+    setSelectedOccassion(item);
+    setValue('occassion_id', item.id);
+  };
 
-      try {
-        const reportResponse = await getReport(authHeader, reportId);
-        setReport({
-          createdAt: reportResponse.created_at,
-          triwulan: {
-            value: reportResponse.triwulan.id,
-            label: reportResponse.triwulan.name,
-          },
-          occasion: {
-            id: reportResponse.occassion.id,
-            title: reportResponse.occassion.title,
-          },
-          organization: {
-            id: reportResponse.organization.id,
-            title: reportResponse.organization.title,
-          },
-          program: {
-            id: reportResponse.program.id,
-            title: reportResponse.program.title,
-          },
-        });
+  const handleSelectOpd = (item) => {
+    setSelectedOpd(item);
+    setValue('organization_id', item.id);
+  };
 
-        setIsLoading(false);
-      } catch (err) {
-        setIsLoading(false);
-        setError(err.message);
-      }
-    };
+  const handleSelectProgram = (item) => {
+    setSelectedProgram(item);
+    setValue('program_id', item.id);
+  };
 
-    const fetchTriwulan = async () => {
-      setIsLoading(true);
-
-      try {
-        const triwulanResponse = await getTriwulan();
-        setTriwulan(triwulanResponse);
-        setIsLoading(false);
-      } catch (err) {
-        setError(err.message);
-        setIsLoading(false);
-      }
-    };
-
-    fetchReport(id);
-    fetchTriwulan();
-  }, []);
-
-  async function fetchOccasions(page) {
-    try {
-      const occasionsResponse = await getOccasions(authHeader, {
-        limit: 15,
-        pageNumber: page,
-      });
-
-      setOccasions((prevData) => ({
-        ...prevData,
-        items: [...prevData.items, ...occasionsResponse.result],
-        totalPages: occasionsResponse.pages,
-      }));
-    } catch (err) {
-      setError(err.message);
-    }
-  }
-  useEffect(() => {
-    fetchOccasions(occasions.currentPage);
-  }, [occasions.currentPage]);
-
-  async function fetchOrganizations(page) {
-    try {
-      const organizationResponse = await getOrganizations(authHeader, {
-        limit: 15,
-        pageNumber: page,
-      });
-      setOrganizations((prevData) => ({
-        ...prevData,
-        items: [...prevData.items, ...organizationResponse.result],
-        totalPages: organizationResponse.pages,
-      }));
-    } catch (err) {
-      setError(err.message);
-    }
-  }
-
-  useEffect(() => {
-    fetchOrganizations(organizations.currentPage);
-  }, [organizations.currentPage]);
-
-  async function fetchPrograms(page) {
-    try {
-      const programResponse = await getPrograms(authHeader, {
-        limit: 15,
-        pageNumber: page,
-      });
-      setPrograms((prevData) => ({
-        ...prevData,
-        items: [...prevData.items, ...programResponse.result],
-        totalPages: programResponse.pages,
-      }));
-    } catch (err) {
-      setError(err.message);
-    }
-  }
-
-  useEffect(() => {
-    fetchPrograms(programs.currentPage);
-  }, [programs.currentPage]);
-
-  const onSelectTriwulan = useCallback(({ newValue, newLabel }) => {
-    setReport((prev) => ({
-      ...prev,
-      triwulan: {
-        value: newValue,
-        label: newLabel,
+  const onSubmit = (formData) => {
+    updateMutation.mutate(
+      {
+        body: {
+          ...formData,
+          data_report_id: id,
+        },
+        token: authHeader(),
       },
-    }));
-  }, []);
-
-  const handleSelectOccasion = (ocs) => {
-    setReport((prev) => ({ ...prev, occasion: ocs }));
-    setOpenOccasionDialog(false);
-  };
-
-  const handleSelectOrganization = (org) => {
-    setReport((prev) => ({ ...prev, organization: org }));
-    setOpenOrganizationDialog(false);
-  };
-
-  const handleSelectProgram = (org) => {
-    setReport((prev) => ({ ...prev, program: org }));
-    setOpenProgramDialog(false);
-  };
-
-  const loadMoreOccasionData = async () => {
-    setOccasions((prevData) => ({
-      ...prevData,
-      currentPage: prevData.currentPage + 1,
-    }));
-  };
-
-  const loadMoreOrganizationData = async () => {
-    setOrganizations((prevData) => ({
-      ...prevData,
-      currentPage: prevData.currentPage + 1,
-    }));
-  };
-
-  const loadMoreProgramData = async () => {
-    setPrograms((prevData) => ({
-      ...prevData,
-      currentPage: prevData.currentPage + 1,
-    }));
-  };
-
-  const onSubmit = async (e) => {
-    e.preventDefault();
-
-    setIsLoading(true);
-
-    try {
-      const reportBody = {
-        data_report_id: id,
-        triwulan_id: Number(report.triwulan.value),
-        organization_id: report.organization.id,
-        occassion_id: report.occasion.id,
-        program_id: report.program.id,
-      };
-      const reportResponse = await updateReport(authHeader, reportBody);
-
-      setIsLoading(false);
-      showToastMessage(reportResponse, 'success');
-      navigate('../');
-    } catch (err) {
-      setIsLoading(false);
-      showToastMessage(err.message, 'error');
-    }
-  };
-
-  const handleOccasionKeyDown = async (e) => {
-    if (e.key === 'Enter') {
-      setOccasions((prev) => ({ ...prev, isLoading: true }));
-      setOpenCreateOccasion(false);
-
-      try {
-        const occasionBody = { title: e.target.value };
-        const occasionResponse = await createOccasion(authHeader, occasionBody);
-
-        setOpenCreateOccasion(false);
-        setOccasions((prev) => ({
-          ...prev,
-          isLoading: false,
-          items: [
-            {
-              id: occasionResponse.data.id,
-              title: occasionResponse.data.title,
-            },
-            ...prev.items,
-          ],
-        }));
-
-        showToastMessage(occasionResponse);
-      } catch (err) {
-        setOpenCreateOccasion(false);
-        setOccasions((prev) => ({ ...prev, isLoading: false }));
-        showToastMessage(err.message, 'error');
+      {
+        onSuccess: () => {
+          showToastMessage('Berhasil mengubah Laporan');
+          navigate('/laporan');
+        },
+        onError: (err) => {
+          showToastMessage(err.message, 'error');
+        },
       }
-    }
+    );
   };
 
-  const handleOpdKeyDown = async (e) => {
-    if (e.key === 'Enter') {
-      setOrganizations((prev) => ({ ...prev, isLoading: true }));
-      setOpenCreateOpd(false);
-
-      try {
-        const organizationBody = { title: e.target.value };
-        const organizationResponse = await createOrganization(
-          authHeader,
-          organizationBody
-        );
-
-        setOpenCreateOpd(false);
-        setOrganizations((prev) => ({
-          ...prev,
-          isLoading: false,
-          items: [
-            {
-              id: organizationResponse.data.id,
-              title: organizationResponse.data.title,
-            },
-            ...prev.items,
-          ],
-        }));
-        showToastMessage(organizationResponse);
-      } catch (err) {
-        setOpenCreateOpd(false);
-        setOrganizations((prev) => ({ ...prev, isLoading: false }));
-        showToastMessage(err.message, 'error');
-      }
-    }
-  };
-
-  const handleProgramKeyDown = async (e) => {
-    if (e.key === 'Enter') {
-      setPrograms((prev) => ({ ...prev, isLoading: true }));
-      setOpenCreateProgram(false);
-
-      try {
-        const programBody = { title: e.target.value };
-        const programResponse = await createProgram(authHeader, programBody);
-
-        setOpenCreateProgram(false);
-        setPrograms((prev) => ({
-          ...prev,
-          isLoading: false,
-          items: [
-            {
-              id: programResponse.data.id,
-              title: programResponse.data.title,
-            },
-            ...prev.items,
-          ],
-        }));
-        showToastMessage(programResponse);
-      } catch (err) {
-        setOpenCreateProgram(false);
-        setPrograms((prev) => ({ ...prev, isLoading: false }));
-        showToastMessage(err.message, 'error');
-      }
-    }
-  };
-
-  if (error) {
-    return <ErrorPage errorMessage={error} />;
+  if (isError) {
+    return <ErrorPage errorMessage={error.message} />;
   }
 
   if (isLoading) {
@@ -404,249 +151,68 @@ export default function ReportEdit() {
           </h1>
         </Link>
 
-        <form className="mt-4 lg:w-2/3 xl:w-1/3" onSubmit={onSubmit}>
+        <form
+          className="mt-4 lg:w-2/3 xl:w-1/3"
+          onSubmit={handleSubmit(onSubmit)}
+        >
           <div className="mb-6">
             <Label className="mb-2">Triwulan</Label>
-            <Dropdown
-              dropdownStyle="border"
-              onSelect={onSelectTriwulan}
-              label="--Pilih Triwulan--"
-              labelPosition="center"
-              selectedItem={report.triwulan}
-            >
-              <Dropdown.Items>
-                {triwulan.map((trw) => (
-                  <li
-                    key={trw.id}
-                    value={trw.id}
-                    className="block px-4 py-2 cursor-pointer hover:bg-gray-100"
-                  >
-                    {trw.name}
-                  </li>
-                ))}
-              </Dropdown.Items>
-            </Dropdown>
+            <DropdownDialog
+              label="Pilih Triwulan"
+              data={triwulanQuery.data}
+              value={selectedTriwulan}
+              onChange={handleSelectTriwulan}
+              register={register('triwulan_id', {
+                required: 'Triwulan wajib dipilih!',
+                valueAsNumber: true,
+              })}
+              error={errors.triwulan_id?.message}
+            />
           </div>
           <div className="mb-6">
-            <Label>Urusan</Label>
-            <Dialog
-              open={openOccasionDialog}
-              onOpenChange={setOpenOccasionDialog}
-            >
-              <DialogTrigger className="w-full">
-                <SelectInputModal
-                  className="mt-2"
-                  selectedValue={report.occasion.title}
-                  label="--- Pilih Urusan ---"
-                />
-              </DialogTrigger>
-
-              <DialogContent
-                addButton
-                title="Pilih Nama Urusan"
-                onCreateClick={() => setOpenCreateOccasion((prev) => !prev)}
-              >
-                {transitionCreateOccasion((style, isOpen) => (
-                  <div>
-                    {isOpen && (
-                      <animated.div
-                        style={style}
-                        className="w-72 bg-white rounded-md absolute z-10 -right-80 top-0 p-4"
-                      >
-                        <TextInput
-                          required
-                          placeholder="Masukan Nama Urusan"
-                          onKeyDown={handleOccasionKeyDown}
-                        />
-                        <p className="text-xs text-light-gray mt-2 text-left">
-                          Tekan{' '}
-                          <span className="itelic text-dark-gray">Enter</span>{' '}
-                          untuk menyimpan
-                        </p>
-                      </animated.div>
-                    )}
-                  </div>
-                ))}
-
-                <div className="relative my-6">
-                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                    <MagnifyingGlassIcon className="w-4 h-4" />
-                  </div>
-                  <input
-                    type="search"
-                    id="search"
-                    className="bg-gray-50 text-light-gray border-none text-sm rounded-lg focus:ring-0 block w-full pl-10 p-2.5 shadow"
-                    placeholder="Pencarian"
-                  />
-                </div>
-                {occasions.isLoading ? (
-                  <ReactLoading />
-                ) : (
-                  <InfiniteScroll
-                    dataLength={occasions.items.length}
-                    next={loadMoreOccasionData}
-                    hasMore={occasions.hasMore}
-                    height={500}
-                    endMessage={
-                      <h1 className="font-bold text-2xl text-gray-400">...</h1>
-                    }
-                  >
-                    <List
-                      data={occasions.items}
-                      onSelectValue={handleSelectOccasion}
-                    />
-                  </InfiniteScroll>
-                )}
-              </DialogContent>
-            </Dialog>
+            <Label className="mb-2">Urusan</Label>
+            <DropdownDialog
+              label="Pilih Urusan"
+              data={occassionQuery.data}
+              value={selectedOccassion}
+              onChange={handleSelectOccassion}
+              register={register('occassion_id', {
+                required: 'Urusan wajib dipilih!',
+                valueAsNumber: true,
+              })}
+              error={errors.occassion_id?.message}
+            />
           </div>
           <div className="mb-6">
-            <Label>Organisasi</Label>
-            <Dialog
-              open={openOrganizationDialog}
-              onOpenChange={setOpenOrganizationDialog}
-            >
-              <DialogTrigger className="w-full">
-                <SelectInputModal
-                  className="mt-2"
-                  selectedValue={report.organization.title}
-                  label="--- Pilih Organisasi ---"
-                />
-              </DialogTrigger>
-
-              <DialogContent
-                addButton
-                title="Pilih Nama OPD"
-                onCreateClick={() => setOpenCreateOpd((prev) => !prev)}
-              >
-                {transitionCreateOpd((style, isOpen) => (
-                  <div>
-                    {isOpen && (
-                      <animated.div
-                        style={style}
-                        className="w-72 bg-white rounded-md absolute z-10 -right-80 top-0 p-4"
-                      >
-                        <TextInput
-                          required
-                          placeholder="Masukan Nama OPD"
-                          onKeyDown={handleOpdKeyDown}
-                        />
-                        <p className="text-xs text-light-gray mt-2 text-left">
-                          Tekan{' '}
-                          <span className="itelic text-dark-gray">Enter</span>{' '}
-                          untuk menyimpan
-                        </p>
-                      </animated.div>
-                    )}
-                  </div>
-                ))}
-
-                <div className="relative my-6">
-                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                    <MagnifyingGlassIcon className="w-4 h-4" />
-                  </div>
-                  <input
-                    type="search"
-                    id="search"
-                    className="bg-gray-50 text-light-gray border-none text-sm rounded-lg focus:ring-0 block w-full pl-10 p-2.5 shadow"
-                    placeholder="Pencarian"
-                  />
-                </div>
-                {organizations.isLoading ? (
-                  <ReactLoading />
-                ) : (
-                  <InfiniteScroll
-                    dataLength={organizations.items.length}
-                    next={loadMoreOrganizationData}
-                    hasMore={organizations.hasMore}
-                    height={500}
-                    endMessage={
-                      <h1 className="font-bold text-2xl text-gray-400">...</h1>
-                    }
-                  >
-                    <List
-                      data={organizations.items}
-                      onSelectValue={handleSelectOrganization}
-                    />
-                  </InfiniteScroll>
-                )}
-              </DialogContent>
-            </Dialog>
+            <Label className="mb-2">Organisasi</Label>
+            <DropdownDialog
+              label="Pilih Organisasi"
+              data={opdQuery.data}
+              value={selectedOpd}
+              onChange={handleSelectOpd}
+              register={register('organization_id', {
+                required: 'Organisasi wajib dipilih!',
+                valueAsNumber: true,
+              })}
+              error={errors.organization_id?.message}
+            />
           </div>
           <div className="mb-6">
-            <Label>Program</Label>
-            <Dialog
-              open={openProgramDialog}
-              onOpenChange={setOpenProgramDialog}
-            >
-              <DialogTrigger className="w-full">
-                <SelectInputModal
-                  className="mt-2"
-                  selectedValue={report.program.title}
-                  label="--- Pilih Program ---"
-                />
-              </DialogTrigger>
-
-              <DialogContent
-                addButton
-                title="Pilih Nama Program"
-                onCreateClick={() => setOpenCreateProgram((prev) => !prev)}
-              >
-                {transitionCreateProgram((style, isOpen) => (
-                  <div>
-                    {isOpen && (
-                      <animated.div
-                        style={style}
-                        className="w-72 bg-white rounded-md absolute z-10 -right-80 top-0 p-4"
-                      >
-                        <TextInput
-                          required
-                          placeholder="Masukan Nama Program"
-                          onKeyDown={handleProgramKeyDown}
-                        />
-                        <p className="text-xs text-light-gray mt-2 text-left">
-                          Tekan{' '}
-                          <span className="itelic text-dark-gray">Enter</span>{' '}
-                          untuk menyimpan
-                        </p>
-                      </animated.div>
-                    )}
-                  </div>
-                ))}
-
-                <div className="relative my-6">
-                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                    <MagnifyingGlassIcon className="w-4 h-4" />
-                  </div>
-                  <input
-                    type="search"
-                    id="search"
-                    className="bg-gray-50 text-light-gray border-none text-sm rounded-lg focus:ring-0 block w-full pl-10 p-2.5 shadow"
-                    placeholder="Pencarian"
-                  />
-                </div>
-                {programs.isLoading ? (
-                  <ReactLoading />
-                ) : (
-                  <InfiniteScroll
-                    dataLength={programs.items.length}
-                    next={loadMoreProgramData}
-                    hasMore={programs.hasMore}
-                    height={500}
-                    endMessage={
-                      <h1 className="font-bold text-2xl text-gray-400">...</h1>
-                    }
-                  >
-                    <List
-                      data={programs.items}
-                      onSelectValue={handleSelectProgram}
-                    />
-                  </InfiniteScroll>
-                )}
-              </DialogContent>
-            </Dialog>
+            <Label className="mb-2">Program</Label>
+            <DropdownDialog
+              label="Pilih Program"
+              data={programQuery.data}
+              value={selectedProgram}
+              onChange={handleSelectProgram}
+              register={register('program_id', {
+                required: 'Program wajib dipilih!',
+                valueAsNumber: true,
+              })}
+              error={errors.program_id?.message}
+            />
           </div>
-          {isLoading ? (
+
+          {updateMutation.isLoading ? (
             <ReactLoading />
           ) : (
             <div className="flex space-x-3">
@@ -674,4 +240,6 @@ export default function ReportEdit() {
       </div>
     </>
   );
-}
+};
+
+export default ReportEdit;

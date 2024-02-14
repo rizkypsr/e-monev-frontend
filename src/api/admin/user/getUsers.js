@@ -1,20 +1,24 @@
-import { baseUrl, domainUrl } from '../../../utils/constants';
-import makeRequest from '../../../utils/makeRequest';
+import axiosClient from '../../../config/axios';
 
-export default async function getUsers(authHeader, options = {}) {
-  const url = new URL(`${baseUrl}/user/list`);
-  url.search = new URLSearchParams(options).toString();
+async function getUsers(params, token) {
+  try {
+    const response = await axiosClient.get('/user/list', {
+      params,
+      headers: {
+        Authorization: token,
+      },
+    });
 
-  const headers = {
-    'Content-Type': 'application/json',
-    'Access-Control-Allow-Origin': domainUrl,
-    authorization: authHeader(),
-  };
+    const responseData = response.data;
 
-  const response = await makeRequest(url.toString(), {
-    method: 'GET',
-    headers,
-  });
+    if (responseData.statusCode !== 200) {
+      throw new Error(responseData.message);
+    }
 
-  return response.data;
+    return responseData;
+  } catch (err) {
+    throw new Error(err);
+  }
 }
+
+export default getUsers;

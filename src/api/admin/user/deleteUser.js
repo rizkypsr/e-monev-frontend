@@ -1,25 +1,29 @@
-import { baseUrl, domainUrl } from '../../../utils/constants';
+import axiosClient from '../../../config/axios';
 
-export default async function deleteUser(authHeader, userId) {
+async function deleteUser({ id, token }) {
   try {
-    const userResponse = await fetch(`${baseUrl}/user/delete`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': domainUrl,
-        authorization: authHeader(),
+    const response = await axiosClient.patch(
+      '/user/delete',
+      {
+        user_id: id,
       },
-      body: JSON.stringify({ user_id: userId }),
-    });
+      {
+        headers: {
+          Authorization: token,
+        },
+      }
+    );
 
-    const userData = await userResponse.json();
+    const responseData = response.data;
 
-    if (!userResponse.ok) {
-      throw new Error(`Terjadi kesalahan pada server: ${userData.message}`);
+    if (responseData.statusCode !== 200) {
+      throw new Error(responseData.message);
     }
 
-    return userData.message;
-  } catch (error) {
-    throw new Error(error.message);
+    return responseData;
+  } catch (err) {
+    throw new Error(err);
   }
 }
+
+export default deleteUser;

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import Dropdown from './Dropdown';
 
-export default function DropdownWrapper({ onFetching, onSelect, error }) {
+const DropdownWrapper = ({ onFetching, onSelect, error }) => {
   const [data, setData] = useState([]);
   const [selectedItem, setSelectedItem] = useState({});
   const [networkError, setNetworkError] = useState('');
@@ -38,7 +38,7 @@ export default function DropdownWrapper({ onFetching, onSelect, error }) {
       error={error}
     >
       {networkError ? (
-        <p className='p-3'>{networkError}</p>
+        <p className="p-3">{networkError}</p>
       ) : (
         <Dropdown.Items>
           {data.map((d) => (
@@ -54,4 +54,6 @@ export default function DropdownWrapper({ onFetching, onSelect, error }) {
       )}
     </Dropdown>
   );
-}
+};
+
+export default DropdownWrapper;

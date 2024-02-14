@@ -1,78 +1,68 @@
-import React, { useState } from 'react';
 import { useAuthUser, useIsAuthenticated, useSignIn } from 'react-auth-kit';
-import { Navigate } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import Slider from 'react-slick';
+import { useMutation } from 'react-query';
+import { useForm } from 'react-hook-form';
 import Logo from '../../assets/images/big_logo.png';
 import Label from '../../components/Label';
 import TextInput from '../../components/TextInput';
 import Button from '../../components/Button';
-import Img1 from '../../assets/images/img1.jpeg';
-import Img2 from '../../assets/images/img2.jpeg';
+import Img1 from '../../assets/images/img1.jpg';
+import Img2 from '../../assets/images/img2.jpg';
 import Img3 from '../../assets/images/img3.jpeg';
 import Img4 from '../../assets/images/img4.jpeg';
+import Img5 from '../../assets/images/img5.jpg';
 import login from '../../api/auth/login';
 import { useToastContext } from '../../context/ToastContext';
 import Loading from '../../components/Loading';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
-function Login() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [usernameError, setUsernameError] = useState('');
-  const [passwordError, setPasswordError] = useState('');
-  const [loading, setLoading] = useState(false);
-
+const Login = () => {
   const isAuthenticated = useIsAuthenticated();
   const signIn = useSignIn();
   const auth = useAuthUser();
   const { showToastMessage } = useToastContext();
 
-  const onSubmit = async (e) => {
-    e.preventDefault();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
 
-    setLoading(true);
-    setUsernameError('');
-    setPasswordError('');
+  const loginMutation = useMutation(login);
 
-    try {
-      const loginBody = { username, password };
-      const loginResponse = await login(loginBody);
+  const onSubmit = (data) => {
+    const { username, password } = data;
 
-      if (
-        signIn({
-          token: loginResponse.access_token,
-          tokenType: 'Bearer',
-          authState: loginResponse.payloadClient,
-          expiresIn: 2880,
-        })
-      ) {
-        setLoading(false);
-      } else {
-        showToastMessage('Terjadi kesalahan saat login', 'error');
+    loginMutation.mutate(
+      {
+        username,
+        password,
+      },
+      {
+        onSuccess: (res) => {
+          if (res.statusCode === 200) {
+            signIn({
+              token: res.access_token,
+              tokenType: 'Bearer',
+              authState: res.payloadClient,
+              expiresIn: 2880,
+            });
+          }
+        },
+        onError: (error) => {
+          showToastMessage(
+            `Terjadi kesalahan saat login: ${error.message}`,
+            'error'
+          );
+        },
       }
-    } catch (error) {
-      switch (error.message) {
-        case 'Data user tidak ditemukan':
-          setUsernameError('Username yang Anda masukkan tidak tersedia');
-          break;
-        case 'Username/password salah':
-          setPasswordError('Password yang Anda masukkan salah');
-          break;
-        default:
-          showToastMessage(error.message, 'error');
-      }
-
-      setLoading(false);
-    }
+    );
   };
 
   if (isAuthenticated()) {
-    if (auth().admin_role_id === 1) {
-      return <Navigate to="/admin" replace />;
-    }
-
-    return <Navigate to="/" replace />;
+    return <Navigate to="/" />;
   }
 
   return (
@@ -96,9 +86,8 @@ function Login() {
           arrows={false}
           adaptiveHeight
           autoplay
-          autoplaySpeed={5000}
         >
-          {[Img1, Img2, Img3, Img4].map((img, index) => (
+          {[Img1, Img2, Img3, Img4, Img5].map((img, index) => (
             // eslint-disable-next-line react/no-array-index-key
             <div key={index}>
               <img
@@ -115,7 +104,7 @@ function Login() {
           <div className="flex space-x-3">
             <img src={Logo} className="w-14" alt="Logo" />
             <div className="text-dark-gray">
-              <h1 className="font-semibold">SISTEM INFORMASI E-MONEY</h1>
+              <h1 className="font-semibold">SISTEM INFORMASI E-MONTIR PEMDA</h1>
               <h2>KABUPATEN SORONG</h2>
             </div>
           </div>
@@ -128,32 +117,30 @@ function Login() {
               Login dibawah untuk akses akun Anda
             </h4>
 
-            <form className="mt-4" onSubmit={onSubmit}>
+            <form className="mt-4" onSubmit={handleSubmit(onSubmit)}>
               <div className="mb-6">
                 <Label htmlFor="username">Username</Label>
                 <TextInput
                   id="username"
-                  className="mt-2"
                   name="username"
                   placeholder="Masukan Username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  error={usernameError}
-                  required
+                  register={register('username', {
+                    required: 'Username wajib diisi!',
+                  })}
+                  error={errors.username?.message}
                 />
               </div>
               <div className="mb-6">
                 <Label htmlFor="password">Password</Label>
                 <TextInput
                   id="password"
-                  className="mt-2"
                   type="password"
                   name="password"
-                  value={password}
                   placeholder="Masukan Password"
-                  onChange={(e) => setPassword(e.target.value)}
-                  error={passwordError}
-                  required
+                  register={register('password', {
+                    required: 'Password wajib diisi!',
+                  })}
+                  error={errors.password?.message}
                 />
               </div>
               <div className="flex items-center justify-between mb-6">
@@ -168,12 +155,12 @@ function Login() {
                   </Label>
                 </div>
 
-                <button type="button" className="text-sm text-primary">
+                <Link to="/forgot-password" className="text-sm text-primary">
                   Lupa Password
-                </button>
+                </Link>
               </div>
 
-              {loading ? (
+              {loginMutation.isLoading ? (
                 <Loading />
               ) : (
                 <Button
@@ -191,6 +178,6 @@ function Login() {
       </div>
     </div>
   );
-}
+};
 
 export default Login;

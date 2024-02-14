@@ -1,17 +1,23 @@
-import { baseUrl, domainUrl } from '../../../utils/constants';
-import makeRequest from '../../../utils/makeRequest';
+import axiosClient from '../../../config/axios';
 
-export default async function createActivity(authHeader, activityBody) {
-  const url = `${baseUrl}/activity/create`;
-  const headers = {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': domainUrl,
-      authorization: authHeader(),
-    },
-    body: JSON.stringify(activityBody),
-  };
-  const activityResponse = await makeRequest(url, headers);
-  return activityResponse.message;
+async function createActivity({ body, token }) {
+  try {
+    const response = await axiosClient.post('/activity/create', body, {
+      headers: {
+        Authorization: token,
+      },
+    });
+
+    const responseData = response.data;
+
+    if (responseData.statusCode !== 200) {
+      throw new Error(responseData.message);
+    }
+
+    return responseData;
+  } catch (err) {
+    throw new Error(err);
+  }
 }
+
+export default createActivity;

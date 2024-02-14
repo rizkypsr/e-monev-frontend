@@ -6,10 +6,10 @@ import {
   TrashIcon,
 } from '@heroicons/react/24/solid';
 import { createColumnHelper } from '@tanstack/react-table';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useAuthHeader } from 'react-auth-kit';
 import { Link } from 'react-router-dom';
-import { ToastContainer } from 'react-toastify';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { getPurposes } from '../../../api/admin/purpose';
 import deletePurpose from '../../../api/admin/purpose/deletePurpose';
 import Button from '../../../components/Button';
@@ -19,18 +19,19 @@ import {
   DialogContent,
   DialogTrigger,
 } from '../../../components/DialogContent';
-import Dropdown from '../../../components/Dropdown';
 import Pagination from '../../../components/Pagination';
 import Table from '../../../components/Table';
 import { useToastContext } from '../../../context/ToastContext';
 import ErrorPage from '../../ErrorPage';
 import TrashImg from '../../../assets/images/trash.png';
+import DropdownSelect from '../../../components/DropdownSelect';
 
 const columnHelper = createColumnHelper();
 const columns = [
-  columnHelper.accessor('id', {
-    cell: (info) => info.getValue(),
-    header: () => <span>ID</span>,
+  columnHelper.accessor((row, index) => index + 1, {
+    id: 'no',
+    cell: (info) => <i>{info.getValue()}</i>,
+    header: () => <span>No</span>,
   }),
   columnHelper.accessor((row) => row.title, {
     id: 'title',
@@ -118,97 +119,108 @@ const columns = [
   }),
 ];
 
-function PurposeTable() {
-  const [error, setError] = useState(false);
-  const [pageSize, setPageSize] = useState(10);
-  const [search, setSearch] = useState('');
-  const [pageData, setCurrentPageData] = useState({
-    rowData: [],
-    isLoading: false,
-    totalPages: 0,
-    totalData: 0,
-  });
-  const [currentPage, setCurrentPage] = useState(1);
-  const [resetPage, setResetPage] = useState(false);
-  const [sorting, setSorting] = useState({
-    value: 'terbaru',
+const sorting = [
+  {
     label: 'Terbaru',
-  });
+    value: 'terbaru',
+  },
+  {
+    label: 'Terlama',
+    value: 'terlama',
+  },
+];
 
+const pageSizes = [
+  {
+    label: '10',
+    value: 10,
+  },
+  {
+    label: '50',
+    value: 50,
+  },
+  {
+    label: '100',
+    value: 100,
+  },
+];
+
+const initialParams = {
+  limit: 10,
+  page: 1,
+  search: '',
+  sort: 'terbaru',
+};
+
+const PurposeTable = () => {
   const authHeader = useAuthHeader();
   const { showToastMessage } = useToastContext();
+  const queryClient = useQueryClient();
 
-  async function fetchPurposes(offset, limit, page, sort) {
-    try {
-      const purposeData = await getPurposes(authHeader, {
-        offset,
-        limit,
-        page,
-        search,
-        sort,
-      });
-      setCurrentPageData({
-        rowData: purposeData.result,
-        isLoading: false,
-        totalPages: purposeData.pages,
-        totalData: purposeData.total,
-      });
-    } catch (err) {
-      setError(err.message);
-    }
-  }
+  const [filterParams, setFilterParams] = useState(initialParams);
+  const [selectedSorting, setSelectedSorting] = useState(sorting[0]);
+  const [selectedPageSize, setSelectedPageSize] = useState(pageSizes[0]);
 
-  useEffect(() => {
-    setCurrentPageData((prevState) => ({
-      ...prevState,
-      rowData: [],
-      isLoading: true,
-    }));
+  const { isLoading, isError, error, data } = useQuery({
+    queryKey: ['get_purposes', filterParams],
+    queryFn: () => getPurposes(filterParams, authHeader()),
+    keepPreviousData: true,
+  });
 
-    fetchPurposes(0, pageSize, currentPage, sorting.value);
-  }, [currentPage, pageSize, sorting]);
-
-  useEffect(() => {
-    setCurrentPage(1);
-    setResetPage((prevState) => !prevState);
-    setCurrentPageData((prevState) => ({
-      ...prevState,
-      rowData: [],
-      isLoading: true,
-    }));
-
-    fetchPurposes(0, pageSize, currentPage, sorting.value);
-  }, [search]);
+  const deleteMutation = useMutation(deletePurpose);
 
   const deletePurposeData = async (id) => {
-    try {
-      const deleteResponse = await deletePurpose(authHeader, id);
-      fetchPurposes(0, pageSize, currentPage);
-
-      showToastMessage(deleteResponse);
-    } catch (err) {
-      showToastMessage(err.message, 'error');
-    }
+    deleteMutation.mutate(
+      {
+        id,
+        token: authHeader(),
+      },
+      {
+        onSuccess: () => {
+          showToastMessage('Berhasil menghapus Sasaran');
+          queryClient.invalidateQueries('get_purposes');
+        },
+        onError: (err) => {
+          showToastMessage(err.message, 'error');
+        },
+      }
+    );
   };
 
-  const onPageSizeChanged = useCallback(
-    ({ newValue }) => {
-      setCurrentPage(1);
-      setResetPage((prevState) => !prevState);
-      setPageSize(Number(newValue));
-    },
-    [setCurrentPage, setResetPage, setPageSize]
-  );
+  const onPageSizeChanged = (selectedValue) => {
+    setSelectedPageSize(selectedValue);
+    setFilterParams({
+      ...filterParams,
+      limit: selectedValue.value,
+    });
+  };
 
-  const onSorting = useCallback(
-    ({ newValue, newLabel }) => {
-      setSorting({ value: newValue, label: newLabel });
-    },
-    [setSorting]
-  );
+  const onSorting = (selectedValue) => {
+    setSelectedSorting(selectedValue);
+    setFilterParams({
+      ...filterParams,
+      sort: selectedValue.value,
+    });
+  };
 
-  if (error) {
-    return <ErrorPage errorMessage={error} />;
+  const onSearchChange = (e) => {
+    setTimeout(() => {
+      setFilterParams({
+        ...filterParams,
+        search: e.target.value,
+      });
+    }, 500);
+  };
+
+  const onPaginationChange = (currentPage) => {
+    setFilterParams({
+      ...filterParams,
+      page: currentPage,
+    });
+  };
+
+  if (isError) {
+    return <ErrorPage errorMessage={error.message} />;
   }
 
   return (
@@ -229,62 +241,22 @@ function PurposeTable() {
       <div className="flex justify-between mt-6">
         <div className="flex space-x-3">
           {/* Sorting Dropdown */}
-          <div>
-            <Dropdown
-              onSelect={onSorting}
-              label="Urutkan:"
-              selectedItem={sorting}
-            >
-              <Dropdown.Items>
-                <li
-                  value="terbaru"
-                  className="block px-4 py-2 font-semibold cursor-pointer hover:bg-gray-100"
-                >
-                  Terbaru
-                </li>
-                <li
-                  value="terlama"
-                  className="block px-4 py-2 font-semibold cursor-pointer hover:bg-gray-100"
-                >
-                  Terlama
-                </li>
-              </Dropdown.Items>
-            </Dropdown>
-          </div>
+          <DropdownSelect
+            value={selectedSorting}
+            options={sorting}
+            onChange={onSorting}
+          >
+            <DropdownSelect.HeaderV1 label="Urutkan:" />
+          </DropdownSelect>
 
           {/* Page Size Dropdown */}
-          <div>
-            <Dropdown
-              onSelect={onPageSizeChanged}
-              label="Tampilkan:"
-              endLabel="Entri"
-              selectedItem={{
-                value: pageSize.toString(),
-                label: pageSize.toString(),
-              }}
-            >
-              <Dropdown.Items>
-                <li
-                  value="10"
-                  className="block px-4 py-2 font-semibold cursor-pointer hover:bg-gray-100"
-                >
-                  10
-                </li>
-                <li
-                  value="50"
-                  className="block px-4 py-2 font-semibold cursor-pointer hover:bg-gray-100"
-                >
-                  50
-                </li>
-                <li
-                  value="100"
-                  className="block px-4 py-2 font-semibold cursor-pointer hover:bg-gray-100"
-                >
-                  100
-                </li>
-              </Dropdown.Items>
-            </Dropdown>
-          </div>
+          <DropdownSelect
+            value={selectedPageSize}
+            options={pageSizes}
+            onChange={onPageSizeChanged}
+          >
+            <DropdownSelect.HeaderV1 label="Tampilkan:" endLabel="Entri" />
+          </DropdownSelect>
         </div>
 
         <div className="relative w-1/3">
@@ -293,8 +265,8 @@ function PurposeTable() {
           </div>
           <input
             type="search"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            value={filterParams.seacrh}
+            onChange={onSearchChange}
             className="bg-gray-50 text-light-gray border-none text-sm rounded-lg focus:ring-0 block w-full pl-10 p-2.5 shadow"
             placeholder="Pencarian"
           />
@@ -311,20 +283,18 @@ function PurposeTable() {
                 }
               : column
           )}
-          rows={pageData.rowData}
-          isLoading={pageData.isLoading}
+          rows={data?.data.result || []}
+          isLoading={isLoading}
         />
 
         <Pagination
-          totalRows={pageData.totalData}
-          pageChangeHandler={setCurrentPage}
-          rowsPerPage={pageSize}
-          resetPage={resetPage}
+          totalRows={data?.data.total || 0}
+          pageChangeHandler={onPaginationChange}
+          rowsPerPage={filterParams.limit}
         />
       </div>
-      <ToastContainer />
     </>
   );
-}
+};
 
 export default PurposeTable;

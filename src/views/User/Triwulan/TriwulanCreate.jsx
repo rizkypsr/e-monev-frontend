@@ -1,117 +1,227 @@
-import React, { useCallback, useState } from 'react';
-import {
-  CheckCircleIcon,
-  MagnifyingGlassIcon,
-} from '@heroicons/react/24/solid';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { CheckCircleIcon } from '@heroicons/react/24/solid';
+import { Link, useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { useInfiniteQuery, useMutation } from 'react-query';
+import { useAuthHeader } from 'react-auth-kit';
+
 import Label from '../../../components/Label';
 import TextInput from '../../../components/TextInput';
 import formattedDate from '../../../utils/formattedDate';
 import ReactLoading from '../../../components/Loading';
 import Button from '../../../components/Button';
-import DialogInputWrapper from '../../../components/DialogInputWrapper';
-import { getPurposes } from '../../../api/admin/purpose';
+import getFundSource from '../../../api/user/triwulan/getFundSource';
+import createTriwulan from '../../../api/user/triwulan/createTriwulan';
+import DropdownDialog from '../../../components/DropdownDialog';
+import { useToastContext } from '../../../context/ToastContext';
+import FileInput from '../../../components/FileInput';
 import { getActivities } from '../../../api/admin/activity';
-import formatRupiah from '../../../utils/formatRupiah';
-import Dropdown from '../../../components/Dropdown';
-import List from '../../../components/List';
-import {
-  Dialog,
-  DialogContent,
-  DialogTrigger,
-} from '../../../components/DialogContent';
-import SelectInputModal from '../../../components/SelectInputModal';
+import CurrencyInput from '../../../components/CurrencyInput';
+import PercentageInput from '../../../components/PercentageInput';
 
-const jenisPengadaan = [
-  { id: 1, name: 'Barang' },
-  { id: 2, name: 'Pekerjaan Konstruksi' },
-  { id: 3, name: 'Jasa Konsultasi' },
-  { id: 4, name: 'Jasa Lainnya' },
-];
-const caraPengadaan = [
-  { id: 1, name: 'Swakelola' },
-  { id: 2, name: 'Pengadaan Langsung' },
-  { id: 3, name: 'Seleksi' },
-  { id: 4, name: 'Tender' },
-  { id: 5, name: 'Penunjukan Langsung' },
-];
+const initialParams = {
+  limit: 20,
+  page: 1,
+  search: '',
+  sort: 'terbaru',
+};
 
-export default function TriwulanCreate() {
-  const [data, setData] = useState({
-    purpose: {},
-    activity: {},
-    sumberDana: '',
-    paguDana: '',
-    opdPengelola: '',
-    pptk: '',
-    nomorTanggalKontrak: '',
-    kontraktor: '',
-    jangkaWaktuPelaksanaan: '',
-    nilaiKontrak: '',
-    realisasiFisik: '',
-    realisasiKeuangan: '',
-    volumeKegiatan: '',
-    outputKegiatan: '',
-    manfaatKegiatanLangsung: '',
-    manfaatKegiatanTidakLangsung: '',
-    jumlahTenagaKerjaLokal: '',
-    jumlahTenagaKerjaNonLokal: '',
-    hambatan: '',
-    solusiPermasalahan: '',
+const jenisPengadaan = {
+  pageParams: [undefined],
+  pages: [
+    {
+      data: {
+        page: 1,
+        pages: 1,
+        result: [
+          { id: 1, name: 'Barang' },
+          { id: 2, name: 'Pekerjaan Konstruksi' },
+          { id: 3, name: 'Jasa Konsultasi' },
+          { id: 4, name: 'Jasa Lainnya' },
+          { id: 5, name: 'Jasa Kelola' },
+        ],
+        total: 4,
+      },
+    },
+  ],
+};
+
+const optionals = {
+  pageParams: [undefined],
+  pages: [
+    {
+      data: {
+        page: 1,
+        pages: 1,
+        result: [
+          { id: 1, name: 'Forst Major' },
+          { id: 2, name: 'Keterlambatan Lelang' },
+          { id: 3, name: 'Perubahan Kebijakan Adendum' },
+        ],
+        total: 3,
+      },
+    },
+  ],
+};
+
+const caraPengadaan = {
+  pageParams: [undefined],
+  pages: [
+    {
+      data: {
+        page: 1,
+        pages: 1,
+        result: [
+          { id: 1, name: 'Swakelola' },
+          { id: 2, name: 'Pengadaan Langsung' },
+          { id: 3, name: 'Seleksi' },
+          { id: 4, name: 'Tender' },
+          { id: 5, name: 'Penunjukan Langsung' },
+        ],
+        total: 4,
+      },
+    },
+  ],
+};
+
+const bentukKegiatan = {
+  pageParams: [undefined],
+  pages: [
+    {
+      data: {
+        page: 1,
+        pages: 1,
+        result: [
+          { id: 1, name: 'fisik' },
+          { id: 2, name: 'nonfisik' },
+        ],
+        total: 4,
+      },
+    },
+  ],
+};
+
+const TriwulanCreate = () => {
+  const authHeader = useAuthHeader();
+  const navigate = useNavigate();
+  const { showToastMessage } = useToastContext();
+
+  const [selectedFundSource, setSelectedFundSource] = useState(null);
+  const [selectedProcurementType, setSelectedProcurementType] = useState(null);
+  const [selectedProcurementMethod, setSelectedProcurementMethod] =
+    useState(null);
+  const [selectedActivityForm, setSelectedActivityForm] = useState(null);
+  const [selectedActivity, setSelectedActivity] = useState(null);
+  const [selectedOptional, setSelectedOptional] = useState(null);
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    control,
+    formState: { errors },
+  } = useForm();
+
+  const activityQuery = useInfiniteQuery({
+    queryKey: ['get_activities'],
+    queryFn: async ({ pageParam = 1 }) => {
+      const params = initialParams;
+
+      params.page = pageParam;
+
+      const res = await getActivities(params, authHeader());
+
+      return res;
+    },
+    getNextPageParam: (lastPage) => {
+      if (lastPage.data.page < lastPage.data.pages) {
+        return lastPage.data.page + 1;
+      }
+
+      return undefined;
+    },
   });
-  const [errors, setErrors] = useState({});
-  const [isLoading, setIsLoading] = useState(false);
-  const [openJenisPengadaan, setOpenJenisPengadaan] = useState(false);
-  const [selectedJenisPengadaan, setSelectedJenisPengadaan] = useState(null);
-  const [openCaraPengadaan, setOpenCaraPengadaan] = useState(false);
-  const [selectedCaraPengadaan, setSelectedCaraPengadaan] = useState(null);
 
-  const handleSelectJenisPengadaan = (opd) => {
-    setSelectedJenisPengadaan(opd);
-    setOpenJenisPengadaan(false);
-  };
+  const fundSourceQuery = useInfiniteQuery({
+    queryKey: ['get_fund_source'],
+    queryFn: ({ pageParam = 1 }) => getFundSource(initialParams, authHeader()),
+    getNextPageParam: (lastPage) => lastPage.nextId ?? undefined,
+    getPreviousPageParam: (firstPage) => firstPage.previousId ?? undefined,
+  });
 
-  const handleSelectCaraPengadaan = (level) => {
-    setSelectedCaraPengadaan(level);
-    setOpenCaraPengadaan(false);
-  };
+  useEffect(() => {
+    setValue('created_at', formattedDate(Date.now()));
+  }, []);
 
-  const handleSelectPurpose = (item) => {
-    setData({
+  const createMutation = useMutation(createTriwulan);
+
+  const onSubmit = (data) => {
+    const formData = new FormData();
+
+    const formDataObject = {
       ...data,
-      purpose: item,
-    });
+      fund_source_id: selectedFundSource?.id,
+      procurement_type: selectedProcurementType?.name,
+      procurement_method: selectedProcurementMethod?.name,
+      activity_id: selectedActivity?.id,
+      activity_form: selectedActivityForm?.id,
+      optional: selectedOptional?.name,
+      contract_date: formattedDate(data?.contract_date),
+    };
+
+    // eslint-disable-next-line no-restricted-syntax
+    for (const key in formDataObject) {
+      // eslint-disable-next-line no-prototype-builtins
+      if (formDataObject.hasOwnProperty(key)) {
+        if (formDataObject[key]) {
+          formData.append(key, formDataObject[key]);
+        }
+      }
+    }
+
+    createMutation.mutate(
+      {
+        body: formData,
+        token: authHeader(),
+      },
+      {
+        onSuccess: () => {
+          showToastMessage('Berhasil membuat Data Triwulan');
+          navigate('/laporan/data-triwulan?limit=10&page=1&sort=terbaru');
+        },
+        onError: (error) => {
+          showToastMessage(error.message, 'error');
+        },
+      }
+    );
+  };
+
+  const handleSelectFundSource = (item) => {
+    setSelectedFundSource(item);
+  };
+
+  const handleSelectProcurementType = (item) => {
+    setSelectedProcurementType(item);
+  };
+
+  const handleSelectOptional = (item) => {
+    setSelectedOptional(item);
+  };
+
+  const handleSelectActivityForm = (item) => {
+    setSelectedActivityForm(item);
   };
 
   const handleSelectActivity = (item) => {
-    setData({
-      ...data,
-      activity: item,
-    });
+    setSelectedActivity(item);
   };
 
-  const handleTextInputChange = (e) => {
-    const { name, value } = e.target;
-    setData({
-      ...data,
-      [name]: value,
-    });
+  const handleSelectProcurementMethod = (item) => {
+    setSelectedProcurementMethod(item);
   };
 
-  const handleNumberInputChange = (e) => {
-    const { name, value } = e.target;
-    setData({
-      ...data,
-      [name]: value,
-    });
-  };
-
-  const handleCurrencyInputChange = (e) => {
-    const { name, value } = e.target;
-    setData({
-      ...data,
-      [name]: formatRupiah(value),
-    });
+  const handleFileInput = (file) => {
+    setValue('file', file);
   };
 
   return (
@@ -121,293 +231,368 @@ export default function TriwulanCreate() {
       </div>
 
       <div className="w-full h-full mt-6 bg-white rounded-lg p-9">
-        <form className="w-4/5 grid grid-cols-2 gap-4">
-          <div className="col-span-2">
-            <Label>Tanggal Input Data</Label>
-            <TextInput
-              disabled
-              className="mt-2"
-              value={formattedDate(Date.now())}
-            />
+        <form id="main" className="w-4/5" onSubmit={handleSubmit(onSubmit)}>
+          <div className="grid grid-cols-2 gap-4 mb-8">
+            {/* <div className="col-span-2">
+              <Label>Tanggal Input Data</Label>
+              <TextInput
+                id="created_at"
+                name="created_at"
+                width="w-full"
+                register={register('created_at', {
+                  disabled: true,
+                })}
+                error={errors.created_at?.message}
+              />
+            </div> */}
+
+            <div>
+              <Label className="mb-2">Output Sub Kegiatan</Label>
+              <TextInput
+                id="activity_name"
+                name="activity_name"
+                placeholder="Tulis Disini..."
+                register={register('activity_name', {
+                  required: 'Nama Kegiatan wajib diisi!',
+                })}
+                error={errors.activity_name?.message}
+              />
+            </div>
+
+            <div>
+              <Label className="mb-2">Lokasi Kegiatan</Label>
+              <TextInput
+                id="activity_location"
+                name="activity_location"
+                placeholder="Tulis Disini..."
+                register={register('activity_location', {
+                  required: 'Lokasi Kegiatan wajib diisi!',
+                })}
+                error={errors.activity_location?.message}
+              />
+            </div>
+
+            <div>
+              <Label className="mb-2">Sumber Dana</Label>
+              <DropdownDialog
+                label="Pilih Sumber Dana"
+                data={fundSourceQuery.data}
+                value={selectedFundSource}
+                onChange={handleSelectFundSource}
+              />
+            </div>
+            <div>
+              <CurrencyInput
+                name="fund_ceiling"
+                label="Pagu Dana (Dalam bentuk angka)"
+                control={control}
+                placeholder="Tulis Disini..."
+                {...register('fund_ceiling', {
+                  required: 'Pagu Dana wajib diisi!',
+                  valueAsNumber: true,
+                  max: {
+                    message: 'Maksimal Rp.200.000.000.000.000',
+                    value: 200000000000000000,
+                  },
+                })}
+              />
+            </div>
+            <div>
+              <Label className="mb-2">OPD Pengelola</Label>
+              <TextInput
+                id="management_organization"
+                name="management_organization"
+                placeholder="Tulis Disini..."
+                register={register('management_organization')}
+                error={errors.management_organization?.message}
+              />
+            </div>
+            <div>
+              <Label className="mb-2">Nama PPTK</Label>
+              <TextInput
+                id="pptk_name"
+                name="pptk_name"
+                placeholder="Tulis Disini..."
+                register={register('pptk_name')}
+                error={errors.pptk_name?.message}
+              />
+            </div>
+            <div>
+              <Label className="mb-2">Nomor Kontrak</Label>
+              <TextInput
+                id="contract_number_date"
+                name="contract_number_date"
+                placeholder="Tulis Disini..."
+                register={register('contract_number_date', {
+                  required: false,
+                })}
+                error={errors.pptk_name?.message}
+              />
+            </div>
+            <div>
+              <Label>Tanggal Kontrak</Label>
+              <TextInput
+                id="contract_date"
+                name="contract_date"
+                type="date"
+                width="w-full"
+                register={register('contract_date', {
+                  valueAsDate: true,
+                })}
+                error={errors.contract_date?.message}
+              />
+            </div>
+            <div>
+              <Label className="mb-2">Nama Penyedia</Label>
+              <TextInput
+                id="contractor_name"
+                name="contractor_name"
+                placeholder="Tulis Disini..."
+                register={register('contractor_name', {
+                  required: false,
+                })}
+                error={errors.contractor_name?.message}
+              />
+            </div>
+            <div>
+              <Label className="mb-2">Jangka Waktu Pelaksanaan</Label>
+              <TextInput
+                id="implementation_period"
+                name="implementation_period"
+                placeholder="Tulis Disini..."
+                register={register('implementation_period', {
+                  required: false,
+                })}
+                error={errors.implementation_period?.message}
+              />
+            </div>
+            <div>
+              <Label className="mb-2">Nama Penanggung Jawab</Label>
+              <TextInput
+                id="pic_name"
+                name="pic_name"
+                placeholder="Tulis Disini..."
+                register={register('pic_name')}
+                error={errors.pic_name?.message}
+              />
+            </div>
+            <div>
+              <CurrencyInput
+                name="contract_value"
+                label="Nilai Kontrak (Dalam bentuk angka)"
+                control={control}
+                placeholder="Tulis Disini..."
+                {...register('contract_value', {
+                  required: false,
+                  valueAsNumber: true,
+                  max: {
+                    message: 'Maksimal Rp.200.000.000.000.000',
+                    value: 200000000000000000,
+                  },
+                })}
+              />
+            </div>
+            <div>
+              <PercentageInput
+                name="physical_realization"
+                label="Realisasi Fisik (Dalam bentuk angka)"
+                control={control}
+                placeholder="Tulis Disini..."
+                {...register('physical_realization', {
+                  required: 'Realisasi Fisik wajib diisi!',
+                  valueAsNumber: true,
+                  max: {
+                    message: 'Maksimal Rp.200.000.000.000.000',
+                    value: 200000000000000000,
+                  },
+                })}
+              />
+            </div>
+            <div>
+              <CurrencyInput
+                name="fund_realization"
+                label="Realisasi Keuangan (Dalam bentuk angka)"
+                control={control}
+                placeholder="Tulis Disini..."
+                {...register('fund_realization', {
+                  required: 'Realisasi Keuangan wajib diisi!',
+                  valueAsNumber: true,
+                  max: {
+                    message: 'Maksimal Rp.200.000.000.000.000',
+                    value: 200000000000000000,
+                  },
+                })}
+              />
+            </div>
+            <div>
+              <Label className="mb-2">Volume Kegiatan</Label>
+              <TextInput
+                id="activity_volume"
+                name="activity_volume"
+                placeholder="Tulis Disini..."
+                register={register('activity_volume')}
+                error={errors.activity_volume?.message}
+              />
+            </div>
+            <div>
+              <Label className="mb-2">Output Kegiatan</Label>
+              <TextInput
+                id="activity_output"
+                name="activity_output"
+                placeholder="Tulis Disini..."
+                register={register('activity_output')}
+                error={errors.activity_output?.message}
+              />
+            </div>
+            <div>
+              <Label className="mb-2">
+                Manfaat Kegiatan (Kelompok sasaran Langsung)
+              </Label>
+              <TextInput
+                id="direct_target_group"
+                name="direct_target_group"
+                placeholder="Tulis Disini..."
+                register={register('direct_target_group')}
+                error={errors.direct_target_group?.message}
+              />
+            </div>
+            <div>
+              <Label className="mb-2">
+                Manfaat Kegiatan (Kelompok sasaran Tidak Langsung)
+              </Label>
+              <TextInput
+                id="indirect_target_group"
+                name="indirect_target_group"
+                placeholder="Tulis Disini..."
+                register={register('indirect_target_group')}
+                error={errors.indirect_target_group?.message}
+              />
+            </div>
+            <div>
+              <CurrencyInput
+                name="local_workforce"
+                label="Jumlah Tenaga Kerja Lokal (Dalam bentuk angka)"
+                control={control}
+                placeholder="Tulis Disini..."
+                {...register('local_workforce', {
+                  required: 'Jumlah Tenaga Kerja Lokal wajib diisi!',
+                  valueAsNumber: true,
+                })}
+              />
+            </div>
+            <div>
+              <CurrencyInput
+                name="non_local_workforce"
+                label="Jumlah Tenaga Kerja Non Lokal (Dalam bentuk angka)"
+                control={control}
+                placeholder="Tulis Disini..."
+                {...register('non_local_workforce', {
+                  required: 'Jumlah Tenaga Kerja Non Lokal wajib diisi!',
+                  valueAsNumber: true,
+                })}
+              />
+            </div>
+            <div>
+              <Label className="mb-2">Hambatan dan Permasalahan</Label>
+              <TextInput
+                id="problems"
+                name="problems"
+                placeholder="Tulis Disini..."
+                register={register('problems')}
+                error={errors.problems?.message}
+              />
+            </div>
+            <div>
+              <Label className="mb-2">Solusi Permasalahan</Label>
+              <TextInput
+                id="solution"
+                name="solution"
+                placeholder="Tulis Disini..."
+                register={register('solution')}
+                error={errors.solution?.message}
+              />
+            </div>
+            <div>
+              <Label className="mb-2">Jenis Pengadaan</Label>
+              <DropdownDialog
+                label="Pilih Jenis Pengadaan"
+                data={jenisPengadaan}
+                value={selectedProcurementType}
+                onChange={handleSelectProcurementType}
+              />
+            </div>
+            <div className="mb-4">
+              <Label className="mb-2">Cara Pengadaan</Label>
+              <DropdownDialog
+                label="Pilih Cara Pengadaan"
+                data={caraPengadaan}
+                value={selectedProcurementMethod}
+                onChange={handleSelectProcurementMethod}
+              />
+            </div>
+            <div className="mb-4">
+              <Label className="mb-2">Sub Kegiatan</Label>
+              <DropdownDialog
+                label="Pilih Sub Kegiatan"
+                data={activityQuery.data}
+                value={selectedActivity}
+                onChange={handleSelectActivity}
+              />
+            </div>
+            <div className="mb-4">
+              <Label className="mb-2">Bentuk Kegiatan</Label>
+              <DropdownDialog
+                label="Pilih Bentuk Kegiatan"
+                data={bentukKegiatan}
+                value={selectedActivityForm}
+                onChange={handleSelectActivityForm}
+              />
+            </div>
+            <div>
+              <Label className="mb-2">Opsi</Label>
+              <DropdownDialog
+                label="Pilih Opsi"
+                data={optionals}
+                value={selectedOptional}
+                onChange={handleSelectOptional}
+              />
+            </div>
+            <div>
+              <Label className="mb-2">Nama Pimpinan</Label>
+              <TextInput
+                id="leader_name"
+                name="leader_name"
+                width="w-full"
+                placeholder="Tulis Disini..."
+                register={register('leader_name')}
+                error={errors.leader_name?.message}
+              />
+            </div>
+            <div className="col-span-2">
+              <Label className="mb-2">Alasan Terkait</Label>
+              <TextInput
+                id="reason"
+                name="reason"
+                width="w-full"
+                placeholder="Tulis Disini..."
+                register={register('reason')}
+                error={errors.reason?.message}
+              />
+            </div>
+
+            <div>
+              <FileInput
+                className="w-full"
+                label="UPLOAD PDF, JPG,PNG, Video (5 MB)"
+                icon={<CheckCircleIcon className="w-5 h-5" />}
+                handleFile={handleFileInput}
+                register={register}
+                error={errors.file?.message}
+              />
+            </div>
           </div>
 
-          <div>
-            <Label className="mb-2">Nama Kegiatan</Label>
-            <DialogInputWrapper
-              label="Kegiatan"
-              selectedItem={data.purpose.title}
-              onFetching={getPurposes}
-              error={errors.purpose}
-              onSelect={handleSelectPurpose}
-            />
-          </div>
-
-          <div>
-            <Label className="mb-2">Lokasi Kegiatan</Label>
-            <DialogInputWrapper
-              label="Lokasi Kegiatan"
-              selectedItem={data.activity.title}
-              onFetching={getActivities}
-              error={errors.activity}
-              onSelect={handleSelectActivity}
-            />
-          </div>
-
-          <div>
-            <Label>Sumber Dana</Label>
-            <TextInput
-              name="targetRPJMDK"
-              className="mt-2"
-              placeholder="Tulis disini..."
-              value={data.targetRPJMDK}
-              onChange={handleTextInputChange}
-            />
-          </div>
-          <div>
-            <Label>Pagu Dana (Rp)</Label>
-            <TextInput
-              leadingIcon
-              name="paguDana"
-              className="mt-2"
-              placeholder="Tulis disini..."
-              value={data.paguDana}
-              onChange={handleCurrencyInputChange}
-            />
-          </div>
-
-          <div>
-            <Label>OPD Pengelolad</Label>
-            <TextInput
-              className="mt-2"
-              name="opdPengelola"
-              placeholder="Tulis disini..."
-              value={data.opdPengelola}
-              onChange={handleTextInputChange}
-            />
-          </div>
-          <div>
-            <Label>Nama PPTK</Label>
-            <TextInput
-              name="pptk"
-              className="mt-2"
-              placeholder="Tulis disini..."
-              value={data.pptk}
-              onChange={handleTextInputChange}
-            />
-          </div>
-
-          <div>
-            <Label>Nomor dan Tanggal Kontrak</Label>
-            <TextInput
-              className="mt-2"
-              name="nomorTanggalKontrak"
-              placeholder="Tulis disini..."
-              value={data.nomorTanggalKontrak}
-              onChange={handleTextInputChange}
-            />
-          </div>
-          <div>
-            <Label>Nama Kontraktor</Label>
-            <TextInput
-              name="kontraktor"
-              className="mt-2"
-              placeholder="Tulis disini..."
-              value={data.kontraktor}
-              onChange={handleTextInputChange}
-            />
-          </div>
-
-          <div>
-            <Label>Jangka Waktu Pelaksanaan</Label>
-            <TextInput
-              className="mt-2"
-              name="jangkaWaktuPelaksanaan"
-              placeholder="Tulis disini..."
-              value={data.jangkaWaktuPelaksanaan}
-              onChange={handleTextInputChange}
-            />
-          </div>
-          <div>
-            <Label>Nilai Kontrak</Label>
-            <TextInput
-              leadingIcon
-              name="nilaiKontrak"
-              className="mt-2"
-              placeholder="Tulis disini..."
-              value={data.nilaiKontrak}
-              onChange={handleCurrencyInputChange}
-            />
-          </div>
-          <div>
-            <Label>Realisasi Fisik</Label>
-            <TextInput
-              className="mt-2"
-              placeholder="Tulis dalam persen (%)"
-              name="realisasiFisik"
-              type="number"
-              value={data.realisasiFisik}
-              onChange={handleNumberInputChange}
-            />
-          </div>
-          <div>
-            <Label>Realisasi Keuangan</Label>
-            <TextInput
-              className="mt-2"
-              type="number"
-              placeholder="Tulis dalam persen (%)"
-              name="realisasiKeuangan"
-              value={data.realisasiKeuangan}
-              onChange={handleNumberInputChange}
-            />
-          </div>
-          <div>
-            <Label>Volume Kegiatan</Label>
-            <TextInput
-              className="mt-2"
-              placeholder="Tulis disini..."
-              name="volumeKegiatan"
-              value={data.volumeKegiatan}
-              onChange={handleTextInputChange}
-            />
-          </div>
-          <div>
-            <Label>Output Kegiatan</Label>
-            <TextInput
-              className="mt-2"
-              placeholder="Tulis disini..."
-              name="outputKegiatan"
-              value={data.outputKegiatan}
-              onChange={handleTextInputChange}
-            />
-          </div>
-          <div>
-            <Label>Manfaat Kegiatan (Kelompok sasaran Langsung)</Label>
-            <TextInput
-              className="mt-2"
-              placeholder="Tulis disini..."
-              name="manfaatKegiatanLangsung"
-              value={data.manfaatKegiatanLangsung}
-              onChange={handleTextInputChange}
-            />
-          </div>
-          <div>
-            <Label>Manfaat Kegiatan (Kelompok sasaran Tidak Langsung)</Label>
-            <TextInput
-              className="mt-2"
-              placeholder="Tulis disini..."
-              name="manfaatKegiatanTidakLangsung"
-              value={data.manfaatKegiatanTidakLangsung}
-              onChange={handleTextInputChange}
-            />
-          </div>
-          <div>
-            <Label>Jumlah Tenaga Kerja (Lokal)</Label>
-            <TextInput
-              className="mt-2"
-              placeholder="Tulis disini..."
-              name="jumlahTenagaKerjaLokal"
-              value={data.jumlahTenagaKerjaLokal}
-              onChange={handleTextInputChange}
-            />
-          </div>
-          <div>
-            <Label>Jumlah Tenaga Kerja (Non Lokal)</Label>
-            <TextInput
-              className="mt-2"
-              placeholder="Tulis disini..."
-              name="jumlahTenagaKerjaNonLokal"
-              value={data.jumlahTenagaKerjaNonLokal}
-              onChange={handleTextInputChange}
-            />
-          </div>
-          <div>
-            <Label>Hambatan dan Permasalahan</Label>
-            <TextInput
-              className="mt-2"
-              placeholder="Tulis disini..."
-              name="hambatan"
-              value={data.hambatan}
-              onChange={handleTextInputChange}
-            />
-          </div>
-          <div>
-            <Label>Solusi Permasalahan</Label>
-            <TextInput
-              className="mt-2"
-              placeholder="Tulis disini..."
-              name="solusiPermasalahan"
-              value={data.solusiPermasalahan}
-              onChange={handleTextInputChange}
-            />
-          </div>
-          <div className="mb-4">
-            <Label className="mb-2">Jenis Pengadaan</Label>
-            <Dialog
-              open={openJenisPengadaan}
-              onOpenChange={setOpenJenisPengadaan}
-            >
-              <DialogTrigger className="w-full">
-                <SelectInputModal
-                  className="mt-2"
-                  selectedValue={
-                    selectedJenisPengadaan && selectedJenisPengadaan.name
-                  }
-                  label="--- Pilih Jenis Pengadaan ---"
-                />
-              </DialogTrigger>
-
-              <DialogContent
-                title="Pilih Jenis Pengadaan"
-                onCreateClick={() => setOpenJenisPengadaan((prev) => !prev)}
-              >
-                <List
-                  data={jenisPengadaan}
-                  onSelectValue={handleSelectJenisPengadaan}
-                />
-              </DialogContent>
-            </Dialog>
-          </div>
-
-          <div>
-            <Label className="mb-2">Cara Pengadaan</Label>
-            <Dialog
-              open={openCaraPengadaan}
-              onOpenChange={setOpenCaraPengadaan}
-            >
-              <DialogTrigger className="w-full">
-                <SelectInputModal
-                  className="mt-2"
-                  selectedValue={
-                    selectedCaraPengadaan && selectedCaraPengadaan.name
-                  }
-                  label="--- Pilih Cara Pengadaan ---"
-                />
-              </DialogTrigger>
-
-              <DialogContent
-                title="Pilih Cara Pengadaan"
-                onCreateClick={() => setOpenCaraPengadaan((prev) => !prev)}
-              >
-                <List
-                  data={caraPengadaan}
-                  onSelectValue={handleSelectCaraPengadaan}
-                />
-              </DialogContent>
-            </Dialog>
-          </div>
-
-          <div className="col-span-2 mb-4">
-            <Button
-              className="w-full md:w-28"
-              background="bg-primary"
-              textColor="text-white"
-              icon={<CheckCircleIcon className="w-5 h-5" />}
-            >
-              UPLOAD PDF, JPG,PNG, Video (5 MB)
-            </Button>
-          </div>
-
-          {isLoading ? (
+          {createMutation.isLoading ? (
             <ReactLoading />
           ) : (
             <div className="flex space-x-3">
@@ -422,7 +607,7 @@ export default function TriwulanCreate() {
               </Button>
               <Link to="../">
                 <Button
-                  className="w-full md:w-28 font-medium"
+                  className="w-full font-medium md:w-28"
                   background="bg-[#EAEAEA]"
                   textColor="text-dark-gray"
                 >
@@ -435,4 +620,6 @@ export default function TriwulanCreate() {
       </div>
     </div>
   );
-}
+};
+
+export default TriwulanCreate;
