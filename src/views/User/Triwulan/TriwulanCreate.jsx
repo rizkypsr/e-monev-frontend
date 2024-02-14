@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { CheckCircleIcon } from '@heroicons/react/24/solid';
 import { Link, useNavigate } from 'react-router-dom';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { useInfiniteQuery, useMutation } from 'react-query';
 import { useAuthHeader } from 'react-auth-kit';
-import { NumericFormat } from 'react-number-format';
 
 import Label from '../../../components/Label';
 import TextInput from '../../../components/TextInput';
@@ -121,17 +120,7 @@ const TriwulanCreate = () => {
     setValue,
     control,
     formState: { errors },
-  } = useForm({
-    // defaultValues: {
-    //   fund_ceiling: 0,
-    //   contract_number_date: 0,
-    //   contract_value: 0,
-    //   physical_realization: 0,
-    //   fund_realization: 0,
-    //   local_workforce: 0,
-    //   non_local_workforce: 0,
-    // },
-  });
+  } = useForm();
 
   const activityQuery = useInfiniteQuery({
     queryKey: ['get_activities'],
@@ -244,7 +233,7 @@ const TriwulanCreate = () => {
       <div className="w-full h-full mt-6 bg-white rounded-lg p-9">
         <form id="main" className="w-4/5" onSubmit={handleSubmit(onSubmit)}>
           <div className="grid grid-cols-2 gap-4 mb-8">
-            <div className="col-span-2">
+            {/* <div className="col-span-2">
               <Label>Tanggal Input Data</Label>
               <TextInput
                 id="created_at"
@@ -255,7 +244,7 @@ const TriwulanCreate = () => {
                 })}
                 error={errors.created_at?.message}
               />
-            </div>
+            </div> */}
 
             <div>
               <Label className="mb-2">Output Sub Kegiatan</Label>
