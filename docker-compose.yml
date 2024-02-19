@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  emonev_fe:
+    container_name: emonev_fe
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    ports:
+      - ${APP_PORT}:80
