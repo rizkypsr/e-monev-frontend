@@ -32,7 +32,7 @@
     "install": "^0.13.0",
     "lodash.debounce": "^4.0.8",
     "npm": "^9.8.1",
-    "pdfjs-dist": "^3.8.162",
+    "pdfjs-dist": "^4.2.67",
     "prop-types": "^15.8.1",
     "query-string": "^8.1.0",
     "react": "^18.2.0",
