@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useAuthHeader, useAuthUser } from 'react-auth-kit';
 import { ArrowDownTrayIcon } from '@heroicons/react/24/solid';
 import { useInfiniteQuery, useQuery } from 'react-query';
-import { useNavigate } from 'react-router-dom';
 import ErrorPage from '../../ErrorPage';
 import CountBox from './components/CountBox';
 import { getOrganizations } from '../../../api/admin/organization';
@@ -15,7 +14,6 @@ import { getActivities } from '../../../api/admin/activity';
 import { getPurposes } from '../../../api/admin/purpose';
 import DropdownDialog from '../../../components/DropdownDialog';
 import getExcel from '../../../api/admin/dashboard/getExcel';
-import ReactLoading from '../../../components/Loading';
 import FundTotal from './components/FundTotal';
 import ProgressBar from '../../../components/ProgressBar';
 import getFundSource from '../../../api/user/triwulan/getFundSource';
@@ -44,7 +42,6 @@ const Dashboard = () => {
 
   const token = useMemo(() => authHeader(), [authHeader]);
 
-  const [search, setSearch] = useState('');
   const [selectedFundSource, setSelectedFundSource] = useState(null);
   const [filterParams, setFilterParams] = useState(initialFundSourceparams);
   const [filterFundSourceChart, setFilterFundSourceChart] = useState(
@@ -158,13 +155,20 @@ const Dashboard = () => {
 
   return (
     <>
-      <h1 className="font-semibold text-2xl mb-8">
+      <h1 className="font-semibold text-2xl mb-4">
         Halo {authUser().role.name}, Selamat Datang di halaman elektronik
         aplikasi&nbsp;
         <span className="italic">e-Montir Pemda</span>
       </h1>
 
-      <div className="flex flex-col space-y-4 lg:space-y-0 lg:flex-row justify-center lg:justify-between mb-8 lg:items-end">
+      <a
+        className="text-2xl underline"
+        href="https://sipd.kemendagri.go.id/landing"
+      >
+        https://sipd.kemendagri.go.id/landing
+      </a>
+
+      <div className="flex flex-col space-y-4 lg:space-y-0 lg:flex-row justify-center lg:justify-between my-8 lg:items-end">
         {authUser().role.id === 1 && (
           <div className="flex-1">
             <Label className="mb-2">Sumber Dana</Label>

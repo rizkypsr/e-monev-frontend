@@ -30,8 +30,6 @@ import PurposeTable from './views/Admin/Purpose/PurposeTable';
 import PurposeCreate from './views/Admin/Purpose/PurposeCreate';
 import PurposeEdit from './views/Admin/Purpose/PurposeEdit';
 import UserAccessDetail from './views/Admin/UserAccess/UserAccessDetail';
-import ErrorPage404 from './views/ErrorPage404';
-import UserLayout from './layouts/UserRoot';
 import OrganizationDetail from './views/Admin/Organization/OrganizationDetail';
 import ProgramDetail from './views/Admin/Program/ProgramDetail';
 import PurposeDetail from './views/Admin/Purpose/PurposeDetail';
@@ -49,7 +47,6 @@ import OccassionTable from './views/Admin/Occassion/OccassionTable';
 import OccasionCreate from './views/Admin/Occassion/OccassionCreate';
 import OccassionEdit from './views/Admin/Occassion/OccassionEdit';
 import OccassionDetail from './views/Admin/Occassion/OccassionDetail';
-import ReportPreview from './views/shared/report/ReportPreview';
 import Configuration from './views/Admin/Configuration/Configuration';
 import ReportMasterTable from './views/Admin/Report/ReportMasterTable';
 import ReportTriwulanTable from './views/Admin/Report/ReportTriwulanTable';
@@ -432,7 +429,7 @@ const router = createBrowserRouter(
       <Route
         key="triwulan"
         path="data-triwulan"
-        loader={() => 'Tambah Data Triwulan'}
+        loader={() => 'Tambah Data Kegiatan'}
         handle={{
           crumb: (data) => (
             <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
