@@ -46,12 +46,12 @@ const Sidebar = ({ isOpen }) => {
       icon: <LockIcon />,
       roles: ['superadmin'],
     },
-    {
-      path: '/urusan',
-      label: 'Urusan',
-      icon: <CheckIcon />,
-      roles: ['superadmin', 'admin bidang'],
-    },
+    // {
+    //   path: '/urusan',
+    //   label: 'Urusan',
+    //   icon: <CheckIcon />,
+    //   roles: ['superadmin', 'admin bidang'],
+    // },
     {
       path: '/sumber-dana',
       label: 'Sumber Dana',
@@ -64,24 +64,24 @@ const Sidebar = ({ isOpen }) => {
       icon: <MedalIcon />,
       roles: ['superadmin'],
     },
-    {
-      path: '/program',
-      label: 'Program',
-      icon: <BookIcon />,
-      roles: ['superadmin', 'admin bidang'],
-    },
-    {
-      path: '/kegiatan',
-      label: 'Kegiatan',
-      icon: <StarIcon />,
-      roles: ['superadmin', 'admin bidang'],
-    },
-    {
-      path: '/sasaran',
-      label: 'Sasaran',
-      icon: <TargetIcon />,
-      roles: ['superadmin', 'admin bidang'],
-    },
+    // {
+    //   path: '/program',
+    //   label: 'Program',
+    //   icon: <BookIcon />,
+    //   roles: ['superadmin', 'admin bidang'],
+    // },
+    // {
+    //   path: '/kegiatan',
+    //   label: 'Kegiatan',
+    //   icon: <StarIcon />,
+    //   roles: ['superadmin', 'admin bidang'],
+    // },
+    // {
+    //   path: '/sasaran',
+    //   label: 'Sasaran',
+    //   icon: <TargetIcon />,
+    //   roles: ['superadmin', 'admin bidang'],
+    // },
     {
       path: '/data-triwulan',
       label: 'Data Kegiatan',
