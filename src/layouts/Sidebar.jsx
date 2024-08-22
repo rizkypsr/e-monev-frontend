@@ -88,12 +88,12 @@ const Sidebar = ({ isOpen }) => {
       icon: <AddIcon />,
       roles: ['opd'],
     },
-    {
-      path: '/data-master',
-      label: 'Data Master',
-      icon: <AddIcon />,
-      roles: ['opd'],
-    },
+    // {
+    //   path: '/data-master',
+    //   label: 'Data Master',
+    //   icon: <AddIcon />,
+    //   roles: ['opd'],
+    // },
     {
       path: '/laporan',
       label: 'Laporan',
