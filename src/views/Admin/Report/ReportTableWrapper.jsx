@@ -5,7 +5,7 @@ import {
   MagnifyingGlassIcon,
 } from '@heroicons/react/24/solid';
 import { useQuery } from 'react-query';
-import { useAuthHeader, useAuthUser } from 'react-auth-kit';
+import { useAuthHeader } from 'react-auth-kit';
 import DropdownSelect from '../../../components/DropdownSelect';
 import useSearchParamsState from '../../../hooks/useSearchParamsState';
 import getTriwulan from '../../../api/static/getTriwulan';
@@ -16,6 +16,8 @@ import objectToQueryString from '../../../utils/objectToQueryString';
 import downloadTriwulanExcel from '../../../api/admin/report/downloadTriwulanExcel';
 import { useToastContext } from '../../../context/ToastContext';
 import downloadMasterExcel from '../../../api/admin/report/downloadMasterExcel';
+import downloadMasterPdf from '../../../api/admin/report/downloadMasterPdf';
+import downloadTriwulanPdf from '../../../api/admin/report/downloadTriwulanPdf';
 
 const type = [
   {
@@ -23,7 +25,7 @@ const type = [
     value: 'data-master',
   },
   {
-    label: 'Data Laporan Triwulan',
+    label: 'Data Laporan Kegiatan',
     value: 'data-triwulan',
   },
 ];
@@ -93,6 +95,41 @@ const ReportTableWrapper = () => {
     queryKey: ['get_fund_source'],
     queryFn: () => getFundSource(initialFundSourceParams, authHeader()),
   });
+
+  const handleDownloadPDF = async () => {
+    let res;
+    let fileName;
+
+    if (selectedType && selectedType.value === 'data-master') {
+      fileName = 'Data Master.pdf';
+      res = await downloadMasterPdf(searchParamsState, authHeader());
+    } else if (selectedType && selectedType.value === 'data-triwulan') {
+      fileName = 'Data Kegiatan.pdf';
+      res = await downloadTriwulanPdf(searchParamsState, authHeader());
+    }
+
+    if (res) {
+      // Create a URL for the blob
+      const blobUrl = URL.createObjectURL(res);
+
+      // Create a link element
+      const link = document.createElement('a');
+
+      // Set the href and download attributes to trigger the download
+      link.href = blobUrl;
+      link.download = fileName;
+
+      // Programmatically click the link to trigger the download
+      document.body.appendChild(link);
+      link.click();
+
+      // Clean up the URL and remove the link from the DOM
+      URL.revokeObjectURL(blobUrl);
+      document.body.removeChild(link);
+    } else {
+      showToastMessage('Terjadi kesalahan saat mengunduh file', 'error');
+    }
+  };
 
   const handleDownloadExcel = async () => {
     let res;
@@ -282,6 +319,7 @@ const ReportTableWrapper = () => {
             background="bg-primary"
             textColor="text-white"
             icon={<ArrowDownTrayIcon className="w-6 h-6" />}
+            onClick={handleDownloadPDF}
           >
             Unduh Data (PDF)
           </Button>
