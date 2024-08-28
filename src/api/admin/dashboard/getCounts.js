@@ -1,4 +1,4 @@
-import { baseUrl } from '../../../utils/constants';
+import { baseUrlAPI as baseUrl } from '../../../utils/constants';
 import makeRequest from '../../../utils/makeRequest';
 
 async function extractTotalCount(response) {
