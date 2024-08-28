@@ -8,8 +8,10 @@ import ErrorPage from '../../ErrorPage';
 import formattedDate from '../../../utils/formattedDate';
 import getTriwulanDetail from '../../../api/user/triwulan/getTriwulanDetail';
 import Button from '../../../components/Button';
-import { baseUrlAPI } from '../../../utils/constants';
 import formatToRupiah from '../../../utils/formatRupiah';
+import downloadTriwulanPdf from '../../../api/admin/report/downloadTriwulanPdf';
+import { useToastContext } from '../../../context/ToastContext';
+import downloadTriwulanExcel from '../../../api/admin/report/downloadTriwulanExcel';
 
 const initialData = {
   id: 0,
@@ -132,6 +134,7 @@ const ReportTriwulanDetail = () => {
   const { id } = useParams();
   const authHeader = useAuthHeader();
   const navigate = useNavigate();
+  const { showToastMessage } = useToastContext();
 
   const [report, setReport] = useState(initialData);
 
@@ -212,29 +215,92 @@ const ReportTriwulanDetail = () => {
       </tr>
     ));
 
+  const handleDownloadPDF = async () => {
+    const fileName = 'Data Kegiatan.pdf';
+    const res = await downloadTriwulanPdf(null, authHeader(), id);
+
+    if (res) {
+      // Create a URL for the blob
+      const blobUrl = URL.createObjectURL(res);
+
+      // Create a link element
+      const link = document.createElement('a');
+
+      // Set the href and download attributes to trigger the download
+      link.href = blobUrl;
+      link.download = fileName;
+
+      // Programmatically click the link to trigger the download
+      document.body.appendChild(link);
+      link.click();
+
+      // Clean up the URL and remove the link from the DOM
+      URL.revokeObjectURL(blobUrl);
+      document.body.removeChild(link);
+    } else {
+      showToastMessage('Terjadi kesalahan saat mengunduh file', 'error');
+    }
+  };
+
+  const handleDownloadExcel = async () => {
+    const fileName = 'Data Triwulan.xlsx';
+    const res = await downloadTriwulanExcel(null, authHeader(), id);
+
+    if (res) {
+      // Create a URL for the blob
+      const blobUrl = URL.createObjectURL(res);
+
+      // Create a link element
+      const link = document.createElement('a');
+
+      // Set the href and download attributes to trigger the download
+      link.href = blobUrl;
+      link.download = fileName;
+
+      // Programmatically click the link to trigger the download
+      document.body.appendChild(link);
+      link.click();
+
+      // Clean up the URL and remove the link from the DOM
+      URL.revokeObjectURL(blobUrl);
+      document.body.removeChild(link);
+    } else {
+      showToastMessage('Terjadi kesalahan saat mengunduh file', 'error');
+    }
+  };
+
   return (
     <div className="w-full h-full mt-6 bg-white rounded-lg p-9">
       <div>
-        <div
-          className="mb-8 cursor-pointer flex justify-between"
-          onClick={() => navigate(-1)}
-        >
+        <div className="mb-8 cursor-pointer flex justify-between">
           <div className="flex space-x-3 items-center">
             <ArrowLeftIcon className="w-6 h-6" />
             <h1 className="font-semibold text-lg text-dark-gray leading-7">
-              Detail Triwulan
+              Detail Kegiatan
             </h1>
           </div>
-          <a href={baseUrlAPI + report.file} target="__blank">
+          <div className="flex space-x-2">
             <Button
               className="w-28 lg:w-auto"
+              type="submit"
               background="bg-primary"
               textColor="text-white"
               icon={<ArrowDownTrayIcon className="w-6 h-6" />}
+              onClick={handleDownloadPDF}
             >
-              Unduh Data
+              Unduh Data (PDF)
             </Button>
-          </a>
+            <Button
+              className="w-28 lg:w-auto"
+              type="submit"
+              background="bg-primary"
+              textColor="text-white"
+              icon={<ArrowDownTrayIcon className="w-6 h-6" />}
+              onClick={handleDownloadExcel}
+            >
+              Unduh Data (XLS)
+            </Button>
+          </div>
         </div>
       </div>
 

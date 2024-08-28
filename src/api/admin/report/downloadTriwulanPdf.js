@@ -1,9 +1,9 @@
 import axiosClient from '../../../config/axios';
 
-async function downloadTriwulanPdf(params, token) {
+async function downloadTriwulanPdf(params, token, id) {
   try {
     const response = await axiosClient.get(
-      '/data-report/user/data-triwulan/pdf',
+      `/data-report/user/data-triwulan/pdf${id ? `/${id}` : ''}`,
       {
         params,
         headers: {
