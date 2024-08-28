@@ -1,9 +1,9 @@
 import axiosClient from '../../../config/axios';
 
-async function downloadTriwulanExcel(params, token, id) {
+async function downloadMasterPdf(params, token) {
   try {
     const response = await axiosClient.get(
-      `/data-report/user/data-triwulan/excel${id ? `/${id}` : ''}`,
+      '/data-report/user/data-master/pdf',
       {
         params,
         headers: {
@@ -25,4 +25,4 @@ async function downloadTriwulanExcel(params, token, id) {
   }
 }
 
-export default downloadTriwulanExcel;
+export default downloadMasterPdf;
