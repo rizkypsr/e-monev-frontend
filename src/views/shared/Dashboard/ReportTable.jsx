@@ -226,18 +226,6 @@ const columns = [
           <Button
             className="text-sm font-normal"
             textColor="text-blue-500"
-            icon={<ArrowDownOnSquareStackIcon className="w-4 h-4" />}
-            onClick={() => {
-              if (file) {
-                downloadFile({
-                  fileUrl: baseUrlAPI + file,
-                });
-              }
-            }}
-          />
-          <Button
-            className="text-sm font-normal"
-            textColor="text-blue-500"
             icon={<ArrowDownOnSquareIcon className="w-4 h-4" />}
             onClick={() => {
               if (file) {
