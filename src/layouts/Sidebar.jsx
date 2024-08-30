@@ -86,7 +86,7 @@ const Sidebar = ({ isOpen }) => {
       path: '/data-triwulan',
       label: 'Data Kegiatan',
       icon: <AddIcon />,
-      roles: ['opd'],
+      roles: ['superadmin', 'opd'],
     },
     // {
     //   path: '/data-master',

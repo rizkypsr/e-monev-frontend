@@ -3,7 +3,7 @@ import { CheckCircleIcon } from '@heroicons/react/24/solid';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { useInfiniteQuery, useMutation } from 'react-query';
-import { useAuthHeader } from 'react-auth-kit';
+import { useAuthHeader, useAuthUser } from 'react-auth-kit';
 
 import Label from '../../../components/Label';
 import TextInput from '../../../components/TextInput';
@@ -18,6 +18,7 @@ import FileInput from '../../../components/FileInput';
 import { getActivities } from '../../../api/admin/activity';
 import CurrencyInput from '../../../components/CurrencyInput';
 import PercentageInput from '../../../components/PercentageInput';
+import getUsers from '../../../api/user/triwulan/getUsers';
 
 const initialParams = {
   limit: 20,
@@ -103,9 +104,11 @@ const bentukKegiatan = {
 
 const TriwulanCreate = () => {
   const authHeader = useAuthHeader();
+  const authUser = useAuthUser();
   const navigate = useNavigate();
   const { showToastMessage } = useToastContext();
 
+  const [selectedOpd, setSelectedOpd] = useState(null);
   const [selectedFundSource, setSelectedFundSource] = useState(null);
   const [selectedProcurementType, setSelectedProcurementType] = useState(null);
   const [selectedProcurementMethod, setSelectedProcurementMethod] =
@@ -121,6 +124,30 @@ const TriwulanCreate = () => {
     control,
     formState: { errors },
   } = useForm();
+
+  const targetOpdQuery = useInfiniteQuery({
+    queryKey: ['get_opd'],
+    queryFn: async ({ pageParam = 1 }) => {
+      const params = {
+        ...initialParams,
+        limit: 0,
+        role_id: 2,
+      };
+
+      params.page = pageParam;
+
+      const res = await getUsers(params, authHeader());
+
+      return res;
+    },
+    getNextPageParam: (lastPage) => {
+      if (lastPage.data.page < lastPage.data.pages) {
+        return lastPage.data.page + 1;
+      }
+
+      return undefined;
+    },
+  });
 
   const activityQuery = useInfiniteQuery({
     queryKey: ['get_activities'],
@@ -167,6 +194,7 @@ const TriwulanCreate = () => {
       activity_form: selectedActivityForm?.id,
       optional: selectedOptional?.name,
       contract_date: formattedDate(data?.contract_date),
+      createdByUid: selectedOpd ? Number(selectedOpd.id) : null,
     };
 
     // Append non-file fields to FormData
@@ -206,6 +234,10 @@ const TriwulanCreate = () => {
         },
       }
     );
+  };
+
+  const handleSelectOpd = (item) => {
+    setSelectedOpd(item);
   };
 
   const handleSelectFundSource = (item) => {
@@ -257,6 +289,18 @@ const TriwulanCreate = () => {
                 error={errors.created_at?.message}
               />
             </div> */}
+
+            {authUser()?.role.name === 'Superadmin' && (
+              <div className="mb-4">
+                <Label className="mb-2">Target OPD</Label>
+                <DropdownDialog
+                  label="Pilih Target OPD"
+                  data={targetOpdQuery.data}
+                  value={selectedOpd}
+                  onChange={handleSelectOpd}
+                />
+              </div>
+            )}
 
             <div>
               <Label className="mb-2">Output Sub Kegiatan</Label>
@@ -574,18 +618,23 @@ const TriwulanCreate = () => {
               <TextInput
                 id="leader_name"
                 name="leader_name"
-                width="w-full"
                 placeholder="Tulis Disini..."
                 register={register('leader_name')}
                 error={errors.leader_name?.message}
               />
             </div>
-            <div className="col-span-2">
+            <div
+              className={`${
+                authUser()?.role.name !== 'Superadmin' ? 'col-span-2' : ''
+              }`}
+            >
               <Label className="mb-2">Alasan Terkait</Label>
               <TextInput
                 id="reason"
                 name="reason"
-                width="w-full"
+                width={`${
+                  authUser()?.role.name === 'Superadmin' ? 'w-full' : null
+                }`}
                 placeholder="Tulis Disini..."
                 register={register('reason')}
                 error={errors.reason?.message}
