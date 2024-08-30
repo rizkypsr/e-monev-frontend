@@ -436,7 +436,7 @@ const router = createBrowserRouter(
           ),
         }}
         element={
-          <Authorization roles={['OPD']}>
+          <Authorization roles={['OPD', 'Superadmin']}>
             <Master />
           </Authorization>
         }

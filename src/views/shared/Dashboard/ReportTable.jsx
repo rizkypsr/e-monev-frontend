@@ -1,33 +1,32 @@
+import React from 'react';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { useAuthHeader, useAuthUser } from 'react-auth-kit';
 import { createColumnHelper } from '@tanstack/react-table';
-import { Link, useSearchParams } from 'react-router-dom';
 import {
+  ArrowDownOnSquareIcon,
+  ArrowDownOnSquareStackIcon,
   EyeIcon,
   PencilIcon,
   TrashIcon,
-  ArrowDownOnSquareIcon,
-  ArrowDownOnSquareStackIcon,
 } from '@heroicons/react/24/solid';
-import { useAuthHeader, useAuthUser } from 'react-auth-kit';
-import { useMutation, useQuery, useQueryClient } from 'react-query';
-import { useEffect, useState } from 'react';
-
+import { Link } from 'react-router-dom';
+import formattedDate from '../../../utils/formattedDate';
+import ErrorPage from '../../ErrorPage';
+import Pagination from '../../../components/Pagination';
+import Table from '../../../components/Table';
+import Button from '../../../components/Button';
 import {
   Dialog,
   DialogClose,
   DialogContent,
   DialogTrigger,
 } from '../../../components/DialogContent';
+import { baseUrlAPI } from '../../../utils/constants';
 import TrashImg from '../../../assets/images/trash.png';
-import ErrorPage from '../../ErrorPage';
-import Table from '../../../components/Table';
-import Pagination from '../../../components/Pagination';
-import { useToastContext } from '../../../context/ToastContext';
 import getTriwulanReport from '../../../api/admin/report/getTriwulanReport';
 import deleteTriwulanReport from '../../../api/admin/report/deleteTriwulanReport';
-import { baseUrlAPI } from '../../../utils/constants';
+import { useToastContext } from '../../../context/ToastContext';
 import useFileDownloader from '../../../hooks/useFileDownloader';
-import formattedDate from '../../../utils/formattedDate';
-import Button from '../../../components/Button';
 
 const columnHelper = createColumnHelper();
 const columns = [
@@ -213,20 +212,11 @@ const columns = [
     cell: (props, deleteUserData, role, downloadFile) => {
       const data = props.row.original;
       const rowId = data.id;
-      const file = data.file;
+      const { file } = data;
 
       return (
         <div className="flex justify-end">
-          {role === 'Superadmin' && (
-            <Link to={`edit/${rowId}`}>
-              <Button
-                className="text-sm font-normal"
-                textColor="text-blue-500"
-                icon={<PencilIcon className="w-4 h-4" />}
-              />
-            </Link>
-          )}
-          <Link to={`detail/${rowId}`}>
+          <Link to={`laporan/data-triwulan/detail/${rowId}`}>
             <Button
               className="text-sm font-normal"
               textColor="text-blue-500"
@@ -311,21 +301,16 @@ const initialParams = {
   sort: 'terbaru',
   month: null,
   year: null,
-  fund_source_id: null,
+  triwulan_id: null,
 };
 
-const ReportTriwulanTable = () => {
-  const [searchParams] = useSearchParams();
+const ReportTable = () => {
+  const authHeader = useAuthHeader();
   const { downloadFile } = useFileDownloader();
 
-  const [filterParams, setFilterParams] = useState(initialParams);
-
-  useEffect(() => {
-    setFilterParams(Object.fromEntries(searchParams.entries()));
-  }, [searchParams]);
+  const [filterParams, setFilterParams] = React.useState(initialParams);
 
   const queryClient = useQueryClient();
-  const authHeader = useAuthHeader();
   const authUser = useAuthUser();
   const { showToastMessage } = useToastContext();
 
@@ -355,18 +340,18 @@ const ReportTriwulanTable = () => {
     );
   };
 
-  const onPaginationChange = (currentPage) => {
-    setFilterParams({
-      ...filterParams,
-      page: currentPage,
-    });
-  };
-
   const handleDownloadFile = ({ fileUrl, isFetch }) => {
     downloadFile({
       fileUrl,
       authToken: authHeader(),
       isFetch,
+    });
+  };
+
+  const onPaginationChange = (currentPage) => {
+    setFilterParams({
+      ...filterParams,
+      page: currentPage,
     });
   };
 
@@ -404,4 +389,4 @@ const ReportTriwulanTable = () => {
   );
 };
 
-export default ReportTriwulanTable;
+export default ReportTable;
