@@ -12,6 +12,7 @@ import formatToRupiah from '../../../utils/formatRupiah';
 import downloadTriwulanPdf from '../../../api/admin/report/downloadTriwulanPdf';
 import { useToastContext } from '../../../context/ToastContext';
 import downloadTriwulanExcel from '../../../api/admin/report/downloadTriwulanExcel';
+import { baseUrlAPI } from '../../../utils/constants';
 
 const initialData = {
   id: 0,
@@ -270,52 +271,76 @@ const ReportTriwulanDetail = () => {
   };
 
   return (
-    <div className="w-full h-full mt-6 bg-white rounded-lg p-9">
-      <div>
-        <div className="mb-8 cursor-pointer flex justify-between">
-          <div className="flex space-x-3 items-center">
-            <button
-              type="button"
-              className="flex space-x-3 items-center mb-8"
-              onClick={() => navigate(-1)}
-            >
-              <ArrowLeftIcon className="w-6 h-6" />
-              <h1 className="font-semibold text-lg text-dark-gray leading-7">
-                Detail Kegiatan
-              </h1>
-            </button>
+    <>
+      <div className="w-full h-full mt-6 bg-white rounded-lg p-9">
+        <div>
+          <div className="mb-8 cursor-pointer flex justify-between">
+            <div className="flex space-x-3 items-center">
+              <button
+                type="button"
+                className="flex space-x-3 items-center mb-8"
+                onClick={() => navigate(-1)}
+              >
+                <ArrowLeftIcon className="w-6 h-6" />
+                <h1 className="font-semibold text-lg text-dark-gray leading-7">
+                  Detail Kegiatan
+                </h1>
+              </button>
+            </div>
+            <div className="flex space-x-2">
+              <Button
+                className="w-28 lg:w-auto"
+                type="submit"
+                background="bg-primary"
+                textColor="text-white"
+                icon={<ArrowDownTrayIcon className="w-6 h-6" />}
+                onClick={handleDownloadPDF}
+              >
+                Unduh Data (PDF)
+              </Button>
+              <Button
+                className="w-28 lg:w-auto"
+                type="submit"
+                background="bg-primary"
+                textColor="text-white"
+                icon={<ArrowDownTrayIcon className="w-6 h-6" />}
+                onClick={handleDownloadExcel}
+              >
+                Unduh Data (XLS)
+              </Button>
+            </div>
           </div>
-          <div className="flex space-x-2">
-            <Button
-              className="w-28 lg:w-auto"
-              type="submit"
-              background="bg-primary"
-              textColor="text-white"
-              icon={<ArrowDownTrayIcon className="w-6 h-6" />}
-              onClick={handleDownloadPDF}
-            >
-              Unduh Data (PDF)
-            </Button>
-            <Button
-              className="w-28 lg:w-auto"
-              type="submit"
-              background="bg-primary"
-              textColor="text-white"
-              icon={<ArrowDownTrayIcon className="w-6 h-6" />}
-              onClick={handleDownloadExcel}
-            >
-              Unduh Data (XLS)
-            </Button>
-          </div>
+        </div>
+
+        <div className="relative overflow-x-auto">
+          <table className="w-full text-sm text-left text-dark-gray">
+            <tbody>{renderTableRows()}</tbody>
+          </table>
         </div>
       </div>
 
-      <div className="relative overflow-x-auto">
-        <table className="w-full text-sm text-left text-dark-gray">
-          <tbody>{renderTableRows()}</tbody>
-        </table>
+      <div className="w-full mt-6 bg-white rounded-lg p-9 overflow-hidden">
+        <h1 className="font-semibold text-lg text-dark-gray leading-7">
+          Daftar Gambar
+        </h1>
+
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 auto-rows-[minmax(100px, auto)] mt-6">
+          {report.file && report.file.length > 0 ? (
+            report.file.map((file) => (
+              <img
+                key={file}
+                src={`${baseUrlAPI}${file}`}
+                alt="file"
+                className="w-full h-auto max-h-80 object-cover rounded-lg shadow-md"
+                style={{ gridRow: `span ${Math.ceil(Math.random() * 2)}` }} // Adjust for staggered effect
+              />
+            ))
+          ) : (
+            <p className="text-dark-gray">Tidak ada gambar</p>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
