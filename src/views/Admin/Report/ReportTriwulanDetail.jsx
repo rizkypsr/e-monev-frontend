@@ -274,10 +274,16 @@ const ReportTriwulanDetail = () => {
       <div>
         <div className="mb-8 cursor-pointer flex justify-between">
           <div className="flex space-x-3 items-center">
-            <ArrowLeftIcon className="w-6 h-6" />
-            <h1 className="font-semibold text-lg text-dark-gray leading-7">
-              Detail Kegiatan
-            </h1>
+            <button
+              type="button"
+              className="flex space-x-3 items-center mb-8"
+              onClick={() => navigate(-1)}
+            >
+              <ArrowLeftIcon className="w-6 h-6" />
+              <h1 className="font-semibold text-lg text-dark-gray leading-7">
+                Detail Kegiatan
+              </h1>
+            </button>
           </div>
           <div className="flex space-x-2">
             <Button

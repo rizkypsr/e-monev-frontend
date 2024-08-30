@@ -19,6 +19,7 @@ import ProgressBar from '../../../components/ProgressBar';
 import getFundSource from '../../../api/user/triwulan/getFundSource';
 import getFundSourceChart from '../../../api/admin/dashboard/getFundSourceChart';
 import formatRupiah from '../../../utils/formatRupiah';
+import ReportTable from './ReportTable';
 
 const initialParams = {
   limit: 0,
@@ -302,6 +303,8 @@ const Dashboard = () => {
           )}
         </div>
       )}
+
+      {authUser().role.name === 'OPD' && <ReportTable />}
     </>
   );
 };
