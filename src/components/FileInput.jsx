@@ -1,14 +1,33 @@
 import React, { useState } from 'react';
 
-const FileInput = ({ className, label, icon, handleFile, error, register }) => {
-  const [fileName, setFileName] = useState('');
+const FileInput = ({
+  className,
+  label,
+  icon,
+  handleFile,
+  error,
+  register,
+  allowMultiple = false,
+}) => {
+  const [fileNames, setFileNames] = useState([]);
 
   const handleChange = (e) => {
-    const fileUploaded = e.target.files[0];
-    handleFile(fileUploaded);
-    setFileName(fileUploaded?.name);
+    const filesUploaded = Array.from(e.target.files);
+    handleFile(allowMultiple ? filesUploaded : filesUploaded[0]);
 
-    register('file').onChange(fileUploaded);
+    setFileNames(
+      allowMultiple
+        ? filesUploaded.map((file) => file.name)
+        : [filesUploaded[0]?.name]
+    );
+  };
+
+  // Display only the first 5 file names and add "..." for the rest
+  const displayFileNames = (files) => {
+    if (files.length <= 5) {
+      return files.join(', ');
+    }
+    return `${files.slice(0, 5).join(', ')}${files.length > 5 ? ', ...' : ''}`;
   };
 
   return (
@@ -18,18 +37,25 @@ const FileInput = ({ className, label, icon, handleFile, error, register }) => {
           htmlFor="file"
           className={`text-white cursor-pointer font-medium rounded-lg text-sm px-3 py-2.5 bg-primary ${
             icon ? 'flex items-center justify-center space-x-2' : ''
-          } ${className} `}
+          } ${className}`}
         >
-          {icon}
+          {fileNames.length > 0 ? icon : null}
+
           <div>{label}</div>
           <input
             id="file"
             type="file"
+            multiple={allowMultiple}
             onChange={handleChange}
             style={{ display: 'none' }}
+            {...register('file', {
+              onChange: (e) => handleChange(e),
+            })}
           />
         </label>
-        <div>{fileName || 'No File'}</div>
+        <div>
+          {fileNames.length > 0 ? displayFileNames(fileNames) : 'No File'}
+        </div>
       </div>
       <p className="mt-2 text-xs text-red-600">{error}</p>
     </div>

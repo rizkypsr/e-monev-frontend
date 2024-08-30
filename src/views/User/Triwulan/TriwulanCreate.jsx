@@ -169,13 +169,25 @@ const TriwulanCreate = () => {
       contract_date: formattedDate(data?.contract_date),
     };
 
+    // Append non-file fields to FormData
     // eslint-disable-next-line no-restricted-syntax
     for (const key in formDataObject) {
-      // eslint-disable-next-line no-prototype-builtins
-      if (formDataObject.hasOwnProperty(key)) {
-        if (formDataObject[key]) {
-          formData.append(key, formDataObject[key]);
-        }
+      if (
+        // eslint-disable-next-line no-prototype-builtins
+        formDataObject.hasOwnProperty(key) &&
+        formDataObject[key] &&
+        key !== 'file'
+      ) {
+        formData.append(key, formDataObject[key]);
+      }
+    }
+
+    // Append files to FormData
+    if (data.file) {
+      if (Array.isArray(data.file)) {
+        data.file.forEach((file) => formData.append('file', file));
+      } else {
+        formData.append('file', data.file);
       }
     }
 
@@ -220,8 +232,8 @@ const TriwulanCreate = () => {
     setSelectedProcurementMethod(item);
   };
 
-  const handleFileInput = (file) => {
-    setValue('file', file);
+  const handleFileInput = (files) => {
+    setValue('file', files);
   };
 
   return (
@@ -588,6 +600,7 @@ const TriwulanCreate = () => {
                 handleFile={handleFileInput}
                 register={register}
                 error={errors.file?.message}
+                allowMultiple
               />
             </div>
           </div>
