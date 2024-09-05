@@ -68,7 +68,10 @@ const ReportTableWrapper = () => {
   const [searchParams] = useSearchParams();
   const { showToastMessage } = useToastContext();
 
-  const [selectedType, setSelectedType] = useState(null);
+  const [selectedType, setSelectedType] = useState({
+    label: 'Data Laporan Kegiatan',
+    value: 'data-triwulan',
+  });
   const [selectedMonth, setSelectedMonth] = useState(null);
   const [selectedTriwulan, setSelectedTriwulan] = useState(null);
   const [selectedYear, setSelectedYear] = useState(null);
@@ -167,6 +170,7 @@ const ReportTableWrapper = () => {
   };
 
   const onSelectType = (item) => {
+    console.log(item);
     setSelectedType(item);
   };
 
@@ -208,7 +212,7 @@ const ReportTableWrapper = () => {
 
   const resetFilter = () => {
     setSearchParamsState(initialFilterParams);
-    setSelectedType(null);
+    setSelectedType({ label: 'Data Laporan Kegiatan', value: 'data-triwulan' });
     setSelectedMonth(null);
     setSelectedYear(null);
     setSelectedTriwulan(null);
@@ -235,14 +239,15 @@ const ReportTableWrapper = () => {
       </div>
 
       <div className="flex items-center justify-between mt-6">
-        <DropdownSelect
+        <div minWidth="14rem"></div>
+        {/* <DropdownSelect
           value={selectedType}
           options={type}
           onChange={onSelectType}
           minWidth="14rem"
         >
           <DropdownSelect.HeaderV2 label="Pilih Data Laporan" />
-        </DropdownSelect>
+        </DropdownSelect> */}
 
         <div className="relative w-1/3">
           <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">

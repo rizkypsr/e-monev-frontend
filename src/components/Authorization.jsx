@@ -16,10 +16,8 @@ const Authorization = ({ children, roles }) => {
       if (authUser().role.name === 'Atasan Daerah') {
         return <Navigate to="/laporan" replace />;
       }
-
       return <Unauthorized />;
     }
-
     return children;
   }
 

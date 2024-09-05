@@ -270,6 +270,8 @@ const ReportTriwulanDetail = () => {
     }
   };
 
+  // console.log(report, 'sadsadasda');
+
   return (
     <>
       <div className="w-full h-full mt-6 bg-white rounded-lg p-9">
@@ -327,13 +329,16 @@ const ReportTriwulanDetail = () => {
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 auto-rows-[minmax(100px, auto)] mt-6">
           {report.file && report.file.length > 0 ? (
             report.file.map((file) => (
-              <img
-                key={file}
-                src={`${baseUrlAPI}${file}`}
-                alt="file"
-                className="w-full h-auto max-h-80 object-cover rounded-lg shadow-md"
-                style={{ gridRow: `span ${Math.ceil(Math.random() * 2)}` }} // Adjust for staggered effect
-              />
+              // console.log(file, '.s..s.s.s.s.');
+              <>
+                <img
+                  key={file}
+                  src={`${baseUrlAPI}/${file}`}
+                  alt="file"
+                  className="w-full h-auto max-h-80 object-cover rounded-lg shadow-md"
+                  style={{ gridRow: `span ${Math.ceil(Math.random() * 2)}` }} // Adjust for staggered effect
+                />
+              </>
             ))
           ) : (
             <p className="text-dark-gray">Tidak ada gambar</p>
