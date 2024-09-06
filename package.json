@@ -59,7 +59,7 @@
     "react-toastify": "^9.1.1",
     "react-uuid": "^2.0.0",
     "slick-carousel": "^1.8.1",
-    "tailwind-merge": "^2.1.0",
+    "tailwind-merge": "^2.5.2",
     "use-query-params": "^2.2.1",
     "vite-plugin-svgr": "^2.4.0"
   },
