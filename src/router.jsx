@@ -65,6 +65,7 @@ import FundSource from './views/Admin/FundSource/FundSource';
 import FundSourceCreate from './views/Admin/FundSource/FundSourceCreate';
 import FundSourceEdit from './views/Admin/FundSource/FundSourceEdit';
 import FundSourceDetail from './views/Admin/FundSource/FundSourceDetail';
+import Location from './views/shared/Location/Location';
 
 const router = createBrowserRouter(
   createRoutesFromElements([
@@ -438,6 +439,24 @@ const router = createBrowserRouter(
         element={
           <Authorization roles={['OPD', 'Superadmin']}>
             <Master />
+          </Authorization>
+        }
+      >
+        <Route index key="triwulanCreate" element={<TriwulanCreate />} />
+        <Route key="triwulanEdit" path="edit/:id" element={<TriwulanEdit />} />
+      </Route>
+      <Route
+        key="location"
+        path="lokasi"
+        loader={() => 'Lokasi Kegiatan'}
+        handle={{
+          crumb: (data) => (
+            <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
+          ),
+        }}
+        element={
+          <Authorization roles={['OPD', 'Superadmin']}>
+            <Location />
           </Authorization>
         }
       >

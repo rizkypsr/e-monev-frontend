@@ -22,6 +22,7 @@ import LogoutIcon from '../components/icons/LogoutIcon';
 import ConfigurationIcon from '../components/icons/ConfigurationIcon';
 import BookIcon from '../components/icons/BookIcon';
 import AddIcon from '../components/icons/AddIcon';
+import LocationIcon from '../components/icons/LocationIcon';
 
 const Sidebar = ({ isOpen }) => {
   const signOut = useSignOut();
@@ -86,6 +87,12 @@ const Sidebar = ({ isOpen }) => {
       path: '/data-triwulan',
       label: 'Data Kegiatan',
       icon: <AddIcon />,
+      roles: ['superadmin', 'opd'],
+    },
+    {
+      path: '/lokasi',
+      label: 'Lokasi',
+      icon: <LocationIcon />,
       roles: ['superadmin', 'opd'],
     },
     // {

@@ -38,3 +38,14 @@
     box-shadow: 0px 6px 0px 0px rgba(189, 189, 189, 1);
   }
 }
+
+.leaflet-container {
+  @apply h-3/4 w-full z-0;
+}
+
+/* Custom CSS to remove outline and border on focus */
+.leaflet-control-geosearch input:focus {
+  outline: none;
+  border: none;
+  box-shadow: none;
+}
