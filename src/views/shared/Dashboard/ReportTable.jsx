@@ -295,7 +295,7 @@ const columns = [
 ];
 
 const initialParams = {
-  limit: 10,
+  limit: 0,
   page: 1,
   search: '',
   sort: 'terbaru',
@@ -359,6 +359,8 @@ const ReportTable = () => {
     return <ErrorPage errorMessage={error.message} />;
   }
 
+  console.log(data?.data);
+
   return (
     <div className="w-full h-full mt-6 bg-white rounded-lg">
       <Table
@@ -380,11 +382,13 @@ const ReportTable = () => {
         isLoading={isLoading}
       />
 
-      <Pagination
-        totalRows={data?.data.total || 0}
-        pageChangeHandler={onPaginationChange}
-        rowsPerPage={filterParams.limit}
-      />
+      {filterParams.limit > 0 && (
+        <Pagination
+          totalRows={data?.data.total || 0}
+          pageChangeHandler={onPaginationChange}
+          rowsPerPage={filterParams.limit}
+        />
+      )}
     </div>
   );
 };

@@ -154,6 +154,14 @@ const Dashboard = () => {
   );
   const showCountBox = (roles) => roles.includes(authUser().role.name);
 
+  const progressBarData = fundSourceChartQuery?.data?.data?.triwulan.map(
+    (triwulan) => ({
+      label: triwulan.nama_aktifitas,
+      completed: triwulan.realisasi_fisik,
+      total: triwulan.pagu_dana,
+    })
+  );
+
   return (
     <>
       <h1 className="font-semibold text-2xl mb-4">
@@ -188,7 +196,7 @@ const Dashboard = () => {
 
         {authUser().role.name !== 'OPD' && (
           <div className="flex space-x-2 flex-3">
-            <Button
+            {/* <Button
               className="w-28 lg:w-auto"
               type="submit"
               background="bg-primary"
@@ -207,7 +215,7 @@ const Dashboard = () => {
               loading={excelQuery.isLoading}
             >
               Unduh Data (XLS)
-            </Button>
+            </Button> */}
           </div>
         )}
       </div>
@@ -233,14 +241,15 @@ const Dashboard = () => {
             />
           </div>
 
-          <div className="space-y-6 mt-12">
-            {fundSourceChartQuery?.data?.data?.triwulan.map((triwulan) => (
+          <div className="space-y-6 ">
+            {progressBarData && <ProgressBar data={progressBarData} />}
+            {/* {fundSourceChartQuery?.data?.data?.triwulan.map((triwulan) => (
               <ProgressBar
                 label={triwulan.nama_aktifitas}
                 completed={triwulan.realisasi_fisik}
                 total={triwulan.pagu_dana}
               />
-            ))}
+            ))} */}
           </div>
         </div>
       )}
