@@ -40,7 +40,7 @@
 }
 
 .leaflet-container {
-  @apply h-3/4 w-full z-0;
+  @apply h-[536px] w-full z-0;
 }
 
 /* Custom CSS to remove outline and border on focus */

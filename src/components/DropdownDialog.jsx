@@ -8,7 +8,7 @@ const DropdownDialog = ({
   label,
   data,
   value,
-  maxWidth = 'max-w-md',
+  //   maxWidth = 'max-w-md',
   onChange,
   onDelete,
   error,
@@ -43,7 +43,7 @@ const DropdownDialog = ({
   };
 
   return (
-    <div className={`text-sm ${maxWidth}`}>
+    <div className="text-sm w-full">
       <div className={`bg-white ${onDelete && 'flex items-center space-x-3'}`}>
         <div
           onClick={openModal}

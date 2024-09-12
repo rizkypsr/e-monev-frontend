@@ -1,5 +1,5 @@
 import React from 'react';
-import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
+import { MapContainer, Marker, Popup, TileLayer, useMap } from 'react-leaflet';
 import SearchMapControl from '../../../components/SearchMapControl';
 import LocateMapControl from '../../../components/LocateMapControl';
 import SidebarMapControl from '../../../components/SidebarMapControl';
@@ -8,14 +8,39 @@ import 'leaflet.locatecontrol';
 import 'leaflet-providers';
 import 'leaflet-sidebar';
 
+import 'leaflet/dist/leaflet.css';
 import 'leaflet.locatecontrol/dist/L.Control.Locate.min.css';
 import 'leaflet-geosearch/dist/geosearch.css';
 
 const position = [-0.8674005, 131.3051903];
 
-const Location = ({ onSelectMap }) => (
-  <div className="h-full">
-    <MapContainer center={position} zoom={13}>
+const MapResizeHandler = () => {
+  const map = useMap();
+
+  React.useEffect(() => {
+    const handleResize = () => {
+      map.invalidateSize();
+    };
+
+    map.invalidateSize();
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [map]);
+
+  return null;
+};
+
+const Location = ({
+  onSelectMap,
+  showSearchBar = false,
+  showSidebar = false,
+}) => (
+  <>
+    <MapContainer center={position} zoom={13} minZoom={3}>
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         maxZoom={19}
@@ -25,14 +50,18 @@ const Location = ({ onSelectMap }) => (
         <Popup>Sorong City, West Papua, Indonesia</Popup>
       </Marker>
       <LocateMapControl />
-      <SearchMapControl />
-      <SidebarMapControl onSelectMap={onSelectMap} />
+      {showSearchBar && <SearchMapControl />}
+      {showSidebar && <SidebarMapControl onSelectMap={onSelectMap} />}
+
+      <MapResizeHandler />
     </MapContainer>
 
-    <div id="sidebar">
-      <h1>leaflet-sidebar</h1>
-    </div>
-  </div>
+    {showSearchBar && (
+      <div id="sidebar">
+        <h1>leaflet-sidebar</h1>
+      </div>
+    )}
+  </>
 );
 
 export default Location;

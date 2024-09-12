@@ -76,7 +76,7 @@ const LocationInput = ({
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="[&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] w-full max-w-7xl h-[45rem] transform rounded-2xl bg-white overflow-y-auto p-6 shadow-xl transition-all">
+                <Dialog.Panel className="w-full max-w-7xl h-[40rem] transform rounded-2xl bg-white p-6 shadow-xl transition-all">
                   <Dialog.Title
                     as="h3"
                     className="text-lg font-medium leading-6 text-gray-900 mb-6 flex items-center justify-between"
@@ -84,7 +84,11 @@ const LocationInput = ({
                     <div>{label}</div>
                   </Dialog.Title>
 
-                  <Location onSelectMap={handleLocationSelect} />
+                  <Location
+                    onSelectMap={handleLocationSelect}
+                    showSearchBar
+                    showSidebar
+                  />
                 </Dialog.Panel>
               </Transition.Child>
             </div>
