@@ -200,12 +200,6 @@ const TriwulanCreate = () => {
       activity_location: JSON.parse(data.activity_location),
     };
 
-    console.log(formDataObject);
-
-    return null;
-
-    process.exit(1);
-
     // Append non-file fields to FormData
     // eslint-disable-next-line no-restricted-syntax
     for (const key in formDataObject) {
@@ -277,10 +271,6 @@ const TriwulanCreate = () => {
     setValue('file', files);
   };
 
-  const onHandleSelectMap = (data) => {
-    // setValue('activity_location', data);
-  };
-
   return (
     <div className="mb-6">
       <div className="flex justify-between">
@@ -291,7 +281,7 @@ const TriwulanCreate = () => {
         <form id="main" className="w-3/4" onSubmit={handleSubmit(onSubmit)}>
           <div className="grid grid-cols-2 gap-4 mb-8">
             {authUser()?.role.name === 'Superadmin' && (
-              <div className="mb-4">
+              <div className="mb-2">
                 <Label className="mb-2">Target OPD</Label>
                 <DropdownDialog
                   label="Pilih Target OPD"
@@ -302,7 +292,7 @@ const TriwulanCreate = () => {
               </div>
             )}
 
-            <div className="mb-4">
+            <div className="mb-2">
               <Label className="mb-2">Lokasi Kegiatan</Label>
               <LocationInput
                 name="activity_location"
@@ -310,7 +300,6 @@ const TriwulanCreate = () => {
                 placeholder="Pilih lokasi kegiatan"
                 register={register}
                 setValue={setValue}
-                onHandleSelect={onHandleSelectMap}
                 error={errors.activity_location?.message}
               />
             </div>

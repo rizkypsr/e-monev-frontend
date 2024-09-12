@@ -10,7 +10,6 @@ const LocationInput = ({
   setValue,
   disabled,
   error,
-  onHandleSelect,
 }) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const [location, setLocation] = React.useState(null);
@@ -32,8 +31,6 @@ const LocationInput = ({
   const handleLocationSelect = (data) => {
     setLocation(data);
     setValue(name, JSON.stringify(data));
-
-    onHandleSelect(data);
 
     closeModal();
   };
