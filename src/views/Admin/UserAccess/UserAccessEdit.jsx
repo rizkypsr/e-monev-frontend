@@ -9,7 +9,6 @@ import { useAuthHeader } from 'react-auth-kit';
 import { useInfiniteQuery, useMutation, useQuery } from 'react-query';
 import { useForm } from 'react-hook-form';
 import Label from '../../../components/Label';
-import TextInput from '../../../components/TextInput';
 import Button from '../../../components/Button';
 import ErrorPage from '../../ErrorPage';
 import { getOrganizations } from '../../../api/admin/organization';
@@ -19,6 +18,7 @@ import ReactLoading from '../../../components/Loading';
 import { getUser } from '../../../api/admin/user';
 import DropdownDialog from '../../../components/DropdownDialog';
 import getRoles from '../../../api/static/getRoles';
+import TextInputV2 from '../../../components/TextInputV2';
 
 let initialParams = {
   limit: 10,
@@ -188,7 +188,7 @@ const UserAccessEdit = () => {
           </h1>
         </Link>
 
-        <form className="mt-4" onSubmit={handleSubmit(onSubmit)}>
+        <form className="mt-4 w-2/5" onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-6">
             <Label className="mb-2">OPD</Label>
             <div className="space-y-3">
@@ -242,10 +242,8 @@ const UserAccessEdit = () => {
             />
           </div>
           <div className="mb-6">
-            <Label htmlFor="username">Nama</Label>
-            <TextInput
-              id="name"
-              name="name"
+            <Label className="mb-2">Nama</Label>
+            <TextInputV2
               placeholder="Masukan Nama"
               register={register('name', {
                 required: 'Nama wajib diisi!',
@@ -254,11 +252,9 @@ const UserAccessEdit = () => {
             />
           </div>
           <div className="mb-6">
-            <Label htmlFor="username">Username</Label>
-            <TextInput
-              id="name"
-              name="name"
-              placeholder="Masukan Nama"
+            <Label className="mb-2">Username</Label>
+            <TextInputV2
+              placeholder="Masukan Username"
               register={register('username', {
                 required: 'Nama wajib diisi!',
               })}
@@ -266,10 +262,8 @@ const UserAccessEdit = () => {
             />
           </div>
           <div className="mb-6">
-            <Label htmlFor="email">Email</Label>
-            <TextInput
-              id="email"
-              name="email"
+            <Label className="mb-2">Email</Label>
+            <TextInputV2
               placeholder="Masukan Email"
               register={register('email', {
                 required: 'Email wajib diisi!',
@@ -278,19 +272,16 @@ const UserAccessEdit = () => {
             />
           </div>
           <div className="mb-6">
-            <Label htmlFor="password">Password</Label>
-            <TextInput
-              id="password"
-              type="password"
-              name="password"
+            <Label className="mb-2">Password</Label>
+            <TextInputV2
               placeholder="Masukan Password"
               register={register('password', {
-                required:
-                  'Password wajib diisi! Masukan password lama jika tidak ingin mengubah',
+                required: 'Password wajib diisi!',
               })}
               error={errors.password?.message}
             />
           </div>
+
           {updateMutation.isLoading ? (
             <ReactLoading />
           ) : (

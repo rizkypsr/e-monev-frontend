@@ -6,7 +6,6 @@ import { useInfiniteQuery, useMutation } from 'react-query';
 import { useAuthHeader, useAuthUser } from 'react-auth-kit';
 
 import Label from '../../../components/Label';
-import TextInput from '../../../components/TextInput';
 import formattedDate from '../../../utils/formattedDate';
 import ReactLoading from '../../../components/Loading';
 import Button from '../../../components/Button';

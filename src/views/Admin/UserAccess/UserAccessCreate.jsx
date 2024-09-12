@@ -3,11 +3,10 @@ import {
   CheckCircleIcon,
   PlusCircleIcon,
 } from '@heroicons/react/24/solid';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthHeader } from 'react-auth-kit';
 import { useInfiniteQuery, useMutation } from 'react-query';
-import { useInView } from 'react-intersection-observer';
 import { useForm } from 'react-hook-form';
 import Label from '../../../components/Label';
 import Button from '../../../components/Button';
@@ -17,8 +16,8 @@ import { useToastContext } from '../../../context/ToastContext';
 import ReactLoading from '../../../components/Loading';
 import DropdownDialog from '../../../components/DropdownDialog';
 import getRoles from '../../../api/static/getRoles';
-import TextInput from '../../../components/TextInput';
 import createUser from '../../../api/admin/user/createUser';
+import TextInputV2 from '../../../components/TextInputV2';
 
 const initialParams = {
   limit: 20,
@@ -162,7 +161,7 @@ const UserAccessCreate = () => {
           </h1>
         </Link>
 
-        <form className="mt-4" onSubmit={handleSubmit(onSubmit)}>
+        <form className="mt-4 w-2/5" onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-6">
             <Label className="mb-2">OPD</Label>
             <div className="space-y-3">
@@ -214,10 +213,8 @@ const UserAccessCreate = () => {
             />
           </div>
           <div className="mb-6">
-            <Label htmlFor="username">Nama</Label>
-            <TextInput
-              id="name"
-              name="name"
+            <Label className="mb-2">Nama</Label>
+            <TextInputV2
               placeholder="Masukan Nama"
               register={register('name', {
                 required: 'Nama wajib diisi!',
@@ -226,10 +223,8 @@ const UserAccessCreate = () => {
             />
           </div>
           <div className="mb-6">
-            <Label htmlFor="username">Username</Label>
-            <TextInput
-              id="username"
-              name="username"
+            <Label className="mb-2">Username</Label>
+            <TextInputV2
               placeholder="Masukan Username"
               register={register('username', {
                 required: 'Nama wajib diisi!',
@@ -238,10 +233,8 @@ const UserAccessCreate = () => {
             />
           </div>
           <div className="mb-6">
-            <Label htmlFor="email">Email</Label>
-            <TextInput
-              id="email"
-              name="email"
+            <Label className="mb-2">Email</Label>
+            <TextInputV2
               placeholder="Masukan Email"
               register={register('email', {
                 required: 'Email wajib diisi!',
@@ -250,11 +243,8 @@ const UserAccessCreate = () => {
             />
           </div>
           <div className="mb-6">
-            <Label htmlFor="password">Password</Label>
-            <TextInput
-              id="password"
-              type="password"
-              name="password"
+            <Label className="mb-2">Password</Label>
+            <TextInputV2
               placeholder="Masukan Password"
               register={register('password', {
                 required: 'Password wajib diisi!',

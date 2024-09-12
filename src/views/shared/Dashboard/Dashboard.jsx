@@ -186,7 +186,6 @@ const Dashboard = () => {
               data={fundSourceQuery.data}
               value={selectedFundSource}
               onChange={handleSelectFundSource}
-              maxWidth="max-w-sm"
               enableSearch
               searchValue={filterParams.search}
               onSearch={handleOnSearch}
