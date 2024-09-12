@@ -13,8 +13,8 @@ import 'leaflet-geosearch/dist/geosearch.css';
 
 const position = [-0.8674005, 131.3051903];
 
-const Location = () => (
-  <div className="h-screen">
+const Location = ({ onSelectMap }) => (
+  <div className="h-full">
     <MapContainer center={position} zoom={13}>
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -26,7 +26,7 @@ const Location = () => (
       </Marker>
       <LocateMapControl />
       <SearchMapControl />
-      <SidebarMapControl />
+      <SidebarMapControl onSelectMap={onSelectMap} />
     </MapContainer>
 
     <div id="sidebar">

@@ -2,7 +2,7 @@ import React from 'react';
 import { useMap } from 'react-leaflet';
 import L from 'leaflet';
 
-const SidebarMapControl = () => {
+const SidebarMapControl = ({ onSelectMap }) => {
   const map = useMap();
   const markerRef = React.useRef(null);
 
@@ -24,6 +24,12 @@ const SidebarMapControl = () => {
       const details = await fetch(
         `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
       ).then((response) => response.json());
+
+      if (details.title !== '404 Not Found') {
+        console.log(details);
+
+        onSelectMap(details);
+      }
 
       const address = details.address || {};
       const content = `
