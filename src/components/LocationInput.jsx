@@ -1,7 +1,7 @@
 import { Dialog, Transition } from '@headlessui/react';
 import { ChevronRightIcon } from '@heroicons/react/24/solid';
 import React, { Fragment } from 'react';
-import Location from '../views/shared/Location/Location';
+import MapLocation from './MapLocation';
 
 const LocationInput = ({
   name,
@@ -84,7 +84,7 @@ const LocationInput = ({
                     <div>{label}</div>
                   </Dialog.Title>
 
-                  <Location
+                  <MapLocation
                     onSelectMap={handleLocationSelect}
                     showSearchBar
                     showSidebar

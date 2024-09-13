@@ -113,7 +113,7 @@ const programPrioritas = {
         result: [
           { id: 1, name: 'Bukan Prioritas' },
           { id: 2, name: 'Daerah' },
-          { id: 2, name: 'Nasional' },
+          { id: 3, name: 'Nasional' },
         ],
         total: 4,
       },

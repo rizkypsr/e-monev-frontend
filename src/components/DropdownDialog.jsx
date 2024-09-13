@@ -5,11 +5,13 @@ import { useInView } from 'react-intersection-observer';
 import ThreeDot from './ThreeDot';
 
 const DropdownDialog = ({
+  name,
   label,
   data,
   value,
   //   maxWidth = 'max-w-md',
   onChange,
+  onChangeV2,
   onDelete,
   error,
   children,
@@ -38,7 +40,9 @@ const DropdownDialog = ({
   };
 
   const onHandleSelect = (newValue) => {
-    onChange(newValue);
+    if (onChange) onChange(name, newValue);
+
+    onChangeV2(name, newValue);
     closeModal();
   };
 
