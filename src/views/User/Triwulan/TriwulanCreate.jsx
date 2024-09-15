@@ -6,7 +6,6 @@ import { useInfiniteQuery, useMutation } from 'react-query';
 import { useAuthHeader, useAuthUser } from 'react-auth-kit';
 
 import Label from '../../../components/Label';
-import TextInput from '../../../components/TextInput';
 import formattedDate from '../../../utils/formattedDate';
 import ReactLoading from '../../../components/Loading';
 import Button from '../../../components/Button';
@@ -19,6 +18,8 @@ import { getActivities } from '../../../api/admin/activity';
 import CurrencyInput from '../../../components/CurrencyInput';
 import PercentageInput from '../../../components/PercentageInput';
 import getUsers from '../../../api/user/triwulan/getUsers';
+import TextInputV2 from '../../../components/TextInputV2';
+import LocationInput from '../../../components/LocationInput';
 
 const initialParams = {
   limit: 20,
@@ -102,6 +103,24 @@ const bentukKegiatan = {
   ],
 };
 
+const programPrioritas = {
+  pageParams: [undefined],
+  pages: [
+    {
+      data: {
+        page: 1,
+        pages: 1,
+        result: [
+          { id: 1, name: 'Bukan Prioritas' },
+          { id: 2, name: 'Daerah' },
+          { id: 3, name: 'Nasional' },
+        ],
+        total: 4,
+      },
+    },
+  ],
+};
+
 const TriwulanCreate = () => {
   const authHeader = useAuthHeader();
   const authUser = useAuthUser();
@@ -116,6 +135,8 @@ const TriwulanCreate = () => {
   const [selectedActivityForm, setSelectedActivityForm] = useState(null);
   const [selectedActivity, setSelectedActivity] = useState(null);
   const [selectedOptional, setSelectedOptional] = useState(null);
+  const [selectedProgramPrioritas, setSelectedProgramPrioritas] =
+    useState(null);
 
   const {
     register,
@@ -195,6 +216,8 @@ const TriwulanCreate = () => {
       optional: selectedOptional?.name,
       contract_date: formattedDate(data?.contract_date),
       createdByUid: selectedOpd ? Number(selectedOpd.id) : null,
+      activity_location: JSON.parse(data.activity_location),
+      program_prio: selectedProgramPrioritas?.name,
     };
 
     // Append non-file fields to FormData
@@ -264,6 +287,10 @@ const TriwulanCreate = () => {
     setSelectedProcurementMethod(item);
   };
 
+  const handleSelectProgramPrioritas = (item) => {
+    setSelectedProgramPrioritas(item);
+  };
+
   const handleFileInput = (files) => {
     setValue('file', files);
   };
@@ -275,23 +302,10 @@ const TriwulanCreate = () => {
       </div>
 
       <div className="w-full h-full mt-6 bg-white rounded-lg p-9">
-        <form id="main" className="w-4/5" onSubmit={handleSubmit(onSubmit)}>
+        <form id="main" className="w-3/4" onSubmit={handleSubmit(onSubmit)}>
           <div className="grid grid-cols-2 gap-4 mb-8">
-            {/* <div className="col-span-2">
-              <Label>Tanggal Input Data</Label>
-              <TextInput
-                id="created_at"
-                name="created_at"
-                width="w-full"
-                register={register('created_at', {
-                  disabled: true,
-                })}
-                error={errors.created_at?.message}
-              />
-            </div> */}
-
             {authUser()?.role.name === 'Superadmin' && (
-              <div className="mb-4">
+              <div className="mb-2 col-span-2">
                 <Label className="mb-2">Target OPD</Label>
                 <DropdownDialog
                   label="Pilih Target OPD"
@@ -302,29 +316,26 @@ const TriwulanCreate = () => {
               </div>
             )}
 
+            <div className="mb-2">
+              <Label className="mb-2">Lokasi Kegiatan</Label>
+              <LocationInput
+                name="activity_location"
+                label="Pilih Lokasi Kegiatan"
+                placeholder="Pilih lokasi kegiatan"
+                register={register}
+                setValue={setValue}
+                error={errors.activity_location?.message}
+              />
+            </div>
+
             <div>
               <Label className="mb-2">Output Sub Kegiatan</Label>
-              <TextInput
-                id="activity_name"
-                name="activity_name"
+              <TextInputV2
                 placeholder="Tulis Disini..."
                 register={register('activity_name', {
                   required: 'Nama Kegiatan wajib diisi!',
                 })}
                 error={errors.activity_name?.message}
-              />
-            </div>
-
-            <div>
-              <Label className="mb-2">Lokasi Kegiatan</Label>
-              <TextInput
-                id="activity_location"
-                name="activity_location"
-                placeholder="Tulis Disini..."
-                register={register('activity_location', {
-                  required: 'Lokasi Kegiatan wajib diisi!',
-                })}
-                error={errors.activity_location?.message}
               />
             </div>
 
@@ -355,9 +366,7 @@ const TriwulanCreate = () => {
             </div>
             <div>
               <Label className="mb-2">OPD Pengelola</Label>
-              <TextInput
-                id="management_organization"
-                name="management_organization"
+              <TextInputV2
                 placeholder="Tulis Disini..."
                 register={register('management_organization')}
                 error={errors.management_organization?.message}
@@ -365,9 +374,7 @@ const TriwulanCreate = () => {
             </div>
             <div>
               <Label className="mb-2">Nama PPTK</Label>
-              <TextInput
-                id="pptk_name"
-                name="pptk_name"
+              <TextInputV2
                 placeholder="Tulis Disini..."
                 register={register('pptk_name')}
                 error={errors.pptk_name?.message}
@@ -375,9 +382,7 @@ const TriwulanCreate = () => {
             </div>
             <div>
               <Label className="mb-2">Nomor Kontrak</Label>
-              <TextInput
-                id="contract_number_date"
-                name="contract_number_date"
+              <TextInputV2
                 placeholder="Tulis Disini..."
                 register={register('contract_number_date', {
                   required: false,
@@ -386,12 +391,9 @@ const TriwulanCreate = () => {
               />
             </div>
             <div>
-              <Label>Tanggal Kontrak</Label>
-              <TextInput
-                id="contract_date"
-                name="contract_date"
+              <Label className="mb-2">Tanggal Kontrak</Label>
+              <TextInputV2
                 type="date"
-                width="w-full"
                 register={register('contract_date', {
                   valueAsDate: true,
                 })}
@@ -400,9 +402,7 @@ const TriwulanCreate = () => {
             </div>
             <div>
               <Label className="mb-2">Nama Penyedia</Label>
-              <TextInput
-                id="contractor_name"
-                name="contractor_name"
+              <TextInputV2
                 placeholder="Tulis Disini..."
                 register={register('contractor_name', {
                   required: false,
@@ -412,9 +412,7 @@ const TriwulanCreate = () => {
             </div>
             <div>
               <Label className="mb-2">Jangka Waktu Pelaksanaan</Label>
-              <TextInput
-                id="implementation_period"
-                name="implementation_period"
+              <TextInputV2
                 placeholder="Tulis Disini..."
                 register={register('implementation_period', {
                   required: false,
@@ -424,9 +422,7 @@ const TriwulanCreate = () => {
             </div>
             <div>
               <Label className="mb-2">Nama Penanggung Jawab</Label>
-              <TextInput
-                id="pic_name"
-                name="pic_name"
+              <TextInputV2
                 placeholder="Tulis Disini..."
                 register={register('pic_name')}
                 error={errors.pic_name?.message}
@@ -449,12 +445,28 @@ const TriwulanCreate = () => {
               />
             </div>
             <div>
-              <PercentageInput
+              <CurrencyInput
                 name="physical_realization"
                 label="Realisasi Fisik (Dalam bentuk angka)"
                 control={control}
                 placeholder="Tulis Disini..."
                 {...register('physical_realization', {
+                  required: 'Realisasi Fisik wajib diisi!',
+                  valueAsNumber: true,
+                  max: {
+                    message: 'Maksimal Rp.200.000.000.000.000',
+                    value: 200000000000000000,
+                  },
+                })}
+              />
+            </div>
+            <div>
+              <PercentageInput
+                name="physical_realization_percentage"
+                label="Realisasi Fisik (Dalam bentuk persentase angka)"
+                control={control}
+                placeholder="Tulis Disini..."
+                {...register('physical_realization_percentage', {
                   required: 'Realisasi Fisik wajib diisi!',
                   valueAsNumber: true,
                   max: {
@@ -481,10 +493,24 @@ const TriwulanCreate = () => {
               />
             </div>
             <div>
+              <PercentageInput
+                name="fund_realization_percentage"
+                label="Realisasi Keuangan (Dalam bentuk persentase angka)"
+                control={control}
+                placeholder="Tulis Disini..."
+                {...register('fund_realization_percentage', {
+                  required: 'Realisasi Keuangan wajib diisi!',
+                  valueAsNumber: true,
+                  max: {
+                    message: 'Maksimal Rp.200.000.000.000.000',
+                    value: 200000000000000000,
+                  },
+                })}
+              />
+            </div>
+            <div>
               <Label className="mb-2">Volume Kegiatan</Label>
-              <TextInput
-                id="activity_volume"
-                name="activity_volume"
+              <TextInputV2
                 placeholder="Tulis Disini..."
                 register={register('activity_volume')}
                 error={errors.activity_volume?.message}
@@ -492,9 +518,7 @@ const TriwulanCreate = () => {
             </div>
             <div>
               <Label className="mb-2">Output Kegiatan</Label>
-              <TextInput
-                id="activity_output"
-                name="activity_output"
+              <TextInputV2
                 placeholder="Tulis Disini..."
                 register={register('activity_output')}
                 error={errors.activity_output?.message}
@@ -504,9 +528,7 @@ const TriwulanCreate = () => {
               <Label className="mb-2">
                 Manfaat Kegiatan (Kelompok sasaran Langsung)
               </Label>
-              <TextInput
-                id="direct_target_group"
-                name="direct_target_group"
+              <TextInputV2
                 placeholder="Tulis Disini..."
                 register={register('direct_target_group')}
                 error={errors.direct_target_group?.message}
@@ -516,9 +538,7 @@ const TriwulanCreate = () => {
               <Label className="mb-2">
                 Manfaat Kegiatan (Kelompok sasaran Tidak Langsung)
               </Label>
-              <TextInput
-                id="indirect_target_group"
-                name="indirect_target_group"
+              <TextInputV2
                 placeholder="Tulis Disini..."
                 register={register('indirect_target_group')}
                 error={errors.indirect_target_group?.message}
@@ -550,9 +570,7 @@ const TriwulanCreate = () => {
             </div>
             <div>
               <Label className="mb-2">Hambatan dan Permasalahan</Label>
-              <TextInput
-                id="problems"
-                name="problems"
+              <TextInputV2
                 placeholder="Tulis Disini..."
                 register={register('problems')}
                 error={errors.problems?.message}
@@ -560,9 +578,7 @@ const TriwulanCreate = () => {
             </div>
             <div>
               <Label className="mb-2">Solusi Permasalahan</Label>
-              <TextInput
-                id="solution"
-                name="solution"
+              <TextInputV2
                 placeholder="Tulis Disini..."
                 register={register('solution')}
                 error={errors.solution?.message}
@@ -586,7 +602,7 @@ const TriwulanCreate = () => {
                 onChange={handleSelectProcurementMethod}
               />
             </div>
-            <div className="mb-4">
+            <div className="mb-2">
               <Label className="mb-2">Sub Kegiatan</Label>
               <DropdownDialog
                 label="Pilih Sub Kegiatan"
@@ -595,7 +611,7 @@ const TriwulanCreate = () => {
                 onChange={handleSelectActivity}
               />
             </div>
-            <div className="mb-4">
+            <div>
               <Label className="mb-2">Bentuk Kegiatan</Label>
               <DropdownDialog
                 label="Pilih Bentuk Kegiatan"
@@ -604,7 +620,7 @@ const TriwulanCreate = () => {
                 onChange={handleSelectActivityForm}
               />
             </div>
-            <div>
+            <div className="mb-2">
               <Label className="mb-2">Opsi</Label>
               <DropdownDialog
                 label="Pilih Opsi"
@@ -615,29 +631,27 @@ const TriwulanCreate = () => {
             </div>
             <div>
               <Label className="mb-2">Nama Pimpinan</Label>
-              <TextInput
-                id="leader_name"
-                name="leader_name"
+              <TextInputV2
                 placeholder="Tulis Disini..."
                 register={register('leader_name')}
                 error={errors.leader_name?.message}
               />
             </div>
-            <div
-              className={`${
-                authUser()?.role.name !== 'Superadmin' ? 'col-span-2' : ''
-              }`}
-            >
+            <div className="mb-4">
               <Label className="mb-2">Alasan Terkait</Label>
-              <TextInput
-                id="reason"
-                name="reason"
-                width={`${
-                  authUser()?.role.name === 'Superadmin' ? 'w-full' : null
-                }`}
+              <TextInputV2
                 placeholder="Tulis Disini..."
                 register={register('reason')}
                 error={errors.reason?.message}
+              />
+            </div>
+            <div>
+              <Label className="mb-2">Program Prioritas</Label>
+              <DropdownDialog
+                label="Pilih Program Prioritas"
+                data={programPrioritas}
+                value={selectedProgramPrioritas}
+                onChange={handleSelectProgramPrioritas}
               />
             </div>
 
