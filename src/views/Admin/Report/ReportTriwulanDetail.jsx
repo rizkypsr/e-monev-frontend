@@ -70,7 +70,10 @@ const fieldMappings = [
   { key: 'activity_output_sub', label: 'Nama Output Sub Kegiatan' },
   { key: 'sub_activity', label: 'Sub Kegiatan' },
   { key: 'program', label: 'Nama Program' },
-  { key: 'activity_location', label: 'Lokasi Kegiatan' },
+  {
+    key: 'activity_location',
+    label: 'Lokasi Kegiatan',
+  },
   {
     key: 'fund_source_id',
     label: 'Sumber Dana',
@@ -150,7 +153,9 @@ const ReportTriwulanDetail = () => {
         activity_name: triwulanData?.activity?.title,
         activity_output_sub: triwulanData?.activity_name,
         sub_activity: triwulanData?.activity?.sub_activity,
-        activity_location: triwulanData?.activity_location,
+        activity_location: triwulanData?.activity_location
+          ? JSON.parse(triwulanData.activity_location)?.name
+          : null,
         program: triwulanData?.activity?.program?.title,
         fund_source_id: triwulanData?.fundSource?.name,
         fund_source_total: triwulanData.fund_source_total ?? 0,

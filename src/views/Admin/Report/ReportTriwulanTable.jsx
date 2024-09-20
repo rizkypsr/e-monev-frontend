@@ -43,7 +43,9 @@ const columns = [
   }),
   columnHelper.accessor((row) => row.activity_location, {
     id: 'activity_location',
-    cell: (info) => <i>{info.getValue()}</i>,
+    cell: (info) => (
+      <div className="w-24">{JSON.parse(info.getValue())?.name ?? '-'}</div>
+    ),
     header: () => <span>Lokasi Kegiatan</span>,
   }),
   columnHelper.accessor((row) => row.fundSource?.name, {

@@ -93,7 +93,7 @@ const Sidebar = ({ isOpen }) => {
       path: '/lokasi',
       label: 'Lokasi',
       icon: <LocationIcon />,
-      roles: ['superadmin', 'opd'],
+      roles: ['superadmin'],
     },
     // {
     //   path: '/data-master',

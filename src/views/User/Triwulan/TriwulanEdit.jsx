@@ -18,6 +18,7 @@ import updateTriwulan from '../../../api/user/triwulan/updateTriwulan';
 import CurrencyInput from '../../../components/CurrencyInput';
 import PercentageInput from '../../../components/PercentageInput';
 import { getActivities } from '../../../api/admin/activity';
+import LocationInput from '../../../components/LocationInput';
 
 const initialParams = {
   page: 1,
@@ -289,13 +290,21 @@ const TriwulanEdit = () => {
 
             <div>
               <Label className="mb-2">Lokasi Kegiatan</Label>
-              <TextInput
+              {/* <TextInput
                 id="activity_location"
                 name="activity_location"
                 placeholder="Tulis Disini..."
                 register={register('activity_location', {
                   required: 'Lokasi Kegiatan wajib diisi!',
                 })}
+                error={errors.activity_location?.message}
+              /> */}
+              <LocationInput
+                name="activity_location"
+                label="Pilih Lokasi Kegiatan"
+                placeholder="Pilih lokasi kegiatan"
+                register={register}
+                setValue={setValue}
                 error={errors.activity_location?.message}
               />
             </div>

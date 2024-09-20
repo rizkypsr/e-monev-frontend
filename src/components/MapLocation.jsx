@@ -46,9 +46,11 @@ const MapLocation = ({
         maxZoom={19}
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       />
-      <Marker position={position}>
-        <Popup>Sorong City, West Papua, Indonesia</Popup>
-      </Marker>
+      {!showSidebar && (
+        <Marker position={position}>
+          <Popup>Sorong City, West Papua, Indonesia</Popup>
+        </Marker>
+      )}
       <LocateMapControl />
       {showSearchBar && <SearchMapControl />}
       {showSidebar && <SidebarMapControl onSelectMap={onSelectMap} />}

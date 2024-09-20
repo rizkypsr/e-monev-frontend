@@ -66,6 +66,7 @@ import FundSourceCreate from './views/Admin/FundSource/FundSourceCreate';
 import FundSourceEdit from './views/Admin/FundSource/FundSourceEdit';
 import FundSourceDetail from './views/Admin/FundSource/FundSourceDetail';
 import Location from './views/shared/Location/Location';
+import ErrorPage404 from './views/ErrorPage404';
 
 const router = createBrowserRouter(
   createRoutesFromElements([
@@ -85,6 +86,7 @@ const router = createBrowserRouter(
           </Link>
         ),
       }}
+      errorElement={<ErrorPage404 />}
     >
       <Route
         index
