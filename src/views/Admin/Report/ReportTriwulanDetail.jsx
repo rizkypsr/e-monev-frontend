@@ -110,10 +110,18 @@ const fieldMappings = [
     formatter: formatToRupiah,
   },
   {
+    key: 'physical_realization_percentage',
+    label: 'Persentase Realisasi Fisik'
+  },
+  {
     key: 'fund_realization',
     label: 'Realisasi Keuangan',
     isFormatted: true,
     formatter: formatToRupiah,
+  },
+  {
+    key: 'fund_realization_percentage',
+    label: 'Persentase Realisasi Sumber Dana'
   },
   { key: 'activity_volume', label: 'Volume Kegiatan' },
   { key: 'activity_output', label: 'Output Kegiatan' },
@@ -153,9 +161,7 @@ const ReportTriwulanDetail = () => {
         activity_name: triwulanData?.activity?.title,
         activity_output_sub: triwulanData?.activity_name,
         sub_activity: triwulanData?.activity?.sub_activity,
-        activity_location: triwulanData?.activity_location
-          ? JSON.parse(triwulanData.activity_location)?.name
-          : null,
+        activity_location: JSON.parse(triwulanData.activity_location)?.name ?? "",
         program: triwulanData?.activity?.program?.title,
         fund_source_id: triwulanData?.fundSource?.name,
         fund_source_total: triwulanData.fund_source_total ?? 0,
@@ -167,13 +173,15 @@ const ReportTriwulanDetail = () => {
         implementation_period: triwulanData.implementation_period,
         contract_value: triwulanData.contract_value ?? 0,
         physical_realization: triwulanData.physical_realization ?? 0,
+        physical_realization_percentage: `${triwulanData.physical_realization_percentage ?? 0} %`,
         fund_realization: triwulanData.fund_realization ?? 0,
+        fund_realization_percentage: `${triwulanData.fund_realization_percentage ?? 0} %`,
         activity_volume: triwulanData.activity_volume,
         activity_output: triwulanData.activity_output,
         direct_target_group: triwulanData.direct_target_group,
         indirect_target_group: triwulanData.indirect_target_group,
-        local_workforce: triwulanData.local_workforce,
-        non_local_workforce: triwulanData.non_local_workforce,
+        local_workforce: `${(String(triwulanData.local_workforce) ?? "0").replace('.00', '')} Orang`,
+        non_local_workforce: `${(String(triwulanData.non_local_workforce) ?? "0").replace('.00', '')} Orang`,
         problems: triwulanData.problems,
         solution: triwulanData.solution,
         procurement_type: triwulanData.procurement_type,
@@ -187,6 +195,7 @@ const ReportTriwulanDetail = () => {
         reason: triwulanData.reason,
         leader_name: triwulanData.leader_name,
         updated_at: triwulanData.updated_at,
+        // ...triwulanData
       });
     },
   });

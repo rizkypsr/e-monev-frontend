@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuthUser, useSignOut } from 'react-auth-kit';
+import { DocumentIcon, HomeIcon, TableCellsIcon, UserIcon } from '@heroicons/react/24/solid';
 import Logo from '../assets/images/big_logo.png';
 import {
   Dialog,
@@ -10,18 +11,18 @@ import {
 } from '../components/DialogContent';
 import LogoutImg from '../assets/images/logout.png';
 import Button from '../components/Button';
-import DashboardIcon from '../components/icons/DashboardIcon';
+// import DashboardIcon from '../components/icons/DashboardIcon';
 import ProfileIcon from '../components/icons/ProfileIcon';
 import LockIcon from '../components/icons/LockIcon';
-import CheckIcon from '../components/icons/CheckIcon';
+// import CheckIcon from '../components/icons/CheckIcon';
 import MedalIcon from '../components/icons/MedalIcon';
-import StarIcon from '../components/icons/StarIcon';
-import TargetIcon from '../components/icons/TargetIcon';
+// import StarIcon from '../components/icons/StarIcon';
+// import TargetIcon from '../components/icons/TargetIcon';
 import ReportIcon from '../components/icons/ReportIcon';
 import LogoutIcon from '../components/icons/LogoutIcon';
 import ConfigurationIcon from '../components/icons/ConfigurationIcon';
-import BookIcon from '../components/icons/BookIcon';
-import AddIcon from '../components/icons/AddIcon';
+// import BookIcon from '../components/icons/BookIcon';
+// import AddIcon from '../components/icons/AddIcon';
 import LocationIcon from '../components/icons/LocationIcon';
 
 const Sidebar = ({ isOpen }) => {
@@ -31,14 +32,14 @@ const Sidebar = ({ isOpen }) => {
   const sidebarList = [
     {
       path: '/',
-      label: 'Dashboard',
-      icon: <DashboardIcon />,
+      label: 'Beranda',
+      icon: <HomeIcon width={21} height={22} />,
       roles: ['superadmin', 'opd', 'admin bidang'],
     },
     {
       path: '/akun-saya',
       label: 'Akun Saya',
-      icon: <ProfileIcon />,
+      icon: <UserIcon width={21} height={22} />,
       roles: ['superadmin', 'opd', 'admin bidang'],
     },
     {
@@ -85,8 +86,8 @@ const Sidebar = ({ isOpen }) => {
     // },
     {
       path: '/data-triwulan',
-      label: 'Data Kegiatan',
-      icon: <AddIcon />,
+      label: 'Data Kegiatan Baru',
+      icon: <DocumentIcon width={21} height={22} />,
       roles: ['superadmin', 'opd'],
     },
     {
@@ -104,7 +105,7 @@ const Sidebar = ({ isOpen }) => {
     {
       path: '/laporan',
       label: 'Laporan',
-      icon: <ReportIcon />,
+      icon: <TableCellsIcon width={21} height={22} />,
       roles: ['superadmin', 'opd', 'admin bidang', 'atasan daerah'],
     },
     {
@@ -127,17 +128,17 @@ const Sidebar = ({ isOpen }) => {
         isOpen ? 'translate-x-0' : '-translate-x-full'
       }`}
     >
-      <div className="h-full overflow-y-auto bg-gray-300 flex flex-col">
+      <div className="h-full overflow-y-auto flex flex-col" style={{backgroundColor: '#063a69'}}>
         <a
           href="/"
           className="flex items-center pl-4 py-5 border-b border-gray-20"
         >
           <img src={Logo} className="h-12 mr-4 sm:h-9" alt="E-Monev Logo" />
           <div className="flex flex-col">
-            <span className="font-semibold whitespace-nowrap">
+            <span className="font-semibold whitespace-nowrap text-white">
               E-MONTIR PEMDA
             </span>
-            <span className="text-xs">KABUPATEN SORONG</span>
+            <span className="text-xs text-white">KABUPATEN SORONG</span>
           </div>
         </a>
         <div className="flex items-center pl-4 py-5">
@@ -147,10 +148,10 @@ const Sidebar = ({ isOpen }) => {
             alt="Profil"
           />
           <div className="flex flex-col">
-            <span className="font-semibold whitespace-nowrap">
+            <span className="font-semibold whitespace-nowrap text-white">
               {authUser()?.role?.name}
             </span>
-            <span className="text-xs">{authUser()?.username}</span>
+            <span className="text-xs text-white">{authUser()?.username}</span>
           </div>
         </div>
         <ul className="space-y-2 px-6 font-medium leading-5">
@@ -164,7 +165,7 @@ const Sidebar = ({ isOpen }) => {
                   className={({ isActive }) =>
                     [
                       'flex items-center p-2',
-                      isActive ? 'text-blue-600' : 'text-black',
+                      isActive ? 'text-blue-600' : 'text-white',
                     ]
                       .filter(Boolean)
                       .join(' ')
@@ -216,14 +217,14 @@ const Sidebar = ({ isOpen }) => {
             </div>
           </DialogContent>
           <DialogTrigger>
-            <div className="flex items-center px-5 py-5 border-t border-gray-20 mt-3 text-light-gray">
+            <div className="flex items-center px-5 py-5 border-t border-gray-20 mt-3 text-white">
               <LogoutIcon />
               <span className="ml-3">Keluar</span>
             </div>
           </DialogTrigger>
         </Dialog>
-        <div className="text-center border-t py-5 border-gray-200 mt-auto text-light-gray text-sm">
-          <div className="font-semibold">&#169;2023 BAPPEDA</div>
+        <div className="text-center border-t py-5 border-gray-200 mt-auto text-white text-sm">
+          <div className="font-semibold">&#169;{new Date().getFullYear()} BAPPEDA</div>
           <div>KAB. SORONG</div>
         </div>
       </div>

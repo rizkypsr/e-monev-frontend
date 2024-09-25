@@ -12,7 +12,7 @@ const Breadcrumb = () => {
     <nav className="flex" aria-label="Breadcrumb">
       <ol className="inline-flex items-center space-x-1 md:space-x-3">
         {crumbs.map((crumb, index) => (
-          <li key={index} className="inline-flex items-center">
+          <li key={index} className="inline-flex items-center text-white">
             {index > 0 && <span>/</span>}
             {crumb}
           </li>

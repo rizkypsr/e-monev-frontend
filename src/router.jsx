@@ -80,7 +80,7 @@ const router = createBrowserRouter(
         crumb: () => (
           <Link
             to="/"
-            className="ml-1 text-sm text-dark-gray hover:text-primary md:ml-2"
+            className="ml-1 text-sm hover:text-primary md:ml-2 text-white"
           >
             e-Montir
           </Link>
@@ -94,7 +94,7 @@ const router = createBrowserRouter(
         loader={() => 'Dashboard'}
         handle={{
           crumb: (data) => (
-            <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
+            <span className="ml-1 text-sm md:ml-2 text-white">{data}</span>
           ),
         }}
         element={
@@ -109,7 +109,7 @@ const router = createBrowserRouter(
         loader={() => 'Akun Saya'}
         handle={{
           crumb: (data) => (
-            <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
+            <span className="ml-1 text-sm md:ml-2 text-white">{data}</span>
           ),
         }}
         element={
@@ -126,7 +126,7 @@ const router = createBrowserRouter(
         loader={() => 'Login Akses User'}
         handle={{
           crumb: (data) => (
-            <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
+            <span className="ml-1 text-sm md:ml-2 text-white">{data}</span>
           ),
         }}
         element={
@@ -158,7 +158,7 @@ const router = createBrowserRouter(
         loader={() => 'Urusan'}
         handle={{
           crumb: (data) => (
-            <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
+            <span className="ml-1 text-sm md:ml-2 text-white">{data}</span>
           ),
         }}
         element={
@@ -182,7 +182,7 @@ const router = createBrowserRouter(
         loader={() => 'Sumber Dana'}
         handle={{
           crumb: (data) => (
-            <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
+            <span className="ml-1 text-sm md:ml-2 text-white">{data}</span>
           ),
         }}
         element={
@@ -214,7 +214,7 @@ const router = createBrowserRouter(
         loader={() => 'Organisasi'}
         handle={{
           crumb: (data) => (
-            <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
+            <span className="ml-1 text-sm md:ml-2 text-white">{data}</span>
           ),
         }}
         element={
@@ -246,7 +246,7 @@ const router = createBrowserRouter(
         loader={() => 'Program'}
         handle={{
           crumb: (data) => (
-            <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
+            <span className="ml-1 text-sm md:ml-2 text-white">{data}</span>
           ),
         }}
         element={
@@ -270,7 +270,7 @@ const router = createBrowserRouter(
         loader={() => 'Kegiatan'}
         handle={{
           crumb: (data) => (
-            <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
+            <span className="ml-1 text-sm md:ml-2 text-white">{data}</span>
           ),
         }}
         element={
@@ -298,7 +298,7 @@ const router = createBrowserRouter(
         loader={() => 'Sasaran'}
         handle={{
           crumb: (data) => (
-            <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
+            <span className="ml-1 text-sm md:ml-2 text-white">{data}</span>
           ),
         }}
         element={
@@ -322,7 +322,7 @@ const router = createBrowserRouter(
         loader={() => 'Data Laporan'}
         handle={{
           crumb: (data) => (
-            <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
+            <span className="ml-1 text-sm md:ml-2 text-white">{data}</span>
           ),
         }}
         element={
@@ -400,7 +400,7 @@ const router = createBrowserRouter(
         loader={() => 'Riwayat'}
         handle={{
           crumb: (data) => (
-            <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
+            <span className="ml-1 text-sm md:ml-2 text-white">{data}</span>
           ),
         }}
         element={
@@ -417,7 +417,7 @@ const router = createBrowserRouter(
         loader={() => 'Tambah Data Master'}
         handle={{
           crumb: (data) => (
-            <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
+            <span className="ml-1 text-sm md:ml-2 text-white">{data}</span>
           ),
         }}
         element={
@@ -435,7 +435,7 @@ const router = createBrowserRouter(
         loader={() => 'Tambah Data Kegiatan'}
         handle={{
           crumb: (data) => (
-            <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
+            <span className="ml-1 text-sm md:ml-2 text-white">{data}</span>
           ),
         }}
         element={
@@ -453,7 +453,7 @@ const router = createBrowserRouter(
         loader={() => 'Lokasi Kegiatan'}
         handle={{
           crumb: (data) => (
-            <span className="ml-1 text-sm text-dark-gray md:ml-2">{data}</span>
+            <span className="ml-1 text-sm md:ml-2 text-white">{data}</span>
           ),
         }}
         element={
