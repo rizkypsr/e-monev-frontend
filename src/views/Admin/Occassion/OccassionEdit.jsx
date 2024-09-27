@@ -1,5 +1,4 @@
 import { ArrowLeftIcon, CheckCircleIcon } from '@heroicons/react/24/solid';
-import { Label } from 'flowbite-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuthHeader } from 'react-auth-kit';
 import { useMutation, useQuery } from 'react-query';
@@ -11,6 +10,7 @@ import { updateOccasion } from '../../../api/admin/occasion';
 import ErrorPage from '../../ErrorPage';
 import ReactLoading from '../../../components/Loading';
 import getOccassion from '../../../api/admin/occasion/getOccasionDetail';
+import Label from '../../../components/Label';
 
 const OccassionEdit = () => {
   const authHeader = useAuthHeader();
