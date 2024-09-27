@@ -9,13 +9,16 @@ import ReactLoading from './Loading';
 
 const Table = ({ className, columns, rows, isLoading }) => {
   const columnData = useMemo(() => columns, [columns]);
-  const rowData = useMemo(() => rows, [rows]);
+  const rowData = useMemo(() => rows?.data?.result, [rows]);
 
   const table = useReactTable({
     columns: columnData,
     data: rowData,
     getCoreRowModel: getCoreRowModel(),
     manualPagination: true,
+    meta: {
+      currentPage: rows?.data?.page,
+    },
   });
 
   if (isLoading) {
