@@ -1,8 +1,9 @@
-import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/solid';
 import React from 'react';
+import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/solid';
 import { twMerge } from 'tailwind-merge';
 
 const TextInputV2 = ({
+  className,
   type = 'text',
   register,
   placeholder,
@@ -29,7 +30,8 @@ const TextInputV2 = ({
         className={twMerge(
           'flex items-center, rounded-lg px-4 py-2',
           disabledClass,
-          errorClass
+          errorClass,
+          className
         )}
       >
         <div className="w-full">
@@ -57,7 +59,7 @@ const TextInputV2 = ({
           </button>
         )}
       </div>
-      {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
+      {error && <p className="mt-2 text-xs text-[#D32F2F]">{error}</p>}
     </>
   );
 };
