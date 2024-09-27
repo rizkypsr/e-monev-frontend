@@ -458,10 +458,7 @@ const router = createBrowserRouter(
             <Location />
           </Authorization>
         }
-      >
-        <Route index key="triwulanCreate" element={<TriwulanCreate />} />
-        <Route key="triwulanEdit" path="edit/:id" element={<TriwulanEdit />} />
-      </Route>
+      />
     </Route>,
   ]),
   {
