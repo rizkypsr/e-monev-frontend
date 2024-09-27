@@ -10,7 +10,7 @@ import React, { useEffect, useState } from 'react';
 import { useAuthHeader } from 'react-auth-kit';
 import { Link } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
-import { deleteActivity, getActivities } from '../../../api/admin/activity';
+import { useDebounce } from '@uidotdev/usehooks';
 import Button from '../../../components/Button';
 import {
   Dialog,
@@ -26,7 +26,6 @@ import ErrorPage from '../../ErrorPage';
 import DropdownSelect from '../../../components/DropdownSelect';
 import getFundSource from '../../../api/user/triwulan/getFundSource';
 import deleteFundSource from '../../../api/admin/fundSource/deleteFundSource';
-import { useDebounce } from '@uidotdev/usehooks';
 
 const columnHelper = createColumnHelper();
 const columns = [
@@ -301,7 +300,7 @@ const FundSourceTable = () => {
                 }
               : column
           )}
-          rows={data?.data.result || []}
+          rows={data}
           isLoading={isLoading}
         />
 
