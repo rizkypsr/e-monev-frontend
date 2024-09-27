@@ -1,145 +1,16 @@
 import React, { useState } from 'react';
-import { createColumnHelper } from '@tanstack/react-table';
-import {
-  EyeIcon,
-  PencilIcon,
-  PlusIcon,
-  TrashIcon,
-  MagnifyingGlassIcon,
-} from '@heroicons/react/24/solid';
+import { PlusIcon, MagnifyingGlassIcon } from '@heroicons/react/24/solid';
 import { Link } from 'react-router-dom';
 import { useAuthHeader } from 'react-auth-kit';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import Table from '../../../components/Table';
 import Button from '../../../components/Button';
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogTrigger,
-} from '../../../components/DialogContent';
-import TrashImg from '../../../assets/images/trash.png';
 import Pagination from '../../../components/Pagination';
 import ErrorPage from '../../ErrorPage';
 import { useToastContext } from '../../../context/ToastContext';
-import formattedDate from '../../../utils/formattedDate';
 import DropdownSelect from '../../../components/DropdownSelect';
 import { deleteUser, getUsers } from '../../../api/admin/user';
-
-const columnHelper = createColumnHelper();
-
-const columns = [
-  columnHelper.accessor((row, index) => index + 1, {
-    id: 'no',
-    cell: (info) => <i>{info.getValue()}</i>,
-    header: () => <span>No</span>,
-  }),
-  columnHelper.accessor((row) => row.username, {
-    id: 'username',
-    cell: (info) => <i>{info.getValue()}</i>,
-    header: () => <span>Username</span>,
-  }),
-  columnHelper.accessor((row) => row.email, {
-    id: 'email',
-    cell: (info) => <i>{info.getValue()}</i>,
-    header: () => <span>Email</span>,
-  }),
-  columnHelper.accessor((row) => row.organization?.title, {
-    id: 'organization',
-    cell: (info) => <i>{info.getValue()}</i>,
-    header: () => <span>Nama OPD</span>,
-  }),
-  columnHelper.accessor((row) => row.role?.name, {
-    id: 'role',
-    cell: (info) => <i>{info.getValue()}</i>,
-    header: () => <span>Level User</span>,
-  }),
-  columnHelper.accessor((row) => row.created_at, {
-    id: 'created_at',
-    cell: (info) => <i>{formattedDate(info.getValue())}</i>,
-    header: () => <span>Tanggal Dibuat</span>,
-  }),
-  columnHelper.accessor((row) => row.aksi, {
-    id: 'aksi',
-    size: 10,
-    cell: (props, deleteUserData) => {
-      const rowId = props.row.original.id;
-      return (
-        <div className="flex justify-end">
-          <Link to={`edit/${rowId}`}>
-            <Button
-              className="text-sm font-normal"
-              textColor="text-blue-500"
-              icon={<PencilIcon className="w-4 h-4" />}
-            >
-              Edit
-            </Button>
-          </Link>
-          <Link to={`detail/${rowId}`}>
-            <Button
-              className="text-sm font-normal"
-              textColor="text-blue-500"
-              icon={<EyeIcon className="w-4 h-4" />}
-            >
-              Lihat
-            </Button>
-          </Link>
-
-          <Dialog>
-            <DialogTrigger>
-              <Button
-                className="text-sm font-normal"
-                type="modal"
-                textColor="text-red-500"
-                icon={<TrashIcon className="w-4 h-4" />}
-              >
-                Hapus
-              </Button>
-            </DialogTrigger>
-
-            <DialogContent className="py-12 w-1/3">
-              <div className="flex flex-col items-center justify-center h-full">
-                <div className="p-6 bg-[#FFDADA] w-fit rounded-lg">
-                  <img src={TrashImg} alt="Hapus" />
-                </div>
-
-                <div>
-                  <h1 className="mt-6 font-semibold text-lg leading-7 text-dark-gray">
-                    Apakah Anda yakin menghapus ini?
-                  </h1>
-                  <div className="flex space-x-3 justify-center">
-                    <DialogClose>
-                      <Button
-                        onClick={() => deleteUserData(rowId)}
-                        className="w-full md:w-28 mt-8 border border-[#EB5757]"
-                        type="modal"
-                        background="bg-white"
-                        textColor="text-[#EB5757]"
-                      >
-                        Ya, hapus
-                      </Button>
-                    </DialogClose>
-                    <DialogClose>
-                      <Button
-                        className="w-full md:w-28 mt-8"
-                        type="modal"
-                        background="bg-primary"
-                        textColor="text-white"
-                      >
-                        Batal
-                      </Button>
-                    </DialogClose>
-                  </div>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
-        </div>
-      );
-    },
-    header: () => <div className="text-right">Aksi</div>,
-  }),
-];
+import columns from './components/columns';
 
 const sorting = [
   {
@@ -305,7 +176,7 @@ const UserAccessTable = () => {
                 }
               : column
           )}
-          rows={data?.data.result || []}
+          rows={data}
           isLoading={isLoading}
         />
 

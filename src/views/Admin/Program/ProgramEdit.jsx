@@ -1,5 +1,4 @@
 import { ArrowLeftIcon, CheckCircleIcon } from '@heroicons/react/24/solid';
-import { Label } from 'flowbite-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuthHeader } from 'react-auth-kit';
 import { useForm } from 'react-hook-form';
@@ -10,6 +9,7 @@ import { getProgram, updateProgram } from '../../../api/admin/program';
 import ErrorPage from '../../ErrorPage';
 import { useToastContext } from '../../../context/ToastContext';
 import ReactLoading from '../../../components/Loading';
+import Label from '../../../components/Label';
 
 const ProgramEdit = () => {
   const { id } = useParams();

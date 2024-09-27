@@ -217,7 +217,7 @@ const ReportMasterTable = () => {
               }
             : column
         )}
-        rows={data?.data.result || []}
+        rows={data}
         isLoading={isLoading}
       />
 

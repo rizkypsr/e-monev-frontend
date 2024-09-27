@@ -83,7 +83,8 @@ const PrivateLayout = () => {
         <Sidebar isOpen={sidebarVisible} onHide={handleMenuClick} />
       </div>
       <div className="bg-[#F3F6FF] md:ml-64 min-h-screen">
-        <header className="px-8 py-4 bg-gray-300" style={{backgroundColor: '#063a69'}}>
+        {/* <header className="px-8 py-4 bg-gray-300" style={{backgroundColor: '#063a69'}}> */}
+        <header className="px-8 py-4 bg-[#ebecf5]">
           <Breadcrumb />
         </header>
         <main className="p-9">

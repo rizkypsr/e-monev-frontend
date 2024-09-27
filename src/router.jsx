@@ -67,6 +67,7 @@ import FundSourceEdit from './views/Admin/FundSource/FundSourceEdit';
 import FundSourceDetail from './views/Admin/FundSource/FundSourceDetail';
 import Location from './views/shared/Location/Location';
 import ErrorPage404 from './views/ErrorPage404';
+import TriwulanForm from './views/User/Triwulan/TriwulanForm';
 
 const router = createBrowserRouter(
   createRoutesFromElements([
@@ -428,10 +429,9 @@ const router = createBrowserRouter(
       >
         <Route index key="masterCreate" element={<MasterCreate />} />
       </Route>
-      ,
       <Route
         key="triwulan"
-        path="data-triwulan"
+        path="data-triwulan/:id?"
         loader={() => 'Tambah Data Kegiatan'}
         handle={{
           crumb: (data) => (
@@ -440,13 +440,10 @@ const router = createBrowserRouter(
         }}
         element={
           <Authorization roles={['OPD', 'Superadmin']}>
-            <Master />
+            <TriwulanForm />
           </Authorization>
         }
-      >
-        <Route index key="triwulanCreate" element={<TriwulanCreate />} />
-        <Route key="triwulanEdit" path="edit/:id" element={<TriwulanEdit />} />
-      </Route>
+      />
       <Route
         key="location"
         path="lokasi"
@@ -461,10 +458,7 @@ const router = createBrowserRouter(
             <Location />
           </Authorization>
         }
-      >
-        <Route index key="triwulanCreate" element={<TriwulanCreate />} />
-        <Route key="triwulanEdit" path="edit/:id" element={<TriwulanEdit />} />
-      </Route>
+      />
     </Route>,
   ]),
   {

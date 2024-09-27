@@ -40,13 +40,21 @@ const columns = [
     cell: (info) => <i>{info.getValue()}</i>,
     header: () => <span>Nama Kegiatan</span>,
   }),
-  columnHelper.accessor((row) => row.activity_location, {
-    id: 'activity_location',
-    cell: (info) => (
-      <div className="w-24">{JSON.parse(info.getValue())?.name ?? '-'}</div>
-    ),
-    header: () => <span>Lokasi Kegiatan</span>,
-  }),
+  {
+    accessorFn: (row) => {
+      let data = row.activity_location;
+
+      try {
+        data = JSON.parse(data);
+
+        return data?.name ?? '-';
+      } catch (error) {
+        return data ?? '-';
+      }
+    },
+    header: 'Lokasi Kegiatan',
+    cell: (info) => <div className="w-64">{info.getValue()}</div>,
+  },
   columnHelper.accessor((row) => row.fundSource?.name, {
     id: 'fund_source_id',
     cell: (info) => <i>{info.getValue()}</i>,
@@ -361,8 +369,6 @@ const ReportTable = () => {
     return <ErrorPage errorMessage={error.message} />;
   }
 
-  console.log(data?.data);
-
   return (
     <div className="w-full h-full mt-6 bg-white rounded-lg">
       <Table
@@ -380,7 +386,7 @@ const ReportTable = () => {
               }
             : column
         )}
-        rows={data?.data.result || []}
+        rows={data}
         isLoading={isLoading}
       />
 

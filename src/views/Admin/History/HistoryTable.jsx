@@ -272,7 +272,7 @@ const HistoryTable = () => {
                 }
               : column
           )}
-          rows={data?.data.result || []}
+          rows={data}
           isLoading={isLoading}
         />
 

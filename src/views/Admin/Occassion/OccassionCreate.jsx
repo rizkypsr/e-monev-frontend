@@ -1,6 +1,5 @@
 import React from 'react';
 import { ArrowLeftIcon, CheckCircleIcon } from '@heroicons/react/24/solid';
-import { Label } from 'flowbite-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthHeader } from 'react-auth-kit';
 import { useMutation } from 'react-query';
@@ -11,6 +10,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useToastContext } from '../../../context/ToastContext';
 import { createOccasion } from '../../../api/admin/occasion';
 import ReactLoading from '../../../components/Loading';
+import Label from '../../../components/Label';
 
 const OccassionCreate = () => {
   const authHeader = useAuthHeader();

@@ -1,12 +1,10 @@
-import { useAuthUser, useIsAuthenticated, useSignIn } from 'react-auth-kit';
+import { useIsAuthenticated, useSignIn } from 'react-auth-kit';
 import { Link, Navigate } from 'react-router-dom';
 import Slider from 'react-slick';
 import { useMutation } from 'react-query';
 import { useForm } from 'react-hook-form';
 import Logo from '../../assets/images/big_logo.png';
 import Label from '../../components/Label';
-import TextInput from '../../components/TextInput';
-import Button from '../../components/Button';
 import Img1 from '../../assets/images/img1.jpg';
 import Img2 from '../../assets/images/img2.jpg';
 import Img3 from '../../assets/images/img3.jpeg';
@@ -15,13 +13,15 @@ import Img5 from '../../assets/images/img5.jpg';
 import login from '../../api/auth/login';
 import { useToastContext } from '../../context/ToastContext';
 import Loading from '../../components/Loading';
+import TextInputV2 from '../../components/TextInputV2';
+
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
+import ButtonV2 from '../../components/ButtonV2';
 
 const Login = () => {
   const isAuthenticated = useIsAuthenticated();
   const signIn = useSignIn();
-  const auth = useAuthUser();
   const { showToastMessage } = useToastContext();
 
   const {
@@ -66,63 +66,35 @@ const Login = () => {
   }
 
   return (
-    <div className="lg:flex h-screen">
-      <style>{`
-        .slick-dots {
-          position: absolute;
-          bottom: 20px;
-          left: 50%;
-          transform: translateX(-50%);
-          z-index: 1;
-        }
-      `}</style>
-      <div className="hidden lg:block h-full sm:w-1/2">
-        <Slider
-          dots
-          infinite
-          slidesToShow={1}
-          slidesToScroll={1}
-          speed={500}
-          arrows={false}
-          adaptiveHeight
-          autoplay
-        >
-          {[Img1, Img2, Img3, Img4, Img5].map((img, index) => (
-            // eslint-disable-next-line react/no-array-index-key
-            <div key={index}>
-              <img
-                src={img}
-                alt={`Gambar ${index + 1}`}
-                className="h-screen w-full object-cover"
-              />
-            </div>
-          ))}
-        </Slider>
-      </div>
-      <div className="w-full lg:w-1/2 flex justify-center p-9">
-        <div className="w-full flex flex-col">
-          <div className="flex space-x-3">
-            <img src={Logo} className="w-14" alt="Logo" />
-            <div className="text-dark-gray">
-              <h1 className="font-semibold">SISTEM INFORMASI E-MONTIR PEMDA</h1>
-              <h2>KABUPATEN SORONG</h2>
-            </div>
+    <div className="h-screen bg-[url('/src/assets/images/newback.png')] flex px-4 py-4 space-x-6">
+      <div className="w-full lg:w-1/2 p-8 rounded-xl flex flex-col">
+        <div className="flex space-x-3 w-full">
+          <img src={Logo} className="w-14" alt="Logo" />
+          <div className="text-white">
+            <h1 className="font-semibold">SISTEM INFORMASI E-MONTIR PEMDA</h1>
+            <h2>KABUPATEN SORONG</h2>
           </div>
+        </div>
 
-          <div className="self-center mt-32 w-full sm:w-2/3 xl:w-1/2">
-            <h3 className="text-2xl font-semibold text-dark-gray">
-              Selamat Datang
-            </h3>
-            <h4 className="text-light-gray">
+        <div className="h-full flex justify-center items-center text-white">
+          <div className="w-4/5">
+            <h3 className="text-2xl font-semibold">Selamat Datang</h3>
+            <h4 className="mb-6 text-gray-100">
               Login dibawah untuk akses akun Anda
             </h4>
 
-            <form className="mt-4" onSubmit={handleSubmit(onSubmit)}>
+            <form className="" onSubmit={handleSubmit(onSubmit)}>
               <div className="mb-6">
-                <Label htmlFor="username">Username</Label>
-                <TextInput
+                <Label
+                  htmlFor="username"
+                  className="mb-2 text-white font-semibold"
+                >
+                  Username
+                </Label>
+                <TextInputV2
                   id="username"
                   name="username"
+                  className="border-[#D1D5DB]"
                   placeholder="Masukan Username"
                   register={register('username', {
                     required: 'Username wajib diisi!',
@@ -131,11 +103,17 @@ const Login = () => {
                 />
               </div>
               <div className="mb-6">
-                <Label htmlFor="password">Password</Label>
-                <TextInput
+                <Label
+                  htmlFor="password"
+                  className="mb-2 text-white font-semibold"
+                >
+                  Password
+                </Label>
+                <TextInputV2
                   id="password"
                   type="password"
                   name="password"
+                  className="border-[#D1D5DB]"
                   placeholder="Masukan Password"
                   register={register('password', {
                     required: 'Password wajib diisi!',
@@ -150,12 +128,18 @@ const Login = () => {
                     type="checkbox"
                     className="w-4 h-4 border rounded border-light-gray focus:ring-3 focus:ring-blue-300"
                   />
-                  <Label htmlFor="remember" className="ml-2">
+                  <Label
+                    htmlFor="remember"
+                    className="ml-2 text-white font-semibold"
+                  >
                     Ingatkan Saya
                   </Label>
                 </div>
 
-                <Link to="/forgot-password" className="text-sm text-primary">
+                <Link
+                  to="/forgot-password"
+                  className="text-sm text-white underline"
+                >
                   Lupa Password
                 </Link>
               </div>
@@ -163,17 +147,51 @@ const Login = () => {
               {loginMutation.isLoading ? (
                 <Loading />
               ) : (
-                <Button
-                  className="w-28"
+                <ButtonV2
+                  className="w-full bg-white text-dark-gray hover:bg-gray-100"
                   type="submit"
-                  background="bg-primary"
-                  textColor="text-white"
+                  background="bg-white"
+                  textColor="text-dark-gray"
                 >
                   Masuk
-                </Button>
+                </ButtonV2>
               )}
             </form>
           </div>
+        </div>
+      </div>
+
+      <div className="w-2/3 bg-white rounded-lg overflow-hidden hidden lg:block">
+        <style>{`
+           .slick-dots {
+             position: absolute;
+             bottom: 60px;
+             left: 50%;
+             transform: translateX(-50%);
+             z-index: 5;
+           }
+         `}</style>
+        <div className="">
+          <Slider
+            dots
+            infinite
+            slidesToShow={1}
+            slidesToScroll={1}
+            speed={500}
+            arrows={false}
+            adaptiveHeight
+            autoplay
+          >
+            {[Img1, Img2, Img3, Img4, Img5].map((img, index) => (
+              <div key={index}>
+                <img
+                  src={img}
+                  alt={`Gambar ${index + 1}`}
+                  className="h-screen w-full object-cover"
+                />
+              </div>
+            ))}
+          </Slider>
         </div>
       </div>
     </div>

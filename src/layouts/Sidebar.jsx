@@ -1,7 +1,17 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuthUser, useSignOut } from 'react-auth-kit';
-import { DocumentIcon, HomeIcon, TableCellsIcon, UserIcon } from '@heroicons/react/24/solid';
+import {
+  HiOutlineDocumentReport,
+  HiOutlineHome,
+  HiOutlineLocationMarker,
+  HiOutlineUser,
+} from 'react-icons/hi';
+import { LiaMoneyCheckAltSolid, LiaUserLockSolid } from 'react-icons/lia';
+import { SlOrganization } from 'react-icons/sl';
+import { RiGroup2Line } from 'react-icons/ri';
+import { MdOutlineHistory, MdOutlineSettings } from 'react-icons/md';
+import { IoMdLogOut } from 'react-icons/io';
 import Logo from '../assets/images/big_logo.png';
 import {
   Dialog,
@@ -11,19 +21,6 @@ import {
 } from '../components/DialogContent';
 import LogoutImg from '../assets/images/logout.png';
 import Button from '../components/Button';
-// import DashboardIcon from '../components/icons/DashboardIcon';
-import ProfileIcon from '../components/icons/ProfileIcon';
-import LockIcon from '../components/icons/LockIcon';
-// import CheckIcon from '../components/icons/CheckIcon';
-import MedalIcon from '../components/icons/MedalIcon';
-// import StarIcon from '../components/icons/StarIcon';
-// import TargetIcon from '../components/icons/TargetIcon';
-import ReportIcon from '../components/icons/ReportIcon';
-import LogoutIcon from '../components/icons/LogoutIcon';
-import ConfigurationIcon from '../components/icons/ConfigurationIcon';
-// import BookIcon from '../components/icons/BookIcon';
-// import AddIcon from '../components/icons/AddIcon';
-import LocationIcon from '../components/icons/LocationIcon';
 
 const Sidebar = ({ isOpen }) => {
   const signOut = useSignOut();
@@ -32,20 +29,23 @@ const Sidebar = ({ isOpen }) => {
   const sidebarList = [
     {
       path: '/',
-      label: 'Beranda',
-      icon: <HomeIcon width={21} height={22} />,
+      // label: 'Beranda',
+      // icon: <HomeIcon width={21} height={22} />,
+      label: 'Dashboard',
+      icon: <HiOutlineHome size={24} />,
       roles: ['superadmin', 'opd', 'admin bidang'],
     },
     {
       path: '/akun-saya',
       label: 'Akun Saya',
-      icon: <UserIcon width={21} height={22} />,
+      // icon: <UserIcon width={21} height={22} />,
+      icon: <HiOutlineUser size={24} />,
       roles: ['superadmin', 'opd', 'admin bidang'],
     },
     {
       path: '/login-akses-user',
       label: 'Login Akses User',
-      icon: <LockIcon />,
+      icon: <LiaUserLockSolid size={24} />,
       roles: ['superadmin'],
     },
     // {
@@ -57,13 +57,13 @@ const Sidebar = ({ isOpen }) => {
     {
       path: '/sumber-dana',
       label: 'Sumber Dana',
-      icon: <ReportIcon />,
+      icon: <LiaMoneyCheckAltSolid size={24} />,
       roles: ['superadmin'],
     },
     {
       path: '/organisasi',
       label: 'Organisasi',
-      icon: <MedalIcon />,
+      icon: <SlOrganization size={24} />,
       roles: ['superadmin'],
     },
     // {
@@ -86,14 +86,16 @@ const Sidebar = ({ isOpen }) => {
     // },
     {
       path: '/data-triwulan',
-      label: 'Data Kegiatan Baru',
-      icon: <DocumentIcon width={21} height={22} />,
+      // label: 'Data Kegiatan Baru',
+      // icon: <DocumentIcon width={21} height={22} />,
+      label: 'Data Kegiatan',
+      icon: <RiGroup2Line size={24} />,
       roles: ['superadmin', 'opd'],
     },
     {
       path: '/lokasi',
       label: 'Lokasi',
-      icon: <LocationIcon />,
+      icon: <HiOutlineLocationMarker size={24} />,
       roles: ['superadmin'],
     },
     // {
@@ -105,19 +107,20 @@ const Sidebar = ({ isOpen }) => {
     {
       path: '/laporan',
       label: 'Laporan',
-      icon: <TableCellsIcon width={21} height={22} />,
+      // icon: <TableCellsIcon width={21} height={22} />,
+      icon: <HiOutlineDocumentReport size={24} />,
       roles: ['superadmin', 'opd', 'admin bidang', 'atasan daerah'],
     },
     {
       path: '/riwayat',
       label: 'Riwayat',
-      icon: <ProfileIcon />,
+      icon: <MdOutlineHistory size={24} />,
       roles: ['superadmin'],
     },
     {
       path: '/konfigurasi',
       label: 'Konfigurasi',
-      icon: <ConfigurationIcon />,
+      icon: <MdOutlineSettings size={24} />,
       roles: ['superadmin'],
     },
   ];
@@ -128,7 +131,8 @@ const Sidebar = ({ isOpen }) => {
         isOpen ? 'translate-x-0' : '-translate-x-full'
       }`}
     >
-      <div className="h-full overflow-y-auto flex flex-col" style={{backgroundColor: '#063a69'}}>
+      {/* <div className="h-full overflow-y-auto flex flex-col" style={{backgroundColor: '#063a69'}}> */}
+      <div className="h-full overflow-y-auto bg-[#ebecf5] flex flex-col">
         <a
           href="/"
           className="flex items-center pl-4 py-5 border-b border-gray-20"
@@ -217,8 +221,11 @@ const Sidebar = ({ isOpen }) => {
             </div>
           </DialogContent>
           <DialogTrigger>
-            <div className="flex items-center px-5 py-5 border-t border-gray-20 mt-3 text-white">
-              <LogoutIcon />
+            {/* <div className="flex items-center px-5 py-5 border-t border-gray-20 mt-3 text-white">
+              <LogoutIcon /> */}
+            <div className="flex items-center px-5 py-5 border-t border-gray-20 mt-3 text-light-gray">
+              <IoMdLogOut size={24} />
+
               <span className="ml-3">Keluar</span>
             </div>
           </DialogTrigger>

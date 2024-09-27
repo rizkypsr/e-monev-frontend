@@ -161,7 +161,7 @@ const ReportTriwulanDetail = () => {
         activity_name: triwulanData?.activity?.title,
         activity_output_sub: triwulanData?.activity_name,
         sub_activity: triwulanData?.activity?.sub_activity,
-        activity_location: JSON.parse(triwulanData.activity_location)?.name ?? "",
+        activity_location: triwulanData?.activity_location,
         program: triwulanData?.activity?.program?.title,
         fund_source_id: triwulanData?.fundSource?.name,
         fund_source_total: triwulanData.fund_source_total ?? 0,
@@ -343,16 +343,13 @@ const ReportTriwulanDetail = () => {
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 auto-rows-[minmax(100px, auto)] mt-6">
           {report.file && report.file.length > 0 ? (
             report.file.map((file) => (
-              // console.log(file, '.s..s.s.s.s.');
-              <>
-                <img
-                  key={file}
-                  src={`${baseUrlAPI}/${file}`}
-                  alt="file"
-                  className="w-full h-auto max-h-80 object-cover rounded-lg shadow-md"
-                  style={{ gridRow: `span ${Math.ceil(Math.random() * 2)}` }} // Adjust for staggered effect
-                />
-              </>
+              <img
+                key={file}
+                src={`${baseUrlAPI}/${file}`}
+                alt="file"
+                className="w-full h-auto max-h-80 object-cover rounded-lg shadow-md"
+                style={{ gridRow: `span ${Math.ceil(Math.random() * 2)}` }} // Adjust for staggered effect
+              />
             ))
           ) : (
             <p className="text-dark-gray">Tidak ada gambar</p>

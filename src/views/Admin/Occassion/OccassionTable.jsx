@@ -286,7 +286,7 @@ const OccassionTable = () => {
                 }
               : column
           )}
-          rows={data?.data.result || []}
+          rows={data}
           isLoading={isLoading}
         />
 
