@@ -196,15 +196,13 @@ const columns = [
 
       return (
         <div className="flex justify-end">
-          {role === 'Superadmin' && (
-            <Link to={`/data-triwulan/${rowId}`}>
-              <Button
-                className="text-sm font-normal"
-                textColor="text-blue-500"
-                icon={<PencilIcon className="w-4 h-4" />}
-              />
-            </Link>
-          )}
+          <Link to={`/data-triwulan/${rowId}`}>
+            <Button
+              className="text-sm font-normal"
+              textColor="text-blue-500"
+              icon={<PencilIcon className="w-4 h-4" />}
+            />
+          </Link>
           <Link to={`detail/${rowId}`}>
             <Button
               className="text-sm font-normal"
