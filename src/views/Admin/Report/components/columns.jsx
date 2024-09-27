@@ -187,8 +187,8 @@ const columns = [
     ),
   },
   {
-    id: 'actions',
-    header: 'Aksi',
+    id: 'action',
+    header: () => <div className="text-right">Aksi</div>,
     cell: (props, deleteUserData, role, downloadFile) => {
       const data = props.row.original;
       const rowId = data.id;

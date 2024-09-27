@@ -8,7 +8,6 @@ import {
   DialogTrigger,
 } from '../../../../components/DialogContent';
 import TrashImg from '../../../../assets/images/trash.png';
-import formattedDate from '../../../../utils/formattedDate';
 
 const columns = [
   {
@@ -20,34 +19,25 @@ const columns = [
     },
   },
   {
-    accessorKey: 'username',
-    header: 'Username',
+    accessorKey: 'name',
+    header: 'Nama',
   },
   {
-    accessorKey: 'email',
-    header: 'Email',
-  },
-  {
-    accessorKey: 'organization.title',
-    header: 'Nama OPD',
-    cell: (info) => <div className="w-64">{info.getValue()}</div>,
-  },
-  {
-    accessorKey: 'role.name',
-    header: 'Level User',
-    cell: (info) => <div className="w-24">{info.getValue()}</div>,
-  },
-  {
-    accessorKey: 'created_at',
-    header: 'Tanggal Dibuat',
+    accessorKey: 'fund_source_total',
+    header: 'Total Sumber Dana',
     cell: (info) => (
-      <div className="w-24">{formattedDate(info.getValue())}</div>
+      <i>
+        {parseFloat(info.getValue()).toLocaleString('id-ID', {
+          style: 'currency',
+          currency: 'IDR',
+        })}
+      </i>
     ),
   },
   {
     id: 'action',
     header: () => <div className="text-right">Aksi</div>,
-    cell: (props, deleteUserData) => {
+    cell: (props, deleteFundSourceData) => {
       const rowId = props.row.original.id;
       return (
         <div className="flex justify-end">
@@ -69,7 +59,6 @@ const columns = [
               Lihat
             </Button>
           </Link>
-
           <Dialog>
             <DialogTrigger>
               <Button
@@ -95,7 +84,7 @@ const columns = [
                   <div className="flex space-x-3 justify-center">
                     <DialogClose>
                       <Button
-                        onClick={() => deleteUserData(rowId)}
+                        onClick={() => deleteFundSourceData(rowId)}
                         className="w-full md:w-28 mt-8 border border-[#EB5757]"
                         type="modal"
                         background="bg-white"
