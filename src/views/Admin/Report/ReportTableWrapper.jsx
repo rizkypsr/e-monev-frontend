@@ -19,16 +19,16 @@ import downloadMasterExcel from '../../../api/admin/report/downloadMasterExcel';
 import downloadMasterPdf from '../../../api/admin/report/downloadMasterPdf';
 import downloadTriwulanPdf from '../../../api/admin/report/downloadTriwulanPdf';
 
-const type = [
-  {
-    label: 'Data Laporan Master',
-    value: 'data-master',
-  },
-  {
-    label: 'Data Laporan Kegiatan',
-    value: 'data-triwulan',
-  },
-];
+// const type = [
+//   {
+//     label: 'Data Laporan Master',
+//     value: 'data-master',
+//   },
+//   {
+//     label: 'Data Laporan Kegiatan',
+//     value: 'data-triwulan',
+//   },
+// ];
 
 const months = [
   { label: 'Januari', value: 1 },
@@ -169,10 +169,10 @@ const ReportTableWrapper = () => {
     }
   };
 
-  const onSelectType = (item) => {
-    console.log(item);
-    setSelectedType(item);
-  };
+  // const onSelectType = (item) => {
+  //   console.log(item);
+  //   setSelectedType(item);
+  // };
 
   const onSelectMonth = (item) => {
     setSelectedMonth(item);
@@ -239,7 +239,7 @@ const ReportTableWrapper = () => {
       </div>
 
       <div className="flex items-center justify-between mt-6">
-        <div minWidth="14rem"></div>
+        <div style={{minWidth: "14rem"}} />
         {/* <DropdownSelect
           value={selectedType}
           options={type}
