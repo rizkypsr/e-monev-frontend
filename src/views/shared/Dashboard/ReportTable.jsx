@@ -136,6 +136,15 @@ const columns = [
     ),
     header: () => <span>Realisasi Fisik</span>,
   }),
+  columnHelper.accessor((row) => row.physical_realization_percentage, {
+    id: 'physical_realization_percentage',
+    cell: (info) => (
+      <i>
+        {parseFloat(info.getValue())}
+      </i>
+    ),
+    header: () => <span>Persentase Realisasi Fisik</span>,
+  }),
   columnHelper.accessor((row) => row.fund_realization, {
     id: 'fund_realization',
     cell: (info) => (
@@ -147,6 +156,18 @@ const columns = [
       </i>
     ),
     header: () => <span>Realisasi Keuangan</span>,
+  }),
+  columnHelper.accessor((row) => row.fund_realization_percentaqge, {
+    id: 'fund_realization',
+    cell: (info) => (
+      <i>
+        {parseFloat(info.getValue() ?? 0).toLocaleString('id-ID', {
+          style: 'currency',
+          currency: 'IDR',
+        })}
+      </i>
+    ),
+    header: () => <span>Persentase Realisasi Keuangan</span>,
   }),
   columnHelper.accessor((row) => row.activity_volume, {
     id: 'activity_volume',
