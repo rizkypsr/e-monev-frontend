@@ -36,12 +36,10 @@ const ProgressBar = ({ data }) => {
     plugins: {
       tooltip: {
         callbacks: {
-          label: function (tooltipItem) {
+          label(tooltipItem) {
             const index = tooltipItem.dataIndex;
             const percentage = tooltipItem.raw || 0;
-            const label = data[index].label;
-            const completed = data[index].completed;
-            const total = data[index].total;
+            const { label, completed, total } = data[index];
 
             return [
               ` ${label}`,
@@ -50,7 +48,7 @@ const ProgressBar = ({ data }) => {
               `Percentage: ${percentage.toFixed(1)}%`,
             ];
           },
-          title: function () {
+          title() {
             return '';
           },
         },
@@ -79,7 +77,7 @@ const ProgressBar = ({ data }) => {
 
         <div className="col-span-1 flex flex-col justify-center flex-1">
           {data.map((item, index) => (
-            <div key={index} className="flex items-center mb-2">
+            <div key={item} className="flex items-center mb-2">
               <div className="w-4 h-4">
                 <span
                   className="inline-block w-4 h-4 rounded-full"
@@ -87,7 +85,7 @@ const ProgressBar = ({ data }) => {
                     backgroundColor:
                       chartData.datasets[0].backgroundColor[index],
                   }}
-                ></span>
+                />
               </div>
               <div className="ml-2">
                 <span

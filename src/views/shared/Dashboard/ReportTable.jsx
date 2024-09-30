@@ -4,9 +4,9 @@ import { useAuthHeader, useAuthUser } from 'react-auth-kit';
 import { createColumnHelper } from '@tanstack/react-table';
 import {
   ArrowDownOnSquareIcon,
-  ArrowDownOnSquareStackIcon,
+  // ArrowDownOnSquareStackIcon,
   EyeIcon,
-  PencilIcon,
+  // PencilIcon,
   TrashIcon,
 } from '@heroicons/react/24/solid';
 import { Link } from 'react-router-dom';
@@ -396,15 +396,15 @@ const ReportTable = () => {
         columns={columns.map((column) =>
           column.cell
             ? {
-                ...column,
-                cell: (props) =>
-                  column.cell(
-                    props,
-                    deleteReportData,
-                    authUser().role?.name,
-                    handleDownloadFile
-                  ),
-              }
+              ...column,
+              cell: (props) =>
+                column.cell(
+                  props,
+                  deleteReportData,
+                  authUser().role?.name,
+                  handleDownloadFile
+                ),
+            }
             : column
         )}
         rows={data}

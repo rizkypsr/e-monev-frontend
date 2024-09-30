@@ -3,15 +3,18 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuthUser, useSignOut } from 'react-auth-kit';
 import {
-//   HiOutlineDocumentReport,
-//   HiOutlineHome,
+  //   HiOutlineDocumentReport,
+  //   HiOutlineHome,
   HiOutlineLocationMarker,
-//   HiOutlineUser,
+  //   HiOutlineUser,
 } from 'react-icons/hi';
 import { LiaMoneyCheckAltSolid, LiaUserLockSolid } from 'react-icons/lia';
 import { SlOrganization } from 'react-icons/sl';
 // import { RiGroup2Line } from 'react-icons/ri';
-import { MdOutlineHistory, MdOutlineSettings } from 'react-icons/md';
+import {
+  // MdOutlineHistory,
+  MdOutlineSettings
+} from 'react-icons/md';
 import { IoMdLogOut } from 'react-icons/io';
 import { DocumentIcon, HomeIcon, TableCellsIcon, UserIcon } from '@heroicons/react/24/solid';
 import Logo from '../assets/images/big_logo.png';
@@ -113,12 +116,12 @@ const Sidebar = ({ isOpen }) => {
       // icon: <HiOutlineDocumentReport size={24} />,
       roles: ['superadmin', 'opd', 'admin bidang', 'atasan daerah'],
     },
-    {
-      path: '/riwayat',
-      label: 'Riwayat',
-      icon: <MdOutlineHistory size={24} />,
-      roles: ['superadmin'],
-    },
+    // {
+    //   path: '/riwayat',
+    //   label: 'Riwayat',
+    //   icon: <MdOutlineHistory size={24} />,
+    //   roles: ['superadmin'],
+    // },
     {
       path: '/konfigurasi',
       label: 'Konfigurasi',
@@ -129,12 +132,11 @@ const Sidebar = ({ isOpen }) => {
 
   return (
     <aside
-      className={`shadow-xl fixed top-0 left-0 z-40 w-64 h-screen transition-transform ${
-        isOpen ? 'translate-x-0' : '-translate-x-full'
-      }`}
+      className={`shadow-xl fixed top-0 left-0 z-40 w-64 h-screen transition-transform ${isOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
     >
-      <div className="h-full overflow-y-auto flex flex-col" style={{backgroundColor: '#063a69'}}>
-      {/* <div className="h-full overflow-y-auto bg-[#ebecf5] flex flex-col"> */}
+      <div className="h-full overflow-y-auto flex flex-col" style={{ backgroundColor: '#063a69' }}>
+        {/* <div className="h-full overflow-y-auto bg-[#ebecf5] flex flex-col"> */}
         <a
           href="/"
           className="flex items-center pl-4 py-5 border-b border-gray-20"
