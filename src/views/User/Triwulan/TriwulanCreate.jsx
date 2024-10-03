@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { CheckCircleIcon } from '@heroicons/react/24/solid';
 import { Link, useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { useInfiniteQuery, useMutation } from 'react-query';
 import { useAuthHeader, useAuthUser } from 'react-auth-kit';
 
@@ -127,17 +127,6 @@ const TriwulanCreate = () => {
   const navigate = useNavigate();
   const { showToastMessage } = useToastContext();
 
-  const [selectedOpd, setSelectedOpd] = useState(null);
-  const [selectedFundSource, setSelectedFundSource] = useState(null);
-  const [selectedProcurementType, setSelectedProcurementType] = useState(null);
-  const [selectedProcurementMethod, setSelectedProcurementMethod] =
-    useState(null);
-  const [selectedActivityForm, setSelectedActivityForm] = useState(null);
-  const [selectedActivity, setSelectedActivity] = useState(null);
-  const [selectedOptional, setSelectedOptional] = useState(null);
-  const [selectedProgramPrioritas, setSelectedProgramPrioritas] =
-    useState(null);
-
   const {
     register,
     handleSubmit,
@@ -208,16 +197,16 @@ const TriwulanCreate = () => {
 
     const formDataObject = {
       ...data,
-      fund_source_id: selectedFundSource?.id,
-      procurement_type: selectedProcurementType?.name,
-      procurement_method: selectedProcurementMethod?.name,
-      activity_id: selectedActivity?.id,
-      activity_form: selectedActivityForm?.id,
-      optional: selectedOptional?.name,
+      fund_source_id: data.fund_source_id?.id,
+      procurement_type: data.procurement_type?.name,
+      procurement_method: data.procurement_method?.name,
+      activity_id: data.activity_id?.id,
+      activity_form: data.activity_form?.id,
+      optional: data.optional?.name,
       contract_date: formattedDate(data?.contract_date),
-      createdByUid: selectedOpd ? Number(selectedOpd.id) : null,
+      createdByUid: data.createdByUid ? Number(data.createdByUid.id) : null,
       activity_location: JSON.parse(data.activity_location),
-      program_prio: selectedProgramPrioritas?.name,
+      program_prio: data.program_prio?.name,
     };
 
     // Append non-file fields to FormData
@@ -259,38 +248,6 @@ const TriwulanCreate = () => {
     );
   };
 
-  const handleSelectOpd = (item) => {
-    setSelectedOpd(item);
-  };
-
-  const handleSelectFundSource = (item) => {
-    setSelectedFundSource(item);
-  };
-
-  const handleSelectProcurementType = (item) => {
-    setSelectedProcurementType(item);
-  };
-
-  const handleSelectOptional = (item) => {
-    setSelectedOptional(item);
-  };
-
-  const handleSelectActivityForm = (item) => {
-    setSelectedActivityForm(item);
-  };
-
-  const handleSelectActivity = (item) => {
-    setSelectedActivity(item);
-  };
-
-  const handleSelectProcurementMethod = (item) => {
-    setSelectedProcurementMethod(item);
-  };
-
-  const handleSelectProgramPrioritas = (item) => {
-    setSelectedProgramPrioritas(item);
-  };
-
   const handleFileInput = (files) => {
     setValue('file', files);
   };
@@ -307,11 +264,17 @@ const TriwulanCreate = () => {
             {authUser()?.role.name === 'Superadmin' && (
               <div className="mb-2 col-span-2">
                 <Label className="mb-2">Target OPD</Label>
-                <DropdownDialog
-                  label="Pilih Target OPD"
-                  data={targetOpdQuery.data}
-                  value={selectedOpd}
-                  onChange={handleSelectOpd}
+
+                <Controller
+                  control={control}
+                  name="createdByUid"
+                  render={({ field }) => (
+                    <DropdownDialog
+                      label="Pilih Target OPD"
+                      data={targetOpdQuery.data}
+                      {...field}
+                    />
+                  )}
                 />
               </div>
             )}
@@ -341,11 +304,16 @@ const TriwulanCreate = () => {
 
             <div>
               <Label className="mb-2">Sumber Dana</Label>
-              <DropdownDialog
-                label="Pilih Sumber Dana"
-                data={fundSourceQuery.data}
-                value={selectedFundSource}
-                onChange={handleSelectFundSource}
+              <Controller
+                control={control}
+                name="fund_source_id"
+                render={({ field }) => (
+                  <DropdownDialog
+                    label="Pilih Sumber Dana"
+                    data={fundSourceQuery.data}
+                    {...field}
+                  />
+                )}
               />
             </div>
             <div>
@@ -586,47 +554,72 @@ const TriwulanCreate = () => {
             </div>
             <div>
               <Label className="mb-2">Jenis Pengadaan</Label>
-              <DropdownDialog
-                label="Pilih Jenis Pengadaan"
-                data={jenisPengadaan}
-                value={selectedProcurementType}
-                onChange={handleSelectProcurementType}
+              <Controller
+                control={control}
+                name="procurement_type"
+                render={({ field }) => (
+                  <DropdownDialog
+                    label="Pilih Jenis Pengadaan"
+                    data={jenisPengadaan}
+                    {...field}
+                  />
+                )}
               />
             </div>
-            <div className="mb-4">
+            <div className="mb-2">
               <Label className="mb-2">Cara Pengadaan</Label>
-              <DropdownDialog
-                label="Pilih Cara Pengadaan"
-                data={caraPengadaan}
-                value={selectedProcurementMethod}
-                onChange={handleSelectProcurementMethod}
+              <Controller
+                control={control}
+                name="procurement_method"
+                render={({ field }) => (
+                  <DropdownDialog
+                    label="Pilih Cara Pengadaan"
+                    data={caraPengadaan}
+                    {...field}
+                  />
+                )}
               />
             </div>
             <div className="mb-2">
               <Label className="mb-2">Sub Kegiatan</Label>
-              <DropdownDialog
-                label="Pilih Sub Kegiatan"
-                data={activityQuery.data}
-                value={selectedActivity}
-                onChange={handleSelectActivity}
+              <Controller
+                control={control}
+                name="activity_id"
+                render={({ field }) => (
+                  <DropdownDialog
+                    label="Pilih Sub Kegiatan"
+                    data={activityQuery.data}
+                    {...field}
+                  />
+                )}
               />
             </div>
             <div>
               <Label className="mb-2">Bentuk Kegiatan</Label>
-              <DropdownDialog
-                label="Pilih Bentuk Kegiatan"
-                data={bentukKegiatan}
-                value={selectedActivityForm}
-                onChange={handleSelectActivityForm}
+              <Controller
+                control={control}
+                name="activity_form"
+                render={({ field }) => (
+                  <DropdownDialog
+                    label="Pilih Bentuk Kegiatan"
+                    data={bentukKegiatan}
+                    {...field}
+                  />
+                )}
               />
             </div>
             <div className="mb-2">
               <Label className="mb-2">Opsi</Label>
-              <DropdownDialog
-                label="Pilih Opsi"
-                data={optionals}
-                value={selectedOptional}
-                onChange={handleSelectOptional}
+              <Controller
+                control={control}
+                name="optional"
+                render={({ field }) => (
+                  <DropdownDialog
+                    label="Pilih Opsi"
+                    data={optionals}
+                    {...field}
+                  />
+                )}
               />
             </div>
             <div>
@@ -637,7 +630,7 @@ const TriwulanCreate = () => {
                 error={errors.leader_name?.message}
               />
             </div>
-            <div className="mb-4">
+            <div className="mb-2">
               <Label className="mb-2">Alasan Terkait</Label>
               <TextInputV2
                 placeholder="Tulis Disini..."
@@ -647,11 +640,16 @@ const TriwulanCreate = () => {
             </div>
             <div>
               <Label className="mb-2">Program Prioritas</Label>
-              <DropdownDialog
-                label="Pilih Program Prioritas"
-                data={programPrioritas}
-                value={selectedProgramPrioritas}
-                onChange={handleSelectProgramPrioritas}
+              <Controller
+                control={control}
+                name="program_prio"
+                render={({ field }) => (
+                  <DropdownDialog
+                    label="Pilih Program Prioritas"
+                    data={programPrioritas}
+                    {...field}
+                  />
+                )}
               />
             </div>
 
