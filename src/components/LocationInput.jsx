@@ -1,24 +1,21 @@
+import React, { Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { ChevronRightIcon } from '@heroicons/react/24/solid';
-import React, { Fragment } from 'react';
+import { useController } from 'react-hook-form';
 import MapLocation from './MapLocation';
 
-const LocationInput = ({
-  name,
-  label,
-  register,
-  setValue,
-  disabled,
-  error,
-}) => {
+const LocationInput = ({ name, label, control }) => {
   const [isOpen, setIsOpen] = React.useState(false);
-  const [location, setLocation] = React.useState(null);
 
-  React.useEffect(() => {
-    register(name, {
-      required: 'Lokasi kegiatan wajib dipilih',
-    });
-  }, [register, name]);
+  const {
+    field,
+    fieldState: { error },
+  } = useController({
+    name,
+    control,
+    rules: { required: 'Lokasi kegiatan wajib dipilih!' },
+    defaultValue: null,
+  });
 
   const openModal = () => {
     setIsOpen(true);
@@ -29,9 +26,7 @@ const LocationInput = ({
   };
 
   const handleLocationSelect = (data) => {
-    setLocation(data);
-    setValue(name, JSON.stringify(data));
-
+    field.onChange(data);
     closeModal();
   };
 
@@ -43,13 +38,13 @@ const LocationInput = ({
           className="flex flex-grow border cursor-pointer justify-between border-dark-gray rounded-lg px-4 py-3 leading-4 text-dark-gray capitalize items-center space-x-3"
         >
           <div className="truncate">
-            {location !== null ? location?.display_name : label}
+            {(field?.value?.display_name || field?.value?.name) ?? label}
           </div>
           <ChevronRightIcon className="w-3 h-3" />
         </div>
       </div>
 
-      {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
+      {error && <p className="mt-2 text-xs text-red-600">{error.message}</p>}
 
       <Transition appear show={isOpen} as={Fragment}>
         <Dialog as="div" className="relative z-50" onClose={closeModal}>
