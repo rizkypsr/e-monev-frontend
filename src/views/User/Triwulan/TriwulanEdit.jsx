@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from 'react';
 import { CheckCircleIcon } from '@heroicons/react/24/solid';
 import { Link, useNavigate, useParams } from 'react-router-dom';
@@ -125,7 +126,7 @@ const TriwulanEdit = () => {
     queryKey: ['get_triwulan'],
     queryFn: () => getTriwulanDetail(id, authHeader()),
     onSuccess: (result) => {
-      const triwulanData = result.data;
+      const triwulanData = result.data[0] ?? {};
 
       setSelectedFundSource(triwulanData.fundSource);
       setSelectedOptional(triwulanData.optional);
