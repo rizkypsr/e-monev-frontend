@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React from 'react';
 import { CheckCircleIcon } from '@heroicons/react/24/solid';
 import { Link, useNavigate, useParams } from 'react-router-dom';
@@ -128,7 +129,7 @@ const TriwulanForm = () => {
     queryFn: () => getTriwulanDetail(id, authHeader()),
     enabled: !!id,
     onSuccess: (result) => {
-      const triwulanData = result.data;
+      const triwulanData = result.data[0] ?? {};
 
       setValue('createdByUid', triwulanData.createdBy);
       setValue('activity_name', triwulanData.activity_name);
@@ -167,7 +168,7 @@ const TriwulanForm = () => {
       setValue('activity_id', triwulanData.activity);
       setValue(
         'activity_form',
-        bentukKegiatanData.find((item) => item.id == triwulanData.activity_form)
+        bentukKegiatanData.find((item) => item.id === triwulanData.activity_form)
       );
       setValue(
         'optional',

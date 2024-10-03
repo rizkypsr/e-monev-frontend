@@ -66,7 +66,7 @@ const Login = () => {
   }
 
   return (
-    <div className="h-screen bg-[url('/src/assets/images/newback.png')] flex px-4 py-4 space-x-6">
+    <div className="h-screen flex px-4 py-4 space-x-6" style={{backgroundColor:'#063a69'}}>
       <div className="w-full lg:w-1/2 p-8 rounded-xl flex flex-col">
         <div className="flex space-x-3 w-full">
           <img src={Logo} className="w-14" alt="Logo" />

@@ -545,11 +545,15 @@ const TriwulanCreate = () => {
               />
             </div>
             <div>
-              <CurrencyInput
-                name="local_workforce"
-                label="Jumlah Tenaga Kerja Lokal (Dalam bentuk angka)"
-                control={control}
+              <Label className="mb-2">
+                Jumlah Orang / Tenaga Kerja Lokal (Dalam bentuk angka)
+              </Label>
+              <TextInputV2
+                // name="local_workforce"
+                // label="Jumlah Tenaga Kerja Lokal (Dalam bentuk angka)"
+                // control={control}
                 placeholder="Tulis Disini..."
+                error={errors.indirect_target_group?.message}
                 {...register('local_workforce', {
                   required: 'Jumlah Tenaga Kerja Lokal wajib diisi!',
                   valueAsNumber: true,
@@ -557,11 +561,15 @@ const TriwulanCreate = () => {
               />
             </div>
             <div>
-              <CurrencyInput
-                name="non_local_workforce"
-                label="Jumlah Tenaga Kerja Non Lokal (Dalam bentuk angka)"
-                control={control}
+              <Label className="mb-2">
+                Jumlah Orang / Tenaga Kerja Non Lokal (Dalam bentuk angka)
+              </Label>
+              <TextInputV2
+                // name="non_local_workforce"
+                // label="Jumlah Tenaga Kerja Non Lokal (Dalam bentuk angka)"
+                // control={control}
                 placeholder="Tulis Disini..."
+                error={errors.indirect_target_group?.message}
                 {...register('non_local_workforce', {
                   required: 'Jumlah Tenaga Kerja Non Lokal wajib diisi!',
                   valueAsNumber: true,
