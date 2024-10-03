@@ -3,15 +3,18 @@ import { Link, Navigate } from 'react-router-dom';
 import Slider from 'react-slick';
 import { useMutation } from 'react-query';
 import { useForm } from 'react-hook-form';
+
 import Logo from '../../assets/images/big_logo.png';
-import Label from '../../components/Label';
 import Img1 from '../../assets/images/img1.jpg';
 import Img2 from '../../assets/images/img2.jpg';
 import Img3 from '../../assets/images/img3.jpeg';
 import Img4 from '../../assets/images/img4.jpeg';
 import Img5 from '../../assets/images/img5.jpg';
+
 import login from '../../api/auth/login';
 import { useToastContext } from '../../context/ToastContext';
+
+import Label from '../../components/Label';
 import Loading from '../../components/Loading';
 import TextInputV2 from '../../components/TextInputV2';
 
@@ -66,24 +69,29 @@ const Login = () => {
   }
 
   return (
-    <div className="h-screen flex px-4 py-4 space-x-6" style={{backgroundColor:'#063a69'}}>
-      <div className="w-full lg:w-1/2 p-8 rounded-xl flex flex-col">
-        <div className="flex space-x-3 w-full">
-          <img src={Logo} className="w-14" alt="Logo" />
-          <div className="text-white">
-            <h1 className="font-semibold">SISTEM INFORMASI E-MONTIR PEMDA</h1>
-            <h2>KABUPATEN SORONG</h2>
+    <div
+      className="h-screen flex px-4 py-4 space-x-6"
+      style={{ backgroundColor: '#063a69' }}
+    >
+      <div className="w-full lg:w-1/2 p-8 rounded-xl flex flex-col items-center">
+        <div className="flex flex-col space-y-6 items-center lg:flex-row lg:space-y-0 lg:space-x-6">
+          <img src={Logo} className="object-cover w-24 h-24" alt="Logo" />
+          <div className="text-white text-center lg:text-left">
+            <h1 className="text-2xl lg:text-xl">
+              SISTEM INFORMASI E-MONTIR PEMDA
+            </h1>
+            <h2 className="text-2xl lg:text-xl">KABUPATEN SORONG</h2>
           </div>
         </div>
 
         <div className="h-full flex justify-center items-center text-white">
-          <div className="w-4/5">
+          <div className="w-4/51">
             <h3 className="text-2xl font-semibold">Selamat Datang</h3>
             <h4 className="mb-6 text-gray-100">
               Login dibawah untuk akses akun Anda
             </h4>
 
-            <form className="" onSubmit={handleSubmit(onSubmit)}>
+            <form onSubmit={handleSubmit(onSubmit)}>
               <div className="mb-6">
                 <Label
                   htmlFor="username"
