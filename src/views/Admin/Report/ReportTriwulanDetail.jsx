@@ -2,7 +2,12 @@
 /* eslint-disable prefer-template */
 /* eslint-disable arrow-body-style */
 /* eslint-disable import/no-extraneous-dependencies */
-import { ArrowDownIcon, ArrowDownTrayIcon, ArrowLeftIcon, ArrowUpIcon } from '@heroicons/react/24/solid';
+import {
+  ArrowDownIcon,
+  ArrowDownTrayIcon,
+  ArrowLeftIcon,
+  ArrowUpIcon,
+} from '@heroicons/react/24/solid';
 import React, { useEffect, useState } from 'react';
 import { useAuthHeader } from 'react-auth-kit';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -118,10 +123,16 @@ const fieldMappings = [
     label: 'Realisasi Fisik',
     isFormatted: true,
     formatter: formatToRupiah,
+    className: 'text-green-500',
   },
   {
     key: 'physical_realization_percentage',
-    label: 'Persentase Realisasi Fisik'
+    label: 'Persentase Realisasi Fisik',
+    cellFn: (value) => (
+      <span className={Number(value) <= 25 ? 'text-red-500' : ''}>
+        {value} %
+      </span>
+    ),
   },
   {
     key: 'fund_realization',
@@ -131,7 +142,7 @@ const fieldMappings = [
   },
   {
     key: 'fund_realization_percentage',
-    label: 'Persentase Realisasi Sumber Dana'
+    label: 'Persentase Realisasi Sumber Dana',
   },
   { key: 'activity_volume', label: 'Volume Kegiatan' },
   { key: 'activity_output', label: 'Output Kegiatan' },
@@ -153,12 +164,12 @@ const fieldMappings = [
 ];
 
 const differ = new Differ({
-  detectCircular: true,    // default `true`
-  maxDepth: Infinity,      // default `Infinity`
+  detectCircular: true, // default `true`
+  maxDepth: Infinity, // default `Infinity`
   showModifications: true, // default `true`
   ignoreCase: true,
   ignoreCaseForKey: true,
-  arrayDiffMethod: 'lcs',  // default `"normal"`, but `"lcs"` may be more useful
+  arrayDiffMethod: 'lcs', // default `"normal"`, but `"lcs"` may be more useful
 });
 
 const ReportTriwulanDetail = () => {
@@ -183,41 +194,50 @@ const ReportTriwulanDetail = () => {
   const compareNumber = (index, key) => {
     const [src, dst] = [
       parseFloat((dataJSON[index + 1] ?? { [key]: '' })[key] ?? ''),
-      parseFloat((dataJSON[index] ?? { [key]: '' })[key] ?? '')]
+      parseFloat((dataJSON[index] ?? { [key]: '' })[key] ?? ''),
+    ];
 
-    if (src < dst)
-      return <ArrowUpIcon color='green' width={20} height={20} />
-    if (src > dst)
-      return <ArrowDownIcon color='red' width={20} height={20} />
-    return <div />
-  }
+    if (src < dst) return <ArrowUpIcon color="green" width={20} height={20} />;
+    if (src > dst) return <ArrowDownIcon color="red" width={20} height={20} />;
+    return <div />;
+  };
 
   const fieldContainsNumber = [
-    "activity_location",
-    "fund_source_total",
-    "fund_ceiling",
-    "contract_value",
-    "physical_realization",
-    "physical_realization_percentage",
-    "fund_realization",
-    "fund_realization_percentage",
-    "local_workforce",
-    "non_local_workforce"
+    'activity_location',
+    'fund_source_total',
+    'fund_ceiling',
+    'contract_value',
+    'physical_realization',
+    'physical_realization_percentage',
+    'fund_realization',
+    'fund_realization_percentage',
+    'local_workforce',
+    'non_local_workforce',
   ];
 
-  const invokeReport = () => setReport({
-    ...triwulanData,
-    activity_location: JSON.parse(triwulanData?.activity_location ?? "{}")?.name ?? "",
-    fund_source_total: triwulanData?.fund_source_total ?? 0,
-    fund_ceiling: triwulanData?.fund_ceiling ?? 0,
-    contract_value: triwulanData.contract_value ?? 0,
-    physical_realization: triwulanData.physical_realization ?? 0,
-    physical_realization_percentage: `${triwulanData?.physical_realization_percentage ?? 0} %`,
-    fund_realization: triwulanData.fund_realization ?? 0,
-    fund_realization_percentage: `${triwulanData?.fund_realization_percentage ?? 0} %`,
-    local_workforce: `${(String(triwulanData?.local_workforce) ?? "0").replace('.00', '') ?? "0"} Orang`,
-    non_local_workforce: `${(String(triwulanData?.non_local_workforce) ?? "0").replace('.00', '') ?? "0"} Orang`,
-  });
+  const invokeReport = () =>
+    setReport({
+      ...triwulanData,
+      activity_location:
+        JSON.parse(triwulanData?.activity_location ?? '{}')?.name ?? '',
+      fund_source_total: triwulanData?.fund_source_total ?? 0,
+      fund_ceiling: triwulanData?.fund_ceiling ?? 0,
+      contract_value: triwulanData.contract_value ?? 0,
+      physical_realization: triwulanData.physical_realization ?? 0,
+      physical_realization_percentage:
+        triwulanData?.physical_realization_percentage ?? 0,
+      fund_realization: triwulanData.fund_realization ?? 0,
+      fund_realization_percentage: `${
+        triwulanData?.fund_realization_percentage ?? 0
+      } %`,
+      local_workforce: `${
+        (String(triwulanData?.local_workforce) ?? '0').replace('.00', '') ?? '0'
+      } Orang`,
+      non_local_workforce: `${
+        (String(triwulanData?.non_local_workforce) ?? '0').replace('.00', '') ??
+        '0'
+      } Orang`,
+    });
 
   const { isLoading, isError, error } = useQuery({
     queryKey: ['get_triwulan'],
@@ -227,35 +247,31 @@ const ReportTriwulanDetail = () => {
      * @param {Array} param0.data
      */
     onSuccess: ({ data = [] }) => {
-
       const r = Array.from(data).reduce((prev, curr, index, original) => {
         const diff = differ
           .diff(original[index - 1], original[index])
           .map((e) => e.filter((f) => f.type !== 'equal'));
 
-        return [...prev, diff]
+        return [...prev, diff];
       }, []);
 
       // console.log(r,'e');
-      var u = Array.from(r)
-      u.shift()
-      setDiffData([...u, r.pop()])
-
+      var u = Array.from(r);
+      u.shift();
+      setDiffData([...u, r.pop()]);
 
       setDataJSON(Array.from(data) ?? []);
       setTriwulanData(Array.from(data)[selectedIndexTimeline] ?? {});
       invokeReport();
-
     },
   });
 
   useEffect(() => {
     if (triwulanData) {
-      invokeReport()
+      invokeReport();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [triwulanData])
-
+  }, [triwulanData]);
 
   if (isError) {
     return <ErrorPage errorMessage={error.message} />;
@@ -264,6 +280,20 @@ const ReportTriwulanDetail = () => {
   if (isLoading) {
     return <ReactLoading />;
   }
+
+  const renderFieldValue = (field, data) => {
+    const value = data[field.key];
+
+    if (field.isFormatted && typeof field.formatter === 'function') {
+      return field.formatter(value);
+    }
+
+    if (field.cellFn && typeof field.cellFn === 'function') {
+      return field.cellFn(value);
+    }
+
+    return value;
+  };
 
   const renderTableRows = () =>
     fieldMappings.map((field) => (
@@ -280,12 +310,12 @@ const ReportTriwulanDetail = () => {
           {field.label}
         </th>
         <td className="px-6 py-4 flex">
-          {field.isFormatted
-            ? field.formatter(report[field.key])
-            : report[field.key]}
-          {fieldContainsNumber.includes(field.key) ?
-            compareNumber(selectedIndexTimeline, field.key) :
-            <div />}
+          {renderFieldValue(field, report)}
+          {fieldContainsNumber.includes(field.key) ? (
+            compareNumber(selectedIndexTimeline, field.key)
+          ) : (
+            <div />
+          )}
         </td>
       </tr>
     ));
@@ -351,38 +381,42 @@ const ReportTriwulanDetail = () => {
    * @returns {JSX.Element[]}
    */
   const displayDiffData = (index = 0, k = false) => {
+    const data =
+      (diffData[index] ?? [])
+        .flat()
+        .map((c) => c.text)
+        .filter((t) => !`${t ?? ''}`.includes('sys_period'))
+        .map((s, i) => {
+          return (
+            <p
+              key={s ?? i}
+              style={{
+                textAlign: 'start',
+                // paddingTop:'2%',
+                // paddingBottom:'2%',
+                paddingLeft: '0.5%',
+                paddingRight: '0.5%',
+              }}
+            >
+              {`${s}`
+                .split(': ')
+                .map((q) => {
+                  const sIndex = fieldMappings.findIndex(
+                    (y) => y.key === `${q}`.slice(1, -1)
+                  );
+                  if (sIndex !== -1) return fieldMappings.at(sIndex).label;
+                  return `${q}`.slice(1, -1);
+                })
+                .join(' ') ?? `${s}`}
+            </p>
+          );
+        }) ?? [];
 
-    const data = (diffData[index] ?? [])
-      .flat()
-      .map((c) => c.text)
-      .filter((t) =>
-        !`${t ?? ""}`.includes('sys_period'))
-      .map((s, i) => {
-
-        return (<p key={s ?? i} style={{
-          textAlign: 'start',
-          // paddingTop:'2%',
-          // paddingBottom:'2%',
-          paddingLeft: '0.5%',
-          paddingRight: '0.5%'
-        }}>
-          {`${s}`
-            .split(': ')
-            .map((q) => {
-              const sIndex = fieldMappings.findIndex((y) => y.key === `${q}`.slice(1, -1))
-              if (sIndex !== -1)
-                return fieldMappings.at(sIndex).label
-              return `${q}`.slice(1, -1)
-            })
-            .join(' ') ?? `${s}`}
-        </p>)
-      }) ?? []
-
-    const length = Math.ceil((data.length ?? 0) / 2)
-    const [first, last] = [k ? 0 : length, k ? length : data.length]
-    return data.slice(first, last)
+    const length = Math.ceil((data.length ?? 0) / 2);
+    const [first, last] = [k ? 0 : length, k ? length : data.length];
+    return data.slice(first, last);
     // return data
-  }
+  };
 
   return (
     <>
@@ -434,48 +468,76 @@ const ReportTriwulanDetail = () => {
             <tbody>{renderTableRows()}</tbody>
           </table>
           <div>
-            <h1 className="font-semibold text-lg text-dark-gray leading-7" style={{ padding: '2%' }}>
+            <h1
+              className="font-semibold text-lg text-dark-gray leading-7"
+              style={{ padding: '2%' }}
+            >
               Histori Data
             </h1>
-            <Timeline align='right' key={selectedIndexTimeline + 'r'} isItemActive={(i) => i === selectedIndexTimeline}>
+            <Timeline
+              align="right"
+              key={selectedIndexTimeline + 'r'}
+              isItemActive={(i) => i === selectedIndexTimeline}
+            >
               {dataJSON.map((e) => {
-
                 const currentIndex = dataJSON.indexOf(e);
-                const date = (`${e.sys_period}` ?? "")
+                const date = (`${e.sys_period}` ?? '')
                   .replace(/[\\[\\"\\)]/g, '')
-                  .split(',')
+                  .split(',');
 
-                return (<Timeline.Item
-                  key={currentIndex}
-                  onClick={() => {
-                    setSelectedIndexTimeline(currentIndex);
-                    setTriwulanData(e);
-                    invokeReport();
-                  }}>
-                  <div key={currentIndex + '1'} style={{
-                    borderStyle: 'groove',
-                    borderRadius: '12px',
-                    borderWidth: '2px',
-                    borderColor: selectedIndexTimeline === currentIndex ?
-                      'blue' :
-                      'white'
-                  }}>
-                    <h6 key={currentIndex + '2'} style={{
-                      textAlign: 'start',
-                      paddingTop: '2%',
-                      paddingBottom: '2%',
-                      paddingLeft: '0.5%',
-                      paddingRight: '0.5%'
-                    }}>
-                      {moment(date[0] ?? '')
-                        .locale('id')
-                        .format('dddd, DD MMMM YYYY (HH:mm ZZ)')}</h6>
-                    <div key={currentIndex + '3'} style={{ paddingTop: '2%', marginTop: '2%' }}>
-                      {currentIndex === dataJSON.length - 1 ? <div /> : (<div>{displayDiffData(currentIndex, true)}
-                        <s key={currentIndex + '4'}>{displayDiffData(currentIndex, false)}</s></div>)}
+                return (
+                  <Timeline.Item
+                    key={currentIndex}
+                    onClick={() => {
+                      setSelectedIndexTimeline(currentIndex);
+                      setTriwulanData(e);
+                      invokeReport();
+                    }}
+                  >
+                    <div
+                      key={currentIndex + '1'}
+                      style={{
+                        borderStyle: 'groove',
+                        borderRadius: '12px',
+                        borderWidth: '2px',
+                        borderColor:
+                          selectedIndexTimeline === currentIndex
+                            ? 'blue'
+                            : 'white',
+                      }}
+                    >
+                      <h6
+                        key={currentIndex + '2'}
+                        style={{
+                          textAlign: 'start',
+                          paddingTop: '2%',
+                          paddingBottom: '2%',
+                          paddingLeft: '0.5%',
+                          paddingRight: '0.5%',
+                        }}
+                      >
+                        {moment(date[0] ?? '')
+                          .locale('id')
+                          .format('dddd, DD MMMM YYYY (HH:mm ZZ)')}
+                      </h6>
+                      <div
+                        key={currentIndex + '3'}
+                        style={{ paddingTop: '2%', marginTop: '2%' }}
+                      >
+                        {currentIndex === dataJSON.length - 1 ? (
+                          <div />
+                        ) : (
+                          <div>
+                            {displayDiffData(currentIndex, true)}
+                            <s key={currentIndex + '4'}>
+                              {displayDiffData(currentIndex, false)}
+                            </s>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                </Timeline.Item>)
+                  </Timeline.Item>
+                );
               })}
             </Timeline>
           </div>
@@ -483,7 +545,6 @@ const ReportTriwulanDetail = () => {
       </div>
 
       <div className="w-full mt-6 bg-white rounded-lg p-9 overflow-hidden">
-
         <h1 className="font-semibold text-lg text-dark-gray leading-7">
           Daftar Gambar
         </h1>
@@ -500,7 +561,6 @@ const ReportTriwulanDetail = () => {
                 className="w-full h-auto max-h-80 object-cover rounded-lg shadow-md"
                 style={{ gridRow: `span ${Math.ceil(Math.random() * 2)}` }} // Adjust for staggered effect
               />
-
             ))
           ) : (
             <p className="text-dark-gray">Tidak ada gambar</p>

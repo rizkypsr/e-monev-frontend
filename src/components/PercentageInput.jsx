@@ -21,8 +21,8 @@ const PercentageInput = React.forwardRef(
         <Label className="mb-2">{label}</Label>
         <NumericFormat
           className={twMerge(
-            className,
-            'text-gray-900 border border-dark-gray bg-white text-sm rounded-lg focus:ring-0 w-full focus:outline-none focus:border-dark-gray px-4 py-2.5'
+            'text-gray-900 border border-dark-gray bg-white text-sm rounded-lg focus:ring-0 w-full focus:outline-none focus:border-dark-gray px-4 py-2.5',
+            className
           )}
           format="##%"
           thousandSeparator=","

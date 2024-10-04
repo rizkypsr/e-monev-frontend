@@ -3,7 +3,15 @@ import { twMerge } from 'tailwind-merge';
 import PropTypes from 'prop-types';
 import ReactLoading from './Loading';
 
-const ButtonV2 = ({ className, type, icon, loading, onClick, children }) => {
+const ButtonV2 = ({
+  className,
+  type,
+  icon,
+  loading,
+  onClick,
+  disabled,
+  children,
+}) => {
   const iconClass = icon ? 'flex items-center justify-center space-x-2' : '';
 
   if (type === 'modal') {
@@ -25,9 +33,13 @@ const ButtonV2 = ({ className, type, icon, loading, onClick, children }) => {
       className={twMerge(
         className,
         iconClass,
-        'font-medium rounded-lg text-sm min-w-fit px-3 py-2.5 h-10'
+        'font-medium rounded-lg text-sm min-w-fit px-3 py-2.5 h-10',
+        disabled
+          ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+          : 'bg-primary text-white'
       )}
       onClick={onClick}
+      disabled={disabled}
     >
       {!loading && icon}
       {loading ? (
@@ -44,6 +56,7 @@ ButtonV2.propTypes = {
   type: PropTypes.string,
   icon: PropTypes.node,
   onClick: PropTypes.func,
+  disabled: PropTypes.bool,
   children: PropTypes.node,
 };
 
@@ -52,6 +65,7 @@ ButtonV2.defaultProps = {
   type: 'button',
   icon: null,
   onClick: null,
+  disabled: false,
   children: null,
 };
 
