@@ -1,16 +1,15 @@
 import React from 'react';
+import { useInfiniteQuery } from 'react-query';
+import { useAuthHeader } from 'react-auth-kit';
 import Label from '../../../../components/Label';
 import DropdownDialog from '../../../../components/DropdownDialog';
 import {
   bentukKegiatanData,
   caraPengadaanData,
   jenisPengadaanData,
-  optionalData,
   programPrioritasData,
 } from '../../../User/Triwulan/constants';
-import { useInfiniteQuery } from 'react-query';
 import getFundSource from '../../../../api/user/triwulan/getFundSource';
-import { useAuthHeader } from 'react-auth-kit';
 
 const jenisPengadaan = {
   pageParams: [undefined],
@@ -21,20 +20,6 @@ const jenisPengadaan = {
         pages: 1,
         result: jenisPengadaanData,
         total: 4,
-      },
-    },
-  ],
-};
-
-const optionals = {
-  pageParams: [undefined],
-  pages: [
-    {
-      data: {
-        page: 1,
-        pages: 1,
-        result: optionalData,
-        total: 3,
       },
     },
   ],
