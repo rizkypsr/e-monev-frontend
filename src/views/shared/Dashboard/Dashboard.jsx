@@ -1,40 +1,36 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useAuthHeader, useAuthUser } from 'react-auth-kit';
-import { ArrowDownTrayIcon } from '@heroicons/react/24/solid';
-import { useInfiniteQuery, useQuery } from 'react-query';
+import { useQuery } from 'react-query';
+
 import ErrorPage from '../../ErrorPage';
 import CountBox from './components/CountBox';
+import FundTotal from './components/FundTotal';
+import ReportTable from './ReportTable';
+import FilterPanel from './components/FilterPanel';
+import ProgressBar from '../../../components/ProgressBar';
+
 import { getOrganizations } from '../../../api/admin/organization';
-import Button from '../../../components/Button';
-import Label from '../../../components/Label';
 import { getUsers } from '../../../api/admin/user';
 import { getOccasions } from '../../../api/admin/occasion';
 import { getPrograms } from '../../../api/admin/program';
 import { getActivities } from '../../../api/admin/activity';
 import { getPurposes } from '../../../api/admin/purpose';
-import DropdownDialog from '../../../components/DropdownDialog';
 import getExcel from '../../../api/admin/dashboard/getExcel';
-import FundTotal from './components/FundTotal';
-import ProgressBar from '../../../components/ProgressBar';
-import getFundSource from '../../../api/user/triwulan/getFundSource';
 import getFundSourceChart from '../../../api/admin/dashboard/getFundSourceChart';
+
 import formatRupiah from '../../../utils/formatRupiah';
-import ReportTable from './ReportTable';
 
 const initialParams = {
   limit: 0,
   page: 0,
 };
 
-const initialFundSourceparams = {
-  limit: 10,
-  page: 1,
-  search: '',
-  sort: 'terbaru',
-};
-
 const initialFundSourceChart = {
   pagu_dana_id: null,
+  tipe_pengadaan: null,
+  bentuk_pengadaan: null,
+  cara_pengadaan: null,
+  program_prio: null,
 };
 
 const Dashboard = () => {
@@ -43,11 +39,17 @@ const Dashboard = () => {
 
   const token = useMemo(() => authHeader(), [authHeader]);
 
-  const [selectedFundSource, setSelectedFundSource] = useState(null);
-  const [filterParams, setFilterParams] = useState(initialFundSourceparams);
   const [filterFundSourceChart, setFilterFundSourceChart] = useState(
     initialFundSourceChart
   );
+  const [filters, setFilters] = React.useState({
+    fundSource: null,
+    jenisPengadaan: null,
+    caraPengadaan: null,
+    bentukKegiatan: null,
+    programPrioritas: null,
+    tahun: null,
+  });
 
   const occassionsQuery = useQuery({
     queryKey: ['get_occassions', initialParams],
@@ -91,52 +93,33 @@ const Dashboard = () => {
     enabled: false,
   });
 
-  const fundSourceQuery = useInfiniteQuery({
-    queryKey: ['get_fund_source', filterParams],
-    queryFn: async ({ pageParam = 1 }) => {
-      const params = filterParams;
-
-      params.page = pageParam;
-
-      const res = await getFundSource(filterParams, authHeader());
-
-      return res;
-    },
-    getNextPageParam: (lastPage) => {
-      if (lastPage.data.page < lastPage.data.pages) {
-        return lastPage.data.page + 1;
-      }
-
-      return undefined;
-    },
-  });
-
   const fundSourceChartQuery = useQuery({
     queryKey: ['get_fund_source_chart', filterFundSourceChart],
     queryFn: () => getFundSourceChart(filterFundSourceChart, authHeader()),
-    enabled: selectedFundSource !== null,
+    enabled: filters.fundSource !== null,
   });
 
   useEffect(() => {
-    if (selectedFundSource?.id) {
+    if (filters.fundSource?.id) {
       setFilterFundSourceChart({
-        pagu_dana_id: selectedFundSource.id,
+        pagu_dana_id: filters.fundSource.id,
+        tipe_pengadaan: filters.jenisPengadaan?.name,
+        bentuk_pengadaan: filters.bentukKegiatan?.name,
+        cara_pengadaan: filters.caraPengadaan?.name,
+        program_prio: filters.programPrioritas?.name,
+        tahun: filters.tahun?.name,
       });
     }
-  }, [selectedFundSource]);
+  }, [filters]);
 
   const handleDownloadExcel = async () => {
     await excelQuery.refetch();
   };
 
-  const handleSelectFundSource = (opd) => {
-    setSelectedFundSource(opd);
-  };
-
-  const handleOnSearch = (e) => {
-    setFilterParams({
-      ...filterParams,
-      search: e,
+  const handleSelectFilter = (key, value) => {
+    setFilters({
+      ...filters,
+      [key]: value,
     });
   };
 
@@ -179,18 +162,7 @@ const Dashboard = () => {
 
       <div className="flex flex-col space-y-4 lg:space-y-0 lg:flex-row justify-center lg:justify-between my-8 lg:items-end">
         {authUser().role.id === 1 && (
-          <div className="flex-1">
-            <Label className="mb-2">Sumber Dana</Label>
-            <DropdownDialog
-              label="Pilih Sumber Dana"
-              data={fundSourceQuery.data}
-              value={selectedFundSource}
-              onChange={handleSelectFundSource}
-              enableSearch
-              searchValue={filterParams.search}
-              onSearch={handleOnSearch}
-            />
-          </div>
+          <FilterPanel filters={filters} onChange={handleSelectFilter} />
         )}
 
         {authUser().role.name !== 'OPD' && (
@@ -227,28 +199,21 @@ const Dashboard = () => {
               {fundSourceChartQuery?.data?.data?.pagu_dana.name}
             </span>
           </h1>
-          <div className="mt-6 flex justify-center space-x-16">
+          <div className="mt-6 flex flex-col space-y-12 lg:flex-row lg:space-y-0 lg:space-x-12 lg:justify-center items-center">
             <FundTotal
               title="Total Sumber Dana"
-              color="bg-[#56CCF2]"
+              className="bg-[#56CCF2]"
               total={formatRupiah(totalPaguDana)}
             />
             <FundTotal
               title="Total Pagu Dana"
-              color="bg-[#BB6BD9]"
+              className="bg-[#BB6BD9]"
               total={formatRupiah(totalPaguDanaDigunakan)}
             />
           </div>
 
-          <div className="space-y-6 ">
+          <div className="mt-20">
             {progressBarData && <ProgressBar data={progressBarData} />}
-            {/* {fundSourceChartQuery?.data?.data?.triwulan.map((triwulan) => (
-              <ProgressBar
-                label={triwulan.nama_aktifitas}
-                completed={triwulan.realisasi_fisik}
-                total={triwulan.pagu_dana}
-              />
-            ))} */}
           </div>
         </div>
       )}
