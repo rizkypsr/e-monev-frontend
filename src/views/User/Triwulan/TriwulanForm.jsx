@@ -30,6 +30,7 @@ import {
   programPrioritasData,
 } from './constants';
 import updateTriwulan from '../../../api/user/triwulan/updateTriwulan';
+import ButtonV2 from '../../../components/ButtonV2';
 
 const initialParams = {
   limit: 20,
@@ -121,19 +122,49 @@ const TriwulanForm = () => {
     handleSubmit,
     setValue,
     control,
+    watch,
+    reset,
     formState: { errors },
-  } = useForm();
+  } = useForm({
+    defaultValues: {
+      createdByUid: null,
+      activity_location: null,
+      fund_source_id: null,
+      fund_ceiling: '',
+      contract_value: '',
+      physical_realization: '',
+      physical_realization_percentage: '',
+      fund_realization: '',
+      fund_realization_percentage: '',
+      procurement_type: null,
+      procurement_method: null,
+      activity_id: null,
+      activity_form: null,
+      optional: null,
+      program_prio: null,
+    },
+  });
+
+  React.useEffect(() => {
+    if (id === undefined) {
+      reset();
+    }
+  }, [id, reset]);
 
   const { isLoading, isError, error } = useQuery({
-    queryKey: ['get_triwulan'],
+    queryKey: ['get_triwulan_edit_detail'],
     queryFn: () => getTriwulanDetail(id, authHeader()),
     enabled: !!id,
+    refetchOnMount: true,
     onSuccess: (result) => {
       const triwulanData = result.data[0] ?? {};
 
+      console.log('triwulanData', triwulanData);
+      console.log('first', JSON.parse(triwulanData.activity_location));
+
       setValue('createdByUid', triwulanData.createdBy);
       setValue('activity_name', triwulanData.activity_name);
-      setValue('activity_location', triwulanData.activity_location);
+      setValue('activity_location', JSON.parse(triwulanData.activity_location));
       setValue('fund_source_id', triwulanData.fundSource);
       setValue('fund_ceiling', triwulanData.fund_ceiling || '');
       setValue('management_organization', triwulanData.management_organization);
@@ -142,7 +173,15 @@ const TriwulanForm = () => {
       setValue('contractor_name', triwulanData.contractor_name);
       setValue('implementation_period', triwulanData.implementation_period);
       setValue('physical_realization', triwulanData.physical_realization);
+      setValue(
+        'physical_realization_percentage',
+        triwulanData.physical_realization_percentage
+      );
       setValue('fund_realization', triwulanData.fund_realization);
+      setValue(
+        'fund_realization_percentage',
+        triwulanData.fund_realization_percentage
+      );
       setValue('activity_volume', triwulanData.activity_volume);
       setValue('activity_output', triwulanData.activity_output);
       setValue('direct_target_group', triwulanData.direct_target_group);
@@ -168,7 +207,9 @@ const TriwulanForm = () => {
       setValue('activity_id', triwulanData.activity);
       setValue(
         'activity_form',
-        bentukKegiatanData.find((item) => item.id === triwulanData.activity_form)
+        bentukKegiatanData.find(
+          (item) => item.name === triwulanData.activity_form
+        )
       );
       setValue(
         'optional',
@@ -181,6 +222,7 @@ const TriwulanForm = () => {
         )
       );
       setValue('contract_date', triwulanData.contract_date);
+      setValue('contract_value', triwulanData.contract_value);
       setValue('pic_name', triwulanData.pic_name);
       setValue('leader_name', triwulanData.leader_name);
       setValue('reason', triwulanData.reason);
@@ -252,11 +294,11 @@ const TriwulanForm = () => {
       procurement_type: data.procurement_type?.name,
       procurement_method: data.procurement_method?.name,
       activity_id: data.activity_id?.id,
-      activity_form: data.activity_form?.id,
+      activity_form: data.activity_form?.name,
       optional: data.optional?.name,
       contract_date: formattedDate(data?.contract_date),
       createdByUid: data.createdByUid ? Number(data.createdByUid.id) : null,
-      activity_location: JSON.parse(data.activity_location),
+      activity_location: JSON.stringify(data.activity_location),
       program_prio: data.program_prio?.name,
     };
 
@@ -359,10 +401,7 @@ const TriwulanForm = () => {
               <LocationInput
                 name="activity_location"
                 label="Pilih Lokasi Kegiatan"
-                placeholder="Pilih lokasi kegiatan"
-                register={register}
-                setValue={setValue}
-                error={errors.activity_location?.message}
+                control={control}
               />
             </div>
 
@@ -505,6 +544,12 @@ const TriwulanForm = () => {
             </div>
             <div>
               <PercentageInput
+                className={
+                  watch('physical_realization_percentage') <= 25 &&
+                  id !== undefined
+                    ? 'text-red-500'
+                    : ''
+                }
                 name="physical_realization_percentage"
                 label="Realisasi Fisik (Dalam bentuk persentase angka)"
                 control={control}
@@ -588,27 +633,25 @@ const TriwulanForm = () => {
               />
             </div>
             <div>
-              <CurrencyInput
-                name="local_workforce"
-                label="Jumlah Tenaga Kerja Lokal (Dalam bentuk angka)"
-                control={control}
-                placeholder="Tulis Disini..."
-                {...register('local_workforce', {
-                  required: 'Jumlah Tenaga Kerja Lokal wajib diisi!',
-                  valueAsNumber: true,
-                })}
+              <Label className="mb-2">
+                Jumlah Tenaga Kerja Lokal (Dalam bentuk angka)
+              </Label>
+              <TextInputV2
+                type="number"
+                placeholder="0"
+                register={register('local_workforce')}
+                error={errors.local_workforce?.message}
               />
             </div>
             <div>
-              <CurrencyInput
-                name="non_local_workforce"
-                label="Jumlah Tenaga Kerja Non Lokal (Dalam bentuk angka)"
-                control={control}
-                placeholder="Tulis Disini..."
-                {...register('non_local_workforce', {
-                  required: 'Jumlah Tenaga Kerja Non Lokal wajib diisi!',
-                  valueAsNumber: true,
-                })}
+              <Label className="mb-2">
+                Jumlah Tenaga Kerja Non Lokal (Dalam bentuk angka)
+              </Label>
+              <TextInputV2
+                type="number"
+                placeholder="0"
+                register={register('non_local_workforce')}
+                error={errors.non_local_workforce?.message}
               />
             </div>
             <div>
@@ -745,15 +788,17 @@ const TriwulanForm = () => {
             <ReactLoading />
           ) : (
             <div className="flex space-x-3">
-              <Button
+              <ButtonV2
                 type="submit"
-                className="w-full md:w-28"
-                background="bg-primary"
-                textColor="text-white"
+                className="w-full md:w-28 bg-primary text-white"
                 icon={<CheckCircleIcon className="w-5 h-5" />}
+                disabled={
+                  watch('physical_realization_percentage') >= 100 &&
+                  id !== undefined
+                }
               >
                 Simpan
-              </Button>
+              </ButtonV2>
               <Link to="../">
                 <Button
                   className="w-full font-medium md:w-28"
