@@ -159,9 +159,6 @@ const TriwulanForm = () => {
     onSuccess: (result) => {
       const triwulanData = result.data[0] ?? {};
 
-      console.log('triwulanData', triwulanData);
-      console.log('first', JSON.parse(triwulanData.activity_location));
-
       setValue('createdByUid', triwulanData.createdBy);
       setValue('activity_name', triwulanData.activity_name);
       setValue('activity_location', JSON.parse(triwulanData.activity_location));
@@ -284,8 +281,6 @@ const TriwulanForm = () => {
   const updateMutation = useMutation(updateTriwulan);
 
   const onSubmit = (data) => {
-    console.log(data);
-
     const formData = new FormData();
 
     const formDataObject = {
