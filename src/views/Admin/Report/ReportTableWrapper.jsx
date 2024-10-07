@@ -14,8 +14,8 @@ import { useToastContext } from '../../../context/ToastContext';
 import getTriwulan from '../../../api/static/getTriwulan';
 import getFundSource from '../../../api/user/triwulan/getFundSource';
 import downloadTriwulanExcel from '../../../api/admin/report/downloadTriwulanExcel';
-import downloadMasterExcel from '../../../api/admin/report/downloadMasterExcel';
-import downloadMasterPdf from '../../../api/admin/report/downloadMasterPdf';
+// import downloadMasterExcel from '../../../api/admin/report/downloadMasterExcel';
+// import downloadMasterPdf from '../../../api/admin/report/downloadMasterPdf';
 import downloadTriwulanPdf from '../../../api/admin/report/downloadTriwulanPdf';
 
 import objectToQueryString from '../../../utils/objectToQueryString';
