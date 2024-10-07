@@ -1,10 +1,9 @@
+import React, { useMemo } from 'react';
 import {
   flexRender,
   getCoreRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import React, { useMemo } from 'react';
-import PropTypes from 'prop-types';
 import ReactLoading from './Loading';
 
 const Table = ({ className, columns, rows, isLoading }) => {
@@ -62,18 +61,6 @@ const Table = ({ className, columns, rows, isLoading }) => {
       </table>
     </div>
   );
-};
-
-Table.propTypes = {
-  className: PropTypes.string,
-  isLoading: PropTypes.bool,
-  columns: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.any)).isRequired,
-  rows: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.any)).isRequired,
-};
-
-Table.defaultProps = {
-  className: null,
-  isLoading: false,
 };
 
 export default Table;

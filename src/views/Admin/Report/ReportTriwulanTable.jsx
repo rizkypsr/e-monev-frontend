@@ -40,7 +40,7 @@ const ReportTriwulanTable = () => {
   const { isLoading, isError, error, data } = useQuery({
     queryKey: ['get_triwulan_reports', filterParams],
     queryFn: () => getTriwulanReport(filterParams, authHeader()),
-    keepPreviousData: true,
+    // keepPreviousData: true,
   });
 
   const deleteMutation = useMutation(deleteTriwulanReport);
@@ -99,10 +99,9 @@ const ReportTriwulanTable = () => {
               }
             : column
         )}
-        rows={data ?? []}
+        rows={data}
         isLoading={isLoading}
       />
-
       <Pagination
         totalRows={data?.data.total || 0}
         pageChangeHandler={onPaginationChange}

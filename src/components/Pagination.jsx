@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types';
 import React, { useEffect, useMemo, useState } from 'react';
 
 const Pagination = ({
@@ -201,12 +200,6 @@ const Pagination = ({
   }
 
   return null;
-};
-
-Pagination.propTypes = {
-  pageChangeHandler: PropTypes.func.isRequired,
-  rowsPerPage: PropTypes.number.isRequired,
-  totalRows: PropTypes.number.isRequired,
 };
 
 export default Pagination;

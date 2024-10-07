@@ -6,16 +6,20 @@ import {
 } from '@heroicons/react/24/solid';
 import { useQuery } from 'react-query';
 import { useAuthHeader } from 'react-auth-kit';
+
 import useSearchParamsState from '../../../hooks/useSearchParamsState';
+import useDebounce from '../../../hooks/useDebounce';
+import { useToastContext } from '../../../context/ToastContext';
+
 import getTriwulan from '../../../api/static/getTriwulan';
 import getFundSource from '../../../api/user/triwulan/getFundSource';
-import useDebounce from '../../../hooks/useDebounce';
-import objectToQueryString from '../../../utils/objectToQueryString';
 import downloadTriwulanExcel from '../../../api/admin/report/downloadTriwulanExcel';
-import { useToastContext } from '../../../context/ToastContext';
 import downloadMasterExcel from '../../../api/admin/report/downloadMasterExcel';
 import downloadMasterPdf from '../../../api/admin/report/downloadMasterPdf';
 import downloadTriwulanPdf from '../../../api/admin/report/downloadTriwulanPdf';
+
+import objectToQueryString from '../../../utils/objectToQueryString';
+
 import {
   Dropdown,
   DropdownContent,
@@ -23,13 +27,14 @@ import {
   DropdownTrigger,
   DropdownValue,
 } from '../../../components/DropdownSelectV2';
+import ButtonV2 from '../../../components/ButtonV2';
+
 import {
   bentukKegiatanData,
   caraPengadaanData,
   jenisPengadaanData,
   programPrioritasData,
 } from '../../User/Triwulan/constants';
-import ButtonV2 from '../../../components/ButtonV2';
 
 const months = [
   { id: 1, name: 'Januari' },
@@ -105,16 +110,8 @@ const ReportTableWrapper = () => {
   });
 
   const handleDownloadPDF = async () => {
-    let res;
-    let fileName;
-
-    if (selectedType && selectedType.value === 'data-master') {
-      fileName = 'Data Master.pdf';
-      res = await downloadMasterPdf(searchParamsState, authHeader());
-    } else if (selectedType && selectedType.value === 'data-triwulan') {
-      fileName = 'Data Kegiatan.pdf';
-      res = await downloadTriwulanPdf(searchParamsState, authHeader());
-    }
+    const fileName = 'Data Kegiatan.pdf';
+    const res = await downloadTriwulanPdf(searchParamsState, authHeader());
 
     if (res) {
       // Create a URL for the blob
@@ -140,16 +137,8 @@ const ReportTableWrapper = () => {
   };
 
   const handleDownloadExcel = async () => {
-    let res;
-    let fileName;
-
-    if (selectedType && selectedType.value === 'data-master') {
-      fileName = 'Data Master.xlsx';
-      res = await downloadMasterExcel(searchParamsState, authHeader());
-    } else if (selectedType && selectedType.value === 'data-triwulan') {
-      fileName = 'Data Triwulan.xlsx';
-      res = await downloadTriwulanExcel(searchParamsState, authHeader());
-    }
+    const fileName = 'Data Triwulan.xlsx';
+    const res = await downloadTriwulanExcel(searchParamsState, authHeader());
 
     if (res) {
       // Create a URL for the blob
@@ -252,7 +241,7 @@ const ReportTableWrapper = () => {
             </DropdownTrigger>
             <DropdownContent>
               {fundSourceQuery.data?.data?.result.map((fundSource) => (
-                <DropdownItem value={fundSource.id}>
+                <DropdownItem key={fundSource.id} value={fundSource.id}>
                   {fundSource.name}
                 </DropdownItem>
               ))}
@@ -268,7 +257,9 @@ const ReportTableWrapper = () => {
             </DropdownTrigger>
             <DropdownContent>
               {months.map((month) => (
-                <DropdownItem value={month.id}>{month.name}</DropdownItem>
+                <DropdownItem key={month.id} value={month.id}>
+                  {month.name}
+                </DropdownItem>
               ))}
             </DropdownContent>
           </Dropdown>
@@ -282,7 +273,9 @@ const ReportTableWrapper = () => {
             </DropdownTrigger>
             <DropdownContent>
               {years.map((year) => (
-                <DropdownItem value={year.id}>{year.name}</DropdownItem>
+                <DropdownItem key={year.id} value={year.id}>
+                  {year.name}
+                </DropdownItem>
               ))}
             </DropdownContent>
           </Dropdown>
@@ -296,7 +289,9 @@ const ReportTableWrapper = () => {
             </DropdownTrigger>
             <DropdownContent>
               {triwulanQuery.data?.data?.map((triwulan) => (
-                <DropdownItem value={triwulan.id}>{triwulan.name}</DropdownItem>
+                <DropdownItem key={triwulan.id} value={triwulan.id}>
+                  {triwulan.name}
+                </DropdownItem>
               ))}
             </DropdownContent>
           </Dropdown>
@@ -312,7 +307,10 @@ const ReportTableWrapper = () => {
             </DropdownTrigger>
             <DropdownContent>
               {jenisPengadaanData.map((jenisPengadaan) => (
-                <DropdownItem value={jenisPengadaan.name}>
+                <DropdownItem
+                  key={jenisPengadaan.id}
+                  value={jenisPengadaan.name}
+                >
                   {jenisPengadaan.name}
                 </DropdownItem>
               ))}
@@ -330,7 +328,7 @@ const ReportTableWrapper = () => {
             </DropdownTrigger>
             <DropdownContent>
               {caraPengadaanData.map((caraPengadaan) => (
-                <DropdownItem value={caraPengadaan.name}>
+                <DropdownItem key={caraPengadaan.id} value={caraPengadaan.name}>
                   {caraPengadaan.name}
                 </DropdownItem>
               ))}
@@ -348,7 +346,9 @@ const ReportTableWrapper = () => {
             </DropdownTrigger>
             <DropdownContent>
               {bentukKegiatanData.map((bentuk) => (
-                <DropdownItem value={bentuk.name}>{bentuk.name}</DropdownItem>
+                <DropdownItem key={bentuk.id} value={bentuk.name}>
+                  {bentuk.name}
+                </DropdownItem>
               ))}
             </DropdownContent>
           </Dropdown>
@@ -362,7 +362,7 @@ const ReportTableWrapper = () => {
             </DropdownTrigger>
             <DropdownContent>
               {programPrioritasData.map((programPrio) => (
-                <DropdownItem value={programPrio.name}>
+                <DropdownItem key={programPrio.id} value={programPrio.name}>
                   {programPrio.name}
                 </DropdownItem>
               ))}

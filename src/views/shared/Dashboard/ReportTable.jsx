@@ -138,11 +138,7 @@ const columns = [
   }),
   columnHelper.accessor((row) => row.physical_realization_percentage, {
     id: 'physical_realization_percentage',
-    cell: (info) => (
-      <i>
-        {parseFloat(info.getValue())}
-      </i>
-    ),
+    cell: (info) => <i>{parseFloat(info.getValue())}</i>,
     header: () => <span>Persentase Realisasi Fisik</span>,
   }),
   columnHelper.accessor((row) => row.fund_realization, {
@@ -247,7 +243,7 @@ const columns = [
 
       return (
         <div className="flex justify-end">
-          <Link to={`laporan/data-triwulan/detail/${rowId}`}>
+          <Link to={`laporan/detail/${rowId}`}>
             <Button
               className="text-sm font-normal"
               textColor="text-blue-500"
@@ -396,15 +392,15 @@ const ReportTable = () => {
         columns={columns.map((column) =>
           column.cell
             ? {
-              ...column,
-              cell: (props) =>
-                column.cell(
-                  props,
-                  deleteReportData,
-                  authUser().role?.name,
-                  handleDownloadFile
-                ),
-            }
+                ...column,
+                cell: (props) =>
+                  column.cell(
+                    props,
+                    deleteReportData,
+                    authUser().role?.name,
+                    handleDownloadFile
+                  ),
+              }
             : column
         )}
         rows={data}

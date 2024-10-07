@@ -19,10 +19,11 @@ import formattedDate from '../../../../utils/formattedDate';
 const columns = [
   {
     header: 'No',
-    cell: ({ row, table }) =>
-      (table
-        .getSortedRowModel()
-        ?.flatRows.findIndex((flatRow) => flatRow.id === row.id) || 0) + 1,
+    cell: ({ row: { index }, table }) => {
+      const currentPage = table.options.meta?.currentPage;
+
+      return <i>{(currentPage - 1) * 10 + (index + 1)}</i>;
+    },
   },
   {
     accessorKey: 'activity_name',

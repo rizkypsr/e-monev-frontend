@@ -35,31 +35,24 @@ import ProgramDetail from './views/Admin/Program/ProgramDetail';
 import PurposeDetail from './views/Admin/Purpose/PurposeDetail';
 import ActivityDetail from './views/Admin/Activity/ActivityDetail';
 import UserAccessEdit from './views/Admin/UserAccess/UserAccessEdit';
-import ReportTable from './views/Admin/Report/ReportTable';
-import ReportDetail from './views/Admin/Report/ReportDetail';
 import ReportEdit from './views/Admin/Report/ReportEdit';
 import MyAccountForm from './views/Admin/MyAccount/MyAccountForm';
 import Master from './views/User/Master/Master';
 import MasterCreate from './views/User/Master/MasterCreate';
-// import TriwulanCreate from './views/User/Triwulan/TriwulanCreate';
 import Occassion from './views/Admin/Occassion/Occassion';
 import OccassionTable from './views/Admin/Occassion/OccassionTable';
 import OccasionCreate from './views/Admin/Occassion/OccassionCreate';
 import OccassionEdit from './views/Admin/Occassion/OccassionEdit';
 import OccassionDetail from './views/Admin/Occassion/OccassionDetail';
 import Configuration from './views/Admin/Configuration/Configuration';
-import ReportMasterTable from './views/Admin/Report/ReportMasterTable';
 import ReportTriwulanTable from './views/Admin/Report/ReportTriwulanTable';
 import ReportTableWrapper from './views/Admin/Report/ReportTableWrapper';
 import ForgotPassword from './views/Auth/ForgotPassword';
 import History from './views/Admin/History/History';
 import HistoryTable from './views/Admin/History/HistoryTable';
 import ReportTriwulanDetail from './views/Admin/Report/ReportTriwulanDetail';
-import TriwulanEdit from './views/User/Triwulan/TriwulanEdit';
-import ReportMasterDetail from './views/Admin/Report/ReportMasterDetail';
 import Authorization from './components/Authorization';
 import PrivateLayout from './layouts/PrivateLayout';
-import MasterEdit from './views/User/Master/MasterEdit';
 import FundSourceTable from './views/Admin/FundSource/FundSourceTable';
 import FundSource from './views/Admin/FundSource/FundSource';
 import FundSourceCreate from './views/Admin/FundSource/FundSourceCreate';
@@ -335,15 +328,9 @@ const router = createBrowserRouter(
         }
       >
         <Route path="" key="report" element={<ReportTableWrapper />}>
-          <Route key="reportTable" path="" element={<ReportTable />} />
-          <Route
-            key="reportMasterTable"
-            path="data-master"
-            element={<ReportMasterTable />}
-          />
           <Route
             key="reportTriwulanTable"
-            path="data-triwulan"
+            path=""
             element={<ReportTriwulanTable />}
           />
         </Route>
@@ -357,33 +344,9 @@ const router = createBrowserRouter(
           }
         />
         <Route
-          key="reportMasterEdit"
-          path="data-master/edit/:id"
-          element={
-            <Authorization roles={['Superadmin', 'OPD']}>
-              <MasterEdit />
-            </Authorization>
-          }
-        />
-        <Route
-          key="reportTriwulanEdit"
-          path="data-triwulan/edit/:id"
-          element={<TriwulanEdit />}
-        />
-        <Route
           key="reportTriwulanDetail"
-          path="data-triwulan/detail/:id"
-          element={<ReportTriwulanDetail />}
-        />
-        <Route
-          key="reportMasterDetail"
-          path="data-master/detail/:id"
-          element={<ReportMasterDetail />}
-        />
-        <Route
-          key="reportDetail"
           path="detail/:id"
-          element={<ReportDetail />}
+          element={<ReportTriwulanDetail />}
         />
       </Route>
       <Route
