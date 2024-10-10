@@ -521,7 +521,7 @@ const ReportTriwulanDetail = () => {
                       >
                         {moment(date[0] ?? '')
                           .locale('id')
-                          .format('dddd, DD MMMM YYYY (HH:mm ZZ)')}
+                          .format('dddd, DD MMMM YYYY HH:mm (Z)')}
                       </h6>
                       <div
                         key={currentIndex + '3'}
