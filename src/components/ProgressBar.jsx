@@ -1,9 +1,10 @@
 import React from 'react';
 import { Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip } from 'chart.js';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 import formatToRupiah from '../utils/formatRupiah';
 
-ChartJS.register(ArcElement, Tooltip);
+ChartJS.register(ArcElement, Tooltip, ChartDataLabels);
 
 const ProgressBar = ({ data }) => {
   const MIN_PERCENTAGE = 1;
@@ -54,9 +55,18 @@ const ProgressBar = ({ data }) => {
             return '';
           },
         },
-
         itemSort: (a, b) => b.raw - a.raw,
         displayColors: true,
+      },
+      datalabels: {
+        formatter: (value, context) => {
+          const percentage = value.toFixed(1);
+          return `${percentage}%`;
+        },
+        color: '#fff',
+        font: {
+          weight: 'bold',
+        },
       },
     },
     elements: {
@@ -67,17 +77,28 @@ const ProgressBar = ({ data }) => {
     },
   };
 
+  // Calculate percentage for each item
+  const dataWithPercentage = data.map((item) => ({
+    ...item,
+    percentage: (item.completed / totalCompleted) * 100,
+  }));
+
+  // Sort data by percentage in descending order
+  const sortedData = dataWithPercentage.sort(
+    (a, b) => b.percentage - a.percentage
+  );
+
+  // Get top 5 data
+  const top5Data = sortedData.slice(0, 5);
+
   return (
-    <div className="w-full flex justify-center mt-20 mb-20">
-      <div className="grid grid-cols-2 w-full min-w-0 items-center">
-        <div
-          className="relative col-span-1 max-w-full overflow-hidden"
-          style={{ width: '100%', height: '400px', minWidth: '300px' }}
-        >
+    <div className="w-full grid grid-rows-2 items-center mt-20 mb-20">
+      <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4 place-items-start">
+        <div className="relative w-full h-64 md:h-96">
           <Pie data={chartData} options={options} />
         </div>
 
-        <div className="col-span-1 flex flex-col justify-center flex-1">
+        <div className="flex flex-col justify-center w-full">
           {data.map((item, index) => (
             <div key={index} className="flex items-center mb-2">
               <div className="w-4 h-4">
@@ -99,6 +120,29 @@ const ProgressBar = ({ data }) => {
               </div>
             </div>
           ))}
+
+          <div className="w-full max-w-md mt-10">
+            <h2 className="text-lg font-bold mb-4">Top 5 Completed Data: </h2>
+            {top5Data.map((item, index) => (
+              <div key={index} className="flex items-center mb-2">
+                <div className="w-4 h-4">
+                  <span
+                    className="inline-block w-4 h-4 rounded-full"
+                    style={{
+                      backgroundColor:
+                        chartData.datasets[0].backgroundColor[index],
+                    }}
+                  ></span>
+                </div>
+                <div className="ml-2">
+                  <span className="text-sm font-medium break-words">
+                    {index + 1}. {item.label} -{' '}
+                    {formatToRupiah(item.completed.toString())}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>

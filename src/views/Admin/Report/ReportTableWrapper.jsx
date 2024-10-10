@@ -238,8 +238,8 @@ const ReportTableWrapper = () => {
         <h1 className="text-2xl font-semibold">Data Laporan</h1>
       </div>
 
-      <div className="flex items-center justify-between mt-6">
-        <div minWidth="14rem"></div>
+      <div className="flex flex-col md:flex-row items-center justify-between mt-6 space-y-3 md:space-y-0">
+        <div className="w-full md:w-auto min-w-[14rem]"></div>
         {/* <DropdownSelect
           value={selectedType}
           options={type}
@@ -249,7 +249,7 @@ const ReportTableWrapper = () => {
           <DropdownSelect.HeaderV2 label="Pilih Data Laporan" />
         </DropdownSelect> */}
 
-        <div className="relative w-1/3">
+        <div className="relative w-full md:w-1/3">
           <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
             <MagnifyingGlassIcon className="w-4 h-4" />
           </div>
@@ -263,9 +263,9 @@ const ReportTableWrapper = () => {
         </div>
       </div>
 
-      <div className="flex justify-between mt-3 space-x-3">
-        <div className="flex space-x-3">
-          <div className="grid grid-cols-2 gap-3">
+      <div className="flex flex-col md:flex-row justify-between mt-3 space-y-3 md:space-y-0 md:space-x-3">
+        <div className="flex flex-col md:flex-row space-y-3 md:space-y-0 md:space-x-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {/* Month Dropdown */}
             <DropdownSelect
               value={selectedMonth}
@@ -308,7 +308,7 @@ const ReportTableWrapper = () => {
           </div>
 
           <Button
-            className="px-3"
+            className="w-full md:w-auto px-3"
             background="bg-primary"
             textColor="text-white"
             onClick={resetFilter}
@@ -317,9 +317,9 @@ const ReportTableWrapper = () => {
           </Button>
         </div>
 
-        <div className="flex space-x-2">
+        <div className="flex flex-col md:flex-row space-y-3 md:space-y-0 md:space-x-2">
           <Button
-            className="w-28 lg:w-auto"
+            className="w-full md:w-28 lg:w-auto"
             type="submit"
             background="bg-primary"
             textColor="text-white"
@@ -329,7 +329,7 @@ const ReportTableWrapper = () => {
             Unduh Data (PDF)
           </Button>
           <Button
-            className="w-28 lg:w-auto"
+            className="w-full md:w-28 lg:w-auto"
             type="submit"
             background="bg-primary"
             textColor="text-white"

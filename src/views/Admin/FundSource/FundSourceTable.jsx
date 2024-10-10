@@ -256,41 +256,40 @@ const FundSourceTable = () => {
         </Link>
       </div>
 
-      <div className="flex justify-between mt-6">
-        <div className="flex space-x-3">
-          {/* Sorting Dropdown */}
-          <DropdownSelect
-            value={selectedSorting}
-            options={sorting}
-            onChange={onSorting}
-          >
-            <DropdownSelect.HeaderV1 label="Urutkan:" />
-          </DropdownSelect>
+      <div className="flex flex-col md:flex-row justify-between mt-6">
+  <div className="flex flex-col md:flex-row space-y-3 md:space-y-0 md:space-x-3 w-full">
+    {/* Sorting Dropdown */}
+    <DropdownSelect
+      value={selectedSorting}
+      options={sorting}
+      onChange={onSorting}
+    >
+      <DropdownSelect.HeaderV1 label="Urutkan:" />
+    </DropdownSelect>
 
-          {/* Page Size Dropdown */}
-          <DropdownSelect
-            value={selectedPageSize}
-            options={pageSizes}
-            onChange={onPageSizeChanged}
-          >
-            <DropdownSelect.HeaderV1 label="Tampilkan:" endLabel="Entri" />
-          </DropdownSelect>
-        </div>
+    {/* Page Size Dropdown */}
+    <DropdownSelect
+      value={selectedPageSize}
+      options={pageSizes}
+      onChange={onPageSizeChanged}
+    >
+      <DropdownSelect.HeaderV1 label="Tampilkan:" endLabel="Entri" />
+    </DropdownSelect>
+  </div>
 
-        <div className="relative w-1/3">
-          <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-            <MagnifyingGlassIcon className="w-4 h-4" />
-          </div>
-          <input
-            type="search"
-            value={searchTerm}
-            onChange={onSearchChange}
-            className="bg-gray-50 text-light-gray border-none text-sm rounded-lg focus:ring-0 block w-full pl-10 p-2.5 shadow"
-            placeholder="Pencarian"
-          />
-        </div>
-      </div>
-
+  <div className="relative w-full md:w-1/3 mt-3 md:mt-0">
+    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+      <MagnifyingGlassIcon className="w-4 h-4" />
+    </div>
+    <input
+      type="search"
+      value={filterParams.search}
+      onChange={onSearchChange}
+      className="bg-gray-50 text-light-gray border-none text-sm rounded-lg focus:ring-0 block w-full pl-10 p-2.5 shadow"
+      placeholder="Pencarian"
+    />
+  </div>
+</div>
       <div className="w-full h-full mt-6 bg-white rounded-lg">
         <Table
           columns={columns.map((column) =>
