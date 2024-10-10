@@ -20,6 +20,7 @@ import getFundSource from '../../../api/user/triwulan/getFundSource';
 import getFundSourceChart from '../../../api/admin/dashboard/getFundSourceChart';
 import formatRupiah from '../../../utils/formatRupiah';
 import ReportTable from './ReportTable';
+import { useLocation } from 'react-router-dom';
 
 const initialParams = {
   limit: 0,
@@ -48,6 +49,8 @@ const Dashboard = () => {
   const [filterFundSourceChart, setFilterFundSourceChart] = useState(
     initialFundSourceChart
   );
+
+  const location = useLocation();
 
   const occassionsQuery = useQuery({
     queryKey: ['get_occassions', initialParams],
@@ -125,6 +128,14 @@ const Dashboard = () => {
     }
   }, [selectedFundSource]);
 
+  useEffect(() => {
+    setSelectedFundSource(null);
+    setFilterParams(initialFundSourceparams);
+    setFilterFundSourceChart(initialFundSourceChart);
+    fundSourceQuery.remove(); // Clear cache for fund source
+    fundSourceChartQuery.remove(); // Clear cache for fund source chart
+  }, [location]);
+
   const handleDownloadExcel = async () => {
     await excelQuery.refetch();
   };
@@ -154,12 +165,14 @@ const Dashboard = () => {
   );
   const showCountBox = (roles) => roles.includes(authUser().role.name);
 
-  const progressBarData = fundSourceChartQuery?.data?.data?.triwulan.map(
-    (triwulan) => ({
-      label: triwulan.nama_aktifitas,
-      completed: triwulan.realisasi_fisik,
-      total: triwulan.pagu_dana,
-    })
+  const progressBarData = useMemo(
+    () =>
+      fundSourceChartQuery?.data?.data?.triwulan.map((triwulan) => ({
+        label: triwulan.nama_aktifitas,
+        completed: triwulan.realisasi_fisik,
+        total: triwulan.pagu_dana,
+      })),
+    [fundSourceChartQuery?.data?.data?.triwulan]
   );
 
   return (
