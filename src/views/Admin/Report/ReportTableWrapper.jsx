@@ -261,7 +261,7 @@ const ReportTableWrapper = () => {
               </DropdownContent>
             </Dropdown>
 
-            <Dropdown
+            {/* <Dropdown
               value={filters.triwulan_id}
               onValueChange={(value) => handleSelectFilter('triwulan_id', value)}
             >
@@ -275,7 +275,7 @@ const ReportTableWrapper = () => {
                   </DropdownItem>
                 ))}
               </DropdownContent>
-            </Dropdown>
+            </Dropdown> */}
 
             <Dropdown
               value={filters.tipe_pengadaan}
