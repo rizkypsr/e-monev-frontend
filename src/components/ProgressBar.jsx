@@ -98,6 +98,8 @@ const ProgressBar = ({ data }) => {
   // Get top 5 data
   const top5Data = sortedData.slice(0, 5);
 
+  if (data.length === 0)
+    return <h4 className='text-center'> Data tidak ditemukan </h4>
   return (
     <div className="w-full grid grid-rows-2 items-center mt-20 mb-20">
       <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4 place-items-start">
