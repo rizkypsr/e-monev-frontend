@@ -1,7 +1,10 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable react-hooks/rules-of-hooks */
 import React, { useEffect, useMemo, useState } from 'react';
 import { useAuthHeader, useAuthUser } from 'react-auth-kit';
 import { useQuery } from 'react-query';
 
+import { useLocation } from 'react-router-dom';
 import ErrorPage from '../../ErrorPage';
 import CountBox from './components/CountBox';
 import FundTotal from './components/FundTotal';
@@ -50,6 +53,8 @@ const Dashboard = () => {
     programPrioritas: null,
     tahun: null,
   });
+
+  const location = useLocation();
 
   const occassionsQuery = useQuery({
     queryKey: ['get_occassions', initialParams],
@@ -112,9 +117,22 @@ const Dashboard = () => {
     }
   }, [filters]);
 
-  const handleDownloadExcel = async () => {
-    await excelQuery.refetch();
-  };
+  useEffect(() => {
+    if (filters.fundSource?.id) {
+      setFilterFundSourceChart({
+        pagu_dana_id: filters.fundSource.id,
+        tipe_pengadaan: filters.jenisPengadaan?.name,
+        bentuk_pengadaan: filters.bentukKegiatan?.name,
+        cara_pengadaan: filters.caraPengadaan?.name,
+        program_prio: filters.programPrioritas?.name,
+        tahun: filters.tahun?.name,
+      });
+    }
+  }, [filters]);
+
+  // const handleDownloadExcel = async () => {
+  //   await excelQuery.refetch();
+  // };
 
   const handleSelectFilter = (key, value) => {
     setFilters({
@@ -137,12 +155,14 @@ const Dashboard = () => {
   );
   const showCountBox = (roles) => roles.includes(authUser().role.name);
 
-  const progressBarData = fundSourceChartQuery?.data?.data?.triwulan.map(
-    (triwulan) => ({
-      label: triwulan.nama_aktifitas,
-      completed: triwulan.realisasi_fisik,
-      total: triwulan.pagu_dana,
-    })
+  const progressBarData = useMemo(
+    () =>
+      fundSourceChartQuery?.data?.data?.triwulan.map((triwulan) => ({
+        label: triwulan.nama_aktifitas,
+        completed: triwulan.realisasi_fisik,
+        total: triwulan.pagu_dana,
+      })),
+    [fundSourceChartQuery?.data?.data?.triwulan]
   );
 
   return (
