@@ -96,8 +96,10 @@ const ReportTableWrapper = () => {
       ...searchParamsState,
       search: debouncedSearch,
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedSearch]);
 
+  // eslint-disable-next-line no-unused-vars
   const triwulanQuery = useQuery({
     queryKey: ['get_triwulan'],
     queryFn: () => getTriwulan(authHeader()),

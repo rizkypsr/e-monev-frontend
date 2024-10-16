@@ -1,108 +1,26 @@
+/* eslint-disable no-shadow */
 import React from 'react';
-import { useInfiniteQuery } from 'react-query';
+import { useInfiniteQuery, useQuery } from 'react-query';
 import { useAuthHeader, useAuthUser } from 'react-auth-kit';
 import MapLocation from '../../../components/MapLocation';
-import DropdownDialog from '../../../components/DropdownDialog';
-import { getActivities } from '../../../api/admin/activity';
+// import DropdownDialog from '../../../components/DropdownDialog';
+// import { getActivities } from '../../../api/admin/activity';
 import getFundSource from '../../../api/user/triwulan/getFundSource';
 import getUsers from '../../../api/user/triwulan/getUsers';
+import getTriwulanReportLocation from '../../../api/admin/report/getTriwulanReportLokasi';
+import {
+  Dropdown,
+  DropdownContent,
+  DropdownItem,
+  DropdownTrigger,
+  DropdownValue,
+} from '../../../components/DropdownSelectV2';
+import { caraPengadaanData, jenisPengadaanData, bentukKegiatanData, optionalData, programPrioritasData } from '../../User/Triwulan/constants';
 
-const jenisPengadaan = {
-  pageParams: [undefined],
-  pages: [
-    {
-      data: {
-        page: 1,
-        pages: 1,
-        result: [
-          { id: 1, name: 'Barang' },
-          { id: 2, name: 'Pekerjaan Konstruksi' },
-          { id: 3, name: 'Jasa Konsultasi' },
-          { id: 4, name: 'Jasa Lainnya' },
-          { id: 5, name: 'Jasa Kelola' },
-        ],
-        total: 4,
-      },
-    },
-  ],
-};
-
-const optional = {
-  pageParams: [undefined],
-  pages: [
-    {
-      data: {
-        page: 1,
-        pages: 1,
-        result: [
-          { id: 1, name: 'Forst Major' },
-          { id: 2, name: 'Keterlambatan Lelang' },
-          { id: 3, name: 'Perubahan Kebijakan Adendum' },
-        ],
-        total: 3,
-      },
-    },
-  ],
-};
-
-const caraPengadaan = {
-  pageParams: [undefined],
-  pages: [
-    {
-      data: {
-        page: 1,
-        pages: 1,
-        result: [
-          { id: 1, name: 'Swakelola' },
-          { id: 2, name: 'Pengadaan Langsung' },
-          { id: 3, name: 'Seleksi' },
-          { id: 4, name: 'Tender' },
-          { id: 5, name: 'Penunjukan Langsung' },
-        ],
-        total: 4,
-      },
-    },
-  ],
-};
-
-const bentukKegiatan = {
-  pageParams: [undefined],
-  pages: [
-    {
-      data: {
-        page: 1,
-        pages: 1,
-        result: [
-          { id: 1, name: 'fisik' },
-          { id: 2, name: 'nonfisik' },
-        ],
-        total: 4,
-      },
-    },
-  ],
-};
-
-const programPrioritas = {
-  pageParams: [undefined],
-  pages: [
-    {
-      data: {
-        page: 1,
-        pages: 1,
-        result: [
-          { id: 1, name: 'Bukan Prioritas' },
-          { id: 2, name: 'Daerah' },
-          { id: 3, name: 'Nasional' },
-        ],
-        total: 4,
-      },
-    },
-  ],
-};
 
 const initialParams = {
-  limit: 20,
-  page: 1,
+  // limit: 1000,
+  // page: 1,
   search: '',
   sort: 'terbaru',
 };
@@ -112,14 +30,14 @@ const Location = () => {
   const authUser = useAuthUser();
 
   const [filterParams, setFilterParams] = React.useState({
-    fund_source_id: null,
+    sumber_dana: null,
     procurement_type: null,
     procurement_method: null,
-    optional: null,
+    optional_notice: null,
     activity_id: null,
     activity_form: null,
-    program_prio: null,
-    createdByUid: null,
+    program_prioritas: null,
+    target_opd: null,
   });
 
   const targetOpdQuery = useInfiniteQuery({
@@ -146,32 +64,47 @@ const Location = () => {
     },
   });
 
-  const activityQuery = useInfiniteQuery({
-    queryKey: ['get_activities'],
-    queryFn: async ({ pageParam = 1 }) => {
-      const params = initialParams;
+  const targetOpdData =
+    (targetOpdQuery.data?.pages ?? [{ result: [] }])[0]?.data?.result
 
-      params.page = pageParam;
+  // const activityQuery = useInfiniteQuery({
+  //   queryKey: ['get_activities'],
+  //   queryFn: async ({ pageParam = 1 }) => {
+  //     const params = initialParams;
 
-      const res = await getActivities(params, authHeader());
+  //     params.page = pageParam;
 
-      return res;
-    },
-    getNextPageParam: (lastPage) => {
-      if (lastPage.data.page < lastPage.data.pages) {
-        return lastPage.data.page + 1;
-      }
+  //     const res = await getActivities(params, authHeader());
 
-      return undefined;
-    },
-  });
+  //     return res;
+  //   },
+  //   getNextPageParam: (lastPage) => {
+  //     if (lastPage.data.page < lastPage.data.pages) {
+  //       return lastPage.data.page + 1;
+  //     }
+
+  //     return undefined;
+  //   },
+  // });
 
   const fundSourceQuery = useInfiniteQuery({
     queryKey: ['get_fund_source'],
-    queryFn: ({ pageParam = 1 }) => getFundSource(initialParams, authHeader()),
+    queryFn: () => getFundSource(initialParams, authHeader()),
     getNextPageParam: (lastPage) => lastPage.nextId ?? undefined,
     getPreviousPageParam: (firstPage) => firstPage.previousId ?? undefined,
   });
+
+  const fundsourceData =
+    (fundSourceQuery.data?.pages ?? [{ result: [] }])[0]?.data?.result
+
+
+  const { data } = useQuery({
+    queryKey: ['get_triwulan_reports', filterParams],
+    queryFn: () => getTriwulanReportLocation(filterParams, authHeader()),
+    // keepPreviousData: true,
+  });
+
+  const locations = (data?.data?.result ?? []).map((e) => e.activity_location)
 
   const handleOnChange = (key, value) => {
     setFilterParams((prev) => ({
@@ -185,66 +118,203 @@ const Location = () => {
       <h1 className="text-2xl font-semibold mb-12">Lokasi Kegiatan</h1>
       <div className="mb-6 grid grid-cols-4 gap-2">
         {authUser()?.role.name === 'Superadmin' && (
-          <DropdownDialog
-            name="createdByUid"
-            label="Pilih Target OPD"
-            data={targetOpdQuery.data}
+
+          <Dropdown
             value={filterParams.createdByUid}
-            onChangeV2={handleOnChange}
-          />
+            onValueChange={(value) =>
+              handleOnChange('createdByUid', value)
+            }
+          >
+            <DropdownTrigger>
+              <DropdownValue placeholder="Pilih Target OPD" />
+            </DropdownTrigger>
+            <DropdownContent>
+              {targetOpdData?.map((e) => (
+                <DropdownItem key={e.name} value={e.id}>
+                  {e.name}
+                </DropdownItem>
+              ))}
+            </DropdownContent>
+          </Dropdown>
+
+          // <DropdownDialog
+          //   name="createdByUid"
+          //   label="Pilih Target OPD"
+          //   data={targetOpdQuery.data}
+          //   value={filterParams.createdByUid}
+          //   onChangeV2={handleOnChange}
+          // />
         )}
 
-        <DropdownDialog
+
+
+        <Dropdown
+          value={filterParams.jenis_pengadaan}
+          onValueChange={(value) =>
+            handleOnChange('jenis_pengadaan', value)
+          }
+        >
+          <DropdownTrigger>
+            <DropdownValue placeholder="Pilih Jenis Pengadaan" />
+          </DropdownTrigger>
+          <DropdownContent>
+            {jenisPengadaanData.map((jenisPengadaan) => (
+              <DropdownItem key={jenisPengadaan.id} value={jenisPengadaan.name}>
+                {jenisPengadaan.name}
+              </DropdownItem>
+            ))}
+          </DropdownContent>
+        </Dropdown>
+
+        {/* <DropdownDialog
           name="procurement_type"
           label="Pilih Jenis Pengadaan"
           data={jenisPengadaan}
           value={filterParams.procurement_type}
-          onChangeV2={handleOnChange}
-        />
-        <DropdownDialog
+          onChangeV2={(v) => handleOnChange('jenis_pengadaan', v)}
+        /> */}
+
+
+        <Dropdown
+          value={filterParams.cara_pengadaan}
+          onValueChange={(value) =>
+            handleOnChange('cara_pengadaan', value)
+          }
+        >
+          <DropdownTrigger>
+            <DropdownValue placeholder="Pilih Cara Pengadaan" />
+          </DropdownTrigger>
+          <DropdownContent>
+            {caraPengadaanData.map((caraPengadaan) => (
+              <DropdownItem key={caraPengadaan.id} value={caraPengadaan.name}>
+                {caraPengadaan.name}
+              </DropdownItem>
+            ))}
+          </DropdownContent>
+        </Dropdown>
+
+        {/* <DropdownDialog
           name="procurement_method"
           label="Pilih Cara Pengadaan"
           data={caraPengadaan}
           value={filterParams.procurement_method}
-          onChangeV2={handleOnChange}
-        />
-        <DropdownDialog
+          onChangeV2={(v) => handleOnChange('cara_pengadaan', v)}
+        /> */}
+
+        <Dropdown
+          value={filterParams.optional}
+          onValueChange={(value) =>
+            handleOnChange('optional', value)
+          }
+        >
+          <DropdownTrigger>
+            <DropdownValue placeholder="Pilih Optional Pengadaan" />
+          </DropdownTrigger>
+          <DropdownContent>
+            {optionalData.map((e) => (
+              <DropdownItem key={e.id} value={e.name}>
+                {e.name}
+              </DropdownItem>
+            ))}
+          </DropdownContent>
+        </Dropdown>
+
+        {/* <DropdownDialog
           name="optional"
           label="Pilih Opsional"
           data={optional}
           value={filterParams.optional}
           onChangeV2={handleOnChange}
-        />
-        <DropdownDialog
+        /> */}
+
+        <Dropdown
+          value={filterParams.bentuk_kegiatan}
+          onValueChange={(value) =>
+            handleOnChange('bentuk_kegiatan', value)
+          }
+        >
+          <DropdownTrigger>
+            <DropdownValue placeholder="Pilih Bentuk Pengadaan" />
+          </DropdownTrigger>
+          <DropdownContent>
+            {bentukKegiatanData.map((e) => (
+              <DropdownItem key={e.id} value={e.name}>
+                {e.name}
+              </DropdownItem>
+            ))}
+          </DropdownContent>
+        </Dropdown>
+
+        {/* <DropdownDialog
           name="activity_form"
           label="Pilih Bentuk Kegiatan"
           data={bentukKegiatan}
           value={filterParams.activity_form}
           onChangeV2={handleOnChange}
-        />
-        <DropdownDialog
+        /> */}
+
+
+        <Dropdown
+          value={filterParams.program_prio}
+          onValueChange={(value) =>
+            handleOnChange('program_prio', value)
+          }
+        >
+          <DropdownTrigger>
+            <DropdownValue placeholder="Pilih Bentuk Pengadaan" />
+          </DropdownTrigger>
+          <DropdownContent>
+            {programPrioritasData.map((e) => (
+              <DropdownItem key={e.id} value={e.name}>
+                {e.name}
+              </DropdownItem>
+            ))}
+          </DropdownContent>
+        </Dropdown>
+
+        {/* <DropdownDialog
           name="program_prio"
           label="Pilih Program Prioritas"
           data={programPrioritas}
           value={filterParams.program_prio}
           onChangeV2={handleOnChange}
-        />
-        <DropdownDialog
+        /> */}
+
+        {/* <DropdownDialog
           name="activity_id"
           label="Pilih Sub Kegiatan"
           data={activityQuery.data}
           value={filterParams.activity_id}
           onChangeV2={handleOnChange}
-        />
-        <DropdownDialog
+        /> */}
+
+        <Dropdown
+          value={filterParams.fund_source_id}
+          onValueChange={(value) =>
+            handleOnChange('fund_source_id', value)
+          }
+        >
+          <DropdownTrigger>
+            <DropdownValue placeholder="Pilih Sumber Dana" />
+          </DropdownTrigger>
+          <DropdownContent>
+            {fundsourceData?.map((e) => (
+              <DropdownItem key={e.id} value={e.id}>
+                {e.name}
+              </DropdownItem>
+            ))}
+          </DropdownContent>
+        </Dropdown>
+
+        {/* <DropdownDialog
           name="fund_source_id"
           label="Pilih Sumber Dana"
           data={fundSourceQuery.data}
           value={filterParams.fund_source_id}
           onChangeV2={handleOnChange}
-        />
+        /> */}
       </div>
-      <MapLocation />
+      <MapLocation data={locations} />
     </>
   );
 };
