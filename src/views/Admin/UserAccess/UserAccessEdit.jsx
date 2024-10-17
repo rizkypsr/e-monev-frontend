@@ -1,26 +1,30 @@
-import {
-  ArrowLeftIcon,
-  CheckCircleIcon,
-  PlusCircleIcon,
-} from '@heroicons/react/24/solid';
 import React, { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuthHeader } from 'react-auth-kit';
 import { useInfiniteQuery, useMutation, useQuery } from 'react-query';
 import { useForm } from 'react-hook-form';
-import Label from '../../../components/Label';
-import Button from '../../../components/Button';
-import ErrorPage from '../../ErrorPage';
-import { getOrganizations } from '../../../api/admin/organization';
-import { useToastContext } from '../../../context/ToastContext';
-import updateUser from '../../../api/auth/updateUser';
-import ReactLoading from '../../../components/Loading';
-import { getUser } from '../../../api/admin/user';
-import DropdownDialog from '../../../components/DropdownDialog';
-import getRoles from '../../../api/static/getRoles';
-import TextInputV2 from '../../../components/TextInputV2';
 
-let initialParams = {
+import {
+  ArrowLeftIcon,
+  CheckCircleIcon,
+  PlusCircleIcon,
+} from '@heroicons/react/24/solid';
+
+import Label from '@/components/Label';
+import Button from '@/components/Button';
+import ReactLoading from '@/components/Loading';
+import DropdownDialog from '@/components/DropdownDialog';
+import TextInputV2 from '@/components/TextInputV2';
+
+import { getOrganizations } from '@/api/admin/organization';
+import { getUser } from '@/api/admin/user';
+import updateUser from '@/api/auth/updateUser';
+import getRoles from '@/api/static/getRoles';
+
+import { useToastContext } from '@/context/ToastContext';
+import ErrorPage from '@/views/ErrorPage';
+
+const initialParams = {
   limit: 10,
   page: 1,
   search: '',
@@ -188,7 +192,10 @@ const UserAccessEdit = () => {
           </h1>
         </Link>
 
-        <form className="mt-4 w-2/5" onSubmit={handleSubmit(onSubmit)}>
+        <form
+          className="mt-4 lg:w-2/3 xl:w-2/6"
+          onSubmit={handleSubmit(onSubmit)}
+        >
           <div className="mb-6">
             <Label className="mb-2">OPD</Label>
             <div className="space-y-3">
