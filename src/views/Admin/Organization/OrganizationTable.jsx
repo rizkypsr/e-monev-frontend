@@ -1,46 +1,30 @@
-import { MagnifyingGlassIcon, PlusIcon } from '@heroicons/react/24/solid';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuthHeader } from 'react-auth-kit';
 import { Link } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
-import { getOrganizations } from '../../../api/admin/organization';
-import deleteOrganization from '../../../api/admin/organization/deleteOrganization';
-import Button from '../../../components/Button';
-import Pagination from '../../../components/Pagination';
-import Table from '../../../components/Table';
-import { useToastContext } from '../../../context/ToastContext';
-import ErrorPage from '../../ErrorPage';
-import DropdownSelect from '../../../components/DropdownSelect';
+import { MagnifyingGlassIcon, PlusIcon } from '@heroicons/react/24/solid';
+import { useDebounce } from '@uidotdev/usehooks';
+
+import { getOrganizations } from '@/api/admin/organization';
+import deleteOrganization from '@/api/admin/organization/deleteOrganization';
+import { useToastContext } from '@/context/ToastContext';
+import Table from '@/components/Table';
+import Pagination from '@/components/Pagination';
+import Button from '@/components/Button';
+import {
+  Dropdown,
+  DropdownContent,
+  DropdownItem,
+  DropdownTrigger,
+  DropdownValue,
+} from '@/components/DropdownSelectV2';
+import ErrorPage from '@/views/ErrorPage';
+import { pageSizes, sorting } from '@/utils/constants';
+
 import columns from './components/columns';
 
-const sorting = [
-  {
-    label: 'Terbaru',
-    value: 'terbaru',
-  },
-  {
-    label: 'Terlama',
-    value: 'terlama',
-  },
-];
-
-const pageSizes = [
-  {
-    label: '10',
-    value: 10,
-  },
-  {
-    label: '50',
-    value: 50,
-  },
-  {
-    label: '100',
-    value: 100,
-  },
-];
-
 const initialParams = {
-  limit: 10,
+  limit: '10',
   page: 1,
   search: '',
   sort: 'terbaru',
@@ -52,13 +36,20 @@ const OrganizationTable = () => {
   const queryClient = useQueryClient();
 
   const [filterParams, setFilterParams] = useState(initialParams);
-  const [selectedSorting, setSelectedSorting] = useState(sorting[0]);
-  const [selectedPageSize, setSelectedPageSize] = useState(pageSizes[0]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
   const { isLoading, isError, error, data } = useQuery({
     queryKey: ['get_organizations', filterParams],
     queryFn: () => getOrganizations(filterParams, authHeader()),
   });
+
+   useEffect(() => {
+    setFilterParams({
+      ...filterParams,
+      search: debouncedSearchTerm,
+    });
+  }, [debouncedSearchTerm]);
 
   const deleteMutation = useMutation(deleteOrganization);
 
@@ -80,29 +71,15 @@ const OrganizationTable = () => {
     );
   };
 
-  const onPageSizeChanged = (selectedValue) => {
-    setSelectedPageSize(selectedValue);
+  const handleSelectFilter = (key, value) => {
     setFilterParams({
       ...filterParams,
-      limit: selectedValue.value,
-    });
-  };
-
-  const onSorting = (selectedValue) => {
-    setSelectedSorting(selectedValue);
-    setFilterParams({
-      ...filterParams,
-      sort: selectedValue.value,
+      [key]: value,
     });
   };
 
   const onSearchChange = (e) => {
-    setTimeout(() => {
-      setFilterParams({
-        ...filterParams,
-        search: e.target.value,
-      });
-    }, 500);
+    setSearchTerm(e.target.value);
   };
 
   const onPaginationChange = (currentPage) => {
@@ -131,34 +108,57 @@ const OrganizationTable = () => {
         </Link>
       </div>
 
-      <div className="flex flex-col md:flex-row justify-between mt-6">
-        <div className="flex flex-col md:flex-row space-y-3 md:space-y-0 md:space-x-3 w-full">
+      <div className="mt-6 flex flex-col space-y-3 lg:flex-row lg:space-y-0 lg:justify-between lg:space-x-3">
+        <div className="space-y-3 flex flex-col lg:flex-row lg:space-y-0 lg:space-x-3">
           {/* Sorting Dropdown */}
-          <DropdownSelect
-            value={selectedSorting}
-            options={sorting}
-            onChange={onSorting}
+          <Dropdown
+            value={filterParams.sort}
+            onValueChange={(value) => handleSelectFilter('sort', value)}
           >
-            <DropdownSelect.HeaderV1 label="Urutkan:" />
-          </DropdownSelect>
+            <DropdownTrigger>
+              <div className="flex space-x-2">
+                <p>Urutkan :</p>
+                <DropdownValue />
+              </div>
+            </DropdownTrigger>
+            <DropdownContent>
+              {sorting.map((sort) => (
+                <DropdownItem key={sort.id} value={sort.id}>
+                  {sort.name}
+                </DropdownItem>
+              ))}
+            </DropdownContent>
+          </Dropdown>
 
           {/* Page Size Dropdown */}
-          <DropdownSelect
-            value={selectedPageSize}
-            options={pageSizes}
-            onChange={onPageSizeChanged}
+          <Dropdown
+            value={filterParams.limit}
+            onValueChange={(value) => handleSelectFilter('limit', value)}
           >
-            <DropdownSelect.HeaderV1 label="Tampilkan:" endLabel="Entri" />
-          </DropdownSelect>
+            <DropdownTrigger>
+              <div className="flex space-x-2">
+                <p>Tampilkan :</p>
+                <DropdownValue />
+                <p>entri</p>
+              </div>
+            </DropdownTrigger>
+            <DropdownContent>
+              {pageSizes.map((pageSize) => (
+                <DropdownItem key={pageSize.id} value={pageSize.name}>
+                  {pageSize.name}
+                </DropdownItem>
+              ))}
+            </DropdownContent>
+          </Dropdown>
         </div>
 
-        <div className="relative w-full md:w-1/3 mt-3 md:mt-0">
+        <div className="relative w-full lg:max-w-sm">
           <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
             <MagnifyingGlassIcon className="w-4 h-4" />
           </div>
           <input
             type="search"
-            value={filterParams.seacrh}
+            value={searchTerm}
             onChange={onSearchChange}
             className="bg-gray-50 text-light-gray border-none text-sm rounded-lg focus:ring-0 block w-full pl-10 p-2.5 shadow"
             placeholder="Pencarian"
