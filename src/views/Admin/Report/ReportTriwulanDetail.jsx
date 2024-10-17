@@ -1,32 +1,33 @@
-/* eslint-disable no-var */
-/* eslint-disable prefer-template */
-/* eslint-disable arrow-body-style */
-/* eslint-disable import/no-extraneous-dependencies */
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useQuery } from 'react-query';
+import { useAuthHeader } from 'react-auth-kit';
+import { Timeline } from 'rsuite';
+import moment from 'moment';
+import { Differ } from 'json-diff-kit';
+
 import {
   ArrowDownIcon,
   ArrowDownTrayIcon,
   ArrowLeftIcon,
   ArrowUpIcon,
 } from '@heroicons/react/24/solid';
-import React, { useEffect, useState } from 'react';
-import { useAuthHeader } from 'react-auth-kit';
-import { useNavigate, useParams } from 'react-router-dom';
-import { useQuery } from 'react-query';
-import { Timeline } from 'rsuite';
-import moment from 'moment';
-import { Differ } from 'json-diff-kit';
-import ReactLoading from '../../../components/Loading';
-import ErrorPage from '../../ErrorPage';
-import formattedDate from '../../../utils/formattedDate';
-import getTriwulanDetail from '../../../api/user/triwulan/getTriwulanDetail';
-import Button from '../../../components/Button';
-import formatToRupiah from '../../../utils/formatRupiah';
-import downloadTriwulanPdf from '../../../api/admin/report/downloadTriwulanPdf';
-import { useToastContext } from '../../../context/ToastContext';
-import downloadTriwulanExcel from '../../../api/admin/report/downloadTriwulanExcel';
-import { baseUrlAPI } from '../../../utils/constants';
+
+import Button from '@/components/Button';
+import ReactLoading from '@/components/Loading';
+
+import { useToastContext } from '@/context/ToastContext';
+
+import getTriwulanDetail from '@/api/user/triwulan/getTriwulanDetail';
+import downloadTriwulanPdf from '@/api/admin/report/downloadTriwulanPdf';
+import downloadTriwulanExcel from '@/api/admin/report/downloadTriwulanExcel';
+
+import ErrorPage from '@/views/ErrorPage';
+import formattedDate from '@/utils/formattedDate';
+import formatToRupiah from '@/utils/formatRupiah';
+import { baseUrlAPI } from '@/utils/constants';
+
 import 'rsuite/dist/rsuite.min.css';
-// eslint-disable-next-line import/no-extraneous-dependencies
 import 'moment/dist/locale/id';
 
 const initialData = {
@@ -180,7 +181,6 @@ const ReportTriwulanDetail = () => {
 
   const [report, setReport] = useState(initialData);
   const [selectedIndexTimeline, setSelectedIndexTimeline] = useState(0);
-  // eslint-disable-next-line no-var, camelcase
   const [dataJSON, setDataJSON] = useState([]);
   const [triwulanData, setTriwulanData] = useState({});
   const [diffData, setDiffData] = useState([]);
@@ -227,13 +227,16 @@ const ReportTriwulanDetail = () => {
       physical_realization_percentage:
         triwulanData?.physical_realization_percentage ?? 0,
       fund_realization: triwulanData.fund_realization ?? 0,
-      fund_realization_percentage: `${triwulanData?.fund_realization_percentage ?? 0
-        } %`,
-      local_workforce: `${(String(triwulanData?.local_workforce) ?? '0').replace('.00', '') ?? '0'
-        } Orang`,
-      non_local_workforce: `${(String(triwulanData?.non_local_workforce) ?? '0').replace('.00', '') ??
+      fund_realization_percentage: `${
+        triwulanData?.fund_realization_percentage ?? 0
+      } %`,
+      local_workforce: `${
+        (String(triwulanData?.local_workforce) ?? '0').replace('.00', '') ?? '0'
+      } Orang`,
+      non_local_workforce: `${
+        (String(triwulanData?.non_local_workforce) ?? '0').replace('.00', '') ??
         '0'
-        } Orang`,
+      } Orang`,
     });
 
   const { isLoading, isError, error } = useQuery({
@@ -245,12 +248,14 @@ const ReportTriwulanDetail = () => {
      * @param {Array} param0.data
      */
     onSuccess: ({ data = [] }) => {
-
       /** reformat object */
       const cpData = Array.from(data).map((e) => {
         delete e.createdBy;
-        return { ...e, activity_location: JSON.parse(e?.activity_location)?.name ?? "" }
-      })
+        return {
+          ...e,
+          activity_location: JSON.parse(e?.activity_location)?.name ?? '',
+        };
+      });
 
       const r = Array.from(cpData).reduce((prev, curr, index, original) => {
         const diff = differ
@@ -260,7 +265,7 @@ const ReportTriwulanDetail = () => {
         return [...prev, diff];
       }, []);
 
-      var u = Array.from(r);
+      const u = Array.from(r);
       u.shift();
       setDiffData([...u, r.pop()]);
 
@@ -390,31 +395,29 @@ const ReportTriwulanDetail = () => {
         .flat()
         .map((c) => c.text)
         .filter((t) => !`${t ?? ''}`.includes('sys_period'))
-        .map((s, i) => {
-          return (
-            <p
-              key={s ?? i}
-              style={{
-                textAlign: 'start',
-                // paddingTop:'2%',
-                // paddingBottom:'2%',
-                paddingLeft: '0.5%',
-                paddingRight: '0.5%',
-              }}
-            >
-              {`${s}`
-                .split(': ')
-                .map((q) => {
-                  const sIndex = fieldMappings.findIndex(
-                    (y) => y.key === `${q}`.slice(1, -1)
-                  );
-                  if (sIndex !== -1) return fieldMappings.at(sIndex).label;
-                  return `${q}`.slice(1, -1);
-                })
-                .join(' ') ?? `${s}`}
-            </p>
-          );
-        }) ?? [];
+        .map((s, i) => (
+          <p
+            key={s ?? i}
+            style={{
+              textAlign: 'start',
+              // paddingTop:'2%',
+              // paddingBottom:'2%',
+              paddingLeft: '0.5%',
+              paddingRight: '0.5%',
+            }}
+          >
+            {`${s}`
+              .split(': ')
+              .map((q) => {
+                const sIndex = fieldMappings.findIndex(
+                  (y) => y.key === `${q}`.slice(1, -1)
+                );
+                if (sIndex !== -1) return fieldMappings.at(sIndex).label;
+                return `${q}`.slice(1, -1);
+              })
+              .join(' ') ?? `${s}`}
+          </p>
+        )) ?? [];
 
     const length = Math.ceil((data.length ?? 0) / 2);
     const [first, last] = [k ? 0 : length, k ? length : data.length];
@@ -425,7 +428,7 @@ const ReportTriwulanDetail = () => {
     <>
       <div className="w-full h-full mt-6 bg-white rounded-lg p-9">
         <div>
-          <div className="mb-8 cursor-pointer flex justify-between">
+          <div className="mb-8 cursor-pointer flex flex-col lg:flex-row lg:justify-between">
             <div className="flex space-x-3 items-center">
               <button
                 type="button"
@@ -441,9 +444,10 @@ const ReportTriwulanDetail = () => {
                 </h1>
               </button>
             </div>
+
             <div className="flex space-x-2">
               <Button
-                className="w-28 lg:w-auto"
+                className="w-full"
                 type="submit"
                 background="bg-primary"
                 textColor="text-white"
@@ -453,7 +457,7 @@ const ReportTriwulanDetail = () => {
                 Unduh Data (PDF)
               </Button>
               <Button
-                className="w-28 lg:w-auto"
+                className="w-full"
                 type="submit"
                 background="bg-primary"
                 textColor="text-white"
@@ -479,7 +483,7 @@ const ReportTriwulanDetail = () => {
             </h1>
             <Timeline
               align="right"
-              key={selectedIndexTimeline + 'r'}
+              key={`${selectedIndexTimeline}r`}
               isItemActive={(i) => i === selectedIndexTimeline}
             >
               {dataJSON.map((e) => {
@@ -498,7 +502,7 @@ const ReportTriwulanDetail = () => {
                     }}
                   >
                     <div
-                      key={currentIndex + '1'}
+                      key={`${currentIndex}1`}
                       style={{
                         borderStyle: 'groove',
                         borderRadius: '12px',
@@ -510,7 +514,7 @@ const ReportTriwulanDetail = () => {
                       }}
                     >
                       <h6
-                        key={currentIndex + '2'}
+                        key={`${currentIndex}2`}
                         style={{
                           textAlign: 'start',
                           paddingTop: '2%',
@@ -524,7 +528,7 @@ const ReportTriwulanDetail = () => {
                           .format('dddd, DD MMMM YYYY HH:mm (Z)')}
                       </h6>
                       <div
-                        key={currentIndex + '3'}
+                        key={`${currentIndex}3`}
                         style={{ paddingTop: '2%', marginTop: '2%' }}
                       >
                         {currentIndex === dataJSON.length - 1 ? (
@@ -532,7 +536,7 @@ const ReportTriwulanDetail = () => {
                         ) : (
                           <div>
                             {displayDiffData(currentIndex, true)}
-                            <s key={currentIndex + '4'}>
+                            <s key={`${currentIndex}4`}>
                               {displayDiffData(currentIndex, false)}
                             </s>
                           </div>
@@ -555,14 +559,12 @@ const ReportTriwulanDetail = () => {
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 auto-rows-[minmax(100px, auto)] mt-6">
           {report.file && report.file.length > 0 ? (
             report.file.map((file) => (
-              // console.log(file, '.s..s.s.s.s.');
-
               <img
                 key={file}
                 src={`${baseUrlAPI}/${file}`}
                 alt="file"
                 className="w-full h-auto max-h-80 object-cover rounded-lg shadow-md"
-                style={{ gridRow: `span ${Math.ceil(Math.random() * 2)}` }} // Adjust for staggered effect
+                style={{ gridRow: `span ${Math.ceil(Math.random() * 2)}` }}
               />
             ))
           ) : (
