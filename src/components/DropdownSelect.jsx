@@ -63,10 +63,11 @@ const DropdownSelect = ({
 };
 
 const HeaderV1 = ({ label, endLabel, value, showOptions }) => (
-  <div className="bg-white shadow rounded-lg px-4 text-sm py-2.5 flex items-center space-x-2 w-full">
+  <div className="bg-white shadow rounded-lg px-4 text-sm py-2.5 flex items-center space-x-2 w-full justify-between">
     <div className="flex space-x-1 items-center">
       <div>{label}</div>
       <div className="text-primary">{value.label}</div>
+      {endLabel && <div>{endLabel}</div>}
     </div>
 
     <div>
@@ -104,8 +105,6 @@ const HeaderV1 = ({ label, endLabel, value, showOptions }) => (
         </svg>
       )}
     </div>
-
-    {endLabel && <div>{endLabel}</div>}
   </div>
 );
 

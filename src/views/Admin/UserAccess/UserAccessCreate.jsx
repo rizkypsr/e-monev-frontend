@@ -1,23 +1,25 @@
-import {
-  ArrowLeftIcon,
-  CheckCircleIcon,
-  PlusCircleIcon,
-} from '@heroicons/react/24/solid';
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthHeader } from 'react-auth-kit';
 import { useInfiniteQuery, useMutation } from 'react-query';
 import { useForm } from 'react-hook-form';
-import Label from '../../../components/Label';
-import Button from '../../../components/Button';
+import {
+  ArrowLeftIcon,
+  CheckCircleIcon,
+  PlusCircleIcon,
+} from '@heroicons/react/24/solid';
 
 import { getOrganizations } from '../../../api/admin/organization';
-import { useToastContext } from '../../../context/ToastContext';
-import ReactLoading from '../../../components/Loading';
-import DropdownDialog from '../../../components/DropdownDialog';
 import getRoles from '../../../api/static/getRoles';
 import createUser from '../../../api/admin/user/createUser';
+
+import Label from '../../../components/Label';
+import Button from '../../../components/Button';
 import TextInputV2 from '../../../components/TextInputV2';
+import ReactLoading from '../../../components/Loading';
+import DropdownDialog from '../../../components/DropdownDialog';
+
+import { useToastContext } from '../../../context/ToastContext';
 
 const initialParams = {
   limit: 20,
@@ -161,7 +163,10 @@ const UserAccessCreate = () => {
           </h1>
         </Link>
 
-        <form className="mt-4 w-2/5" onSubmit={handleSubmit(onSubmit)}>
+        <form
+          className="mt-4 lg:w-2/3 xl:w-2/6"
+          onSubmit={handleSubmit(onSubmit)}
+        >
           <div className="mb-6">
             <Label className="mb-2">OPD</Label>
             <div className="space-y-3">

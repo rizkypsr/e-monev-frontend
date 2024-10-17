@@ -18,7 +18,7 @@ const DropdownTrigger = React.forwardRef(
     <SelectPrimitive.Trigger
       ref={ref}
       className={twMerge(
-        'flex h-10 w-full items-center justify-between rounded-lg bg-white px-3 py-2 text-sm placeholder:text-gray-100 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1 shadow',
+        'flex h-10 items-center justify-between rounded-lg bg-white px-3 py-2 text-sm placeholder:text-gray-100 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1 shadow space-x-3',
         className
       )}
       {...props}
