@@ -232,9 +232,11 @@ const Dashboard = () => {
             />
           </div>
 
-          <div className="mt-20">
-            {progressBarData && <ProgressBar data={progressBarData} />}
-          </div>
+          {progressBarData && (
+            <div className="mt-20">
+              <ProgressBar data={progressBarData} />
+            </div>
+          )}
         </div>
       )}
 
