@@ -159,9 +159,11 @@ const TriwulanForm = () => {
     onSuccess: (result) => {
       const triwulanData = result.data[0] ?? {};
 
+      console.log(triwulanData);
+
       setValue('createdByUid', triwulanData.createdBy);
       setValue('activity_name', triwulanData.activity_name);
-      setValue('activity_location', JSON.parse(triwulanData.activity_location));
+      //   setValue('activity_location', JSON.parse(triwulanData.activity_location));
       setValue('fund_source_id', triwulanData.fundSource);
       setValue('fund_ceiling', triwulanData.fund_ceiling || '');
       setValue('management_organization', triwulanData.management_organization);
