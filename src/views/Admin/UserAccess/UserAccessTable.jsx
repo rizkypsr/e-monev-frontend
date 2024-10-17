@@ -159,7 +159,7 @@ const UserAccessTable = () => {
           </div>
           <input
             type="search"
-            value={filterParams.search}
+            value={searchTerm}
             onChange={onSearchChange}
             className="bg-gray-50 text-light-gray border-none text-sm rounded-lg focus:ring-0 block w-full pl-10 p-2.5 shadow"
             placeholder="Pencarian"
