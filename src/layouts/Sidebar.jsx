@@ -13,10 +13,15 @@ import { SlOrganization } from 'react-icons/sl';
 // import { RiGroup2Line } from 'react-icons/ri';
 import {
   // MdOutlineHistory,
-  MdOutlineSettings
+  MdOutlineSettings,
 } from 'react-icons/md';
 import { IoMdLogOut } from 'react-icons/io';
-import { DocumentIcon, HomeIcon, TableCellsIcon, UserIcon } from '@heroicons/react/24/solid';
+import {
+  DocumentIcon,
+  HomeIcon,
+  TableCellsIcon,
+  UserIcon,
+} from '@heroicons/react/24/solid';
 import Logo from '../assets/images/big_logo.png';
 import {
   Dialog,
@@ -132,11 +137,14 @@ const Sidebar = ({ isOpen }) => {
 
   return (
     <aside
-      className={`shadow-xl fixed top-0 left-0 z-40 w-64 h-screen transition-transform ${isOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
+      className={`shadow-xl fixed top-0 left-0 z-40 w-64 h-screen transition-transform ${
+        isOpen ? 'translate-x-0' : '-translate-x-full'
+      }`}
     >
-      <div className="h-full overflow-y-auto flex flex-col" style={{ backgroundColor: '#063a69' }}>
-        {/* <div className="h-full overflow-y-auto bg-[#ebecf5] flex flex-col"> */}
+      <div
+        className="h-full overflow-y-auto flex flex-col"
+        style={{ backgroundColor: '#063a69' }}
+      >
         <a
           href="/"
           className="flex items-center pl-4 py-5 border-b border-gray-20"
@@ -188,7 +196,7 @@ const Sidebar = ({ isOpen }) => {
           })}
         </ul>
         <Dialog>
-          <DialogContent className="py-12">
+          <DialogContent className="py-12 w-[80%] md:max-w-sm">
             <div className="flex flex-col items-center justify-center h-full">
               <div className="p-6 bg-[#FFDADA] w-fit rounded-lg">
                 <img src={LogoutImg} alt="Logout" />
@@ -235,7 +243,9 @@ const Sidebar = ({ isOpen }) => {
           </DialogTrigger>
         </Dialog>
         <div className="text-center border-t py-5 border-gray-200 mt-auto text-white text-sm">
-          <div className="font-semibold">&#169;{new Date().getFullYear()} BAPPEDA</div>
+          <div className="font-semibold">
+            &#169;{new Date().getFullYear()} BAPPEDA
+          </div>
           <div>KAB. SORONG</div>
         </div>
       </div>
