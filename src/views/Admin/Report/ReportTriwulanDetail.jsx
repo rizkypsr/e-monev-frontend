@@ -227,27 +227,32 @@ const ReportTriwulanDetail = () => {
       physical_realization_percentage:
         triwulanData?.physical_realization_percentage ?? 0,
       fund_realization: triwulanData.fund_realization ?? 0,
-      fund_realization_percentage: `${
-        triwulanData?.fund_realization_percentage ?? 0
-      } %`,
-      local_workforce: `${
-        (String(triwulanData?.local_workforce) ?? '0').replace('.00', '') ?? '0'
-      } Orang`,
-      non_local_workforce: `${
-        (String(triwulanData?.non_local_workforce) ?? '0').replace('.00', '') ??
+      fund_realization_percentage: `${triwulanData?.fund_realization_percentage ?? 0
+        } %`,
+      local_workforce: `${(String(triwulanData?.local_workforce) ?? '0').replace('.00', '') ?? '0'
+        } Orang`,
+      non_local_workforce: `${(String(triwulanData?.non_local_workforce) ?? '0').replace('.00', '') ??
         '0'
-      } Orang`,
+        } Orang`,
     });
 
   const { isLoading, isError, error } = useQuery({
     queryKey: ['get_triwulan'],
     queryFn: () => getTriwulanDetail(id, authHeader()),
+
     /**
      * @param {object} param0
      * @param {Array} param0.data
      */
     onSuccess: ({ data = [] }) => {
-      const r = Array.from(data).reduce((prev, curr, index, original) => {
+
+      /** reformat object */
+      const cpData = Array.from(data).map((e) => {
+        delete e.createdBy;
+        return { ...e, activity_location: JSON.parse(e?.activity_location)?.name ?? "" }
+      })
+
+      const r = Array.from(cpData).reduce((prev, curr, index, original) => {
         const diff = differ
           .diff(original[index - 1], original[index])
           .map((e) => e.filter((f) => f.type !== 'equal'));
@@ -255,7 +260,6 @@ const ReportTriwulanDetail = () => {
         return [...prev, diff];
       }, []);
 
-      // console.log(r,'e');
       var u = Array.from(r);
       u.shift();
       setDiffData([...u, r.pop()]);
@@ -415,7 +419,6 @@ const ReportTriwulanDetail = () => {
     const length = Math.ceil((data.length ?? 0) / 2);
     const [first, last] = [k ? 0 : length, k ? length : data.length];
     return data.slice(first, last);
-    // return data
   };
 
   return (
@@ -518,7 +521,7 @@ const ReportTriwulanDetail = () => {
                       >
                         {moment(date[0] ?? '')
                           .locale('id')
-                          .format('dddd, DD MMMM YYYY (HH:mm ZZ)')}
+                          .format('dddd, DD MMMM YYYY HH:mm (Z)')}
                       </h6>
                       <div
                         key={currentIndex + '3'}

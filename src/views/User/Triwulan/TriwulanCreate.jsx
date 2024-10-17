@@ -1,3 +1,7 @@
+/* eslint-disable guard-for-in */
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable no-plusplus */
 import React, { useEffect } from 'react';
 import { CheckCircleIcon } from '@heroicons/react/24/solid';
 import { Link, useNavigate } from 'react-router-dom';
@@ -188,7 +192,7 @@ const TriwulanCreate = () => {
 
   useEffect(() => {
     setValue('created_at', formattedDate(Date.now()));
-  }, []);
+  }, [setValue]);
 
   const createMutation = useMutation(createTriwulan);
 
@@ -210,24 +214,14 @@ const TriwulanCreate = () => {
     };
 
     // Append non-file fields to FormData
-    // eslint-disable-next-line no-restricted-syntax
     for (const key in formDataObject) {
-      if (
-        // eslint-disable-next-line no-prototype-builtins
-        formDataObject.hasOwnProperty(key) &&
-        formDataObject[key] &&
-        key !== 'file'
-      ) {
-        formData.append(key, formDataObject[key]);
-      }
+      formData.append(key, formDataObject[key]);
     }
 
     // Append files to FormData
     if (data.file) {
-      if (Array.isArray(data.file)) {
-        data.file.forEach((file) => formData.append('file', file));
-      } else {
-        formData.append('file', data.file);
+      for (let i = 0; i < data.file.length; i++) {
+        formData.append('file', data.file[i]);
       }
     }
 
@@ -238,8 +232,8 @@ const TriwulanCreate = () => {
       },
       {
         onSuccess: () => {
-          showToastMessage('Berhasil membuat Data Kegiatan');
-          navigate('/laporan/data-triwulan?limit=10&page=1&sort=terbaru');
+          showToastMessage('Data berhasil ditambahkan', 'success');
+          navigate('../');
         },
         onError: (error) => {
           showToastMessage(error.message, 'error');
@@ -258,9 +252,13 @@ const TriwulanCreate = () => {
         <h1 className="text-2xl font-semibold">Tambah Data Kegiatan</h1>
       </div>
 
-      <div className="w-full h-full mt-6 bg-white rounded-lg p-9">
-        <form id="main" className="w-3/4" onSubmit={handleSubmit(onSubmit)}>
-          <div className="grid grid-cols-2 gap-4 mb-8">
+      <div className="w-full h-full mt-6 bg-white rounded-lg p-6 md:p-9">
+        <form
+          id="main"
+          className="w-full md:w-4/5"
+          onSubmit={handleSubmit(onSubmit)}
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
             {authUser()?.role.name === 'Superadmin' && (
               <div className="mb-2 col-span-2">
                 <Label className="mb-2">Target OPD</Label>
@@ -355,7 +353,7 @@ const TriwulanCreate = () => {
                 register={register('contract_number_date', {
                   required: false,
                 })}
-                error={errors.pptk_name?.message}
+                error={errors.contract_number_date?.message}
               />
             </div>
             <div>
@@ -677,7 +675,7 @@ const TriwulanCreate = () => {
           {createMutation.isLoading ? (
             <ReactLoading />
           ) : (
-            <div className="flex space-x-3">
+            <div className="flex flex-col md:flex-row space-y-3 md:space-y-0 md:space-x-3">
               <Button
                 type="submit"
                 className="w-full md:w-28"

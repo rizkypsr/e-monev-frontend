@@ -1,9 +1,10 @@
 import React from 'react';
 import { Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip } from 'chart.js';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 import formatToRupiah from '../utils/formatRupiah';
 
-ChartJS.register(ArcElement, Tooltip);
+ChartJS.register(ArcElement, Tooltip, ChartDataLabels);
 
 const ProgressBar = ({ data }) => {
   const MIN_PERCENTAGE = 1;
@@ -11,6 +12,7 @@ const ProgressBar = ({ data }) => {
 
   const generateColors = (num) => {
     const colors = [];
+    // eslint-disable-next-line no-plusplus
     for (let i = 0; i < num; i++) {
       const hue = (i * 137.5) % 360;
       colors.push(`hsl(${hue}, 70%, 50%)`);
@@ -52,9 +54,18 @@ const ProgressBar = ({ data }) => {
             return '';
           },
         },
-
         itemSort: (a, b) => b.raw - a.raw,
         displayColors: true,
+      },
+      datalabels: {
+        formatter: (value) => {
+          const percentage = value.toFixed(1);
+          return `${percentage}%`;
+        },
+        color: '#fff',
+        font: {
+          weight: 'bold',
+        },
       },
     },
     elements: {
@@ -65,44 +76,83 @@ const ProgressBar = ({ data }) => {
     },
   };
 
-  if (data.length === 0) {
-    return (
-      <div className="text-center text-2xl font-semibold">
-        Data tidak ditemukan
-      </div>
-    );
-  }
+  // if (data.length === 0) {
+  //   return (
+  //     <div className="text-center text-2xl font-semibold">
+  //       Data tidak ditemukan
+  //     </div>
+  //   );
+  // }
 
+  // Calculate percentage for each item
+  const dataWithPercentage = data.map((item) => ({
+    ...item,
+    percentage: (item.completed / totalCompleted) * 100,
+  }));
+
+  // Sort data by percentage in descending order
+  const sortedData = dataWithPercentage.sort(
+    (a, b) => b.percentage - a.percentage
+  );
+
+  // Get top 5 data
+  const top5Data = sortedData.slice(0, 5);
+
+  if (data.length === 0)
+    return <h4 className='text-center'> Data tidak ditemukan </h4>
   return (
-    <div className="grid grid-col-1 lg:grid-cols-2 gap-6">
-      <div
-        className="relative col-span-1 max-w-full overflow-hidden"
-        style={{ width: '100%', height: '400px', minWidth: '300px' }}
-      >
-        <Pie data={chartData} options={options} />
-      </div>
+    <div className="w-full grid grid-rows-2 items-center mt-20 mb-20">
+      <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4 place-items-start">
+        <div className="relative w-full h-64 md:h-96">
+          <Pie data={chartData} options={options} />
+        </div>
 
-      <div className="flex flex-col space-y-3">
-        {data.map((item, index) => (
-          <div key={item.label} className="flex items-center space-x-3">
-            <div className="w-4 h-4">
-              <span
-                className="inline-block w-4 h-4 rounded-full"
-                style={{
-                  backgroundColor: chartData.datasets[0].backgroundColor[index],
-                }}
-              />
+        <div className="flex flex-col justify-center w-full">
+          {data.map((item, index) => (
+            <div key={item} className="flex items-center mb-2">
+              <div className="w-4 h-4">
+                <span
+                  className="inline-block w-4 h-4 rounded-full"
+                  style={{
+                    backgroundColor:
+                      chartData.datasets[0].backgroundColor[index],
+                  }}
+                />
+              </div>
+              <div className="ml-2">
+                <span
+                  className="text-sm font-medium break-words"
+                  style={{ maxWidth: '150px' }}
+                >
+                  {item.label}
+                </span>
+              </div>
             </div>
-            <div>
-              <span
-                className="text-sm font-medium break-words"
-                style={{ maxWidth: '150px' }}
-              >
-                {item.label}
-              </span>
-            </div>
+          ))}
+
+          <div className="w-full max-w-md mt-10">
+            <h2 className="text-lg font-bold mb-4">Top 5 Completed Data: </h2>
+            {top5Data.map((item, index) => (
+              <div key={item} className="flex items-center mb-2">
+                <div className="w-4 h-4">
+                  <span
+                    className="inline-block w-4 h-4 rounded-full"
+                    style={{
+                      backgroundColor:
+                        chartData.datasets[0].backgroundColor[index],
+                    }}
+                  />
+                </div>
+                <div className="ml-2">
+                  <span className="text-sm font-medium break-words">
+                    {index + 1}. {item.label} -{' '}
+                    {formatToRupiah(item.completed.toString())}
+                  </span>
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
       </div>
     </div>
   );

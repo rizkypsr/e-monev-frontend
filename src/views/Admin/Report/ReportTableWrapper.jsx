@@ -1,3 +1,4 @@
+/* eslint-disable react/self-closing-comp */
 import React, { useEffect, useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import {
@@ -14,8 +15,6 @@ import { useToastContext } from '../../../context/ToastContext';
 import getTriwulan from '../../../api/static/getTriwulan';
 import getFundSource from '../../../api/user/triwulan/getFundSource';
 import downloadTriwulanExcel from '../../../api/admin/report/downloadTriwulanExcel';
-import downloadMasterExcel from '../../../api/admin/report/downloadMasterExcel';
-import downloadMasterPdf from '../../../api/admin/report/downloadMasterPdf';
 import downloadTriwulanPdf from '../../../api/admin/report/downloadTriwulanPdf';
 
 import objectToQueryString from '../../../utils/objectToQueryString';
@@ -97,8 +96,10 @@ const ReportTableWrapper = () => {
       ...searchParamsState,
       search: debouncedSearch,
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedSearch]);
 
+  // eslint-disable-next-line no-unused-vars
   const triwulanQuery = useQuery({
     queryKey: ['get_triwulan'],
     queryFn: () => getTriwulan(authHeader()),
@@ -193,9 +194,9 @@ const ReportTableWrapper = () => {
         <h1 className="text-2xl font-semibold">Data Laporan</h1>
       </div>
 
-      <div className="flex items-center justify-between mt-6">
-        <div style={{ minWidth: '14rem' }} />
-        <div className="relative w-1/3">
+      <div className="flex flex-col md:flex-row items-center justify-between mt-6 space-y-3 md:space-y-0">
+        <div className="w-full md:w-auto min-w-[14rem]"></div>
+        <div className="relative w-full md:w-1/3">
           <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
             <MagnifyingGlassIcon className="w-4 h-4" />
           </div>
@@ -209,11 +210,166 @@ const ReportTableWrapper = () => {
         </div>
       </div>
 
-      <div className="mt-3">
-        <div className="flex space-x-2 mb-6 md:justify-end">
+      <div className="flex flex-col md:flex-row justify-between mt-3 space-y-3 md:space-y-0 md:space-x-3">
+        <div className="flex flex-col md:flex-row space-y-3 md:space-y-0 md:space-x-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <Dropdown
+              value={filters.fund_source_id}
+              onValueChange={(value) =>
+                handleSelectFilter('fund_source_id', value)
+              }
+            >
+              <DropdownTrigger>
+                <DropdownValue placeholder="Pilih Sumber Dana" />
+              </DropdownTrigger>
+              <DropdownContent>
+                {fundSourceQuery.data?.data?.result.map((fundSource) => (
+                  <DropdownItem key={fundSource.id} value={fundSource.id}>
+                    {fundSource.name}
+                  </DropdownItem>
+                ))}
+              </DropdownContent>
+            </Dropdown>
+
+            <Dropdown
+              value={filters.month}
+              onValueChange={(value) => handleSelectFilter('month', value)}
+            >
+              <DropdownTrigger>
+                <DropdownValue placeholder="Pilih Bulan" />
+              </DropdownTrigger>
+              <DropdownContent>
+                {months.map((month) => (
+                  <DropdownItem key={month.id} value={month.id}>
+                    {month.name}
+                  </DropdownItem>
+                ))}
+              </DropdownContent>
+            </Dropdown>
+
+            <Dropdown
+              value={filters.year}
+              onValueChange={(value) => handleSelectFilter('year', value)}
+            >
+              <DropdownTrigger>
+                <DropdownValue placeholder="Pilih Tahun" />
+              </DropdownTrigger>
+              <DropdownContent>
+                {years.map((year) => (
+                  <DropdownItem key={year.id} value={year.id}>
+                    {year.name}
+                  </DropdownItem>
+                ))}
+              </DropdownContent>
+            </Dropdown>
+
+            {/* <Dropdown
+              value={filters.triwulan_id}
+              onValueChange={(value) => handleSelectFilter('triwulan_id', value)}
+            >
+              <DropdownTrigger>
+                <DropdownValue placeholder="Pilih Triwulan" />
+              </DropdownTrigger>
+              <DropdownContent>
+                {triwulanQuery.data?.data?.map((triwulan) => (
+                  <DropdownItem key={triwulan.id} value={triwulan.id}>
+                    {triwulan.name}
+                  </DropdownItem>
+                ))}
+              </DropdownContent>
+            </Dropdown> */}
+
+            <Dropdown
+              value={filters.tipe_pengadaan}
+              onValueChange={(value) =>
+                handleSelectFilter('tipe_pengadaan', value)
+              }
+            >
+              <DropdownTrigger>
+                <DropdownValue placeholder="Pilih Jenis Pengadaan" />
+              </DropdownTrigger>
+              <DropdownContent>
+                {jenisPengadaanData.map((jenisPengadaan) => (
+                  <DropdownItem
+                    key={jenisPengadaan.id}
+                    value={jenisPengadaan.name}
+                  >
+                    {jenisPengadaan.name}
+                  </DropdownItem>
+                ))}
+              </DropdownContent>
+            </Dropdown>
+
+            <Dropdown
+              value={filters.cara_pengadaan}
+              onValueChange={(value) =>
+                handleSelectFilter('cara_pengadaan', value)
+              }
+            >
+              <DropdownTrigger>
+                <DropdownValue placeholder="Pilih Cara Pengadaan" />
+              </DropdownTrigger>
+              <DropdownContent>
+                {caraPengadaanData.map((caraPengadaan) => (
+                  <DropdownItem key={caraPengadaan.id} value={caraPengadaan.name}>
+                    {caraPengadaan.name}
+                  </DropdownItem>
+                ))}
+              </DropdownContent>
+            </Dropdown>
+
+            <Dropdown
+              value={filters.bentuk_pengadaan}
+              onValueChange={(value) =>
+                handleSelectFilter('bentuk_pengadaan', value)
+              }
+            >
+              <DropdownTrigger>
+                <DropdownValue placeholder="Pilih Bentuk Pengadaan" />
+              </DropdownTrigger>
+              <DropdownContent>
+                {bentukKegiatanData.map((bentuk) => (
+                  <DropdownItem key={bentuk.id} value={bentuk.name}>
+                    {bentuk.name}
+                  </DropdownItem>
+                ))}
+              </DropdownContent>
+            </Dropdown>
+
+            <Dropdown
+              value={filters.program_prio}
+              onValueChange={(value) => handleSelectFilter('program_prio', value)}
+            >
+              <DropdownTrigger>
+                <DropdownValue placeholder="Pilih Program Prioritas" />
+              </DropdownTrigger>
+              <DropdownContent>
+                {programPrioritasData.map((programPrio) => (
+                  <DropdownItem key={programPrio.id} value={programPrio.name}>
+                    {programPrio.name}
+                  </DropdownItem>
+                ))}
+              </DropdownContent>
+            </Dropdown>
+
+          </div>
+
+          <ButtonV2
+            className="w-full md:w-auto px-3"
+            background="bg-primary"
+            textColor="text-white"
+            onClick={resetFilter}
+          >
+            Reset
+          </ButtonV2>
+        </div>
+
+        {/* className="w-full md:w-fit lg:w-auto bg-primary text-white" className="w-full md:w-28 lg:w-auto bg-primary text-white" */}
+
+        <div className="flex flex-col md:flex-row space-y-3 md:space-y-0 md:space-x-2">
           <ButtonV2
             type="submit"
-            className="w-full md:w-fit bg-primary text-white"
+            className="w-full md:w-fit lg:w-auto bg-primary text-white"
             icon={<ArrowDownTrayIcon className="w-6 h-6" />}
             onClick={handleDownloadPDF}
           >
@@ -221,7 +377,7 @@ const ReportTableWrapper = () => {
           </ButtonV2>
           <ButtonV2
             type="submit"
-            className="w-full md:w-fit bg-primary text-white"
+            className="w-full md:w-fit lg:w-auto bg-primary text-white"
             icon={<ArrowDownTrayIcon className="w-6 h-6" />}
             onClick={handleDownloadExcel}
           >
@@ -229,8 +385,8 @@ const ReportTableWrapper = () => {
           </ButtonV2>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 xl:grid-cols-4 grid-cols-subgrid">
-          <Dropdown
+        {/* <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 xl:grid-cols-4 grid-cols-subgrid"> */}
+        {/* <Dropdown
             value={filters.fund_source_id}
             onValueChange={(value) =>
               handleSelectFilter('fund_source_id', value)
@@ -374,8 +530,8 @@ const ReportTableWrapper = () => {
             onClick={resetFilter}
           >
             Reset
-          </ButtonV2>
-        </div>
+          </ButtonV2> */}
+        {/* </div> */}
       </div>
       <Outlet />
     </>
