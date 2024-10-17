@@ -241,8 +241,8 @@ const OccassionTable = () => {
         </Link>
       </div>
 
-      <div className="flex justify-between mt-6">
-        <div className="flex space-x-3 w-full">
+      <div className="flex flex-col md:flex-row justify-between mt-6">
+        <div className="flex flex-col md:flex-row space-y-3 md:space-y-0 md:space-x-3 w-full">
           {/* Sorting Dropdown */}
           <DropdownSelect
             value={selectedSorting}
@@ -262,7 +262,7 @@ const OccassionTable = () => {
           </DropdownSelect>
         </div>
 
-        <div className="relative w-1/3">
+        <div className="relative w-full md:w-1/3 mt-3 md:mt-0">
           <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
             <MagnifyingGlassIcon className="w-4 h-4" />
           </div>
