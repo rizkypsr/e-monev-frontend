@@ -1,17 +1,19 @@
-import { useMutation, useQuery, useQueryClient } from 'react-query';
 import React, { useState } from 'react';
-import DateRangePicker from '@wojtekmaj/react-daterange-picker';
-import { CheckCircleIcon } from '@heroicons/react/24/solid';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useAuthHeader } from 'react-auth-kit';
-import Label from '../../../components/Label';
-import ReactLoading from '../../../components/Loading';
-import Button from '../../../components/Button';
+import { CheckCircleIcon } from '@heroicons/react/24/solid';
+import DateRangePicker from '@wojtekmaj/react-daterange-picker';
+
+import Label from '@/components/Label';
+import ReactLoading from '@/components/Loading';
+import Button from '@/components/Button';
+import { useToastContext } from '@/context/ToastContext';
+
+import setTriwulanSetting from '@/api/admin/configuration/setTriwulanSetting';
+import getTriwulanSetting from '@/api/admin/configuration/getTriwulanSetting';
+import formattedDate from '@/utils/formattedDate';
 
 import './dateRangePicker.css';
-import setTriwulanSetting from '../../../api/admin/configuration/setTriwulanSetting';
-import formattedDate from '../../../utils/formattedDate';
-import { useToastContext } from '../../../context/ToastContext';
-import getTriwulanSetting from '../../../api/admin/configuration/getTriwulanSetting';
 
 const Configuration = () => {
   const [datePicker, setDatePicker] = useState([new Date(), new Date()]);
@@ -83,7 +85,7 @@ const Configuration = () => {
           <div className="mb-6">
             <Label>Tanggal OPD (untuk Pengisian Tambah Data Triwulan)</Label>
             <DateRangePicker
-              className="mt-2"
+              className="mt-2 w-full md:max-w-xs"
               onChange={setDatePicker}
               value={datePicker}
             />
