@@ -1,48 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PlusIcon, MagnifyingGlassIcon } from '@heroicons/react/24/solid';
 import { Link } from 'react-router-dom';
 import { useAuthHeader } from 'react-auth-kit';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
-import Table from '../../../components/Table';
-import Button from '../../../components/Button';
-import Pagination from '../../../components/Pagination';
-import ErrorPage from '../../ErrorPage';
-import { useToastContext } from '../../../context/ToastContext';
-import { deleteUser, getUsers } from '../../../api/admin/user';
-import columns from './components/columns';
+import { useDebounce } from '@uidotdev/usehooks';
+
+import Table from '@/components/Table';
+import Button from '@/components/Button';
+import Pagination from '@/components/Pagination';
+import { useToastContext } from '@/context/ToastContext';
+
+import { deleteUser, getUsers } from '@/api/admin/user';
 import {
   Dropdown,
   DropdownContent,
   DropdownItem,
   DropdownTrigger,
   DropdownValue,
-} from '../../../components/DropdownSelectV2';
+} from '@/components/DropdownSelectV2';
 
-const sorting = [
-  {
-    id: 'terbaru',
-    name: 'Terbaru',
-  },
-  {
-    id: 'terlama',
-    name: 'Terlama',
-  },
-];
-
-const pageSizes = [
-  {
-    id: 10,
-    name: '10',
-  },
-  {
-    id: 50,
-    name: '50',
-  },
-  {
-    id: 100,
-    name: '100',
-  },
-];
+import { pageSizes, sorting } from '@/utils/constants';
+import ErrorPage from '@/views/ErrorPage';
+import columns from './components/columns';
 
 const initialParams = {
   limit: '10',
@@ -57,12 +36,21 @@ const UserAccessTable = () => {
   const queryClient = useQueryClient();
 
   const [filterParams, setFilterParams] = useState(initialParams);
+  const [searchTerm, setSearchTerm] = useState('');
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
   const { isLoading, isError, data, error } = useQuery({
     queryKey: ['get_users', filterParams],
     queryFn: () => getUsers(filterParams, authHeader()),
     enabled: authHeader() !== null,
   });
+
+  useEffect(() => {
+    setFilterParams({
+      ...filterParams,
+      search: debouncedSearchTerm,
+    });
+  }, [debouncedSearchTerm]);
 
   const deleteMutation = useMutation(deleteUser);
 
@@ -92,12 +80,7 @@ const UserAccessTable = () => {
   };
 
   const onSearchChange = (e) => {
-    setTimeout(() => {
-      setFilterParams({
-        ...filterParams,
-        search: e.target.value,
-      });
-    }, 500);
+    setSearchTerm(e.target.value);
   };
 
   const onPaginationChange = (currentPage) => {
