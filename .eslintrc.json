@@ -6,6 +6,7 @@
   },
   "extends": [
     "eslint:recommended",
+    "plugin:import/errors",
     "plugin:react/recommended",
     "plugin:react-hooks/recommended",
     "plugin:react/jsx-runtime",
@@ -41,5 +42,15 @@
         "unnamedComponents": "arrow-function"
       }
     ]
+  },
+  "settings": {
+    "import/resolver": {
+      "alias" : {
+        "extensions": [".js", ".jsx"],
+        "map": [
+            ["@", "./src"]
+        ]
+      }
+    }
   }
 }
