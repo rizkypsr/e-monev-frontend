@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import React from 'react';
 import { CheckCircleIcon } from '@heroicons/react/24/solid';
 import { Link, useNavigate, useParams } from 'react-router-dom';
@@ -6,22 +5,27 @@ import { Controller, useForm } from 'react-hook-form';
 import { useInfiniteQuery, useMutation, useQuery } from 'react-query';
 import { useAuthHeader, useAuthUser } from 'react-auth-kit';
 
-import Label from '../../../components/Label';
-import formattedDate from '../../../utils/formattedDate';
-import ReactLoading from '../../../components/Loading';
-import Button from '../../../components/Button';
-import getFundSource from '../../../api/user/triwulan/getFundSource';
-import createTriwulan from '../../../api/user/triwulan/createTriwulan';
-import DropdownDialog from '../../../components/DropdownDialog';
-import { useToastContext } from '../../../context/ToastContext';
-import FileInput from '../../../components/FileInput';
-import { getActivities } from '../../../api/admin/activity';
-import CurrencyInput from '../../../components/CurrencyInput';
-import PercentageInput from '../../../components/PercentageInput';
-import getUsers from '../../../api/user/triwulan/getUsers';
-import TextInputV2 from '../../../components/TextInputV2';
-import LocationInput from '../../../components/LocationInput';
-import getTriwulanDetail from '../../../api/user/triwulan/getTriwulanDetail';
+import Label from '@/components/Label';
+import ReactLoading from '@/components/Loading';
+import Button from '@/components/Button';
+import DropdownDialog from '@/components/DropdownDialog';
+import FileInput from '@/components/FileInput';
+import CurrencyInput from '@/components/CurrencyInput';
+import PercentageInput from '@/components/PercentageInput';
+import TextInputV2 from '@/components/TextInputV2';
+import LocationInput from '@/components/LocationInput';
+import ButtonV2 from '@/components/ButtonV2';
+
+import formattedDate from '@/utils/formattedDate';
+import { useToastContext } from '@/context/ToastContext';
+
+import getFundSource from '@/api/user/triwulan/getFundSource';
+import createTriwulan from '@/api/user/triwulan/createTriwulan';
+import getUsers from '@/api/user/triwulan/getUsers';
+import getTriwulanDetail from '@/api/user/triwulan/getTriwulanDetail';
+import updateTriwulan from '@/api/user/triwulan/updateTriwulan';
+import { getActivities } from '@/api/admin/activity';
+
 import {
   bentukKegiatanData,
   caraPengadaanData,
@@ -29,8 +33,6 @@ import {
   optionalData,
   programPrioritasData,
 } from './constants';
-import updateTriwulan from '../../../api/user/triwulan/updateTriwulan';
-import ButtonV2 from '../../../components/ButtonV2';
 
 const initialParams = {
   limit: 20,
@@ -373,10 +375,10 @@ const TriwulanForm = () => {
       </div>
 
       <div className="w-full h-full mt-6 bg-white rounded-lg p-9">
-        <form id="main" className="w-3/4" onSubmit={handleSubmit(onSubmit)}>
-          <div className="grid grid-cols-2 gap-4 mb-8">
+        <form id="main" className="2xl:w-3/4" onSubmit={handleSubmit(onSubmit)}>
+          <div className="grid grid-cols-1 lg:grid-cols-2 mb-8 gap-4">
             {authUser()?.role.name === 'Superadmin' && (
-              <div className="mb-2 col-span-2">
+              <div className="lg:col-span-2">
                 <Label className="mb-2">Target OPD</Label>
 
                 <Controller
@@ -393,7 +395,7 @@ const TriwulanForm = () => {
               </div>
             )}
 
-            <div className="mb-2">
+            <div className="">
               <Label className="mb-2">Lokasi Kegiatan</Label>
               <LocationInput
                 name="activity_location"
@@ -427,6 +429,7 @@ const TriwulanForm = () => {
                 )}
               />
             </div>
+
             <div>
               <CurrencyInput
                 name="fund_ceiling"
@@ -443,6 +446,7 @@ const TriwulanForm = () => {
                 })}
               />
             </div>
+
             <div>
               <Label className="mb-2">OPD Pengelola</Label>
               <TextInputV2
@@ -451,6 +455,7 @@ const TriwulanForm = () => {
                 error={errors.management_organization?.message}
               />
             </div>
+
             <div>
               <Label className="mb-2">Nama PPTK</Label>
               <TextInputV2
@@ -459,6 +464,7 @@ const TriwulanForm = () => {
                 error={errors.pptk_name?.message}
               />
             </div>
+
             <div>
               <Label className="mb-2">Nomor Kontrak</Label>
               <TextInputV2
@@ -469,6 +475,7 @@ const TriwulanForm = () => {
                 error={errors.pptk_name?.message}
               />
             </div>
+
             <div>
               <Label className="mb-2">Tanggal Kontrak</Label>
               <TextInputV2
@@ -479,6 +486,7 @@ const TriwulanForm = () => {
                 error={errors.contract_date?.message}
               />
             </div>
+
             <div>
               <Label className="mb-2">Nama Penyedia</Label>
               <TextInputV2
@@ -489,6 +497,7 @@ const TriwulanForm = () => {
                 error={errors.contractor_name?.message}
               />
             </div>
+
             <div>
               <Label className="mb-2">Jangka Waktu Pelaksanaan</Label>
               <TextInputV2
@@ -499,6 +508,7 @@ const TriwulanForm = () => {
                 error={errors.implementation_period?.message}
               />
             </div>
+
             <div>
               <Label className="mb-2">Nama Penanggung Jawab</Label>
               <TextInputV2
@@ -507,6 +517,7 @@ const TriwulanForm = () => {
                 error={errors.pic_name?.message}
               />
             </div>
+
             <div>
               <CurrencyInput
                 name="contract_value"
@@ -523,6 +534,7 @@ const TriwulanForm = () => {
                 })}
               />
             </div>
+
             <div>
               <CurrencyInput
                 name="physical_realization"
@@ -539,6 +551,7 @@ const TriwulanForm = () => {
                 })}
               />
             </div>
+
             <div>
               <PercentageInput
                 className={
@@ -561,6 +574,7 @@ const TriwulanForm = () => {
                 })}
               />
             </div>
+
             <div>
               <CurrencyInput
                 name="fund_realization"
@@ -577,6 +591,7 @@ const TriwulanForm = () => {
                 })}
               />
             </div>
+
             <div>
               <PercentageInput
                 name="fund_realization_percentage"
@@ -593,6 +608,7 @@ const TriwulanForm = () => {
                 })}
               />
             </div>
+
             <div>
               <Label className="mb-2">Volume Kegiatan</Label>
               <TextInputV2
@@ -601,6 +617,7 @@ const TriwulanForm = () => {
                 error={errors.activity_volume?.message}
               />
             </div>
+
             <div>
               <Label className="mb-2">Output Kegiatan</Label>
               <TextInputV2
@@ -609,6 +626,7 @@ const TriwulanForm = () => {
                 error={errors.activity_output?.message}
               />
             </div>
+
             <div>
               <Label className="mb-2">
                 Manfaat Kegiatan (Kelompok sasaran Langsung)
@@ -619,6 +637,7 @@ const TriwulanForm = () => {
                 error={errors.direct_target_group?.message}
               />
             </div>
+
             <div>
               <Label className="mb-2">
                 Manfaat Kegiatan (Kelompok sasaran Tidak Langsung)
@@ -629,6 +648,7 @@ const TriwulanForm = () => {
                 error={errors.indirect_target_group?.message}
               />
             </div>
+
             <div>
               <Label className="mb-2">
                 Jumlah Tenaga Kerja Lokal (Dalam bentuk angka)
@@ -640,6 +660,7 @@ const TriwulanForm = () => {
                 error={errors.local_workforce?.message}
               />
             </div>
+
             <div>
               <Label className="mb-2">
                 Jumlah Tenaga Kerja Non Lokal (Dalam bentuk angka)
@@ -651,6 +672,7 @@ const TriwulanForm = () => {
                 error={errors.non_local_workforce?.message}
               />
             </div>
+
             <div>
               <Label className="mb-2">Hambatan dan Permasalahan</Label>
               <TextInputV2
@@ -659,6 +681,7 @@ const TriwulanForm = () => {
                 error={errors.problems?.message}
               />
             </div>
+
             <div>
               <Label className="mb-2">Solusi Permasalahan</Label>
               <TextInputV2
@@ -667,6 +690,7 @@ const TriwulanForm = () => {
                 error={errors.solution?.message}
               />
             </div>
+
             <div>
               <Label className="mb-2">Jenis Pengadaan</Label>
               <Controller
@@ -681,7 +705,8 @@ const TriwulanForm = () => {
                 )}
               />
             </div>
-            <div className="mb-2">
+
+            <div>
               <Label className="mb-2">Cara Pengadaan</Label>
               <Controller
                 control={control}
@@ -695,7 +720,8 @@ const TriwulanForm = () => {
                 )}
               />
             </div>
-            <div className="mb-2">
+
+            <div>
               <Label className="mb-2">Sub Kegiatan</Label>
               <Controller
                 control={control}
@@ -709,6 +735,7 @@ const TriwulanForm = () => {
                 )}
               />
             </div>
+
             <div>
               <Label className="mb-2">Bentuk Kegiatan</Label>
               <Controller
@@ -723,7 +750,8 @@ const TriwulanForm = () => {
                 )}
               />
             </div>
-            <div className="mb-2">
+
+            <div>
               <Label className="mb-2">Opsi</Label>
               <Controller
                 control={control}
@@ -737,6 +765,7 @@ const TriwulanForm = () => {
                 )}
               />
             </div>
+
             <div>
               <Label className="mb-2">Nama Pimpinan</Label>
               <TextInputV2
@@ -745,7 +774,8 @@ const TriwulanForm = () => {
                 error={errors.leader_name?.message}
               />
             </div>
-            <div className="mb-2">
+
+            <div>
               <Label className="mb-2">Alasan Terkait</Label>
               <TextInputV2
                 placeholder="Tulis Disini..."
@@ -753,6 +783,7 @@ const TriwulanForm = () => {
                 error={errors.reason?.message}
               />
             </div>
+
             <div>
               <Label className="mb-2">Program Prioritas</Label>
               <Controller
