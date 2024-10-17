@@ -1,23 +1,19 @@
-/* eslint-disable react/self-closing-comp */
 import React, { useEffect, useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
+import { useQuery } from 'react-query';
+import { useAuthHeader } from 'react-auth-kit';
+import { useDebounce } from '@uidotdev/usehooks';
 import {
   ArrowDownTrayIcon,
   MagnifyingGlassIcon,
 } from '@heroicons/react/24/solid';
-import { useQuery } from 'react-query';
-import { useAuthHeader } from 'react-auth-kit';
 
-import useSearchParamsState from '../../../hooks/useSearchParamsState';
-import useDebounce from '../../../hooks/useDebounce';
-import { useToastContext } from '../../../context/ToastContext';
-
-import getTriwulan from '../../../api/static/getTriwulan';
-import getFundSource from '../../../api/user/triwulan/getFundSource';
-import downloadTriwulanExcel from '../../../api/admin/report/downloadTriwulanExcel';
-import downloadTriwulanPdf from '../../../api/admin/report/downloadTriwulanPdf';
-
-import objectToQueryString from '../../../utils/objectToQueryString';
+import { useToastContext } from '@/context/ToastContext';
+import useSearchParamsState from '@/hooks/useSearchParamsState';
+import getFundSource from '@/api/user/triwulan/getFundSource';
+import downloadTriwulanPdf from '@/api/admin/report/downloadTriwulanPdf';
+import downloadTriwulanExcel from '@/api/admin/report/downloadTriwulanExcel';
+import objectToQueryString from '@/utils/objectToQueryString';
 
 import {
   Dropdown,
@@ -25,15 +21,15 @@ import {
   DropdownItem,
   DropdownTrigger,
   DropdownValue,
-} from '../../../components/DropdownSelectV2';
-import ButtonV2 from '../../../components/ButtonV2';
+} from '@/components/DropdownSelectV2';
+import ButtonV2 from '@/components/ButtonV2';
 
 import {
   bentukKegiatanData,
   caraPengadaanData,
   jenisPengadaanData,
   programPrioritasData,
-} from '../../User/Triwulan/constants';
+} from '@/views/User/Triwulan/constants';
 
 const months = [
   { id: 1, name: 'Januari' },
@@ -98,12 +94,6 @@ const ReportTableWrapper = () => {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedSearch]);
-
-  // eslint-disable-next-line no-unused-vars
-  const triwulanQuery = useQuery({
-    queryKey: ['get_triwulan'],
-    queryFn: () => getTriwulan(authHeader()),
-  });
 
   const fundSourceQuery = useQuery({
     queryKey: ['get_fund_source'],
@@ -194,9 +184,8 @@ const ReportTableWrapper = () => {
         <h1 className="text-2xl font-semibold">Data Laporan</h1>
       </div>
 
-      <div className="flex flex-col md:flex-row items-center justify-between mt-6 space-y-3 md:space-y-0">
-        <div className="w-full md:w-auto min-w-[14rem]"></div>
-        <div className="relative w-full md:w-1/3">
+      <div className="my-6">
+        <div className="relative lg:max-w-sm ml-auto">
           <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
             <MagnifyingGlassIcon className="w-4 h-4" />
           </div>
@@ -311,7 +300,10 @@ const ReportTableWrapper = () => {
               </DropdownTrigger>
               <DropdownContent>
                 {caraPengadaanData.map((caraPengadaan) => (
-                  <DropdownItem key={caraPengadaan.id} value={caraPengadaan.name}>
+                  <DropdownItem
+                    key={caraPengadaan.id}
+                    value={caraPengadaan.name}
+                  >
                     {caraPengadaan.name}
                   </DropdownItem>
                 ))}
@@ -338,7 +330,9 @@ const ReportTableWrapper = () => {
 
             <Dropdown
               value={filters.program_prio}
-              onValueChange={(value) => handleSelectFilter('program_prio', value)}
+              onValueChange={(value) =>
+                handleSelectFilter('program_prio', value)
+              }
             >
               <DropdownTrigger>
                 <DropdownValue placeholder="Pilih Program Prioritas" />
@@ -351,7 +345,6 @@ const ReportTableWrapper = () => {
                 ))}
               </DropdownContent>
             </Dropdown>
-
           </div>
 
           <ButtonV2
@@ -364,9 +357,7 @@ const ReportTableWrapper = () => {
           </ButtonV2>
         </div>
 
-        {/* className="w-full md:w-fit lg:w-auto bg-primary text-white" className="w-full md:w-28 lg:w-auto bg-primary text-white" */}
-
-        <div className="flex flex-col md:flex-row space-y-3 md:space-y-0 md:space-x-2">
+        <div className="flex flex-col xl:flex-row space-y-3 xl:space-y-0 xl:space-x-2">
           <ButtonV2
             type="submit"
             className="w-full md:w-fit lg:w-auto bg-primary text-white"
@@ -384,154 +375,6 @@ const ReportTableWrapper = () => {
             Unduh Data (XLS)
           </ButtonV2>
         </div>
-
-        {/* <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 xl:grid-cols-4 grid-cols-subgrid"> */}
-        {/* <Dropdown
-            value={filters.fund_source_id}
-            onValueChange={(value) =>
-              handleSelectFilter('fund_source_id', value)
-            }
-          >
-            <DropdownTrigger>
-              <DropdownValue placeholder="Pilih Sumber Dana" />
-            </DropdownTrigger>
-            <DropdownContent>
-              {fundSourceQuery.data?.data?.result.map((fundSource) => (
-                <DropdownItem key={fundSource.id} value={fundSource.id}>
-                  {fundSource.name}
-                </DropdownItem>
-              ))}
-            </DropdownContent>
-          </Dropdown>
-
-          <Dropdown
-            value={filters.month}
-            onValueChange={(value) => handleSelectFilter('month', value)}
-          >
-            <DropdownTrigger>
-              <DropdownValue placeholder="Pilih Bulan" />
-            </DropdownTrigger>
-            <DropdownContent>
-              {months.map((month) => (
-                <DropdownItem key={month.id} value={month.id}>
-                  {month.name}
-                </DropdownItem>
-              ))}
-            </DropdownContent>
-          </Dropdown>
-
-          <Dropdown
-            value={filters.year}
-            onValueChange={(value) => handleSelectFilter('year', value)}
-          >
-            <DropdownTrigger>
-              <DropdownValue placeholder="Pilih Tahun" />
-            </DropdownTrigger>
-            <DropdownContent>
-              {years.map((year) => (
-                <DropdownItem key={year.id} value={year.id}>
-                  {year.name}
-                </DropdownItem>
-              ))}
-            </DropdownContent>
-          </Dropdown>
-
-          <Dropdown
-            value={filters.triwulan_id}
-            onValueChange={(value) => handleSelectFilter('triwulan_id', value)}
-          >
-            <DropdownTrigger>
-              <DropdownValue placeholder="Pilih Triwulan" />
-            </DropdownTrigger>
-            <DropdownContent>
-              {triwulanQuery.data?.data?.map((triwulan) => (
-                <DropdownItem key={triwulan.id} value={triwulan.id}>
-                  {triwulan.name}
-                </DropdownItem>
-              ))}
-            </DropdownContent>
-          </Dropdown>
-
-          <Dropdown
-            value={filters.tipe_pengadaan}
-            onValueChange={(value) =>
-              handleSelectFilter('tipe_pengadaan', value)
-            }
-          >
-            <DropdownTrigger>
-              <DropdownValue placeholder="Pilih Jenis Pengadaan" />
-            </DropdownTrigger>
-            <DropdownContent>
-              {jenisPengadaanData.map((jenisPengadaan) => (
-                <DropdownItem
-                  key={jenisPengadaan.id}
-                  value={jenisPengadaan.name}
-                >
-                  {jenisPengadaan.name}
-                </DropdownItem>
-              ))}
-            </DropdownContent>
-          </Dropdown>
-
-          <Dropdown
-            value={filters.cara_pengadaan}
-            onValueChange={(value) =>
-              handleSelectFilter('cara_pengadaan', value)
-            }
-          >
-            <DropdownTrigger>
-              <DropdownValue placeholder="Pilih Cara Pengadaan" />
-            </DropdownTrigger>
-            <DropdownContent>
-              {caraPengadaanData.map((caraPengadaan) => (
-                <DropdownItem key={caraPengadaan.id} value={caraPengadaan.name}>
-                  {caraPengadaan.name}
-                </DropdownItem>
-              ))}
-            </DropdownContent>
-          </Dropdown>
-
-          <Dropdown
-            value={filters.bentuk_pengadaan}
-            onValueChange={(value) =>
-              handleSelectFilter('bentuk_pengadaan', value)
-            }
-          >
-            <DropdownTrigger>
-              <DropdownValue placeholder="Pilih Bentuk Pengadaan" />
-            </DropdownTrigger>
-            <DropdownContent>
-              {bentukKegiatanData.map((bentuk) => (
-                <DropdownItem key={bentuk.id} value={bentuk.name}>
-                  {bentuk.name}
-                </DropdownItem>
-              ))}
-            </DropdownContent>
-          </Dropdown>
-
-          <Dropdown
-            value={filters.program_prio}
-            onValueChange={(value) => handleSelectFilter('program_prio', value)}
-          >
-            <DropdownTrigger>
-              <DropdownValue placeholder="Pilih Program Prioritas" />
-            </DropdownTrigger>
-            <DropdownContent>
-              {programPrioritasData.map((programPrio) => (
-                <DropdownItem key={programPrio.id} value={programPrio.name}>
-                  {programPrio.name}
-                </DropdownItem>
-              ))}
-            </DropdownContent>
-          </Dropdown>
-
-          <ButtonV2
-            className="px-3 bg-primary text-white w-full col-span-2 lg:col-span-1 place-self-end lg:col-start-4"
-            onClick={resetFilter}
-          >
-            Reset
-          </ButtonV2> */}
-        {/* </div> */}
       </div>
       <Outlet />
     </>
