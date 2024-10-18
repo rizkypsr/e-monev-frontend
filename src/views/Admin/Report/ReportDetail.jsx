@@ -62,7 +62,7 @@ const ReportDetail = () => {
             <tr className="bg-white">
               <th
                 scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
               >
                 Tanggal
               </th>
@@ -71,7 +71,7 @@ const ReportDetail = () => {
             <tr className="bg-light-blue">
               <th
                 scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
               >
                 Triwulan
               </th>
@@ -80,7 +80,7 @@ const ReportDetail = () => {
             <tr className="bg-white">
               <th
                 scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
               >
                 Urusan
               </th>
@@ -89,7 +89,7 @@ const ReportDetail = () => {
             <tr className="bg-light-blue">
               <th
                 scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
               >
                 Organisasi
               </th>
@@ -98,7 +98,7 @@ const ReportDetail = () => {
             <tr className="bg-white">
               <th
                 scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
               >
                 Program
               </th>

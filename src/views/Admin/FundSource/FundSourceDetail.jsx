@@ -57,7 +57,7 @@ const FundSourceDetail = () => {
             <tr className="bg-light-blue">
               <th
                 scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
               >
                 No.
               </th>
@@ -66,7 +66,7 @@ const FundSourceDetail = () => {
             <tr className="bg-white">
               <th
                 scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
               >
                 Nama
               </th>
@@ -75,7 +75,7 @@ const FundSourceDetail = () => {
             <tr className="bg-light-blue">
               <th
                 scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
               >
                 Total Sumber Dana
               </th>

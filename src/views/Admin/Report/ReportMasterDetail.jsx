@@ -70,7 +70,7 @@ const ReportMasterDetail = () => {
             <tr className="bg-white">
               <th
                 scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
               >
                 Tanggal
               </th>
@@ -79,7 +79,7 @@ const ReportMasterDetail = () => {
             <tr className="bg-light-blue">
               <th
                 scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
               >
                 Sasaran RPJMD
               </th>
@@ -88,7 +88,7 @@ const ReportMasterDetail = () => {
             <tr className="bg-white">
               <th
                 scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
               >
                 Triwulan
               </th>
@@ -97,7 +97,7 @@ const ReportMasterDetail = () => {
             <tr className="bg-light-blue">
               <th
                 scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
               >
                 Organisasi
               </th>
@@ -106,7 +106,7 @@ const ReportMasterDetail = () => {
             <tr className="bg-white">
               <th
                 scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
               >
                 Indikator Kegiatan
               </th>
@@ -115,7 +115,7 @@ const ReportMasterDetail = () => {
             <tr className="bg-light-blue">
               <th
                 scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
               >
                 Urusan
               </th>

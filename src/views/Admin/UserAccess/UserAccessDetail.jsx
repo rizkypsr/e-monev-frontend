@@ -55,7 +55,7 @@ const UserAccessDetail = () => {
             <tr className="bg-light-blue">
               <th
                 scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
               >
                 ID
               </th>
@@ -64,7 +64,7 @@ const UserAccessDetail = () => {
             <tr className="bg-white">
               <th
                 scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
               >
                 Nama
               </th>
@@ -73,7 +73,7 @@ const UserAccessDetail = () => {
             <tr className="bg-light-blue">
               <th
                 scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
               >
                 Username
               </th>
@@ -82,7 +82,7 @@ const UserAccessDetail = () => {
             <tr className="bg-white">
               <th
                 scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
               >
                 Level User
               </th>

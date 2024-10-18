@@ -52,7 +52,7 @@ const PurposeDetail = () => {
             <tr className="bg-white">
               <th
                 scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
               >
                 ID
               </th>
@@ -61,7 +61,7 @@ const PurposeDetail = () => {
             <tr className="bg-light-blue">
               <th
                 scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
               >
                 Indikator Program
               </th>
