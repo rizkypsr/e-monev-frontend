@@ -1,26 +1,26 @@
 import { useIsAuthenticated, useSignIn } from 'react-auth-kit';
 import { Link, Navigate } from 'react-router-dom';
-import Slider from 'react-slick';
 import { useMutation } from 'react-query';
 import { useForm } from 'react-hook-form';
+import Slider from 'react-slick';
 
-import Logo from '../../assets/images/big_logo.png';
-import Img1 from '../../assets/images/img1.jpg';
-import Img2 from '../../assets/images/img2.jpg';
-import Img3 from '../../assets/images/img3.jpeg';
-import Img4 from '../../assets/images/img4.jpeg';
-import Img5 from '../../assets/images/img5.jpg';
+import Logo from '@/assets/images/big_logo.png';
+import Img1 from '@/assets/images/img1.jpg';
+import Img2 from '@/assets/images/img2.jpg';
+import Img3 from '@/assets/images/img3.jpeg';
+import Img4 from '@/assets/images/img4.jpeg';
+import Img5 from '@/assets/images/img5.jpg';
 
-import login from '../../api/auth/login';
-import { useToastContext } from '../../context/ToastContext';
+import login from '@/api/auth/login';
+import { useToastContext } from '@/context/ToastContext';
 
-import Label from '../../components/Label';
-import Loading from '../../components/Loading';
-import TextInputV2 from '../../components/TextInputV2';
+import Label from '@/components/Label';
+import Loading from '@/components/Loading';
+import TextInputV2 from '@/components/TextInputV2';
+import ButtonV2 from '@/components/ButtonV2';
 
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
-import ButtonV2 from '../../components/ButtonV2';
 
 const Login = () => {
   const isAuthenticated = useIsAuthenticated();
@@ -155,12 +155,7 @@ const Login = () => {
               {loginMutation.isLoading ? (
                 <Loading />
               ) : (
-                <ButtonV2
-                  className="w-full bg-white text-dark-gray hover:bg-gray-100"
-                  type="submit"
-                  background="bg-white"
-                  textColor="text-dark-gray"
-                >
+                <ButtonV2 className="w-full hover:bg-gray-200" type="submit">
                   Masuk
                 </ButtonV2>
               )}
@@ -191,7 +186,7 @@ const Login = () => {
             autoplay
           >
             {[Img1, Img2, Img3, Img4, Img5].map((img, index) => (
-              <div key={index}>
+              <div key={img}>
                 <img
                   src={img}
                   alt={`Gambar ${index + 1}`}

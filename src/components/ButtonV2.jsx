@@ -5,7 +5,7 @@ import ReactLoading from './Loading';
 
 const ButtonV2 = ({
   className,
-  type,
+  type = 'button',
   icon,
   loading,
   onClick,
@@ -31,12 +31,12 @@ const ButtonV2 = ({
     <button
       type={type}
       className={twMerge(
-        className,
         iconClass,
         'font-medium rounded-lg text-sm min-w-fit px-3 py-2.5 h-10',
+        className,
         disabled
           ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-          : 'bg-primary text-white'
+          : 'bg-white text-primary font-semibold'
       )}
       onClick={onClick}
       disabled={disabled}
