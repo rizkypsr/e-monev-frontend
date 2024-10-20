@@ -60,7 +60,7 @@ const optionals = {
         page: 1,
         pages: 1,
         result: [
-          { id: 1, name: 'Forst Major' },
+          { id: 1, name: 'Force Majeure' },
           { id: 2, name: 'Keterlambatan Lelang' },
           { id: 3, name: 'Perubahan Kebijakan Adendum' },
         ],
