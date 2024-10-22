@@ -2,6 +2,9 @@
 /* eslint-disable arrow-body-style */
 import React from 'react';
 import { MapContainer, Marker, Popup, TileLayer, useMap } from 'react-leaflet';
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+import L from 'leaflet';
 import SearchMapControl from './SearchMapControl';
 import LocateMapControl from './LocateMapControl';
 import SidebarMapControl from './SidebarMapControl';
@@ -13,6 +16,18 @@ import 'leaflet-sidebar';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet.locatecontrol/dist/L.Control.Locate.min.css';
 import 'leaflet-geosearch/dist/geosearch.css';
+
+// import './style.css';
+
+
+
+const DefaultIcon = L.icon({
+  iconUrl: icon,
+  shadowUrl: iconShadow
+});
+
+L.Marker.prototype.options.icon = DefaultIcon;
+
 
 const position = [-0.8674005, 131.3051903];
 
