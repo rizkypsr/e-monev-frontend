@@ -85,7 +85,7 @@ const Location = () => {
     queryFn: () => getTriwulanReportLocation(filterParams, authHeader()),
   });
 
-  const locations = (data?.data?.result ?? []).map((e) => e.activity_location);
+  const locations = data?.data?.result ?? [];
 
   const handleOnChange = (key, value) => {
     setFilterParams((prev) => ({
