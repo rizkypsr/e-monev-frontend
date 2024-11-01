@@ -332,7 +332,7 @@ const TriwulanForm = () => {
         {
           onSuccess: () => {
             showToastMessage('Berhasil mengubah Data Kegiatan');
-            navigate('/laporan/data-triwulan?limit=10&page=1&sort=terbaru');
+            navigate('/laporan');
           },
           onError: (err) => {
             showToastMessage(err.message, 'error');
@@ -351,7 +351,8 @@ const TriwulanForm = () => {
       {
         onSuccess: () => {
           showToastMessage('Berhasil membuat Data Kegiatan');
-          navigate('/laporan/data-triwulan?limit=10&page=1&sort=terbaru');
+          // window.location.reload();
+          navigate('/laporan?limit=10&page=1&sort=terbaru&search='); // Updated this line
         },
         onError: (err) => {
           showToastMessage(err.message, 'error');
