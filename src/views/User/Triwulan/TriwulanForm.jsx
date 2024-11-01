@@ -352,7 +352,7 @@ const TriwulanForm = () => {
         onSuccess: () => {
           showToastMessage('Berhasil membuat Data Kegiatan');
           // window.location.reload();
-          navigate('/laporan?limit=10&page=1&sort=terbaru&search='); // Updated this line
+          navigate('/laporan?limit=10&page=1&sort=terbaru&search=');
         },
         onError: (err) => {
           showToastMessage(err.message, 'error');
