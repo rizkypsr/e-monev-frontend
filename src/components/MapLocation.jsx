@@ -2,6 +2,9 @@
 /* eslint-disable arrow-body-style */
 import React from 'react';
 import { MapContainer, Marker, Popup, TileLayer, useMap } from 'react-leaflet';
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+import L from 'leaflet';
 import SearchMapControl from './SearchMapControl';
 import LocateMapControl from './LocateMapControl';
 import SidebarMapControl from './SidebarMapControl';
@@ -13,6 +16,18 @@ import 'leaflet-sidebar';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet.locatecontrol/dist/L.Control.Locate.min.css';
 import 'leaflet-geosearch/dist/geosearch.css';
+
+// import './style.css';
+
+
+
+const DefaultIcon = L.icon({
+  iconUrl: icon,
+  shadowUrl: iconShadow
+});
+
+L.Marker.prototype.options.icon = DefaultIcon;
+
 
 const position = [-0.8674005, 131.3051903];
 
@@ -60,6 +75,11 @@ const MapLocation = ({
     return Number.isNaN(result) ? position[0] : result
   }
 
+  // eslint-disable-next-line no-var
+  var parsedLocs = [];
+  // eslint-disable-next-line no-var
+  var parsedLocsName = [];
+
   return (
     <>
       <MapContainer center={position} zoom={13} minZoom={3}>
@@ -73,13 +93,28 @@ const MapLocation = ({
             <Popup>Sorong City, West Papua, Indonesia</Popup>
           </Marker>
         )} */}
-        {data.map((e) => {
+        {Array.from(data).map((e) => {
           const currentPos = [
-            safeParseLonLat(e.lat),
-            safeParseLonLat(e.lon)];
-          return (<Marker key={Math.random()} position={currentPos}>
-            <Popup>{e.display_name ?? e.name ?? ""}</Popup>
-          </Marker>)
+            safeParseLonLat(e.activity_location.lat),
+            safeParseLonLat(e.activity_location.lon)];
+          const stringifiedCurrentPos = currentPos.join(',');
+          const FilterLocs = parsedLocs.filter((e) => e === stringifiedCurrentPos);
+          const displayResult = (<Marker key={Math.random()} position={currentPos}>
+            <Popup>{
+              FilterLocs.length !== 0 ?
+                (() => {
+                  const result =
+                    `${e.activity_location.display_name ?? e.activity_location.name ?? "?"},
+                     Total ${FilterLocs.length} lokasi yang sama,
+                     aktivitas: ${parsedLocsName.join(',\n')}`
+                  parsedLocsName = [...parsedLocsName, e.activity_name]
+                  return result
+                })() :
+                `Aktivitas: ${e.activity_name},
+                 Lokasi: ${e.activity_location.display_name ?? e.activity_location.name ?? ""}`}</Popup>
+          </Marker>);
+          parsedLocs = [currentPos.join(','), ...parsedLocs]
+          return displayResult;
         })}
         <LocateMapControl />
         {showSearchBar && <SearchMapControl />}
