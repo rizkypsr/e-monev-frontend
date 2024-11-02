@@ -161,8 +161,6 @@ const TriwulanForm = () => {
     onSuccess: (result) => {
       const triwulanData = result.data[0] ?? {};
 
-      console.log(triwulanData);
-
       setValue('createdByUid', triwulanData.createdBy);
       setValue('activity_name', triwulanData.activity_name);
       //   setValue('activity_location', JSON.parse(triwulanData.activity_location));
@@ -371,7 +369,9 @@ const TriwulanForm = () => {
   return (
     <div className="mb-6">
       <div className="flex justify-between">
-        <h1 className="text-2xl font-semibold">Tambah Data Kegiatan</h1>
+        <h1 className="text-2xl font-semibold">
+          {id ? 'Edit Data Kegiatan' : 'Tambah Data Kegiatan'}
+        </h1>
       </div>
 
       <div className="w-full h-full mt-6 bg-white rounded-lg p-9">
