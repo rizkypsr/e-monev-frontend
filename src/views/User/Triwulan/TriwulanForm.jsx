@@ -160,10 +160,9 @@ const TriwulanForm = () => {
     refetchOnMount: true,
     onSuccess: (result) => {
       const triwulanData = result.data[0] ?? {};
-
       setValue('createdByUid', triwulanData.createdBy);
       setValue('activity_name', triwulanData.activity_name);
-      //   setValue('activity_location', JSON.parse(triwulanData.activity_location));
+      setValue('activity_location', JSON.parse(triwulanData.activity_location));
       setValue('fund_source_id', triwulanData.fundSource);
       setValue('fund_ceiling', triwulanData.fund_ceiling || '');
       setValue('management_organization', triwulanData.management_organization);
@@ -557,7 +556,7 @@ const TriwulanForm = () => {
               <PercentageInput
                 className={
                   watch('physical_realization_percentage') <= 25 &&
-                  id !== undefined
+                    id !== undefined
                     ? 'text-red-500'
                     : ''
                 }
