@@ -555,7 +555,7 @@ const TriwulanForm = () => {
             <div>
               <PercentageInput
                 className={
-                  watch('physical__percentage') <= 25 &&
+                  watch('physical_realization_percentage') <= 25 &&
                     id !== undefined
                     ? 'text-red-500'
                     : ''
