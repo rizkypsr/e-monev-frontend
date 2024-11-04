@@ -84,7 +84,7 @@ const fieldMappings = [
   },
   { key: 'activity_name', label: 'Nama Kegiatan' },
   { key: 'activity_output_sub', label: 'Nama Output Sub Kegiatan' },
-  { key: 'sub_activity', label: 'Sub Kegiatan' },
+  // { key: 'sub_activity', label: 'Sub Kegiatan' },
   { key: 'program', label: 'Nama Program' },
   {
     key: 'activity_location',
@@ -227,16 +227,13 @@ const ReportTriwulanDetail = () => {
       physical_realization_percentage:
         triwulanData?.physical_realization_percentage ?? 0,
       fund_realization: triwulanData.fund_realization ?? 0,
-      fund_realization_percentage: `${
-        triwulanData?.fund_realization_percentage ?? 0
-      } %`,
-      local_workforce: `${
-        (String(triwulanData?.local_workforce) ?? '0').replace('.00', '') ?? '0'
-      } Orang`,
-      non_local_workforce: `${
-        (String(triwulanData?.non_local_workforce) ?? '0').replace('.00', '') ??
+      fund_realization_percentage: `${triwulanData?.fund_realization_percentage ?? 0
+        } %`,
+      local_workforce: `${(String(triwulanData?.local_workforce) ?? '0').replace('.00', '') ?? '0'
+        } Orang`,
+      non_local_workforce: `${(String(triwulanData?.non_local_workforce) ?? '0').replace('.00', '') ??
         '0'
-      } Orang`,
+        } Orang`,
     });
 
   const { isLoading, isError, error } = useQuery({

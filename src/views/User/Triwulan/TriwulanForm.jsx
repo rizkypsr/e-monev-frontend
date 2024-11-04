@@ -721,7 +721,7 @@ const TriwulanForm = () => {
               />
             </div>
 
-            <div>
+            {/* <div>
               <Label className="mb-2">Sub Kegiatan</Label>
               <Controller
                 control={control}
@@ -734,7 +734,7 @@ const TriwulanForm = () => {
                   />
                 )}
               />
-            </div>
+            </div> */}
 
             <div>
               <Label className="mb-2">Bentuk Kegiatan</Label>

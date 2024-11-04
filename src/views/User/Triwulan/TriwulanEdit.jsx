@@ -568,7 +568,7 @@ const TriwulanEdit = () => {
                 onChange={handleSelectProcurementMethod}
               />
             </div>
-            <div className="mb-4">
+            {/* <div className="mb-4">
               <Label className="mb-2">Sub Kegiatan</Label>
               <DropdownDialog
                 label="Pilih Sub Kegiatan"
@@ -576,7 +576,7 @@ const TriwulanEdit = () => {
                 value={selectedActivity}
                 onChange={handleSelectActivity}
               />
-            </div>
+            </div> */}
             <div className="mb-4">
               <Label className="mb-2">Bentuk Kegiatan</Label>
               <DropdownDialog
