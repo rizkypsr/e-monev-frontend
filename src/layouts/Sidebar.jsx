@@ -137,9 +137,8 @@ const Sidebar = ({ isOpen }) => {
 
   return (
     <aside
-      className={`shadow-xl fixed top-0 left-0 z-40 w-64 h-screen transition-transform ${
-        isOpen ? 'translate-x-0' : '-translate-x-full'
-      }`}
+      className={`shadow-xl fixed top-0 left-0 z-40 w-64 h-screen transition-transform ${isOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
     >
       <div
         className="h-full overflow-y-auto flex flex-col"
@@ -158,11 +157,8 @@ const Sidebar = ({ isOpen }) => {
           </div>
         </a>
         <div className="flex items-center pl-4 py-5">
-          <img
-            src="https://images.pexels.com/photos/4336061/pexels-photo-4336061.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-            className="object-cover mr-4 rounded-full h-9 w-9"
-            alt="Profil"
-          />
+          <UserIcon color='white' className="object-cover mr-4 rounded-full h-9 w-9"
+            alt="Profil" />
           <div className="flex flex-col">
             <span className="font-semibold whitespace-nowrap text-white">
               {authUser()?.role?.name}
@@ -244,9 +240,9 @@ const Sidebar = ({ isOpen }) => {
         </Dialog>
         <div className="text-center border-t py-5 border-gray-200 mt-auto text-white text-sm">
           <div className="font-semibold">
-            &#169;{new Date().getFullYear()} BAPPEDA
+            &#169;{new Date().getFullYear()} Baperlitbang
           </div>
-          <div>KAB. SORONG</div>
+          <div>Kab. Sorong</div>
         </div>
       </div>
     </aside>
