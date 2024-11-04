@@ -555,7 +555,7 @@ const TriwulanForm = () => {
             <div>
               <PercentageInput
                 className={
-                  watch('physical_realization_percentage') <= 25 &&
+                  watch('physical__percentage') <= 25 &&
                     id !== undefined
                     ? 'text-red-500'
                     : ''
@@ -821,7 +821,7 @@ const TriwulanForm = () => {
                 className="w-full md:w-28 bg-primary text-white"
                 icon={<CheckCircleIcon className="w-5 h-5" />}
                 disabled={
-                  watch('physical_realization_percentage') >= 100 &&
+                  watch('physical_realization_percentage') > 100 &&
                   id !== undefined
                 }
               >
