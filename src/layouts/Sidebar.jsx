@@ -17,8 +17,11 @@ import {
 } from 'react-icons/md';
 import { IoMdLogOut } from 'react-icons/io';
 import {
+  // ClipboardDocumentListIcon,
   DocumentIcon,
   HomeIcon,
+  // ListBulletIcon,
+  // QueueListIcon,
   TableCellsIcon,
   UserIcon,
 } from '@heroicons/react/24/solid';
@@ -58,12 +61,6 @@ const Sidebar = ({ isOpen }) => {
       icon: <LiaUserLockSolid size={24} />,
       roles: ['superadmin'],
     },
-    // {
-    //   path: '/urusan',
-    //   label: 'Urusan',
-    //   icon: <CheckIcon />,
-    //   roles: ['superadmin', 'admin bidang'],
-    // },
     {
       path: '/sumber-dana',
       label: 'Sumber Dana',
@@ -77,15 +74,21 @@ const Sidebar = ({ isOpen }) => {
       roles: ['superadmin'],
     },
     // {
+    //   path: '/urusan',
+    //   label: 'Urusan',
+    //   icon: <QueueListIcon width={21} height={22} />,
+    //   roles: ['superadmin', 'admin bidang'],
+    // },
+    // {
     //   path: '/program',
     //   label: 'Program',
-    //   icon: <BookIcon />,
+    //   icon: <ClipboardDocumentListIcon width={21} height={22} />,
     //   roles: ['superadmin', 'admin bidang'],
     // },
     // {
     //   path: '/kegiatan',
-    //   label: 'Kegiatan',
-    //   icon: <StarIcon />,
+    //   label: 'Sub-kegiatan',
+    //   icon: <ListBulletIcon width={21} height={22} />,
     //   roles: ['superadmin', 'admin bidang'],
     // },
     // {

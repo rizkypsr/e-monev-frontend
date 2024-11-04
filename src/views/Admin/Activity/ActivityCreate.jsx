@@ -1,7 +1,9 @@
 import {
   ArrowLeftIcon,
   CheckCircleIcon,
+  LockClosedIcon,
   PlusIcon,
+  XMarkIcon,
 } from '@heroicons/react/24/solid';
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -175,9 +177,10 @@ const ActivityCreate = () => {
             >
               <Button
                 type="button"
-                background="bg-primary"
+                background={openCreateActivity ? 'bg-dark-red' : "bg-primary"}
                 textColor="text-white"
-                icon={<PlusIcon className="w-4 h-4" />}
+                className='justify-self-end'
+                icon={openCreateActivity ? <XMarkIcon className="w-4 h-4" /> : <PlusIcon className="w-4 h-4" />}
                 onClick={() => openCreateActivityClick()}
               />
 
@@ -186,7 +189,7 @@ const ActivityCreate = () => {
                   {isOpen && (
                     <animated.div
                       style={style}
-                      className="w-72 bg-white absolute z-auto rounded-md p-4 -right-80 top-0"
+                      className=" bg-white rounded-md p-4 right-auto top-0"
                     >
                       <form
                         id="createFundSource"
@@ -194,7 +197,7 @@ const ActivityCreate = () => {
                       >
                         <TextInput
                           required
-                          placeholder="Masukan Nama Kegiatan"
+                          placeholder="Ketik Kegiatan Baru"
                           register={register2('activity2', {
                             required: 'Nama Kegiatan wajib diisi!',
                           })}
