@@ -637,7 +637,7 @@ const TriwulanCreate = () => {
               />
             </div>
             <div>
-              <Label className="mb-2">Nama Pimpinan</Label>
+              <Label className="mb-2">Nama Pimpinan Daerah</Label>
               <TextInputV2
                 placeholder="Tulis Disini..."
                 register={register('leader_name')}

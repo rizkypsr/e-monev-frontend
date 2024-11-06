@@ -607,7 +607,7 @@ const TriwulanEdit = () => {
               />
             </div>
             <div>
-              <Label className="mb-2">Nama Pimpinan</Label>
+              <Label className="mb-2">Nama Pimpinan Daerah</Label>
               <TextInput
                 id="leader_name"
                 name="leader_name"

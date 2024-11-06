@@ -110,7 +110,7 @@ const columns = [
   columnHelper.accessor((row) => row.leader_name, {
     id: 'leader_name',
     cell: (info) => <i>{info.getValue()}</i>,
-    header: () => <span>Nama Pimpinan</span>,
+    header: () => <span>Nama Pimpinan Daerah</span>,
   }),
   columnHelper.accessor((row) => row.implementation_period, {
     id: 'implementation_period',
