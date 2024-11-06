@@ -482,7 +482,7 @@ const TriwulanForm = () => {
                 register={register('contract_number_date', {
                   required: false,
                 })}
-                error={errors.pptk_name?.message}
+                error={errors.contract_number_date?.message}
               />
             </div>
 
