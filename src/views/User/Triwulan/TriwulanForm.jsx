@@ -1,3 +1,6 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable camelcase */
+/* eslint-disable no-underscore-dangle */
 import React from 'react';
 import { CheckCircleIcon } from '@heroicons/react/24/solid';
 import { Link, useNavigate, useParams } from 'react-router-dom';
@@ -26,6 +29,8 @@ import getTriwulanDetail from '@/api/user/triwulan/getTriwulanDetail';
 import updateTriwulan from '@/api/user/triwulan/updateTriwulan';
 import { getActivities } from '@/api/admin/activity';
 
+// eslint-disable-next-line import/no-extraneous-dependencies
+import BigNumber from "bignumber.js";
 import {
   bentukKegiatanData,
   caraPengadaanData,
@@ -33,6 +38,7 @@ import {
   optionalData,
   programPrioritasData,
 } from './constants';
+
 
 const initialParams = {
   limit: 20,
@@ -359,6 +365,15 @@ const TriwulanForm = () => {
     );
   };
 
+  // eslint-disable-next-line no-unused-vars
+  const countRealisasiFisPercent = (_) => {
+    const physical_realization = new BigNumber(control._formValues.physical_realization);
+    const contract_value = new BigNumber(control._formValues.contract_value)
+    setValue('physical_realization_percentage',
+      physical_realization.dividedBy(contract_value).times(100).toFixed(2),
+    )
+  }
+
   const handleFileInput = (files) => {
     setValue('file', files);
   };
@@ -537,6 +552,7 @@ const TriwulanForm = () => {
                 {...register('contract_value', {
                   required: false,
                   valueAsNumber: true,
+                  onChange: countRealisasiFisPercent,
                   max: {
                     message: 'Maksimal Rp.200.000.000.000.000',
                     value: 200000000000000000,
@@ -554,6 +570,7 @@ const TriwulanForm = () => {
                 {...register('physical_realization', {
                   required: 'Realisasi Fisik wajib diisi!',
                   valueAsNumber: true,
+                  onChange: countRealisasiFisPercent,
                   max: {
                     message: 'Maksimal Rp.200.000.000.000.000',
                     value: 200000000000000000,

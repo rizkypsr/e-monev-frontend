@@ -1,3 +1,5 @@
+/* eslint-disable camelcase */
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable guard-for-in */
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-restricted-syntax */
@@ -9,6 +11,8 @@ import { Controller, useForm } from 'react-hook-form';
 import { useInfiniteQuery, useMutation } from 'react-query';
 import { useAuthHeader, useAuthUser } from 'react-auth-kit';
 
+// eslint-disable-next-line import/no-extraneous-dependencies
+import BigNumber from 'bignumber.js';
 import Label from '../../../components/Label';
 import formattedDate from '../../../utils/formattedDate';
 import ReactLoading from '../../../components/Loading';
@@ -242,6 +246,15 @@ const TriwulanCreate = () => {
     );
   };
 
+  // eslint-disable-next-line no-unused-vars
+  const countRealisasiFisPercent = (_) => {
+    const physical_realization = new BigNumber(control._formValues.physical_realization);
+    const contract_value = new BigNumber(control._formValues.contract_value)
+    setValue('physical_realization_percentage',
+      physical_realization.dividedBy(contract_value).times(100).toFixed(2),
+    )
+  }
+
   const handleFileInput = (files) => {
     setValue('file', files);
   };
@@ -411,6 +424,7 @@ const TriwulanCreate = () => {
                 {...register('contract_value', {
                   required: false,
                   valueAsNumber: true,
+                  onChange: countRealisasiFisPercent,
                   max: {
                     message: 'Maksimal Rp.200.000.000.000.000',
                     value: 200000000000000000,
@@ -427,6 +441,7 @@ const TriwulanCreate = () => {
                 {...register('physical_realization', {
                   required: 'Realisasi Fisik wajib diisi!',
                   valueAsNumber: true,
+                  onChange: countRealisasiFisPercent,
                   max: {
                     message: 'Maksimal Rp.200.000.000.000.000',
                     value: 200000000000000000,
@@ -443,6 +458,7 @@ const TriwulanCreate = () => {
                 {...register('physical_realization_percentage', {
                   required: 'Realisasi Fisik wajib diisi!',
                   valueAsNumber: true,
+                  value: (control._formValues.physical_realization / control._formValues.contract_value) * 100,
                   max: {
                     message: 'Maksimal Rp.200.000.000.000.000',
                     value: 200000000000000000,

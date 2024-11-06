@@ -1,3 +1,5 @@
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable camelcase */
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from 'react';
 import { CheckCircleIcon } from '@heroicons/react/24/solid';
@@ -5,6 +7,8 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { useInfiniteQuery, useMutation, useQuery } from 'react-query';
 import { useAuthHeader } from 'react-auth-kit';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import BigNumber from 'bignumber.js';
 import Label from '../../../components/Label';
 import TextInput from '../../../components/TextInput';
 import formattedDate from '../../../utils/formattedDate';
@@ -261,6 +265,15 @@ const TriwulanEdit = () => {
   const handleSelectActivity = (item) => {
     setSelectedActivity(item);
   };
+
+  // eslint-disable-next-line no-unused-vars
+  const countRealisasiFisPercent = (_) => {
+    const physical_realization = new BigNumber(control._formValues.physical_realization);
+    const contract_value = new BigNumber(control._formValues.contract_value)
+    setValue('physical_realization_percentage',
+      physical_realization.dividedBy(contract_value).times(100).toFixed(2),
+    )
+  }
 
   const handleFileInput = (file) => {
     setValue('file', file);
@@ -607,7 +620,7 @@ const TriwulanEdit = () => {
               />
             </div>
             <div>
-              <Label className="mb-2">Nama Pimpinan Daerah</Label>
+              <Label className="mb-2">Nama Pimpinan</Label>
               <TextInput
                 id="leader_name"
                 name="leader_name"
