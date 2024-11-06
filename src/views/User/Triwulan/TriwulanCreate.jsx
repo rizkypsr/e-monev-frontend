@@ -339,6 +339,14 @@ const TriwulanCreate = () => {
               />
             </div>
             <div>
+              <Label className="mb-2">Nama Kepala Dinas</Label>
+              <TextInputV2
+                placeholder="Tulis Disini..."
+                register={register('kepala_dinas_name')}
+                error={errors.kepala_dinas_name?.message}
+              />
+            </div>
+            <div>
               <Label className="mb-2">Nama PPTK</Label>
               <TextInputV2
                 placeholder="Tulis Disini..."

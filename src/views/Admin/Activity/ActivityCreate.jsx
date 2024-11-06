@@ -1,7 +1,7 @@
 import {
   ArrowLeftIcon,
   CheckCircleIcon,
-  LockClosedIcon,
+  // LockClosedIcon,
   PlusIcon,
   XMarkIcon,
 } from '@heroicons/react/24/solid';

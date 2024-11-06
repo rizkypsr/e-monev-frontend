@@ -77,6 +77,11 @@ const columns = [
     cell: (info) => <i>{info.getValue()}</i>,
     header: () => <span>OPD Organisasi</span>,
   }),
+  columnHelper.accessor((row) => row.kepala_dinas_name, {
+    id: 'kepala_dinas_name',
+    cell: (info) => <i>{info.getValue()}</i>,
+    header: () => <span>Nama Kepala Dinas</span>,
+  }),
   columnHelper.accessor((row) => row.pptk_name, {
     id: 'pptk_name',
     cell: (info) => <i>{info.getValue()}</i>,
@@ -392,15 +397,15 @@ const ReportTable = () => {
         columns={columns.map((column) =>
           column.cell
             ? {
-                ...column,
-                cell: (props) =>
-                  column.cell(
-                    props,
-                    deleteReportData,
-                    authUser().role?.name,
-                    handleDownloadFile
-                  ),
-              }
+              ...column,
+              cell: (props) =>
+                column.cell(
+                  props,
+                  deleteReportData,
+                  authUser().role?.name,
+                  handleDownloadFile
+                ),
+            }
             : column
         )}
         rows={data}

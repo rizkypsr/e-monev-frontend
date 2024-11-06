@@ -136,6 +136,7 @@ const TriwulanEdit = () => {
       setValue('fund_source_id', triwulanData.fund_source_id);
       setValue('fund_ceiling', triwulanData.fund_ceiling || '');
       setValue('management_organization', triwulanData.management_organization);
+      setValue('kepala_dinas_name', triwulanData.kepala_dinas_name);
       setValue('pptk_name', triwulanData.pptk_name);
       setValue('contract_number_date', triwulanData.contract_number_date);
       setValue('contractor_name', triwulanData.contractor_name);
@@ -346,6 +347,16 @@ const TriwulanEdit = () => {
               />
             </div>
             <div>
+              <Label className="mb-2">Nama Kepala Dinas</Label>
+              <TextInput
+                id="kepala_dinas_name"
+                name="kepala_dinas_name"
+                placeholder="Tulis Disini..."
+                register={register('kepala_dinas_name')}
+                error={errors.kepala_dinas_name?.message}
+              />
+            </div>
+            <div>
               <Label className="mb-2">Nama PPTK</Label>
               <TextInput
                 id="pptk_name"
@@ -364,7 +375,7 @@ const TriwulanEdit = () => {
                 register={register('contract_number_date', {
                   required: false,
                 })}
-                error={errors.pptk_name?.message}
+                error={errors.contract_number_date?.message}
               />
             </div>
             <div>

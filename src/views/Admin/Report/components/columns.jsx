@@ -66,6 +66,10 @@ const columns = [
     header: 'OPD Organisasi',
   },
   {
+    accessorFn: (row) => row.kepala_dinas_name ?? '-',
+    header: 'Nama Kepala Dinas',
+  },
+  {
     accessorFn: (row) => row.pptk_name ?? '-',
     header: 'Nama PPTK',
   },

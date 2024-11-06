@@ -166,6 +166,7 @@ const TriwulanForm = () => {
       setValue('fund_source_id', triwulanData.fundSource);
       setValue('fund_ceiling', triwulanData.fund_ceiling || '');
       setValue('management_organization', triwulanData.management_organization);
+      setValue('kepala_dinas_name', triwulanData.kepala_dinas_name);
       setValue('pptk_name', triwulanData.pptk_name);
       setValue('contract_number_date', triwulanData.contract_number_date);
       setValue('contractor_name', triwulanData.contractor_name);
@@ -453,6 +454,15 @@ const TriwulanForm = () => {
                 placeholder="Tulis Disini..."
                 register={register('management_organization')}
                 error={errors.management_organization?.message}
+              />
+            </div>
+
+            <div>
+              <Label className="mb-2">Nama Kepala Dinas</Label>
+              <TextInputV2
+                placeholder="Tulis Disini..."
+                register={register('kepala_dinas_name')}
+                error={errors.kepala_dinas_name?.message}
               />
             </div>
 
