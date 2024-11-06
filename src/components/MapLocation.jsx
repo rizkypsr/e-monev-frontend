@@ -82,7 +82,7 @@ const MapLocation = ({
 
   return (
     <>
-      <MapContainer center={position} zoom={13} minZoom={3}>
+      <MapContainer preferCanvas={!L.Browser.svg && !L.Browser.vml} center={position} zoom={13} minZoom={3}>
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           maxZoom={19}
@@ -106,7 +106,7 @@ const MapLocation = ({
                   const result =
                     `${e.activity_location.display_name ?? e.activity_location.name ?? "?"},
                      Total ${FilterLocs.length} lokasi yang sama,
-                     aktivitas: ${parsedLocsName.join(',\n')}`
+                     Aktivitas: ${parsedLocsName.join(',\n')}`
                   parsedLocsName = [...parsedLocsName, e.activity_name]
                   return result
                 })() :
