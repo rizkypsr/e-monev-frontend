@@ -284,6 +284,10 @@ const TriwulanCreate = () => {
                       label="Pilih Target OPD"
                       data={targetOpdQuery.data}
                       {...field}
+                      onChange={(e) => {
+                        setValue('createdByUid', e);
+                        setValue('management_organization', e.organization.title);
+                      }}
                     />
                   )}
                 />
