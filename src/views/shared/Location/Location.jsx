@@ -12,7 +12,7 @@ import {
 } from '@/components/DropdownSelectV2';
 
 import getFundSource from '@/api/user/triwulan/getFundSource';
-import getUsers from '@/api/user/triwulan/getUsers';
+import getUsersAll from '@/api/user/triwulan/getUsersAll';
 import getTriwulanReportLocation from '@/api/admin/report/getTriwulanReportLokasi';
 
 import {
@@ -54,7 +54,7 @@ const Location = () => {
 
       params.page = pageParam;
 
-      const res = await getUsers(params, authHeader());
+      const res = await getUsersAll(params, authHeader());
 
       return res;
     },

@@ -24,7 +24,7 @@ import { useToastContext } from '@/context/ToastContext';
 
 import getFundSource from '@/api/user/triwulan/getFundSource';
 import createTriwulan from '@/api/user/triwulan/createTriwulan';
-import getUsers from '@/api/user/triwulan/getUsers';
+import getUsersAll from '@/api/user/triwulan/getUsersAll';
 import getTriwulanDetail from '@/api/user/triwulan/getTriwulanDetail';
 import updateTriwulan from '@/api/user/triwulan/updateTriwulan';
 import { getActivities } from '@/api/admin/activity';
@@ -245,7 +245,7 @@ const TriwulanForm = () => {
 
       params.page = pageParam;
 
-      const res = await getUsers(params, authHeader());
+      const res = await getUsersAll(params, authHeader());
 
       return res;
     },

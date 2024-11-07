@@ -25,7 +25,7 @@ import FileInput from '../../../components/FileInput';
 import { getActivities } from '../../../api/admin/activity';
 import CurrencyInput from '../../../components/CurrencyInput';
 import PercentageInput from '../../../components/PercentageInput';
-import getUsers from '../../../api/user/triwulan/getUsers';
+import getUsersAll from '../../../api/user/triwulan/getUsersAll';
 import TextInputV2 from '../../../components/TextInputV2';
 import LocationInput from '../../../components/LocationInput';
 
@@ -154,7 +154,7 @@ const TriwulanCreate = () => {
 
       params.page = pageParam;
 
-      const res = await getUsers(params, authHeader());
+      const res = await getUsersAll(params, authHeader());
 
       return res;
     },
