@@ -73,6 +73,16 @@ const OrganizationCreate = () => {
               error={errors.title?.message}
             />
           </div>
+          <div className="mb-6">
+            <Label className="mb-2">Nama Kepala Dinas</Label>
+            <TextInput
+              id="kepala_dinas_name"
+              name="kepala_dinas_name"
+              placeholder="Tuliskan disini ..."
+              register={register('kepala_dinas_name', { required: false })}
+              error={errors.kepala_dinas_name?.message}
+            />
+          </div>
           {createMutation.isLoading ? (
             <ReactLoading />
           ) : (

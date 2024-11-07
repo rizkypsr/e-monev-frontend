@@ -28,6 +28,11 @@ const columns = [
     cell: (info) => <i>{info.getValue().toUpperCase()}</i>,
   },
   {
+    accessorKey: 'kepala_dinas_name',
+    header: 'Kepala Dinas',
+    cell: (info) => <i>{info.getValue()}</i>,
+  },
+  {
     id: 'action',
     header: () => <div className="text-right">Aksi</div>,
     cell: (props, deleteOccasionData) => {

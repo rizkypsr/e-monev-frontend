@@ -407,6 +407,7 @@ const TriwulanForm = () => {
                       {...field}
                       onChange={(e) => {
                         setValue('createdByUid', e);
+                        setValue('kepala_dinas_name', e.organization.kepala_dinas_name);
                         setValue('management_organization', e.organization.title);
                       }}
                     />
