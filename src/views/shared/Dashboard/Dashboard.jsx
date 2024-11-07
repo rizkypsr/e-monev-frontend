@@ -182,7 +182,7 @@ const Dashboard = () => {
 
       <div className="flex flex-col space-y-4 lg:space-y-0 lg:flex-row justify-center lg:justify-between my-8 lg:items-end">
         {authUser().role.id === 1 && (
-          <FilterPanel filters={filters} onChange={handleSelectFilter} />
+          <FilterPanel all filters={filters} onChange={handleSelectFilter} />
         )}
 
         {authUser().role.name !== 'OPD' && (

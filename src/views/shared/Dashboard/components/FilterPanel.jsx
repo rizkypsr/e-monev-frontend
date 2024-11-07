@@ -10,6 +10,7 @@ import {
   programPrioritasData,
 } from '../../../User/Triwulan/constants';
 import getFundSource from '../../../../api/user/triwulan/getFundSource';
+import getFundSourceAll from '../../../../api/user/triwulan/getFundSourceAll';
 
 const jenisPengadaan = {
   pageParams: [undefined],
@@ -91,7 +92,7 @@ const initialFundSourceparams = {
   sort: 'terbaru',
 };
 
-const FilterPanel = ({ filters, onChange }) => {
+const FilterPanel = ({ filters, onChange, all = false }) => {
   const authHeader = useAuthHeader();
 
   const [fundSourceFilterParams, setFundSourceFilterParams] = React.useState(
@@ -105,7 +106,7 @@ const FilterPanel = ({ filters, onChange }) => {
 
       params.page = pageParam;
 
-      const res = await getFundSource(fundSourceFilterParams, authHeader());
+      const res = all ? await getFundSourceAll(fundSourceFilterParams, authHeader()) : await getFundSource(fundSourceFilterParams, authHeader());
 
       return res;
     },
