@@ -1,3 +1,4 @@
+/* eslint-disable vars-on-top */
 /* eslint-disable no-var */
 /* eslint-disable arrow-body-style */
 import React, { useEffect, useState } from 'react';
@@ -8,7 +9,6 @@ import { Timeline } from 'rsuite';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import moment from 'moment-timezone';
 import { Differ } from 'json-diff-kit';
-
 import {
   ArrowDownIcon,
   ArrowDownTrayIcon,
@@ -29,6 +29,8 @@ import ErrorPage from '@/views/ErrorPage';
 import formattedDate from '@/utils/formattedDate';
 import formatToRupiah from '@/utils/formatRupiah';
 import { baseUrlAPI } from '@/utils/constants';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import _ from 'lodash';
 
 import 'rsuite/dist/rsuite.min.css';
 import 'moment/dist/locale/id';
@@ -78,13 +80,13 @@ const fieldMappings = [
     key: 'created_at',
     label: 'Tanggal Dibuat',
     isFormatted: true,
-    formatter: formattedDate,
+    formatter: (v) => formattedDate(v, true),
   },
   {
     key: 'updated_at',
     label: 'Terakhir Update',
     isFormatted: true,
-    formatter: formattedDate,
+    formatter: (v) => formattedDate(v, true),
   },
   { key: 'activity_name', label: 'Nama Kegiatan' },
   { key: 'activity_output_sub', label: 'Nama Output Sub Kegiatan' },
@@ -188,8 +190,11 @@ const ReportTriwulanDetail = () => {
 
   const [report, setReport] = useState(initialData);
   const [selectedIndexTimeline, setSelectedIndexTimeline] = useState(0);
+  const [selectedTriwulanTabs, setSelectedTriwulanTabs] = useState(0);
+  // eslint-disable-next-line no-unused-vars
   const [dataJSON, setDataJSON] = useState([]);
   const [triwulanData, setTriwulanData] = useState({});
+  const [formattedTriwulanData, setFormattedTriwulanData] = useState([]);
   const [diffData, setDiffData] = useState([]);
 
   moment.tz.setDefault('Asia/Jayapura');
@@ -201,9 +206,10 @@ const ReportTriwulanDetail = () => {
    * @returns {JSX.Element}
    */
   const compareNumber = (index, key) => {
+    const currData = (formattedTriwulanData[selectedTriwulanTabs]?.data ?? [])
     const [src, dst] = [
-      parseFloat((dataJSON[index + 1] ?? { [key]: '' })[key] ?? ''),
-      parseFloat((dataJSON[index] ?? { [key]: '' })[key] ?? ''),
+      parseFloat((currData[index + 1] ?? { [key]: '' })[key] ?? ''),
+      parseFloat((currData[index] ?? { [key]: '' })[key] ?? ''),
     ];
 
     if (src < dst) return <ArrowUpIcon color="green" width={20} height={20} />;
@@ -238,12 +244,48 @@ const ReportTriwulanDetail = () => {
       fund_realization: triwulanData.fund_realization ?? 0,
       fund_realization_percentage: `${triwulanData?.fund_realization_percentage ?? 0
         } %`,
-      local_workforce: `${(String(triwulanData?.local_workforce) ?? '0').replace('.00', '') ?? '0'
+      local_workforce: `${(String(triwulanData?.local_workforce ?? "0") ?? '0').replace('.00', '') ?? '0'
         } Orang`,
-      non_local_workforce: `${(String(triwulanData?.non_local_workforce) ?? '0').replace('.00', '') ??
+      non_local_workforce: `${(String(triwulanData?.non_local_workforce ?? "0") ?? '0').replace('.00', '') ??
         '0'
         } Orang`
     });
+
+  const formatToTriwulan = (data) => _(Array.from(data))
+    .groupBy((e) => moment(e.updated_at).quarter())
+    .map((value, key) => ({ triwulan: Number(key), data: value }))
+    .orderBy((e) => e.triwulan, 'asc')
+    .value();
+
+  /**
+   *
+   * @param {Array<object>} formattedTriwulanSrc
+   * @param {number} selectedTabTriwulan
+   */
+  const formatDiffData = (formattedTriwulanSrc, selectedTabTriwulan) => {
+    /** reformat object for historical data change */
+    const currentDataArray = formattedTriwulanSrc[selectedTabTriwulan]?.data;
+    const cpData = Array.from(currentDataArray).map((e) => ({
+      ...e,
+      activity_location: JSON.parse(e?.activity_location)?.name ?? '',
+    }));
+    var r = Array.from(cpData).map((e) => {
+      delete e.createdBy;
+      delete e.user_id;
+      delete e.updated_at;
+      delete e.file;
+      return e;
+    }).reduce((prev, curr, index, original) => {
+      const diff = differ
+        .diff(original[index - 1], original[index])
+        .map((e) => e.filter((f) => f.type !== 'equal'));
+
+      return [...prev, diff];
+    }, []);
+    var u = Array.from(r)
+    u.shift();
+    setDiffData([...u, r.pop()]);
+  }
 
   const { isLoading, isError, error } = useQuery({
     queryKey: ['get_triwulan'],
@@ -254,36 +296,24 @@ const ReportTriwulanDetail = () => {
      * @param {Array} param0.data
      */
     onSuccess: ({ data = [] }) => {
-      /** reformat object */
-      const cpData = Array.from(data).map((e) => {
-        // delete e.createdBy;
-        // delete e.user_id;
-        return {
-          ...e,
-          createdBy: e.createdBy?.name,
-          activity_location: JSON.parse(e?.activity_location)?.name ?? '',
-        };
-      });
+      /** format data to triwulan by updated_at */
+      const trwln = formatToTriwulan(data)
+      const defaultSelectedTriwulanTabs = Math.max(...Array.from(trwln.map((e) => e.triwulan))) - 1;
+      const agTrwln = [
+        ...Array.from({ length: 4 - trwln.length }, (_value, i) => ({ triwulan: i + 1, data: [] })),
+        ...trwln
+      ]
+      setSelectedTriwulanTabs(defaultSelectedTriwulanTabs);
+      setFormattedTriwulanData(agTrwln);
 
-      var r = Array.from(cpData).map((e) => {
-        delete e.createdBy;
-        delete e.user_id;
-        delete e.updated_at;
-        return e;
-      }).reduce((prev, curr, index, original) => {
-        const diff = differ
-          .diff(original[index - 1], original[index])
-          .map((e) => e.filter((f) => f.type !== 'equal'));
+      formatDiffData(agTrwln, defaultSelectedTriwulanTabs);
+      const currentDataArray = agTrwln[defaultSelectedTriwulanTabs]?.data ?? []
 
-        return [...prev, diff];
-      }, []);
-
-      var u = Array.from(r)
-      u.shift();
-      setDiffData([...u, r.pop()]);
-
-      setDataJSON(Array.from(data).map((e) => ({ ...e, createdBy: e.createdBy?.name, })) ?? []);
-      setTriwulanData(Array.from(data).map((e) => ({ ...e, createdBy: e.createdBy?.name, }))[selectedIndexTimeline] ?? {});
+      /** save original data */
+      setDataJSON(
+        Array.from(data).map((e) => ({ ...e, createdBy: e.createdBy?.name, })) ?? []);
+      setTriwulanData(
+        Array.from(currentDataArray).map((e) => ({ ...e, createdBy: e.createdBy?.name, }))[selectedIndexTimeline] ?? {});
       invokeReport();
     },
   });
@@ -485,7 +515,26 @@ const ReportTriwulanDetail = () => {
           </div>
         </div>
 
+        <h6 className='m-auto p-2'>Triwulan</h6>
+        {Array.from({ length: formattedTriwulanData.length }).map((e, i) => (
+          <button
+            key={`${e ?? i}`}
+            onClick={() => {
+              setSelectedIndexTimeline(0);
+              setSelectedTriwulanTabs(i);
+              setTriwulanData((formattedTriwulanData[i]?.data ?? [])
+                .map((x) => ({ ...x, createdBy: x.createdBy?.name, }))[0] ?? {});
+              formatDiffData(formattedTriwulanData, i);
+              invokeReport();
+            }}
+            type='button'
+            className={i === selectedTriwulanTabs ?
+              'm-auto mr-2 border bg-white border-blue-700 text-blue rounded-md p-2' :
+              'm-auto mr-2 border bg-white border-gray-300 border-solid text-blue rounded-md p-2'}>
+            Triwulan {i + 1}
+          </button>))}
         <div className="relative flex overflow-x-auto">
+
           <table className="w-full text-sm text-left text-dark-gray">
             <tbody>{renderTableRows()}</tbody>
           </table>
@@ -501,18 +550,21 @@ const ReportTriwulanDetail = () => {
               key={`${selectedIndexTimeline}r`}
               isItemActive={(i) => i === selectedIndexTimeline}
             >
-              {dataJSON.map((e) => {
-                const currentIndex = dataJSON.indexOf(e);
-                const date = (`${e.sys_period}` ?? '')
-                  .replace(/[\\[\\"\\)]/g, '')
-                  .split(',');
+              {(formattedTriwulanData[selectedTriwulanTabs]?.data ?? []).map((e) => {
+                const currData = (formattedTriwulanData[selectedTriwulanTabs]?.data ?? [])
+                const currentIndex = currData.indexOf(e);
+                // const date = (`${e.sys_period}` ?? '')
+                //   .replace(/[\\[\\"\\)]/g, '')
+                //   .split(',');
+                const date = e.updated_at;
 
                 return (
                   <Timeline.Item
                     key={currentIndex}
                     onClick={() => {
                       setSelectedIndexTimeline(currentIndex);
-                      setTriwulanData(e);
+                      setTriwulanData((currData ?? [])
+                        .map((x) => ({ ...x, createdBy: x.createdBy?.name, }))[currentIndex] ?? {});
                       invokeReport();
                     }}
                   >
@@ -538,7 +590,7 @@ const ReportTriwulanDetail = () => {
                           paddingRight: '0.5%',
                         }}
                       >
-                        {moment(date[0] ?? '')
+                        {moment(date ?? new Date())
                           .locale('id')
                           .format('dddd, DD MMMM YYYY HH:mm (Z)')}
                       </h6>
@@ -546,7 +598,7 @@ const ReportTriwulanDetail = () => {
                         key={`${currentIndex}3`}
                         style={{ paddingTop: '2%', marginTop: '2%' }}
                       >
-                        {currentIndex === dataJSON.length - 1 ? (
+                        {currentIndex === currData.length - 1 ? (
                           <div />
                         ) : (
                           <div>
