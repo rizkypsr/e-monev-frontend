@@ -5,6 +5,7 @@ import { useAuthHeader, useAuthUser } from 'react-auth-kit';
 import { useQuery } from 'react-query';
 
 import { useLocation } from 'react-router-dom';
+import getTriwulan from '@/api/static/getTriwulan';
 import ErrorPage from '../../ErrorPage';
 import CountBox from './components/CountBox';
 import FundTotal from './components/FundTotal';
@@ -34,6 +35,7 @@ const initialFundSourceChart = {
   bentuk_pengadaan: null,
   cara_pengadaan: null,
   program_prio: null,
+  triwulan_id: null
 };
 
 const Dashboard = () => {
@@ -45,13 +47,14 @@ const Dashboard = () => {
   const [filterFundSourceChart, setFilterFundSourceChart] = useState(
     initialFundSourceChart
   );
-  const [filters, setFilters] = React.useState({
+  const [filters, setFilters] = useState({
     fundSource: null,
     jenisPengadaan: null,
     caraPengadaan: null,
     bentukKegiatan: null,
     programPrioritas: null,
     tahun: null,
+    triwulan_id: null
   });
 
   const location = useLocation();
@@ -104,18 +107,11 @@ const Dashboard = () => {
     enabled: filters.fundSource !== null,
   });
 
-  useEffect(() => {
-    if (filters.fundSource?.id) {
-      setFilterFundSourceChart({
-        pagu_dana_id: filters.fundSource.id,
-        tipe_pengadaan: filters.jenisPengadaan?.name,
-        bentuk_pengadaan: filters.bentukKegiatan?.name,
-        cara_pengadaan: filters.caraPengadaan?.name,
-        program_prio: filters.programPrioritas?.name,
-        tahun: filters.tahun?.name,
-      });
-    }
-  }, [filters]);
+  // const triwulanQuery = useQuery({
+  //   queryKey: ['get_triwulan'],
+  //   queryFn: () => getTriwulan(authHeader()),
+  //   enabled: filters.fundSource !== null,
+  // });
 
   useEffect(() => {
     if (filters.fundSource?.id) {
@@ -126,9 +122,24 @@ const Dashboard = () => {
         cara_pengadaan: filters.caraPengadaan?.name,
         program_prio: filters.programPrioritas?.name,
         tahun: filters.tahun?.name,
+        triwulan_id: filters.triwulan_id?.id
       });
     }
   }, [filters]);
+
+  // useEffect(() => {
+  //   if (filters.fundSource?.id) {
+  //     setFilterFundSourceChart({
+  //       pagu_dana_id: filters.fundSource.id,
+  //       tipe_pengadaan: filters.jenisPengadaan?.name,
+  //       bentuk_pengadaan: filters.bentukKegiatan?.name,
+  //       cara_pengadaan: filters.caraPengadaan?.name,
+  //       program_prio: filters.programPrioritas?.name,
+  //       tahun: filters.tahun?.name,
+  //       triwulan_id: filters.triwulan_id?.name
+  //     });
+  //   }
+  // }, [filters]);
 
   // const handleDownloadExcel = async () => {
   //   await excelQuery.refetch();

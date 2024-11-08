@@ -31,6 +31,7 @@ import {
   jenisPengadaanData,
   programPrioritasData,
 } from '@/views/User/Triwulan/constants';
+import getTriwulan from '@/api/static/getTriwulan';
 
 const months = [
   { id: 1, name: 'Januari' },
@@ -83,7 +84,7 @@ const ReportTableWrapper = () => {
 
   const { showToastMessage } = useToastContext();
 
-  const [filters, setFilters] = React.useState(initialFilters);
+  const [filters, setFilters] = useState(initialFilters);
 
   const [searchParamsState, setSearchParamsState] =
     useSearchParamsState(initialFilterParams);
@@ -98,6 +99,11 @@ const ReportTableWrapper = () => {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedSearch]);
+
+  const triwulanQuery = useQuery({
+    queryKey: ['get_triwulan'],
+    queryFn: () => getTriwulan(authHeader()),
+  });
 
   const fundSourceQuery = useQuery({
     queryKey: ['get_fund_source'],
@@ -285,7 +291,7 @@ const ReportTableWrapper = () => {
               </DropdownContent>
             </Dropdown>
 
-            {/* <Dropdown
+            <Dropdown
               value={filters.triwulan_id}
               onValueChange={(value) => handleSelectFilter('triwulan_id', value)}
             >
@@ -299,7 +305,7 @@ const ReportTableWrapper = () => {
                   </DropdownItem>
                 ))}
               </DropdownContent>
-            </Dropdown> */}
+            </Dropdown>
 
             {authUser()?.role.name === 'Superadmin' && (
               <Dropdown

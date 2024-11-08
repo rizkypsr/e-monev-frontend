@@ -22,6 +22,7 @@ import {
   optionalData,
   programPrioritasData,
 } from '@/views/User/Triwulan/constants';
+import getTriwulan from '@/api/static/getTriwulan';
 
 const initialParams = {
   search: '',
@@ -41,6 +42,7 @@ const Location = () => {
     activity_form: null,
     program_prioritas: null,
     target_opd: null,
+    triwulan_id: ''
   });
 
   const targetOpdQuery = useInfiniteQuery({
@@ -69,6 +71,11 @@ const Location = () => {
 
   const targetOpdData = (targetOpdQuery.data?.pages ?? [{ result: [] }])[0]
     ?.data?.result;
+
+  const triwulanQuery = useQuery({
+    queryKey: ['get_triwulan'],
+    queryFn: () => getTriwulan(authHeader()),
+  });
 
   const fundSourceQuery = useInfiniteQuery({
     queryKey: ['get_fund_source'],
@@ -115,6 +122,22 @@ const Location = () => {
             </DropdownContent>
           </Dropdown>
         )}
+
+        <Dropdown
+          value={filterParams.triwulan_id}
+          onValueChange={(value) => handleOnChange('triwulan_id', value)}
+        >
+          <DropdownTrigger>
+            <DropdownValue placeholder="Pilih Triwulan" />
+          </DropdownTrigger>
+          <DropdownContent>
+            {triwulanQuery.data?.data?.map((triwulan) => (
+              <DropdownItem key={triwulan.id} value={triwulan.id}>
+                {triwulan.name}
+              </DropdownItem>
+            ))}
+          </DropdownContent>
+        </Dropdown>
 
         <Dropdown
           value={filterParams.jenis_pengadaan}
