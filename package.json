@@ -30,6 +30,8 @@
     "bignumber.js": "^9.1.2",
     "chart.js": "^4.4.4",
     "dotenv": "^16.0.3",
+    "echarts": "^5.5.1",
+    "echarts-for-react": "^3.0.2",
     "install": "^0.13.0",
     "json-diff-kit": "^1.0.29",
     "leaflet": "^1.9.4",
