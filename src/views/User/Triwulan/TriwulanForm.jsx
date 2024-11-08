@@ -157,6 +157,10 @@ const TriwulanForm = () => {
     if (id === undefined) {
       reset();
     }
+
+    const currUser = authUser();
+    if (!id && currUser?.role?.name !== 'Superadmin')
+      setValue('management_organization', (currUser.organization?.title ?? "").trim());
   }, [id, reset]);
 
   const { isLoading, isError, error } = useQuery({
@@ -381,6 +385,8 @@ const TriwulanForm = () => {
   if (isLoading) {
     return <ReactLoading />;
   }
+
+
 
   return (
     <div className="mb-6">
