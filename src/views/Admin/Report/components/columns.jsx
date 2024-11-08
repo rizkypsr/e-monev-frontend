@@ -43,7 +43,7 @@ const columns = [
       }
     },
     header: 'Lokasi Kegiatan',
-    cell: (info) => <div className="w-64">{info.getValue()}</div>,
+    cell: (info) => <div className="w-48">{info.getValue()}</div>,
   },
   {
     accessorFn: (row) => row.fundSource?.name ?? '-',
@@ -64,6 +64,10 @@ const columns = [
   {
     accessorFn: (row) => row.management_organization ?? '-',
     header: 'OPD Organisasi',
+  },
+  {
+    accessorFn: (row) => row.createdBy?.name ?? '-',
+    header: 'Diinput Oleh',
   },
   {
     accessorFn: (row) => row.kepala_dinas_name ?? '-',

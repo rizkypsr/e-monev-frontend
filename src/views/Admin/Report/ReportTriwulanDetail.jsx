@@ -1,9 +1,12 @@
+/* eslint-disable no-var */
+/* eslint-disable arrow-body-style */
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from 'react-query';
 import { useAuthHeader } from 'react-auth-kit';
 import { Timeline } from 'rsuite';
-import moment from 'moment';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import moment from 'moment-timezone';
 import { Differ } from 'json-diff-kit';
 
 import {
@@ -85,8 +88,9 @@ const fieldMappings = [
   },
   { key: 'activity_name', label: 'Nama Kegiatan' },
   { key: 'activity_output_sub', label: 'Nama Output Sub Kegiatan' },
+  { key: 'createdBy', label: 'Diinput Oleh' },
   // { key: 'sub_activity', label: 'Sub Kegiatan' },
-  { key: 'program', label: 'Nama Program' },
+  // { key: 'program', label: 'Nama Program' },
   {
     key: 'activity_location',
     label: 'Lokasi Kegiatan',
@@ -155,13 +159,14 @@ const fieldMappings = [
   },
   {
     key: 'indirect_target_group',
-    label: 'Manfaat Kegiatan (Kelompok sasaran Langsung)',
+    label: 'Manfaat Kegiatan (Kelompok sasaran tidak Langsung)',
   },
   { key: 'local_workforce', label: 'Jumlah Tenaga Kerja (Lokal)' },
   { key: 'non_local_workforce', label: 'Jumlah Tenaga Kerja (Non Lokal)' },
   { key: 'problems', label: 'Hambatan dan Permasalahan' },
   { key: 'procurement_type', label: 'Jenis Pengadaan' },
   { key: 'procurement_method', label: 'Cara Pengadaan' },
+  { key: 'activity_form', label: 'Bentuk Pengadaan' },
   { key: 'optional', label: 'Opsi' },
   { key: 'reason', label: 'Alasan Terkait' },
 ];
@@ -186,6 +191,8 @@ const ReportTriwulanDetail = () => {
   const [dataJSON, setDataJSON] = useState([]);
   const [triwulanData, setTriwulanData] = useState({});
   const [diffData, setDiffData] = useState([]);
+
+  moment.tz.setDefault('Asia/Jayapura');
 
   /**
    * display icon up / down
@@ -235,7 +242,7 @@ const ReportTriwulanDetail = () => {
         } Orang`,
       non_local_workforce: `${(String(triwulanData?.non_local_workforce) ?? '0').replace('.00', '') ??
         '0'
-        } Orang`,
+        } Orang`
     });
 
   const { isLoading, isError, error } = useQuery({
@@ -249,14 +256,21 @@ const ReportTriwulanDetail = () => {
     onSuccess: ({ data = [] }) => {
       /** reformat object */
       const cpData = Array.from(data).map((e) => {
-        delete e.createdBy;
+        // delete e.createdBy;
+        // delete e.user_id;
         return {
           ...e,
+          createdBy: e.createdBy?.name,
           activity_location: JSON.parse(e?.activity_location)?.name ?? '',
         };
       });
 
-      const r = Array.from(cpData).reduce((prev, curr, index, original) => {
+      var r = Array.from(cpData).map((e) => {
+        delete e.createdBy;
+        delete e.user_id;
+        delete e.updated_at;
+        return e;
+      }).reduce((prev, curr, index, original) => {
         const diff = differ
           .diff(original[index - 1], original[index])
           .map((e) => e.filter((f) => f.type !== 'equal'));
@@ -264,12 +278,12 @@ const ReportTriwulanDetail = () => {
         return [...prev, diff];
       }, []);
 
-      const u = Array.from(r);
+      var u = Array.from(r)
       u.shift();
       setDiffData([...u, r.pop()]);
 
-      setDataJSON(Array.from(data) ?? []);
-      setTriwulanData(Array.from(data)[selectedIndexTimeline] ?? {});
+      setDataJSON(Array.from(data).map((e) => ({ ...e, createdBy: e.createdBy?.name, })) ?? []);
+      setTriwulanData(Array.from(data).map((e) => ({ ...e, createdBy: e.createdBy?.name, }))[selectedIndexTimeline] ?? {});
       invokeReport();
     },
   });
@@ -289,8 +303,10 @@ const ReportTriwulanDetail = () => {
     return <ReactLoading />;
   }
 
+  const accessObj = (path, data) => path.split('.').reduce((o, i) => o[i], data);
+
   const renderFieldValue = (field, data) => {
-    const value = data[field.key];
+    const value = accessObj(field.key, data);
 
     if (field.isFormatted && typeof field.formatter === 'function') {
       return field.formatter(value);
