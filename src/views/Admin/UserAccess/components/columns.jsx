@@ -28,8 +28,12 @@ const columns = [
     header: 'Email',
   },
   {
+    accessorKey: 'name',
+    header: 'Nama',
+  },
+  {
     accessorKey: 'organization.title',
-    header: 'Nama OPD',
+    header: 'Organisasi',
     cell: (info) => <div className="w-64">{info.getValue()}</div>,
   },
   {

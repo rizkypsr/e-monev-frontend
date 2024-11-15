@@ -1,3 +1,6 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable camelcase */
+/* eslint-disable no-underscore-dangle */
 import React from 'react';
 import { CheckCircleIcon } from '@heroicons/react/24/solid';
 import { Link, useNavigate, useParams } from 'react-router-dom';
@@ -21,11 +24,13 @@ import { useToastContext } from '@/context/ToastContext';
 
 import getFundSource from '@/api/user/triwulan/getFundSource';
 import createTriwulan from '@/api/user/triwulan/createTriwulan';
-import getUsers from '@/api/user/triwulan/getUsers';
+import getUsersAll from '@/api/user/triwulan/getUsersAll';
 import getTriwulanDetail from '@/api/user/triwulan/getTriwulanDetail';
 import updateTriwulan from '@/api/user/triwulan/updateTriwulan';
 import { getActivities } from '@/api/admin/activity';
 
+// eslint-disable-next-line import/no-extraneous-dependencies
+import BigNumber from "bignumber.js";
 import {
   bentukKegiatanData,
   caraPengadaanData,
@@ -33,6 +38,7 @@ import {
   optionalData,
   programPrioritasData,
 } from './constants';
+
 
 const initialParams = {
   limit: 20,
@@ -151,6 +157,10 @@ const TriwulanForm = () => {
     if (id === undefined) {
       reset();
     }
+
+    const currUser = authUser();
+    if (!id && currUser?.role?.name !== 'Superadmin')
+      setValue('management_organization', (currUser.organization?.title ?? "").trim());
   }, [id, reset]);
 
   const { isLoading, isError, error } = useQuery({
@@ -160,13 +170,13 @@ const TriwulanForm = () => {
     refetchOnMount: true,
     onSuccess: (result) => {
       const triwulanData = result.data[0] ?? {};
-
       setValue('createdByUid', triwulanData.createdBy);
       setValue('activity_name', triwulanData.activity_name);
-      //   setValue('activity_location', JSON.parse(triwulanData.activity_location));
+      setValue('activity_location', JSON.parse(triwulanData.activity_location));
       setValue('fund_source_id', triwulanData.fundSource);
       setValue('fund_ceiling', triwulanData.fund_ceiling || '');
       setValue('management_organization', triwulanData.management_organization);
+      setValue('kepala_dinas_name', triwulanData.kepala_dinas_name);
       setValue('pptk_name', triwulanData.pptk_name);
       setValue('contract_number_date', triwulanData.contract_number_date);
       setValue('contractor_name', triwulanData.contractor_name);
@@ -239,7 +249,7 @@ const TriwulanForm = () => {
 
       params.page = pageParam;
 
-      const res = await getUsers(params, authHeader());
+      const res = await getUsersAll(params, authHeader());
 
       return res;
     },
@@ -330,7 +340,7 @@ const TriwulanForm = () => {
         {
           onSuccess: () => {
             showToastMessage('Berhasil mengubah Data Kegiatan');
-            navigate('/laporan/data-triwulan?limit=10&page=1&sort=terbaru');
+            navigate('/laporan');
           },
           onError: (err) => {
             showToastMessage(err.message, 'error');
@@ -349,7 +359,8 @@ const TriwulanForm = () => {
       {
         onSuccess: () => {
           showToastMessage('Berhasil membuat Data Kegiatan');
-          navigate('/laporan/data-triwulan?limit=10&page=1&sort=terbaru');
+          // window.location.reload();
+          navigate('/laporan?limit=10&page=1&sort=terbaru&search=');
         },
         onError: (err) => {
           showToastMessage(err.message, 'error');
@@ -358,6 +369,15 @@ const TriwulanForm = () => {
     );
   };
 
+  // eslint-disable-next-line no-unused-vars
+  const countRealisasiFisPercent = (_) => {
+    const physical_realization = new BigNumber(control._formValues.physical_realization);
+    const contract_value = new BigNumber(control._formValues.contract_value)
+    setValue('physical_realization_percentage',
+      physical_realization.dividedBy(contract_value).times(100).toFixed(2),
+    )
+  }
+
   const handleFileInput = (files) => {
     setValue('file', files);
   };
@@ -365,6 +385,8 @@ const TriwulanForm = () => {
   if (isLoading) {
     return <ReactLoading />;
   }
+
+
 
   return (
     <div className="mb-6">
@@ -389,6 +411,11 @@ const TriwulanForm = () => {
                       label="Pilih Target OPD"
                       data={targetOpdQuery.data}
                       {...field}
+                      onChange={(e) => {
+                        setValue('createdByUid', e);
+                        setValue('kepala_dinas_name', e.organization.kepala_dinas_name);
+                        setValue('management_organization', e.organization.title);
+                      }}
                     />
                   )}
                 />
@@ -457,6 +484,15 @@ const TriwulanForm = () => {
             </div>
 
             <div>
+              <Label className="mb-2">Nama Kepala Dinas</Label>
+              <TextInputV2
+                placeholder="Tulis Disini..."
+                register={register('kepala_dinas_name')}
+                error={errors.kepala_dinas_name?.message}
+              />
+            </div>
+
+            <div>
               <Label className="mb-2">Nama PPTK</Label>
               <TextInputV2
                 placeholder="Tulis Disini..."
@@ -472,7 +508,7 @@ const TriwulanForm = () => {
                 register={register('contract_number_date', {
                   required: false,
                 })}
-                error={errors.pptk_name?.message}
+                error={errors.contract_number_date?.message}
               />
             </div>
 
@@ -527,6 +563,7 @@ const TriwulanForm = () => {
                 {...register('contract_value', {
                   required: false,
                   valueAsNumber: true,
+                  onChange: countRealisasiFisPercent,
                   max: {
                     message: 'Maksimal Rp.200.000.000.000.000',
                     value: 200000000000000000,
@@ -544,6 +581,7 @@ const TriwulanForm = () => {
                 {...register('physical_realization', {
                   required: 'Realisasi Fisik wajib diisi!',
                   valueAsNumber: true,
+                  onChange: countRealisasiFisPercent,
                   max: {
                     message: 'Maksimal Rp.200.000.000.000.000',
                     value: 200000000000000000,
@@ -556,7 +594,7 @@ const TriwulanForm = () => {
               <PercentageInput
                 className={
                   watch('physical_realization_percentage') <= 25 &&
-                  id !== undefined
+                    id !== undefined
                     ? 'text-red-500'
                     : ''
                 }
@@ -721,7 +759,7 @@ const TriwulanForm = () => {
               />
             </div>
 
-            <div>
+            {/* <div>
               <Label className="mb-2">Sub Kegiatan</Label>
               <Controller
                 control={control}
@@ -734,7 +772,7 @@ const TriwulanForm = () => {
                   />
                 )}
               />
-            </div>
+            </div> */}
 
             <div>
               <Label className="mb-2">Bentuk Kegiatan</Label>
@@ -767,7 +805,7 @@ const TriwulanForm = () => {
             </div>
 
             <div>
-              <Label className="mb-2">Nama Pimpinan</Label>
+              <Label className="mb-2">Nama Pimpinan Daerah</Label>
               <TextInputV2
                 placeholder="Tulis Disini..."
                 register={register('leader_name')}
@@ -821,7 +859,7 @@ const TriwulanForm = () => {
                 className="w-full md:w-28 bg-primary text-white"
                 icon={<CheckCircleIcon className="w-5 h-5" />}
                 disabled={
-                  watch('physical_realization_percentage') >= 100 &&
+                  watch('physical_realization_percentage') > 100 &&
                   id !== undefined
                 }
               >

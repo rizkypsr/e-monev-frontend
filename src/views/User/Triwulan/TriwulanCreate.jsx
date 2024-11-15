@@ -1,3 +1,5 @@
+/* eslint-disable camelcase */
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable guard-for-in */
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-restricted-syntax */
@@ -9,6 +11,8 @@ import { Controller, useForm } from 'react-hook-form';
 import { useInfiniteQuery, useMutation } from 'react-query';
 import { useAuthHeader, useAuthUser } from 'react-auth-kit';
 
+// eslint-disable-next-line import/no-extraneous-dependencies
+import BigNumber from 'bignumber.js';
 import Label from '../../../components/Label';
 import formattedDate from '../../../utils/formattedDate';
 import ReactLoading from '../../../components/Loading';
@@ -21,7 +25,7 @@ import FileInput from '../../../components/FileInput';
 import { getActivities } from '../../../api/admin/activity';
 import CurrencyInput from '../../../components/CurrencyInput';
 import PercentageInput from '../../../components/PercentageInput';
-import getUsers from '../../../api/user/triwulan/getUsers';
+import getUsersAll from '../../../api/user/triwulan/getUsersAll';
 import TextInputV2 from '../../../components/TextInputV2';
 import LocationInput from '../../../components/LocationInput';
 
@@ -150,7 +154,7 @@ const TriwulanCreate = () => {
 
       params.page = pageParam;
 
-      const res = await getUsers(params, authHeader());
+      const res = await getUsersAll(params, authHeader());
 
       return res;
     },
@@ -242,6 +246,15 @@ const TriwulanCreate = () => {
     );
   };
 
+  // eslint-disable-next-line no-unused-vars
+  const countRealisasiFisPercent = (_) => {
+    const physical_realization = new BigNumber(control._formValues.physical_realization);
+    const contract_value = new BigNumber(control._formValues.contract_value)
+    setValue('physical_realization_percentage',
+      physical_realization.dividedBy(contract_value).times(100).toFixed(2),
+    )
+  }
+
   const handleFileInput = (files) => {
     setValue('file', files);
   };
@@ -271,6 +284,11 @@ const TriwulanCreate = () => {
                       label="Pilih Target OPD"
                       data={targetOpdQuery.data}
                       {...field}
+                      onChange={(e) => {
+                        setValue('createdByUid', e);
+                        setValue('kepala_dinas_name', e.organization.kepala_dinas_name);
+                        setValue('management_organization', e.organization.title);
+                      }}
                     />
                   )}
                 />
@@ -339,6 +357,14 @@ const TriwulanCreate = () => {
               />
             </div>
             <div>
+              <Label className="mb-2">Nama Kepala Dinas</Label>
+              <TextInputV2
+                placeholder="Tulis Disini..."
+                register={register('kepala_dinas_name')}
+                error={errors.kepala_dinas_name?.message}
+              />
+            </div>
+            <div>
               <Label className="mb-2">Nama PPTK</Label>
               <TextInputV2
                 placeholder="Tulis Disini..."
@@ -403,6 +429,7 @@ const TriwulanCreate = () => {
                 {...register('contract_value', {
                   required: false,
                   valueAsNumber: true,
+                  onChange: countRealisasiFisPercent,
                   max: {
                     message: 'Maksimal Rp.200.000.000.000.000',
                     value: 200000000000000000,
@@ -419,6 +446,7 @@ const TriwulanCreate = () => {
                 {...register('physical_realization', {
                   required: 'Realisasi Fisik wajib diisi!',
                   valueAsNumber: true,
+                  onChange: countRealisasiFisPercent,
                   max: {
                     message: 'Maksimal Rp.200.000.000.000.000',
                     value: 200000000000000000,
@@ -435,6 +463,7 @@ const TriwulanCreate = () => {
                 {...register('physical_realization_percentage', {
                   required: 'Realisasi Fisik wajib diisi!',
                   valueAsNumber: true,
+                  value: (control._formValues.physical_realization / control._formValues.contract_value) * 100,
                   max: {
                     message: 'Maksimal Rp.200.000.000.000.000',
                     value: 200000000000000000,
@@ -586,7 +615,7 @@ const TriwulanCreate = () => {
                 )}
               />
             </div>
-            <div className="mb-2">
+            {/* <div className="mb-2">
               <Label className="mb-2">Sub Kegiatan</Label>
               <Controller
                 control={control}
@@ -599,7 +628,7 @@ const TriwulanCreate = () => {
                   />
                 )}
               />
-            </div>
+            </div> */}
             <div>
               <Label className="mb-2">Bentuk Kegiatan</Label>
               <Controller
@@ -629,7 +658,7 @@ const TriwulanCreate = () => {
               />
             </div>
             <div>
-              <Label className="mb-2">Nama Pimpinan</Label>
+              <Label className="mb-2">Nama Pimpinan Daerah</Label>
               <TextInputV2
                 placeholder="Tulis Disini..."
                 register={register('leader_name')}

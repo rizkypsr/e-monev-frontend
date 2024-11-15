@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useInfiniteQuery } from 'react-query';
 import { useAuthHeader } from 'react-auth-kit';
+// import getTriwulan from '@/api/static/getTriwulan';
 import Label from '../../../../components/Label';
 import DropdownDialog from '../../../../components/DropdownDialog';
 import {
@@ -10,6 +11,7 @@ import {
   programPrioritasData,
 } from '../../../User/Triwulan/constants';
 import getFundSource from '../../../../api/user/triwulan/getFundSource';
+import getFundSourceAll from '../../../../api/user/triwulan/getFundSourceAll';
 
 const jenisPengadaan = {
   pageParams: [undefined],
@@ -84,6 +86,23 @@ const years = {
   ],
 };
 
+const triwulanList = {
+  pageParams: [undefined],
+  pages: [
+    {
+      data: {
+        page: 1,
+        pages: 1,
+        result: Array.from({ length: 4 }, (_, i) => ({
+          id: i + 1,
+          name: `Triwulan ${i + 1}`,
+        })),
+        total: 4,
+      },
+    },
+  ],
+};
+
 const initialFundSourceparams = {
   limit: 10,
   page: 1,
@@ -91,10 +110,10 @@ const initialFundSourceparams = {
   sort: 'terbaru',
 };
 
-const FilterPanel = ({ filters, onChange }) => {
+const FilterPanel = ({ filters, onChange, all = false }) => {
   const authHeader = useAuthHeader();
 
-  const [fundSourceFilterParams, setFundSourceFilterParams] = React.useState(
+  const [fundSourceFilterParams, setFundSourceFilterParams] = useState(
     initialFundSourceparams
   );
 
@@ -105,7 +124,7 @@ const FilterPanel = ({ filters, onChange }) => {
 
       params.page = pageParam;
 
-      const res = await getFundSource(fundSourceFilterParams, authHeader());
+      const res = all ? await getFundSourceAll(fundSourceFilterParams, authHeader()) : await getFundSource(fundSourceFilterParams, authHeader());
 
       return res;
     },
@@ -128,6 +147,12 @@ const FilterPanel = ({ filters, onChange }) => {
   const handleSelectFilter = (key, value) => {
     onChange(key, value);
   };
+
+  // const triwulanQuery = useInfiniteQuery({
+  //   queryKey: ['get_triwulan'],
+  //   queryFn: () => getTriwulan(authHeader()),
+  // });
+
 
   return (
     <div className="flex-1">
@@ -197,6 +222,18 @@ const FilterPanel = ({ filters, onChange }) => {
               onChangeV2={handleSelectFilter}
             />
           </div>
+
+          <div>
+            <Label className="mb-2">Triwulan</Label>
+            <DropdownDialog
+              name="triwulan_id"
+              label="Pilih Triwulan"
+              value={filters.triwulan_id}
+              data={triwulanList}
+              onChangeV2={handleSelectFilter}
+            />
+          </div>
+
         </div>
       )}
     </div>

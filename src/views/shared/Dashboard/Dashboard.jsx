@@ -1,3 +1,5 @@
+/* eslint-disable vars-on-top */
+/* eslint-disable no-var */
 /* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/rules-of-hooks */
 import React, { useEffect, useMemo, useState } from 'react';
@@ -5,6 +7,10 @@ import { useAuthHeader, useAuthUser } from 'react-auth-kit';
 import { useQuery } from 'react-query';
 
 import { useLocation } from 'react-router-dom';
+import getTriwulan from '@/api/static/getTriwulan';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import ReactECharts from 'echarts-for-react'; // import reactecharts
+import _ from 'lodash';
 import ErrorPage from '../../ErrorPage';
 import CountBox from './components/CountBox';
 import FundTotal from './components/FundTotal';
@@ -20,7 +26,6 @@ import { getActivities } from '../../../api/admin/activity';
 import { getPurposes } from '../../../api/admin/purpose';
 import getExcel from '../../../api/admin/dashboard/getExcel';
 import getFundSourceChart from '../../../api/admin/dashboard/getFundSourceChart';
-
 import formatRupiah from '../../../utils/formatRupiah';
 
 const initialParams = {
@@ -34,6 +39,7 @@ const initialFundSourceChart = {
   bentuk_pengadaan: null,
   cara_pengadaan: null,
   program_prio: null,
+  triwulan_id: null
 };
 
 const Dashboard = () => {
@@ -45,13 +51,14 @@ const Dashboard = () => {
   const [filterFundSourceChart, setFilterFundSourceChart] = useState(
     initialFundSourceChart
   );
-  const [filters, setFilters] = React.useState({
+  const [filters, setFilters] = useState({
     fundSource: null,
     jenisPengadaan: null,
     caraPengadaan: null,
     bentukKegiatan: null,
     programPrioritas: null,
     tahun: null,
+    triwulan_id: null
   });
 
   const location = useLocation();
@@ -104,18 +111,11 @@ const Dashboard = () => {
     enabled: filters.fundSource !== null,
   });
 
-  useEffect(() => {
-    if (filters.fundSource?.id) {
-      setFilterFundSourceChart({
-        pagu_dana_id: filters.fundSource.id,
-        tipe_pengadaan: filters.jenisPengadaan?.name,
-        bentuk_pengadaan: filters.bentukKegiatan?.name,
-        cara_pengadaan: filters.caraPengadaan?.name,
-        program_prio: filters.programPrioritas?.name,
-        tahun: filters.tahun?.name,
-      });
-    }
-  }, [filters]);
+  // const triwulanQuery = useQuery({
+  //   queryKey: ['get_triwulan'],
+  //   queryFn: () => getTriwulan(authHeader()),
+  //   enabled: filters.fundSource !== null,
+  // });
 
   useEffect(() => {
     if (filters.fundSource?.id) {
@@ -126,9 +126,24 @@ const Dashboard = () => {
         cara_pengadaan: filters.caraPengadaan?.name,
         program_prio: filters.programPrioritas?.name,
         tahun: filters.tahun?.name,
+        triwulan_id: filters.triwulan_id?.id
       });
     }
   }, [filters]);
+
+  // useEffect(() => {
+  //   if (filters.fundSource?.id) {
+  //     setFilterFundSourceChart({
+  //       pagu_dana_id: filters.fundSource.id,
+  //       tipe_pengadaan: filters.jenisPengadaan?.name,
+  //       bentuk_pengadaan: filters.bentukKegiatan?.name,
+  //       cara_pengadaan: filters.caraPengadaan?.name,
+  //       program_prio: filters.programPrioritas?.name,
+  //       tahun: filters.tahun?.name,
+  //       triwulan_id: filters.triwulan_id?.name
+  //     });
+  //   }
+  // }, [filters]);
 
   // const handleDownloadExcel = async () => {
   //   await excelQuery.refetch();
@@ -165,6 +180,42 @@ const Dashboard = () => {
     [fundSourceChartQuery?.data?.data?.triwulan]
   );
 
+  // Specify the configuration items and data for the chart
+
+  const calculateBarData = () => {
+    const x = _(fundSourceChartQuery?.data?.data?.triwulan ?? []).groupBy((e) => e.nama_opd)
+      .map((value, key) => ([
+        // nama_opd
+        key,
+        // realisasi_fisik
+        value.reduce((prev, curr) => prev + curr.realisasi_fisik, 0),
+        // realisasi_fisik_persentase
+        value.reduce((prev, curr) => prev + curr.realisasi_fisik_persentase, 0) / value.length
+      ]))
+      .value()
+
+    return x
+
+  }
+  var option = {
+    legend: {},
+    tooltip: {},
+    dataset: {
+      source: [
+        ['Nama OPD', 'Realisasi Fisik angka', 'Realisasi Fisik Persentase'],
+        // eslint-disable-next-line no-unsafe-optional-chaining
+        ...calculateBarData()
+        // ...(fundSourceChartQuery?.data?.data?.triwulan.map((e) => ([e?.nama_opd ?? 0,
+        // e?.realisasi_fisik ?? 0,
+        // e?.realisasi_fisik_persentase ?? 0]))) ?? []
+      ]
+    },
+    xAxis: { type: 'category' },
+    yAxis: {},
+    series: [{ type: 'bar', barMinHeight: 15, barWidth: '30%' }, { type: 'bar', barMinHeight: 15, barWidth: '30%' }]
+  };
+
+
   return (
     <>
       <h1 className="font-semibold text-2xl mb-4">
@@ -182,7 +233,7 @@ const Dashboard = () => {
 
       <div className="flex flex-col space-y-4 lg:space-y-0 lg:flex-row justify-center lg:justify-between my-8 lg:items-end">
         {authUser().role.id === 1 && (
-          <FilterPanel filters={filters} onChange={handleSelectFilter} />
+          <FilterPanel all filters={filters} onChange={handleSelectFilter} />
         )}
 
         {authUser().role.name !== 'OPD' && (
@@ -211,36 +262,43 @@ const Dashboard = () => {
         )}
       </div>
 
-      {authUser().role.name !== 'OPD' && (
-        <div className="mb-8 bg-white rounded-lg shadow-2xl shadow-[#F3F6FF] p-8">
-          <h1 className="text-2xl font-semibold text-center space-x-3">
-            <span>Sumber Dana:</span>
-            <span className="uppercase">
-              {fundSourceChartQuery?.data?.data?.pagu_dana.name}
-            </span>
-          </h1>
-          <div className="mt-6 flex flex-col space-y-12 lg:flex-row lg:space-y-0 lg:space-x-12 lg:justify-center items-center">
-            <FundTotal
-              title="Total Sumber Dana"
-              className="bg-[#56CCF2]"
-              total={formatRupiah(totalPaguDana)}
-            />
-            <FundTotal
-              title="Total Pagu Dana"
-              className="bg-[#BB6BD9]"
-              total={formatRupiah(totalPaguDanaDigunakan)}
-            />
-          </div>
-
-          {progressBarData && (
-            <div className="mt-20">
-              <ProgressBar data={progressBarData} />
+      {
+        authUser().role.name !== 'OPD' && (
+          <div className="mb-8 bg-white rounded-lg shadow-2xl shadow-[#F3F6FF] p-8">
+            <h1 className="text-2xl font-semibold text-center space-x-3">
+              <span>Sumber Dana:</span>
+              <span className="uppercase">
+                {fundSourceChartQuery?.data?.data?.pagu_dana.name}
+              </span>
+            </h1>
+            <div className="mt-6 flex flex-col space-y-12 lg:flex-row lg:space-y-0 lg:space-x-12 lg:justify-center items-center">
+              <FundTotal
+                title="Total Sumber Dana"
+                className="bg-[#56CCF2]"
+                total={formatRupiah(totalPaguDana)}
+              />
+              <FundTotal
+                title="Total Pagu Dana"
+                className="bg-[#BB6BD9]"
+                total={formatRupiah(totalPaguDanaDigunakan)}
+              />
             </div>
-          )}
-        </div>
-      )}
 
-      {authUser().role.name !== 'OPD' && (
+            {progressBarData && (
+              <div className="mt-20">
+                <ProgressBar data={progressBarData} />
+              </div>
+            )}
+
+            {progressBarData && (
+              <ReactECharts className='mt-20' option={option} />
+            )}
+
+          </div>
+        )
+      }
+
+      {/* {authUser().role.name !== 'OPD' && (
         <div className="bg-white rounded-lg grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-y-7 p-8 shadow-2xl shadow-[#F3F6FF]">
           {showCountBox(['Superadmin', 'Admin Bidang']) && (
             <CountBox
@@ -297,7 +355,7 @@ const Dashboard = () => {
             />
           )}
         </div>
-      )}
+      )} */}
 
       {authUser().role.name === 'OPD' && <ReportTable />}
     </>

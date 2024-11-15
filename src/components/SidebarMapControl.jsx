@@ -26,8 +26,6 @@ const SidebarMapControl = ({ onSelectMap }) => {
       ).then((response) => response.json());
 
       if (details.title !== '404 Not Found') {
-        console.log(details);
-
         onSelectMap(details);
       }
 
@@ -39,9 +37,8 @@ const SidebarMapControl = ({ onSelectMap }) => {
                 <div><strong>Negara:</strong> ${address.country || '-'}</div>
                 <div><strong>Kota:</strong> ${address.city || '-'}</div>
                 <div><strong>Provinsi:</strong> ${address.state || '-'}</div>
-                <div><strong>Alamat Lengkap:</strong> ${
-                  details.display_name || '-'
-                }</div>
+                <div><strong>Alamat Lengkap:</strong> ${details.display_name || '-'
+        }</div>
                 <div><strong>Latitude:</strong> ${lat}</div>
                 <div><strong>Longitude:</strong> ${lng}</div>
               </div>

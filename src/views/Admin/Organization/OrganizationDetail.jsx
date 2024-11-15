@@ -22,10 +22,7 @@ const OrganizationDetail = () => {
     queryKey: ['get_organization'],
     queryFn: () => getOrganization(id, authHeader()),
     onSuccess: (result) => {
-      setOrganization({
-        code: result.data.code,
-        title: result.data.title,
-      });
+      setOrganization(result.data);
     },
   });
 
@@ -75,6 +72,15 @@ const OrganizationDetail = () => {
                 Urusan
               </th>
               <td className="px-6 py-4">{organization.title}</td>
+            </tr>
+            <tr className="bg-light-blue">
+              <th
+                scope="row"
+                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
+              >
+                Nama Kepala Dinas
+              </th>
+              <td className="px-6 py-4">{organization.kepala_dinas_name}</td>
             </tr>
           </tbody>
         </table>

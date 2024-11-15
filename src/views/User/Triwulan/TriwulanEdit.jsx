@@ -1,3 +1,5 @@
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable camelcase */
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from 'react';
 import { CheckCircleIcon } from '@heroicons/react/24/solid';
@@ -5,6 +7,8 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { useInfiniteQuery, useMutation, useQuery } from 'react-query';
 import { useAuthHeader } from 'react-auth-kit';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import BigNumber from 'bignumber.js';
 import Label from '../../../components/Label';
 import TextInput from '../../../components/TextInput';
 import formattedDate from '../../../utils/formattedDate';
@@ -136,6 +140,7 @@ const TriwulanEdit = () => {
       setValue('fund_source_id', triwulanData.fund_source_id);
       setValue('fund_ceiling', triwulanData.fund_ceiling || '');
       setValue('management_organization', triwulanData.management_organization);
+      setValue('kepala_dinas_name', triwulanData.kepala_dinas_name);
       setValue('pptk_name', triwulanData.pptk_name);
       setValue('contract_number_date', triwulanData.contract_number_date);
       setValue('contractor_name', triwulanData.contractor_name);
@@ -261,6 +266,15 @@ const TriwulanEdit = () => {
     setSelectedActivity(item);
   };
 
+  // eslint-disable-next-line no-unused-vars
+  const countRealisasiFisPercent = (_) => {
+    const physical_realization = new BigNumber(control._formValues.physical_realization);
+    const contract_value = new BigNumber(control._formValues.contract_value)
+    setValue('physical_realization_percentage',
+      physical_realization.dividedBy(contract_value).times(100).toFixed(2),
+    )
+  }
+
   const handleFileInput = (file) => {
     setValue('file', file);
   };
@@ -346,6 +360,16 @@ const TriwulanEdit = () => {
               />
             </div>
             <div>
+              <Label className="mb-2">Nama Kepala Dinas</Label>
+              <TextInput
+                id="kepala_dinas_name"
+                name="kepala_dinas_name"
+                placeholder="Tulis Disini..."
+                register={register('kepala_dinas_name')}
+                error={errors.kepala_dinas_name?.message}
+              />
+            </div>
+            <div>
               <Label className="mb-2">Nama PPTK</Label>
               <TextInput
                 id="pptk_name"
@@ -364,7 +388,7 @@ const TriwulanEdit = () => {
                 register={register('contract_number_date', {
                   required: false,
                 })}
-                error={errors.pptk_name?.message}
+                error={errors.contract_number_date?.message}
               />
             </div>
             <div>
@@ -568,7 +592,7 @@ const TriwulanEdit = () => {
                 onChange={handleSelectProcurementMethod}
               />
             </div>
-            <div className="mb-4">
+            {/* <div className="mb-4">
               <Label className="mb-2">Sub Kegiatan</Label>
               <DropdownDialog
                 label="Pilih Sub Kegiatan"
@@ -576,7 +600,7 @@ const TriwulanEdit = () => {
                 value={selectedActivity}
                 onChange={handleSelectActivity}
               />
-            </div>
+            </div> */}
             <div className="mb-4">
               <Label className="mb-2">Bentuk Kegiatan</Label>
               <DropdownDialog

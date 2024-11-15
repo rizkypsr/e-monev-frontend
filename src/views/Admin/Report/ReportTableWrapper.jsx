@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
-import { useQuery } from 'react-query';
-import { useAuthHeader } from 'react-auth-kit';
+import { useInfiniteQuery, useQuery } from 'react-query';
+import { useAuthHeader, useAuthUser } from 'react-auth-kit';
 import { useDebounce } from '@uidotdev/usehooks';
 import {
   ArrowDownTrayIcon,
@@ -14,6 +14,7 @@ import getFundSource from '@/api/user/triwulan/getFundSource';
 import downloadTriwulanPdf from '@/api/admin/report/downloadTriwulanPdf';
 import downloadTriwulanExcel from '@/api/admin/report/downloadTriwulanExcel';
 import objectToQueryString from '@/utils/objectToQueryString';
+import getUsersAll from '@/api/user/triwulan/getUsersAll';
 
 import {
   Dropdown,
@@ -30,6 +31,7 @@ import {
   jenisPengadaanData,
   programPrioritasData,
 } from '@/views/User/Triwulan/constants';
+import getTriwulan from '@/api/static/getTriwulan';
 
 const months = [
   { id: 1, name: 'Januari' },
@@ -72,14 +74,17 @@ const initialFilters = {
   bentuk_pengadaan: '',
   cara_pengadaan: '',
   program_prio: '',
+  createdByUid: '',
 };
 
 const ReportTableWrapper = () => {
   const authHeader = useAuthHeader();
   const navigate = useNavigate();
+  const authUser = useAuthUser();
+
   const { showToastMessage } = useToastContext();
 
-  const [filters, setFilters] = React.useState(initialFilters);
+  const [filters, setFilters] = useState(initialFilters);
 
   const [searchParamsState, setSearchParamsState] =
     useSearchParamsState(initialFilterParams);
@@ -94,6 +99,11 @@ const ReportTableWrapper = () => {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedSearch]);
+
+  const triwulanQuery = useQuery({
+    queryKey: ['get_triwulan'],
+    queryFn: () => getTriwulan(authHeader()),
+  });
 
   const fundSourceQuery = useQuery({
     queryKey: ['get_fund_source'],
@@ -178,6 +188,35 @@ const ReportTableWrapper = () => {
     navigate(`/laporan?${queryString}`);
   };
 
+  const targetOpdQuery = useInfiniteQuery({
+    queryKey: ['get_opd'],
+    queryFn: async ({ pageParam = 1 }) => {
+      const params = {
+        search: '',
+        sort: 'terbaru',
+        limit: 0,
+        role_id: 2,
+      };
+
+      params.page = pageParam;
+
+      const res = await getUsersAll(params, authHeader());
+
+      return res;
+    },
+    getNextPageParam: (lastPage) => {
+      if (lastPage.data.page < lastPage.data.pages) {
+        return lastPage.data.page + 1;
+      }
+
+      return undefined;
+    },
+  });
+
+  const targetOpdData = (targetOpdQuery.data?.pages ?? [{ result: [] }])[0]
+    ?.data?.result;
+
+
   return (
     <>
       <div className="flex justify-between">
@@ -252,7 +291,7 @@ const ReportTableWrapper = () => {
               </DropdownContent>
             </Dropdown>
 
-            {/* <Dropdown
+            <Dropdown
               value={filters.triwulan_id}
               onValueChange={(value) => handleSelectFilter('triwulan_id', value)}
             >
@@ -266,7 +305,25 @@ const ReportTableWrapper = () => {
                   </DropdownItem>
                 ))}
               </DropdownContent>
-            </Dropdown> */}
+            </Dropdown>
+
+            {authUser()?.role.name === 'Superadmin' && (
+              <Dropdown
+                value={filters.createdByUid}
+                onValueChange={(value) => handleSelectFilter('createdByUid', value)}
+              >
+                <DropdownTrigger>
+                  <DropdownValue placeholder="Pilih Target OPD" />
+                </DropdownTrigger>
+                <DropdownContent>
+                  {targetOpdData?.map((e) => (
+                    <DropdownItem key={e.name} value={e.id}>
+                      {e.name}
+                    </DropdownItem>
+                  ))}
+                </DropdownContent>
+              </Dropdown>
+            )}
 
             <Dropdown
               value={filters.tipe_pengadaan}
