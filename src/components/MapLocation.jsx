@@ -19,15 +19,12 @@ import 'leaflet-geosearch/dist/geosearch.css';
 
 // import './style.css';
 
-
-
 const DefaultIcon = L.icon({
   iconUrl: icon,
-  shadowUrl: iconShadow
+  shadowUrl: iconShadow,
 });
 
 L.Marker.prototype.options.icon = DefaultIcon;
-
 
 const position = [-0.8674005, 131.3051903];
 
@@ -63,17 +60,16 @@ const MapLocation = ({
   onSelectMap,
   showSearchBar = false,
   showSidebar = false,
-  data = []
+  data = [],
 }) => {
-
   /**
    * @param {string} v
    * @returns {number}
    */
   const safeParseLonLat = (v) => {
-    const result = parseFloat(v ?? position[0])
-    return Number.isNaN(result) ? position[0] : result
-  }
+    const result = parseFloat(v ?? position[0]);
+    return Number.isNaN(result) ? position[0] : result;
+  };
 
   // eslint-disable-next-line no-var
   var parsedLocs = [];
@@ -96,24 +92,37 @@ const MapLocation = ({
         {Array.from(data).map((e) => {
           const currentPos = [
             safeParseLonLat(e.activity_location.lat),
-            safeParseLonLat(e.activity_location.lon)];
+            safeParseLonLat(e.activity_location.lon),
+          ];
           const stringifiedCurrentPos = currentPos.join(',');
-          const FilterLocs = parsedLocs.filter((e) => e === stringifiedCurrentPos);
-          const displayResult = (<Marker key={Math.random()} position={currentPos}>
-            <Popup>{
-              FilterLocs.length !== 0 ?
-                (() => {
-                  const result =
-                    `${e.activity_location.display_name ?? e.activity_location.name ?? "?"},
+          const FilterLocs = parsedLocs.filter(
+            (e) => e === stringifiedCurrentPos
+          );
+          const displayResult = (
+            <Marker key={Math.random()} position={currentPos}>
+              <Popup>
+                {FilterLocs.length !== 0
+                  ? (() => {
+                      const result = `${
+                        e.activity_location.display_name ??
+                        e.activity_location.name ??
+                        '?'
+                      },
                      Total ${FilterLocs.length} lokasi yang sama,
-                     aktivitas: ${parsedLocsName.join(',\n')}`
-                  parsedLocsName = [...parsedLocsName, e.activity_name]
-                  return result
-                })() :
-                `Aktivitas: ${e.activity_name},
-                 Lokasi: ${e.activity_location.display_name ?? e.activity_location.name ?? ""}`}</Popup>
-          </Marker>);
-          parsedLocs = [currentPos.join(','), ...parsedLocs]
+                     aktivitas: ${parsedLocsName.join(',\n')}`;
+                      parsedLocsName = [...parsedLocsName, e.activity_name];
+                      return result;
+                    })()
+                  : `Aktivitas: ${e.activity_name},
+                 Lokasi: ${
+                   e.activity_location.display_name ??
+                   e.activity_location.name ??
+                   ''
+                 }`}
+              </Popup>
+            </Marker>
+          );
+          parsedLocs = [currentPos.join(','), ...parsedLocs];
           return displayResult;
         })}
         <LocateMapControl />
@@ -130,6 +139,6 @@ const MapLocation = ({
       )}
     </>
   );
-}
+};
 
 export default MapLocation;
