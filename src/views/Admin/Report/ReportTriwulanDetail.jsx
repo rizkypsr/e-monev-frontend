@@ -298,11 +298,15 @@ const ReportTriwulanDetail = () => {
     onSuccess: ({ data = [] }) => {
       /** format data to triwulan by updated_at */
       const trwln = formatToTriwulan(data)
-      const defaultSelectedTriwulanTabs = Math.max(...Array.from(trwln.map((e) => e.triwulan))) - 1;
+      const listAvailTriwulanNum = Array.from(trwln).map((e) => e.triwulan)
       const agTrwln = [
-        ...Array.from({ length: 4 - trwln.length }, (_value, i) => ({ triwulan: i + 1, data: [] })),
-        ...trwln
-      ]
+        ...([1, 2, 3, 4].map((e) => !listAvailTriwulanNum.includes(e) ?
+          ({ triwulan: e, data: [] }) :
+          ({ triwulan: null, data: null }))), ...trwln]
+        .filter((f) => f?.triwulan !== null)
+        .sort((f1, f2) => f1.triwulan - f2.triwulan)
+      const defaultSelectedTriwulanTabs = Math.max(...Array.from(trwln.map((e) => e.triwulan))) - 1;
+
       setSelectedTriwulanTabs(defaultSelectedTriwulanTabs);
       setFormattedTriwulanData(agTrwln);
 
@@ -543,7 +547,7 @@ const ReportTriwulanDetail = () => {
               className="font-semibold text-lg text-dark-gray leading-7"
               style={{ padding: '2%' }}
             >
-              Histori Data
+              Histori Triwulan {selectedTriwulanTabs + 1}
             </h1>
             <Timeline
               align="right"
