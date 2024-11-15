@@ -27,7 +27,7 @@ const LocationInput = ({ name, label, control }) => {
 
   const handleLocationSelect = (data) => {
     field.onChange(data);
-    closeModal();
+    // closeModal();
   };
 
   return (
@@ -77,6 +77,8 @@ const LocationInput = ({ name, label, control }) => {
                     className="text-lg font-medium leading-6 text-gray-900 mb-6 flex items-center justify-between"
                   >
                     <div>{label}</div>
+                    <button className='rounded-md px-3 py-2 leading-tight text-sm font-semibold hover:text-gray-700 bg-primary border border-priimary hover:bg-gray-100 text-white' onClick={closeModal} type='button'> Simpan </button>
+
                   </Dialog.Title>
 
                   <MapLocation

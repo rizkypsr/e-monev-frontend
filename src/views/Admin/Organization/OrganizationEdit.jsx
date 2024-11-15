@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuthHeader } from 'react-auth-kit';
 import { useForm } from 'react-hook-form';
 import { useMutation, useQuery } from 'react-query';
+import TextInputV2 from '@/components/TextInputV2';
 import TextInput from '../../../components/TextInput';
 import Button from '../../../components/Button';
 import { useToastContext } from '../../../context/ToastContext';
@@ -32,6 +33,7 @@ const OrganizationEdit = () => {
     queryFn: () => getOrganization(id, authHeader()),
     onSuccess: (result) => {
       setValue('title', result.data.title);
+      setValue('kepala_dinas_name', result.data.kepala_dinas_name);
     },
   });
 
@@ -91,6 +93,17 @@ const OrganizationEdit = () => {
                 },
               })}
               error={errors.title?.message}
+            />
+          </div>
+
+          <div className="mb-6">
+            <Label className="mb-2">Nama Kepala Dinas</Label>
+            <TextInputV2
+              id="kepala_dinas_name"
+              name="kepala_dinas_name"
+              placeholder="Tuliskan disini ..."
+              register={register('kepala_dinas_name', { required: false })}
+              error={errors.kepala_dinas_name?.message}
             />
           </div>
 

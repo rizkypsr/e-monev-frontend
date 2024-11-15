@@ -77,6 +77,11 @@ const columns = [
     cell: (info) => <i>{info.getValue()}</i>,
     header: () => <span>OPD Organisasi</span>,
   }),
+  columnHelper.accessor((row) => row.kepala_dinas_name, {
+    id: 'kepala_dinas_name',
+    cell: (info) => <i>{info.getValue()}</i>,
+    header: () => <span>Nama Kepala Dinas</span>,
+  }),
   columnHelper.accessor((row) => row.pptk_name, {
     id: 'pptk_name',
     cell: (info) => <i>{info.getValue()}</i>,
@@ -105,7 +110,7 @@ const columns = [
   columnHelper.accessor((row) => row.leader_name, {
     id: 'leader_name',
     cell: (info) => <i>{info.getValue()}</i>,
-    header: () => <span>Nama Pimpinan</span>,
+    header: () => <span>Nama Pimpinan Daerah</span>,
   }),
   columnHelper.accessor((row) => row.implementation_period, {
     id: 'implementation_period',
@@ -392,15 +397,15 @@ const ReportTable = () => {
         columns={columns.map((column) =>
           column.cell
             ? {
-                ...column,
-                cell: (props) =>
-                  column.cell(
-                    props,
-                    deleteReportData,
-                    authUser().role?.name,
-                    handleDownloadFile
-                  ),
-              }
+              ...column,
+              cell: (props) =>
+                column.cell(
+                  props,
+                  deleteReportData,
+                  authUser().role?.name,
+                  handleDownloadFile
+                ),
+            }
             : column
         )}
         rows={data}
