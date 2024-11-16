@@ -22,12 +22,11 @@ const FileInput = ({
     );
   };
 
-  // Display only the first 5 file names and add "..." for the rest
   const displayFileNames = (files) => {
-    if (files.length <= 5) {
-      return files.join(', ');
+    if (files.length === 0) {
+      return 'No File';
     }
-    return `${files.slice(0, 5).join(', ')}${files.length > 5 ? ', ...' : ''}`;
+    return `${files.length} file berhasil dipilih`;
   };
 
   return (
@@ -53,8 +52,8 @@ const FileInput = ({
             })}
           />
         </label>
-        <div>
-          {fileNames.length > 0 ? displayFileNames(fileNames) : 'No File'}
+        <div className="font-semibold underline">
+          {displayFileNames(fileNames)}
         </div>
       </div>
       <p className="mt-2 text-xs text-red-600">{error}</p>
