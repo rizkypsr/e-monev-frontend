@@ -260,7 +260,7 @@ const ReportTriwulanDetail = () => {
   const formatToTriwulan = (data) =>
     _(Array.from(data))
       .groupBy((e) => moment(e.updated_at).quarter())
-      .map((value, key) => ({ triwulan: Number(key), data: value }))
+      .map((value, key) => ({ triwulan: Number(key), data: _.orderBy(value, ['updated_at'], ['desc']) }))
       .orderBy((e) => e.triwulan, 'asc')
       .value();
 
