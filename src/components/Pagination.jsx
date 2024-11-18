@@ -48,11 +48,11 @@ const Pagination = ({
     if (noOfPages <= 10) {
       for (let i = 0; i < noOfPages; i++) {
         items.push(
-          <li key={i}>
+          <span key={i}>
             <button
               type="button"
               onClick={() => onPageSelect(i)}
-              className={`px-3 py-2 leading-tight text-sm font-semibold rounded-md hover:text-gray-700 ${
+              className={`h-10 w-10 leading-tight text-sm font-semibold rounded-md hover:text-gray-700 ${
                 i === currentPage
                   ? 'bg-primary border border-priimary hover:bg-gray-100 text-white'
                   : 'bg-white border border-gray-300 hover:bg-gray-100 text-dark-gray'
@@ -60,7 +60,7 @@ const Pagination = ({
             >
               {i + 1}
             </button>
-          </li>
+          </span>
         );
       }
     } else {
@@ -73,7 +73,7 @@ const Pagination = ({
             key="first"
             type="button"
             onClick={() => onPageSelect(0)}
-            className={`px-3 py-2 leading-tight text-sm font-semibold rounded-md hover:text-gray-700 ${
+            className={`h-10 w-10 leading-tight text-sm font-semibold rounded-md hover:text-gray-700 ${
               currentPage === 1
                 ? 'bg-primary border border-priimary hover:bg-gray-100 text-white'
                 : 'bg-white border border-gray-300 hover:bg-gray-100 text-dark-gray'
@@ -94,7 +94,7 @@ const Pagination = ({
             type="button"
             onClick={() => onPageSelect(i)}
             disabled={currentPage === i}
-            className={`px-3 py-2 leading-tight text-sm font-semibold rounded-md hover:text-gray-700 ${
+            className={`h-10 w-10 leading-tight text-sm font-semibold rounded-md hover:text-gray-700 ${
               i === currentPage
                 ? 'bg-primary border border-priimary hover:bg-gray-100 text-white'
                 : 'bg-white border border-gray-300 hover:bg-gray-100 text-dark-gray'
@@ -121,7 +121,7 @@ const Pagination = ({
             key="last"
             type="button"
             onClick={() => onPageSelect(noOfPages - 1)}
-            className={`px-3 py-2 leading-tight text-sm font-semibold rounded-md hover:text-gray-700 ${
+            className={`h-10 w-10 leading-tight text-sm font-semibold rounded-md hover:text-gray-700 ${
               noOfPages === currentPage
                 ? 'bg-primary border border-priimary hover:bg-gray-100 text-white'
                 : 'bg-white border border-gray-300 hover:bg-gray-100 text-dark-gray'
@@ -139,7 +139,7 @@ const Pagination = ({
   if (noOfPages > 1) {
     return (
       <nav
-        className="flex items-center justify-between w-full p-5 "
+        className="flex p-5 space-y-3 items-center lg:space-y-0 flex-col lg:flex-row lg:justify-between"
         aria-label="Table navigation"
       >
         <span className="text-sm text-gray-500">
@@ -148,8 +148,8 @@ const Pagination = ({
           {totalRows} entri
         </span>
 
-        <ul className="inline-flex items-center space-x-2">
-          <li>
+        <div className="flex items-center space-x-2">
+          <div>
             <button
               type="button"
               onClick={onPrevPage}
@@ -170,9 +170,13 @@ const Pagination = ({
                 />
               </svg>
             </button>
-          </li>
-          {paginationItems}
-          <li>
+          </div>
+
+          <div className="flex flex-wrap justify-center gap-1">
+            {paginationItems}
+          </div>
+
+          <div>
             <button
               type="button"
               onClick={onNextPage}
@@ -193,8 +197,8 @@ const Pagination = ({
                 />
               </svg>
             </button>
-          </li>
-        </ul>
+          </div>
+        </div>
       </nav>
     );
   }
