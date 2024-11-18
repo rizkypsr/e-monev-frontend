@@ -2,11 +2,18 @@
 /* eslint-disable camelcase */
 /* eslint-disable no-underscore-dangle */
 import React from 'react';
-import { CheckCircleIcon } from '@heroicons/react/24/solid';
+import { CheckCircleIcon, TrashIcon } from '@heroicons/react/24/solid';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Controller, useForm } from 'react-hook-form';
-import { useInfiniteQuery, useMutation, useQuery } from 'react-query';
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from 'react-query';
 import { useAuthHeader, useAuthUser } from 'react-auth-kit';
+import BigNumber from 'bignumber.js';
+import { FaFile } from 'react-icons/fa6';
 
 import Label from '@/components/Label';
 import ReactLoading from '@/components/Loading';
@@ -18,8 +25,16 @@ import PercentageInput from '@/components/PercentageInput';
 import TextInputV2 from '@/components/TextInputV2';
 import LocationInput from '@/components/LocationInput';
 import ButtonV2 from '@/components/ButtonV2';
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogTrigger,
+} from '@/components/DialogContent';
 
 import formattedDate from '@/utils/formattedDate';
+import formatFilename from '@/utils/formatFilename';
+import { baseUrlAPI } from '@/utils/constants';
 import { useToastContext } from '@/context/ToastContext';
 
 import getFundSource from '@/api/user/triwulan/getFundSource';
@@ -28,9 +43,9 @@ import getUsersAll from '@/api/user/triwulan/getUsersAll';
 import getTriwulanDetail from '@/api/user/triwulan/getTriwulanDetail';
 import updateTriwulan from '@/api/user/triwulan/updateTriwulan';
 import { getActivities } from '@/api/admin/activity';
+import deleteFiles from '@/api/user/triwulan/deleteFiles';
 
-// eslint-disable-next-line import/no-extraneous-dependencies
-import BigNumber from "bignumber.js";
+import TrashImg from '@/assets/images/trash.png';
 import {
   bentukKegiatanData,
   caraPengadaanData,
@@ -38,7 +53,6 @@ import {
   optionalData,
   programPrioritasData,
 } from './constants';
-
 
 const initialParams = {
   limit: 20,
@@ -125,10 +139,13 @@ const TriwulanForm = () => {
   const navigate = useNavigate();
   const { showToastMessage } = useToastContext();
 
+  const [previews, setPreviews] = React.useState([]);
+
   const {
     register,
     handleSubmit,
     setValue,
+    getValues,
     control,
     watch,
     reset,
@@ -160,8 +177,13 @@ const TriwulanForm = () => {
 
     const currUser = authUser();
     if (!id && currUser?.role?.name !== 'Superadmin')
-      setValue('management_organization', (currUser.organization?.title ?? "").trim());
+      setValue(
+        'management_organization',
+        (currUser.organization?.title ?? '').trim()
+      );
   }, [id, reset]);
+
+  const queryClient = useQueryClient();
 
   const { isLoading, isError, error } = useQuery({
     queryKey: ['get_triwulan_edit_detail'],
@@ -170,6 +192,9 @@ const TriwulanForm = () => {
     refetchOnMount: true,
     onSuccess: (result) => {
       const triwulanData = result.data[0] ?? {};
+
+      setPreviews(triwulanData.file);
+
       setValue('createdByUid', triwulanData.createdBy);
       setValue('activity_name', triwulanData.activity_name);
       setValue('activity_location', JSON.parse(triwulanData.activity_location));
@@ -369,14 +394,38 @@ const TriwulanForm = () => {
     );
   };
 
+  const deleteMutation = useMutation(deleteFiles);
+
+  const deleteFileData = (triwulanId, filename) => {
+    deleteMutation.mutate(
+      {
+        id: triwulanId,
+        token: authHeader(),
+        body: [filename],
+      },
+      {
+        onSuccess: (result) => {
+          queryClient.invalidateQueries('get_triwulan_edit_detail');
+          showToastMessage('Berhasil menghapus file');
+        },
+        onError: (err) => {
+          showToastMessage(err.message, 'error');
+        },
+      }
+    );
+  };
+
   // eslint-disable-next-line no-unused-vars
   const countRealisasiFisPercent = (_) => {
-    const physical_realization = new BigNumber(control._formValues.physical_realization);
-    const contract_value = new BigNumber(control._formValues.contract_value)
-    setValue('physical_realization_percentage',
-      physical_realization.dividedBy(contract_value).times(100).toFixed(2),
-    )
-  }
+    const physical_realization = new BigNumber(
+      control._formValues.physical_realization
+    );
+    const contract_value = new BigNumber(control._formValues.contract_value);
+    setValue(
+      'physical_realization_percentage',
+      physical_realization.dividedBy(contract_value).times(100).toFixed(2)
+    );
+  };
 
   const handleFileInput = (files) => {
     setValue('file', files);
@@ -385,8 +434,6 @@ const TriwulanForm = () => {
   if (isLoading) {
     return <ReactLoading />;
   }
-
-
 
   return (
     <div className="mb-6">
@@ -413,8 +460,14 @@ const TriwulanForm = () => {
                       {...field}
                       onChange={(e) => {
                         setValue('createdByUid', e);
-                        setValue('kepala_dinas_name', e.organization.kepala_dinas_name);
-                        setValue('management_organization', e.organization.title);
+                        setValue(
+                          'kepala_dinas_name',
+                          e.organization.kepala_dinas_name
+                        );
+                        setValue(
+                          'management_organization',
+                          e.organization.title
+                        );
                       }}
                     />
                   )}
@@ -594,7 +647,7 @@ const TriwulanForm = () => {
               <PercentageInput
                 className={
                   watch('physical_realization_percentage') <= 25 &&
-                    id !== undefined
+                  id !== undefined
                     ? 'text-red-500'
                     : ''
                 }
@@ -837,9 +890,9 @@ const TriwulanForm = () => {
               />
             </div>
 
-            <div>
+            <div className="">
               <FileInput
-                className="w-full"
+                className="w-full lg:w-min"
                 label="UPLOAD PDF, JPG,PNG, Video (5 MB)"
                 icon={<CheckCircleIcon className="w-5 h-5" />}
                 handleFile={handleFileInput}
@@ -848,6 +901,84 @@ const TriwulanForm = () => {
                 allowMultiple
               />
             </div>
+
+            {id && (
+              <div className="bg-white border border-gray-200 rounded-lg shadow">
+                <div className="pb-3 mb-3 border-b p-3">
+                  <h1 className="text-xs md:text-base">File yang tersimpan</h1>
+                </div>
+                <div className="flex flex-col max-h-32 overflow-auto px-3 pb-6 space-y-3">
+                  {previews.length === 0 ? (
+                    <div>Tidak ada file</div>
+                  ) : (
+                    previews.map((preview, index) => (
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          <FaFile />
+                          <a
+                            href={baseUrlAPI + preview}
+                            className="text-base font-normal m-0"
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            {formatFilename(preview)}
+                          </a>
+                        </div>
+
+                        <Dialog>
+                          <DialogTrigger>
+                            <ButtonV2
+                              className="text-sm font-normal text-red-500"
+                              type="modal"
+                              icon={<TrashIcon className="w-4 h-4" />}
+                            />
+                          </DialogTrigger>
+
+                          <DialogContent className="w-1/3 py-12">
+                            <div className="flex flex-col items-center justify-center h-full">
+                              <div className="p-6 bg-[rgb(255,218,218)] w-fit rounded-lg">
+                                <img src={TrashImg} alt="Hapus" />
+                              </div>
+
+                              <div>
+                                <h1 className="mt-6 text-lg font-semibold leading-7 text-dark-gray">
+                                  Apakah Anda yakin menghapus file ini?
+                                </h1>
+                                <div className="flex justify-center space-x-3">
+                                  <DialogClose>
+                                    <Button
+                                      onClick={() =>
+                                        deleteFileData(id, preview)
+                                      }
+                                      className="w-full md:w-28 mt-8 border border-[#EB5757]"
+                                      type="modal"
+                                      background="bg-white"
+                                      textColor="text-[#EB5757]"
+                                    >
+                                      Ya, hapus
+                                    </Button>
+                                  </DialogClose>
+                                  <DialogClose>
+                                    <Button
+                                      className="w-full mt-8 md:w-28"
+                                      type="modal"
+                                      background="bg-primary"
+                                      textColor="text-white"
+                                    >
+                                      Batal
+                                    </Button>
+                                  </DialogClose>
+                                </div>
+                              </div>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
           {createMutation.isLoading ? (
