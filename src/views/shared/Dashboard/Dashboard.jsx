@@ -225,7 +225,7 @@ const Dashboard = () => {
       </h1>
 
       <a
-        className="text-2xl underline"
+        className="text-lg lg:text-2xl underline"
         href="https://sipd.kemendagri.go.id/landing"
       >
         https://sipd.kemendagri.go.id/landing

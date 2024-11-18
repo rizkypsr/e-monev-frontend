@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { twMerge } from 'tailwind-merge';
 
 const FileInput = ({
   className,
@@ -10,55 +11,89 @@ const FileInput = ({
   allowMultiple = false,
 }) => {
   const [fileNames, setFileNames] = useState([]);
+  const [labelText, setLabelText] = useState(label);
+
+  const displayFileNames = (files) => {
+    if (files.length === 0) {
+      return 'No File';
+    }
+    return `File terpilih: ${files.length}`;
+  };
 
   const handleChange = (e) => {
     const filesUploaded = Array.from(e.target.files);
     handleFile(allowMultiple ? filesUploaded : filesUploaded[0]);
 
-    setFileNames(
-      allowMultiple
-        ? filesUploaded.map((file) => file.name)
-        : [filesUploaded[0]?.name]
-    );
+    const newFileNames = allowMultiple
+      ? filesUploaded.map((file) => file.name)
+      : [filesUploaded[0]?.name];
+    setFileNames(newFileNames);
+    setLabelText(displayFileNames(newFileNames));
   };
 
-  // Display only the first 5 file names and add "..." for the rest
-  const displayFileNames = (files) => {
-    if (files.length <= 5) {
-      return files.join(', ');
-    }
-    return `${files.slice(0, 5).join(', ')}${files.length > 5 ? ', ...' : ''}`;
+  const handleOnMouseEnter = () => {
+    setLabelText('Klik untuk memilih file');
+  };
+
+  const handleOnMouseLeave = () => {
+    setLabelText(fileNames.length > 0 ? displayFileNames(fileNames) : label);
   };
 
   return (
-    <div>
-      <div className="flex items-center space-x-3 whitespace-nowrap">
+    <>
+      <div className="bg-primary text-white px-3 py-2.5 rounded-lg whitespace-nowrap">
         <label
           htmlFor="file"
-          className={`text-white cursor-pointer font-medium rounded-lg text-sm px-3 py-2.5 bg-primary ${
-            icon ? 'flex items-center justify-center space-x-2' : ''
-          } ${className}`}
+          className={twMerge(
+            'cursor-pointer font-medium block',
+            icon && 'flex items-center justify-center space-x-2'
+          )}
+          onMouseEnter={handleOnMouseEnter}
+          onMouseLeave={handleOnMouseLeave}
         >
-          {fileNames.length > 0 ? icon : null}
-
-          <div>{label}</div>
+          {fileNames.length > 0 && <div>{icon}</div>}
+          <div>{labelText}</div>
           <input
             id="file"
             type="file"
+            className="hidden"
             multiple={allowMultiple}
-            onChange={handleChange}
-            style={{ display: 'none' }}
             {...register('file', {
-              onChange: (e) => handleChange(e),
+              onChange: handleChange,
             })}
           />
         </label>
-        <div>
-          {fileNames.length > 0 ? displayFileNames(fileNames) : 'No File'}
-        </div>
       </div>
       <p className="mt-2 text-xs text-red-600">{error}</p>
-    </div>
+    </>
+    // <div>
+    //   <div className="whitespace-nowrap">
+    //     <label
+    //       htmlFor="file"
+    //       className={`text-white cursor-pointer font-medium rounded-lg text-sm px-3 py-2.5 bg-primary ${
+    //         icon ? 'flex items-center justify-center space-x-2 mb-2' : ''
+    //       } ${className}`}
+    //     >
+    //       {fileNames.length > 0 ? icon : null}
+    //
+    //       <div className="text-xs">{label}</div>
+    //       <input
+    //         id="file"
+    //         type="file"
+    //         multiple={allowMultiple}
+    //         onChange={handleChange}
+    //         style={{ display: 'none' }}
+    //         {...register('file', {
+    //           onChange: (e) => handleChange(e),
+    //         })}
+    //       />
+    //     </label>
+    //     <div className="">
+    //       {displayFileNames(fileNames)}
+    //     </div>
+    //   </div>
+    //   <p className="mt-2 text-xs text-red-600">{error}</p>
+    // </div>
   );
 };
 

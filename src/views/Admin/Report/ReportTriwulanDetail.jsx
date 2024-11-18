@@ -34,6 +34,7 @@ import _ from 'lodash';
 
 import 'rsuite/dist/rsuite.min.css';
 import 'moment/dist/locale/id';
+import { twMerge } from 'tailwind-merge';
 
 const initialData = {
   id: 0,
@@ -206,7 +207,7 @@ const ReportTriwulanDetail = () => {
    * @returns {JSX.Element}
    */
   const compareNumber = (index, key) => {
-    const currData = (formattedTriwulanData[selectedTriwulanTabs]?.data ?? [])
+    const currData = formattedTriwulanData[selectedTriwulanTabs]?.data ?? [];
     const [src, dst] = [
       parseFloat((currData[index + 1] ?? { [key]: '' })[key] ?? ''),
       parseFloat((currData[index] ?? { [key]: '' })[key] ?? ''),
@@ -244,18 +245,24 @@ const ReportTriwulanDetail = () => {
       fund_realization: triwulanData.fund_realization ?? 0,
       fund_realization_percentage: `${triwulanData?.fund_realization_percentage ?? 0
         } %`,
-      local_workforce: `${(String(triwulanData?.local_workforce ?? "0") ?? '0').replace('.00', '') ?? '0'
+      local_workforce: `${(String(triwulanData?.local_workforce ?? '0') ?? '0').replace(
+        '.00',
+        ''
+      ) ?? '0'
         } Orang`,
-      non_local_workforce: `${(String(triwulanData?.non_local_workforce ?? "0") ?? '0').replace('.00', '') ??
-        '0'
-        } Orang`
+      non_local_workforce: `${(String(triwulanData?.non_local_workforce ?? '0') ?? '0').replace(
+        '.00',
+        ''
+      ) ?? '0'
+        } Orang`,
     });
 
-  const formatToTriwulan = (data) => _(Array.from(data))
-    .groupBy((e) => moment(e.updated_at).quarter())
-    .map((value, key) => ({ triwulan: Number(key), data: value }))
-    .orderBy((e) => e.triwulan, 'asc')
-    .value();
+  const formatToTriwulan = (data) =>
+    _(Array.from(data))
+      .groupBy((e) => moment(e.updated_at).quarter())
+      .map((value, key) => ({ triwulan: Number(key), data: value }))
+      .orderBy((e) => e.triwulan, 'asc')
+      .value();
 
   /**
    *
@@ -269,23 +276,25 @@ const ReportTriwulanDetail = () => {
       ...e,
       activity_location: JSON.parse(e?.activity_location)?.name ?? '',
     }));
-    var r = Array.from(cpData).map((e) => {
-      delete e.createdBy;
-      delete e.user_id;
-      delete e.updated_at;
-      delete e.file;
-      return e;
-    }).reduce((prev, curr, index, original) => {
-      const diff = differ
-        .diff(original[index - 1], original[index])
-        .map((e) => e.filter((f) => f.type !== 'equal'));
+    var r = Array.from(cpData)
+      .map((e) => {
+        delete e.createdBy;
+        delete e.user_id;
+        delete e.updated_at;
+        delete e.file;
+        return e;
+      })
+      .reduce((prev, curr, index, original) => {
+        const diff = differ
+          .diff(original[index - 1], original[index])
+          .map((e) => e.filter((f) => f.type !== 'equal'));
 
-      return [...prev, diff];
-    }, []);
-    var u = Array.from(r)
+        return [...prev, diff];
+      }, []);
+    var u = Array.from(r);
     u.shift();
     setDiffData([...u, r.pop()]);
-  }
+  };
 
   const { isLoading, isError, error } = useQuery({
     queryKey: ['get_triwulan'],
@@ -311,13 +320,19 @@ const ReportTriwulanDetail = () => {
       setFormattedTriwulanData(agTrwln);
 
       formatDiffData(agTrwln, defaultSelectedTriwulanTabs);
-      const currentDataArray = agTrwln[defaultSelectedTriwulanTabs]?.data ?? []
+      const currentDataArray = agTrwln[defaultSelectedTriwulanTabs]?.data ?? [];
 
       /** save original data */
       setDataJSON(
-        Array.from(data).map((e) => ({ ...e, createdBy: e.createdBy?.name, })) ?? []);
+        Array.from(data).map((e) => ({ ...e, createdBy: e.createdBy?.name })) ??
+        []
+      );
       setTriwulanData(
-        Array.from(currentDataArray).map((e) => ({ ...e, createdBy: e.createdBy?.name, }))[selectedIndexTimeline] ?? {});
+        Array.from(currentDataArray).map((e) => ({
+          ...e,
+          createdBy: e.createdBy?.name,
+        }))[selectedIndexTimeline] ?? {}
+      );
       invokeReport();
     },
   });
@@ -337,7 +352,8 @@ const ReportTriwulanDetail = () => {
     return <ReactLoading />;
   }
 
-  const accessObj = (path, data) => path.split('.').reduce((o, i) => o[i], data);
+  const accessObj = (path, data) =>
+    path.split('.').reduce((o, i) => o[i], data);
 
   const renderFieldValue = (field, data) => {
     const value = accessObj(field.key, data);
@@ -485,16 +501,16 @@ const ReportTriwulanDetail = () => {
                 onClick={() => navigate(-1)}
               >
                 <ArrowLeftIcon className="w-6 h-6" />
-                <h1 className="font-semibold text-lg text-dark-gray leading-7">
+                <h1 className="font-semibold text-sm xl:text-lg text-dark-gray leading-7">
                   Detail Kegiatan
                 </h1>
-                <h1 className="font-semibold text-lg text-dark-gray leading-7">
+                <h1 className="font-semibold text-sm xl:text-lg text-dark-gray leading-7">
                   &quot;{triwulanData.activity_name}&rdquo;
                 </h1>
               </button>
             </div>
 
-            <div className="flex space-x-2">
+            <div className="grid md:grid-cols-2 gap-2">
               <Button
                 className="w-full"
                 type="submit"
@@ -519,26 +535,38 @@ const ReportTriwulanDetail = () => {
           </div>
         </div>
 
-        <h6 className='m-auto p-2'>Triwulan</h6>
-        {Array.from({ length: formattedTriwulanData.length }).map((e, i) => (
-          <button
-            key={`${e ?? i}`}
-            onClick={() => {
-              setSelectedIndexTimeline(0);
-              setSelectedTriwulanTabs(i);
-              setTriwulanData((formattedTriwulanData[i]?.data ?? [])
-                .map((x) => ({ ...x, createdBy: x.createdBy?.name, }))[0] ?? {});
-              formatDiffData(formattedTriwulanData, i);
-              invokeReport();
-            }}
-            type='button'
-            className={i === selectedTriwulanTabs ?
-              'm-auto mr-2 border bg-white border-blue-700 text-blue rounded-md p-2' :
-              'm-auto mr-2 border bg-white border-gray-300 border-solid text-blue rounded-md p-2'}>
-            Triwulan {i + 1}
-          </button>))}
-        <div className="relative flex overflow-x-auto">
+        <h6 className="mb-3">Triwulan</h6>
 
+        <div className="grid grid-cols-2 gap-2 mb-6 md:grid-cols-4 max-w-md">
+          {Array.from({ length: formattedTriwulanData.length }).map((e, i) => (
+            <button
+              key={`${e ?? i}`}
+              onClick={() => {
+                setSelectedIndexTimeline(0);
+                setSelectedTriwulanTabs(i);
+                setTriwulanData(
+                  (formattedTriwulanData[i]?.data ?? []).map((x) => ({
+                    ...x,
+                    createdBy: x.createdBy?.name,
+                  }))[0] ?? {}
+                );
+                formatDiffData(formattedTriwulanData, i);
+                invokeReport();
+              }}
+              type="button"
+              className={twMerge(
+                'border bg-white rounded-md p-2 text-blue whitespace-nowrap',
+                i === selectedTriwulanTabs
+                  ? 'border-blue-700'
+                  : 'border-gray-300'
+              )}
+            >
+              Triwulan {i + 1}
+            </button>
+          ))}
+        </div>
+
+        <div className="relative flex overflow-x-auto">
           <table className="w-full text-sm text-left text-dark-gray">
             <tbody>{renderTableRows()}</tbody>
           </table>
@@ -554,69 +582,76 @@ const ReportTriwulanDetail = () => {
               key={`${selectedIndexTimeline}r`}
               isItemActive={(i) => i === selectedIndexTimeline}
             >
-              {(formattedTriwulanData[selectedTriwulanTabs]?.data ?? []).map((e) => {
-                const currData = (formattedTriwulanData[selectedTriwulanTabs]?.data ?? [])
-                const currentIndex = currData.indexOf(e);
-                // const date = (`${e.sys_period}` ?? '')
-                //   .replace(/[\\[\\"\\)]/g, '')
-                //   .split(',');
-                const date = e.updated_at;
+              {(formattedTriwulanData[selectedTriwulanTabs]?.data ?? []).map(
+                (e) => {
+                  const currData =
+                    formattedTriwulanData[selectedTriwulanTabs]?.data ?? [];
+                  const currentIndex = currData.indexOf(e);
+                  // const date = (`${e.sys_period}` ?? '')
+                  //   .replace(/[\\[\\"\\)]/g, '')
+                  //   .split(',');
+                  const date = e.updated_at;
 
-                return (
-                  <Timeline.Item
-                    key={currentIndex}
-                    onClick={() => {
-                      setSelectedIndexTimeline(currentIndex);
-                      setTriwulanData((currData ?? [])
-                        .map((x) => ({ ...x, createdBy: x.createdBy?.name, }))[currentIndex] ?? {});
-                      invokeReport();
-                    }}
-                  >
-                    <div
-                      key={`${currentIndex}1`}
-                      style={{
-                        borderStyle: 'groove',
-                        borderRadius: '12px',
-                        borderWidth: '2px',
-                        borderColor:
-                          selectedIndexTimeline === currentIndex
-                            ? 'blue'
-                            : 'white',
+                  return (
+                    <Timeline.Item
+                      key={currentIndex}
+                      onClick={() => {
+                        setSelectedIndexTimeline(currentIndex);
+                        setTriwulanData(
+                          (currData ?? []).map((x) => ({
+                            ...x,
+                            createdBy: x.createdBy?.name,
+                          }))[currentIndex] ?? {}
+                        );
+                        invokeReport();
                       }}
                     >
-                      <h6
-                        key={`${currentIndex}2`}
+                      <div
+                        key={`${currentIndex}1`}
                         style={{
-                          textAlign: 'start',
-                          paddingTop: '2%',
-                          paddingBottom: '2%',
-                          paddingLeft: '0.5%',
-                          paddingRight: '0.5%',
+                          borderStyle: 'groove',
+                          borderRadius: '12px',
+                          borderWidth: '2px',
+                          borderColor:
+                            selectedIndexTimeline === currentIndex
+                              ? 'blue'
+                              : 'white',
                         }}
                       >
-                        {moment(date ?? new Date())
-                          .locale('id')
-                          .format('dddd, DD MMMM YYYY HH:mm (Z)')}
-                      </h6>
-                      <div
-                        key={`${currentIndex}3`}
-                        style={{ paddingTop: '2%', marginTop: '2%' }}
-                      >
-                        {currentIndex === currData.length - 1 ? (
-                          <div />
-                        ) : (
-                          <div>
-                            {displayDiffData(currentIndex, true)}
-                            <s key={`${currentIndex}4`}>
-                              {displayDiffData(currentIndex, false)}
-                            </s>
-                          </div>
-                        )}
+                        <h6
+                          key={`${currentIndex}2`}
+                          style={{
+                            textAlign: 'start',
+                            paddingTop: '2%',
+                            paddingBottom: '2%',
+                            paddingLeft: '0.5%',
+                            paddingRight: '0.5%',
+                          }}
+                        >
+                          {moment(date ?? new Date())
+                            .locale('id')
+                            .format('dddd, DD MMMM YYYY HH:mm (Z)')}
+                        </h6>
+                        <div
+                          key={`${currentIndex}3`}
+                          style={{ paddingTop: '2%', marginTop: '2%' }}
+                        >
+                          {currentIndex === currData.length - 1 ? (
+                            <div />
+                          ) : (
+                            <div>
+                              {displayDiffData(currentIndex, true)}
+                              <s key={`${currentIndex}4`}>
+                                {displayDiffData(currentIndex, false)}
+                              </s>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  </Timeline.Item>
-                );
-              })}
+                    </Timeline.Item>
+                  );
+                }
+              )}
             </Timeline>
           </div>
         </div>
