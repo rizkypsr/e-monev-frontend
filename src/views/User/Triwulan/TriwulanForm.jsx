@@ -647,7 +647,7 @@ const TriwulanForm = () => {
               <PercentageInput
                 className={
                   watch('physical_realization_percentage') <= 25 &&
-                  id !== undefined
+                    id !== undefined
                     ? 'text-red-500'
                     : ''
                 }
@@ -916,7 +916,7 @@ const TriwulanForm = () => {
                         <div className="flex items-center space-x-3">
                           <FaFile />
                           <a
-                            href={baseUrlAPI + preview}
+                            href={`${baseUrlAPI}/${preview}`}
                             className="text-base font-normal m-0"
                             target="_blank"
                             rel="noreferrer"
