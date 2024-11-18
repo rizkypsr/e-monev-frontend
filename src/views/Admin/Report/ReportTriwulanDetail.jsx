@@ -34,6 +34,7 @@ import _ from 'lodash';
 
 import 'rsuite/dist/rsuite.min.css';
 import 'moment/dist/locale/id';
+import { twMerge } from 'tailwind-merge';
 
 const initialData = {
   id: 0,
@@ -503,16 +504,16 @@ const ReportTriwulanDetail = () => {
                 onClick={() => navigate(-1)}
               >
                 <ArrowLeftIcon className="w-6 h-6" />
-                <h1 className="font-semibold text-lg text-dark-gray leading-7">
+                <h1 className="font-semibold text-sm xl:text-lg text-dark-gray leading-7">
                   Detail Kegiatan
                 </h1>
-                <h1 className="font-semibold text-lg text-dark-gray leading-7">
+                <h1 className="font-semibold text-sm xl:text-lg text-dark-gray leading-7">
                   &quot;{triwulanData.activity_name}&rdquo;
                 </h1>
               </button>
             </div>
 
-            <div className="flex space-x-2">
+            <div className="grid md:grid-cols-2 gap-2">
               <Button
                 className="w-full"
                 type="submit"
@@ -539,7 +540,7 @@ const ReportTriwulanDetail = () => {
 
         <h6 className="mb-3">Triwulan</h6>
 
-        <div className="grid grid-cols-3 gap-2 mb-6 md:grid-cols-4 max-w-md">
+        <div className="grid grid-cols-2 gap-2 mb-6 md:grid-cols-4 max-w-md">
           {Array.from({ length: formattedTriwulanData.length }).map((e, i) => (
             <button
               key={`${e ?? i}`}
@@ -556,11 +557,12 @@ const ReportTriwulanDetail = () => {
                 invokeReport();
               }}
               type="button"
-              className={
+              className={twMerge(
+                'border bg-white rounded-md p-2 text-blue whitespace-nowrap',
                 i === selectedTriwulanTabs
-                  ? 'border bg-white border-blue-700 text-blue rounded-md p-2'
-                  : 'border bg-white border-gray-300 border-solid text-blue rounded-md p-2'
-              }
+                  ? 'border-blue-700'
+                  : 'border-gray-300'
+              )}
             >
               Triwulan {i + 1}
             </button>
