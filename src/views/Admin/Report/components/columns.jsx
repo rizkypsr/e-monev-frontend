@@ -128,6 +128,10 @@ const columns = [
     ),
   },
   {
+    accessorKey: 'catatan_realisasi_fisik',
+    header: 'Catatan Realisasi Fisik',
+  },
+  {
     accessorKey: 'fund_realization',
     header: 'Realisasi Keuangan',
     cell: (info) => (

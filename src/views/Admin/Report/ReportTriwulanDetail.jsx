@@ -53,6 +53,7 @@ const initialData = {
   contractor_name: '',
   implementation_period: '',
   contract_value: 0,
+  catatan_realisasi_fisik: '',
   physical_realization: 0,
   fund_realization: 0,
   activity_volume: '',
@@ -134,6 +135,10 @@ const fieldMappings = [
     isFormatted: true,
     formatter: formatToRupiah,
     className: 'text-green-500',
+  },
+  {
+    key: 'catatan_realisasi_fisik',
+    label: 'Catatan Realisasi Fisik',
   },
   {
     key: 'physical_realization_percentage',
@@ -243,27 +248,24 @@ const ReportTriwulanDetail = () => {
       physical_realization_percentage:
         triwulanData?.physical_realization_percentage ?? 0,
       fund_realization: triwulanData.fund_realization ?? 0,
-      fund_realization_percentage: `${
-        triwulanData?.fund_realization_percentage ?? 0
-      } %`,
-      local_workforce: `${
-        (String(triwulanData?.local_workforce ?? '0') ?? '0').replace(
-          '.00',
-          ''
-        ) ?? '0'
-      } Orang`,
-      non_local_workforce: `${
-        (String(triwulanData?.non_local_workforce ?? '0') ?? '0').replace(
-          '.00',
-          ''
-        ) ?? '0'
-      } Orang`,
+      fund_realization_percentage: `${triwulanData?.fund_realization_percentage ?? 0
+        } %`,
+      local_workforce: `${(String(triwulanData?.local_workforce ?? '0') ?? '0').replace(
+        '.00',
+        ''
+      ) ?? '0'
+        } Orang`,
+      non_local_workforce: `${(String(triwulanData?.non_local_workforce ?? '0') ?? '0').replace(
+        '.00',
+        ''
+      ) ?? '0'
+        } Orang`,
     });
 
   const formatToTriwulan = (data) =>
     _(Array.from(data))
       .groupBy((e) => moment(e.updated_at).quarter())
-      .map((value, key) => ({ triwulan: Number(key), data: value }))
+      .map((value, key) => ({ triwulan: Number(key), data: _.orderBy(value, ['updated_at'], ['desc']) }))
       .orderBy((e) => e.triwulan, 'asc')
       .value();
 
@@ -309,16 +311,16 @@ const ReportTriwulanDetail = () => {
      */
     onSuccess: ({ data = [] }) => {
       /** format data to triwulan by updated_at */
-      const trwln = formatToTriwulan(data);
-      const defaultSelectedTriwulanTabs =
-        Math.max(...Array.from(trwln.map((e) => e.triwulan))) - 1;
+      const trwln = formatToTriwulan(data)
+      const listAvailTriwulanNum = Array.from(trwln).map((e) => e.triwulan)
       const agTrwln = [
-        ...Array.from({ length: 4 - trwln.length }, (_value, i) => ({
-          triwulan: i + 1,
-          data: [],
-        })),
-        ...trwln,
-      ];
+        ...([1, 2, 3, 4].map((e) => !listAvailTriwulanNum.includes(e) ?
+          ({ triwulan: e, data: [] }) :
+          ({ triwulan: null, data: null }))), ...trwln]
+        .filter((f) => f?.triwulan !== null)
+        .sort((f1, f2) => f1.triwulan - f2.triwulan)
+      const defaultSelectedTriwulanTabs = Math.max(...Array.from(trwln.map((e) => e.triwulan))) - 1;
+
       setSelectedTriwulanTabs(defaultSelectedTriwulanTabs);
       setFormattedTriwulanData(agTrwln);
 
@@ -328,7 +330,7 @@ const ReportTriwulanDetail = () => {
       /** save original data */
       setDataJSON(
         Array.from(data).map((e) => ({ ...e, createdBy: e.createdBy?.name })) ??
-          []
+        []
       );
       setTriwulanData(
         Array.from(currentDataArray).map((e) => ({
@@ -578,7 +580,7 @@ const ReportTriwulanDetail = () => {
               className="font-semibold text-lg text-dark-gray leading-7"
               style={{ padding: '2%' }}
             >
-              Histori Data
+              Histori Triwulan {selectedTriwulanTabs + 1}
             </h1>
             <Timeline
               align="right"

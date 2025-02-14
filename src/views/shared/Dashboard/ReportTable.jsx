@@ -141,6 +141,11 @@ const columns = [
     ),
     header: () => <span>Realisasi Fisik</span>,
   }),
+  columnHelper.accessor((row) => row.catatan_realisasi_fisik, {
+    id: 'catatan_realisasi_fisik',
+    cell: (info) => <i>{info.getValue()}</i>,
+    header: () => <span>Catatan Realisasi Fisik</span>,
+  }),
   columnHelper.accessor((row) => row.physical_realization_percentage, {
     id: 'physical_realization_percentage',
     cell: (info) => <i>{parseFloat(info.getValue())}</i>,
