@@ -207,6 +207,7 @@ const TriwulanForm = () => {
       setValue('contractor_name', triwulanData.contractor_name);
       setValue('implementation_period', triwulanData.implementation_period);
       setValue('physical_realization', triwulanData.physical_realization);
+      setValue('catatan_realisasi_fisik', triwulanData.catatan_realisasi_fisik);
       setValue(
         'physical_realization_percentage',
         triwulanData.physical_realization_percentage
@@ -346,6 +347,7 @@ const TriwulanForm = () => {
         formData.append(key, formDataObject[key]);
       }
     }
+
 
     if (data.file) {
       if (Array.isArray(data.file)) {
@@ -663,6 +665,15 @@ const TriwulanForm = () => {
                     value: 200000000000000000,
                   },
                 })}
+              />
+            </div>
+
+            <div>
+              <Label className="mb-2">Catatan Realisasi Fisik</Label>
+              <TextInputV2
+                placeholder="Tulis Disini..."
+                register={register('catatan_realisasi_fisik')}
+                error={errors.catatan_realisasi_fisik?.message}
               />
             </div>
 

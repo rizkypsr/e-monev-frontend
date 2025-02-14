@@ -53,6 +53,7 @@ const initialData = {
   contractor_name: '',
   implementation_period: '',
   contract_value: 0,
+  catatan_realisasi_fisik: '',
   physical_realization: 0,
   fund_realization: 0,
   activity_volume: '',
@@ -134,6 +135,10 @@ const fieldMappings = [
     isFormatted: true,
     formatter: formatToRupiah,
     className: 'text-green-500',
+  },
+  {
+    key: 'catatan_realisasi_fisik',
+    label: 'Catatan Realisasi Fisik',
   },
   {
     key: 'physical_realization_percentage',
