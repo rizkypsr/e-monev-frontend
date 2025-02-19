@@ -627,7 +627,7 @@ const TriwulanForm = () => {
               />
             </div>
 
-            <div>
+            {/* <div>
               <CurrencyInput
                 name="physical_realization"
                 label="Realisasi Fisik (Dalam bentuk angka)"
@@ -643,7 +643,7 @@ const TriwulanForm = () => {
                   },
                 })}
               />
-            </div>
+            </div> */}
 
             <div>
               <PercentageInput
